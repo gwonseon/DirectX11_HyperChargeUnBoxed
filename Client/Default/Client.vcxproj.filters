@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="98.Default">
+      <UniqueIdentifier>{ca8cb5d7-eb97-4e13-868c-35c5482f2f7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. MainApp">
+      <UniqueIdentifier>{8584ba6c-066c-4968-968a-0a34087d45d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines">
+      <UniqueIdentifier>{71623b21-504b-41a1-a1df-b5c028e22f5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels">
+      <UniqueIdentifier>{15b8446d-6ddd-448e-a585-54e4a63dd900}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\00. Logo">
+      <UniqueIdentifier>{841ddf86-66ae-4b04-bae2-720e1a742362}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\01. Gameplay">
+      <UniqueIdentifier>{2d942472-0036-45cc-b3c4-2599e6ee6e63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\99. Loading">
+      <UniqueIdentifier>{94c50e97-8e3c-4b18-b0b3-557504ffb898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\99. Loading\Loader">
+      <UniqueIdentifier>{101a83ee-f01e-4890-bbe0-49de20f5f897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects">
+      <UniqueIdentifier>{fb68bbc2-26ce-4760-bcce-98cd11387ddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. ShaderFiles">
+      <UniqueIdentifier>{f1b39e3b-051c-4d10-b071-e07f1466223d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\90. ImGui">
+      <UniqueIdentifier>{a5f5ee42-b33f-46f5-a142-67540fe6e3b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI">
+      <UniqueIdentifier>{b44f6c71-887f-4124-aa1c-d4f8a46ab143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\Menu_UI">
+      <UniqueIdentifier>{deee2b3f-64d4-45b7-9a83-6a6b1ef198b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Terrain">
+      <UniqueIdentifier>{bd8f6c1e-9db8-4313-84f6-b0c534d381a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Camera">
+      <UniqueIdentifier>{86edeefb-b7c3-402b-b24e-91f70af235aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Camera\Camera_Free">
+      <UniqueIdentifier>{c2d59788-6f3e-496f-b8ae-7dffe215f449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\Loading_UI">
+      <UniqueIdentifier>{a09c5918-2c0c-45a1-b74f-6b99c680b27b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster">
+      <UniqueIdentifier>{f3644440-5474-4a53-8e7b-2bfee04ed2c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI">
+      <UniqueIdentifier>{ea592776-649f-46c3-9f00-c36e0df4e33e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\CrossLine">
+      <UniqueIdentifier>{506a56da-ca8a-47d0-ae83-29594cc501c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI">
+      <UniqueIdentifier>{28a65b46-13ba-4f22-8177-5786ff43a4a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\2D_BackGround">
+      <UniqueIdentifier>{b8cc729c-852a-46e3-9a46-db10bb74edfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\Button">
+      <UniqueIdentifier>{2f5f4ae9-bd6b-4186-b020-5965ab08d8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Map">
+      <UniqueIdentifier>{14490b87-dea2-476a-9acb-77a8f9d70db3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Environment">
+      <UniqueIdentifier>{30ca4e58-b335-4598-a231-84a22f198bdc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Client.h">
+      <Filter>98.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>98.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>98.Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MainApp.h">
+      <Filter>00. MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Logo.h">
+      <Filter>01. Levels\00. Logo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_GamePlay.h">
+      <Filter>01. Levels\01. Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Loading.h">
+      <Filter>01. Levels\99. Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader.h">
+      <Filter>01. Levels\99. Loading\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Defines.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BackGround.h">
+      <Filter>02. GameObjects\UI\2D_BackGround</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_ImGui.h">
+      <Filter>01. Levels\90. ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CrossLine.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\CrossLine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InGameUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MenuUI.h">
+      <Filter>02. GameObjects\UI\Menu_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Terrain.h">
+      <Filter>02. GameObjects\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Free.h">
+      <Filter>02. GameObjects\Camera\Camera_Free</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loading_UI.h">
+      <Filter>02. GameObjects\UI\Loading_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster.h">
+      <Filter>02. GameObjects\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ButtonUI.h">
+      <Filter>02. GameObjects\UI\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Environment.h">
+      <Filter>02. GameObjects\Environment</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Client.cpp">
+      <Filter>98.Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MainApp.cpp">
+      <Filter>00. MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>98.Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Logo.cpp">
+      <Filter>01. Levels\00. Logo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_GamePlay.cpp">
+      <Filter>01. Levels\01. Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Loading.cpp">
+      <Filter>01. Levels\99. Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>01. Levels\99. Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BackGround.cpp">
+      <Filter>02. GameObjects\UI\2D_BackGround</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_ImGui.cpp">
+      <Filter>01. Levels\90. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CrossLine.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\CrossLine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InGameUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MenuUI.cpp">
+      <Filter>02. GameObjects\UI\Menu_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Terrain.cpp">
+      <Filter>02. GameObjects\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Free.cpp">
+      <Filter>02. GameObjects\Camera\Camera_Free</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loading_UI.cpp">
+      <Filter>02. GameObjects\UI\Loading_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster.cpp">
+      <Filter>02. GameObjects\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ButtonUI.cpp">
+      <Filter>02. GameObjects\UI\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Environment.cpp">
+      <Filter>02. GameObjects\Environment</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Client.ico">
+      <Filter>98.Default</Filter>
+    </Image>
+    <Image Include="small.ico">
+      <Filter>98.Default</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc">
+      <Filter>98.Default</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
