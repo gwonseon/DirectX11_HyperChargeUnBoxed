@@ -79,7 +79,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 			_uint			iIndex = i * m_iNumVerticesX + j;
 			// 높이값 계산을 위해 0x000000ff 16진수 ARGB 에서 B 값을 받아온다.
 			// 정점의 위치를 설정한다. 15로 나누는 것은 높이 스케일 조정하는것
-			pVertices[iIndex].vPosition = _float3(j, (pPixel[iIndex] & 0x000000ff) / 10.0f, i); // 15 나눈 값으로 높이 스케일 조정
+			pVertices[iIndex].vPosition = _float3(j,0.f, i); // 15 나눈 값으로 높이 스케일 조정
 			pVertices[iIndex].vNormal = _float3(0.0f, 0.f, 0.f); // 정점의 법선 벡터 초기화
 			pVertices[iIndex].vTexcoord = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f)); // 텍스처 좌표 설정
 			m_fVertexPos[iIndex] = pVertices[iIndex].vPosition;
