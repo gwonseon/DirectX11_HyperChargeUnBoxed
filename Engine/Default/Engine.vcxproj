@@ -117,6 +117,7 @@
       <AdditionalIncludeDirectories>../Public/;../../</AdditionalIncludeDirectories>
       <PrecompiledHeader>
       </PrecompiledHeader>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,6 +142,7 @@ call UpdateLib.bat</Command>
       <AdditionalIncludeDirectories>../Public/;../../</AdditionalIncludeDirectories>
       <PrecompiledHeader>
       </PrecompiledHeader>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,6 +166,7 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\Channel.h" />
     <ClInclude Include="..\Public\Component.h" />
     <ClInclude Include="..\Public\Component_Manager.h" />
+    <ClInclude Include="..\Public\ContainerObject.h" />
     <ClInclude Include="..\Public\Engine_Defines.h" />
     <ClInclude Include="..\Public\Engine_Function.h" />
     <ClInclude Include="..\Public\Engine_Macro.h" />
@@ -172,6 +175,8 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\GameInstance.h" />
     <ClInclude Include="..\Public\GameObject.h" />
     <ClInclude Include="..\Public\Graphic_Device.h" />
+    <ClInclude Include="..\Public\SphereCollider.h" />
+    <ClInclude Include="..\Public\VIBuffer_Box.h" />
     <ClInclude Include="..\Public\Input_Device.h" />
     <ClInclude Include="..\Public\Layer.h" />
     <ClInclude Include="..\Public\Level.h" />
@@ -182,6 +187,7 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\MeshMaterial.h" />
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\Public\Object_Manager.h" />
+    <ClInclude Include="..\Public\PartObject.h" />
     <ClInclude Include="..\Public\Picking_Manager.h" />
     <ClInclude Include="..\Public\PipeLine.h" />
     <ClInclude Include="..\Public\Renderer.h" />
@@ -204,10 +210,13 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Private\Channel.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
     <ClCompile Include="..\Private\Component_Manager.cpp" />
+    <ClCompile Include="..\Private\ContainerObject.cpp" />
     <ClCompile Include="..\Private\Engine_Struct.cpp" />
     <ClCompile Include="..\Private\GameInstance.cpp" />
     <ClCompile Include="..\Private\GameObject.cpp" />
     <ClCompile Include="..\Private\Graphic_Device.cpp" />
+    <ClCompile Include="..\Private\SphereCollider.cpp" />
+    <ClCompile Include="..\Private\VIBuffer_Box.cpp" />
     <ClCompile Include="..\Private\Input_Device.cpp" />
     <ClCompile Include="..\Private\Layer.cpp" />
     <ClCompile Include="..\Private\Level.cpp" />
@@ -218,6 +227,7 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Private\MeshMaterial.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
     <ClCompile Include="..\Private\Object_Manager.cpp" />
+    <ClCompile Include="..\Private\PartObject.cpp" />
     <ClCompile Include="..\Private\Picking_Manager.cpp" />
     <ClCompile Include="..\Private\PipeLine.cpp" />
     <ClCompile Include="..\Private\Renderer.cpp" />

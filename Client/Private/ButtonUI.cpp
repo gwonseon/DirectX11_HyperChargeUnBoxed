@@ -82,6 +82,7 @@ void CButtonUI::Late_Update(_float fTimeDelta)
 
 HRESULT CButtonUI::Render()
 {
+    m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Begin(0)))
@@ -91,6 +92,9 @@ HRESULT CButtonUI::Render()
 
     if (FAILED(m_pVIBufferCom->Render()))
         return E_FAIL;
+
+
+
     return S_OK;
 }
 
@@ -121,7 +125,7 @@ HRESULT CButtonUI::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom_Button0->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+    if (FAILED(m_pTextureCom_Button0->Bind_ShaderResource(m_pShaderCom, "g_Texture", 1)))
         return E_FAIL;
 
     return S_OK;

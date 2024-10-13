@@ -52,9 +52,6 @@
     <Filter Include="02. GameObjects\UI\Loading_UI">
       <UniqueIdentifier>{a09c5918-2c0c-45a1-b74f-6b99c680b27b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Monster">
-      <UniqueIdentifier>{f3644440-5474-4a53-8e7b-2bfee04ed2c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\UI\GamePlay_UI">
       <UniqueIdentifier>{ea592776-649f-46c3-9f00-c36e0df4e33e}</UniqueIdentifier>
     </Filter>
@@ -70,11 +67,47 @@
     <Filter Include="02. GameObjects\UI\Button">
       <UniqueIdentifier>{2f5f4ae9-bd6b-4186-b020-5965ab08d8a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Environment">
+      <UniqueIdentifier>{30ca4e58-b335-4598-a231-84a22f198bdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player">
+      <UniqueIdentifier>{d85c6c7e-5dee-4ff9-bb35-405e838c9579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Body">
+      <UniqueIdentifier>{0198c07a-a3d8-437c-a7c9-df7e5bd789de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Weapon">
+      <UniqueIdentifier>{83f8d798-7dd7-4595-9e60-ffad93ac730d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Head">
+      <UniqueIdentifier>{0770bb3a-7494-4a7a-83f0-520740257c59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Pivot">
+      <UniqueIdentifier>{585bb748-6e6c-454e-a963-2d321402d3be}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02. GameObjects\Map">
       <UniqueIdentifier>{14490b87-dea2-476a-9acb-77a8f9d70db3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Environment">
-      <UniqueIdentifier>{30ca4e58-b335-4598-a231-84a22f198bdc}</UniqueIdentifier>
+    <Filter Include="02. GameObjects\Environment\CollisionBox">
+      <UniqueIdentifier>{662bfdc2-493f-4ce2-b2ca-bc0e80252a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Camera\Camera_TPS">
+      <UniqueIdentifier>{3651e037-023f-47d7-a322-fa8646fa529f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Weapon\Weapon_Katana">
+      <UniqueIdentifier>{287e9917-dce8-4422-820f-2abe31bb590e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Environment\Weapon_Item">
+      <UniqueIdentifier>{05982dc5-68eb-4d90-9836-cbc295bd6e07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\Circle_Guage">
+      <UniqueIdentifier>{2b68e7da-d5a5-4be4-9e42-b1817676f13c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\FPS">
+      <UniqueIdentifier>{ae42c5d3-814b-444b-acf2-fb961415fcbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster">
+      <UniqueIdentifier>{f3644440-5474-4a53-8e7b-2bfee04ed2c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +174,42 @@
     <ClInclude Include="..\Public\Environment.h">
       <Filter>02. GameObjects\Environment</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02. GameObjects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Body_Player.h">
+      <Filter>02. GameObjects\Player\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Weapon.h">
+      <Filter>02. GameObjects\Player\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Head_Player.h">
+      <Filter>02. GameObjects\Player\Head</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Pivot.h">
+      <Filter>02. GameObjects\Player\Pivot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CollisionBox.h">
+      <Filter>02. GameObjects\Environment\CollisionBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_TPS.h">
+      <Filter>02. GameObjects\Camera\Camera_TPS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Weapon_Katana.h">
+      <Filter>02. GameObjects\Player\Weapon\Weapon_Katana</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Weapon_Item.h">
+      <Filter>02. GameObjects\Environment\Weapon_Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_CircleGuage.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\Circle_Guage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_FPS.h">
+      <Filter>02. GameObjects\Player\FPS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FPS_Pivot.h">
+      <Filter>02. GameObjects\Player\Pivot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -197,6 +266,42 @@
     <ClCompile Include="..\Private\Environment.cpp">
       <Filter>02. GameObjects\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02. GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Body_Player.cpp">
+      <Filter>02. GameObjects\Player\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon.cpp">
+      <Filter>02. GameObjects\Player\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Head_Player.cpp">
+      <Filter>02. GameObjects\Player\Head</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pivot.cpp">
+      <Filter>02. GameObjects\Player\Pivot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionBox.cpp">
+      <Filter>02. GameObjects\Environment\CollisionBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_TPS.cpp">
+      <Filter>02. GameObjects\Camera\Camera_TPS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon_Katana.cpp">
+      <Filter>02. GameObjects\Player\Weapon\Weapon_Katana</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon_Item.cpp">
+      <Filter>02. GameObjects\Environment\Weapon_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_CircleGuage.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\Circle_Guage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_FPS.cpp">
+      <Filter>02. GameObjects\Player\FPS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FPS_Pivot.cpp">
+      <Filter>02. GameObjects\Player\Pivot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -222,6 +327,15 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxBoxColor.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxItem.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCircle_Gauge.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

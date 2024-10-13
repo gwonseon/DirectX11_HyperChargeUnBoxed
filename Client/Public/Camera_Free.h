@@ -11,6 +11,12 @@ public:
 	{
 		LEVELID eLevel{};
 		_float	fMouseSensor{};
+
+		_vector* m_vecTPS_CamPos{};
+		_vector* m_vecFPS_CamPos{};
+
+		_uint* iViewState{};
+		const _float4x4* matPlayerWorld = { nullptr };
 	}CAMERA_FREE_DESC;
 private:
 	CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,9 +35,42 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	void	Set_PlayerPos(_vector vPos) { m_vecPos = vPos; }
+	void	Set_Rotation(_float fX, _float fY, _float fZ) {
+		m_pTransformCom->Rotation(fX, fY, fZ);
+	}
+	void	Set_Direction(_vector vDirect) { m_vecDir = vDirect; }
+
+
+	_vector Get_Dir() { return m_pTransformCom->Get_State(CTransform::STATE_LOOK); }
+	_vector* Get_Camera_At() { return &vAt; }
+
+
 private:
 	_float					m_fMouseSensor = { 0.f };
 	_bool					m_bMouseLock = true;
+	_vector					m_vecDir{};
+	_vector					m_vecPos{};
+	LEVELID					m_eLevelID = LEVEL_END;
+	_vector					vecEye{};
+	_uint*					m_iViewState{};
+	_vector				vAt{};
+private:
+	const _float4x4* m_matPlayerWorld = { nullptr };
+
+private:
+	_float					m_fRotationPerSec{};
+	_float					m_fAngle_Y{};
+
+	_vector* m_vecTPSPos = {nullptr};
+	_vector* m_vecFPSPos = { nullptr };
+
+	
+	XMMATRIX RotationMatrix{};
+	XMMATRIX matWorld{};
+
+
 public:
 	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

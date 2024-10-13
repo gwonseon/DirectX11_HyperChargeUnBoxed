@@ -54,15 +54,17 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
 	if (m_pLoadingUI != nullptr)
 	{
-		m_pLoadingUI->Set_Percent(m_fLoading_Per);
 		m_pLoadingUI->Update(fTimeDelta);
 
 	}
 	if (m_pLoadingUI_Logo != nullptr)
 	{
-		m_pLoadingUI_Logo->Set_Percent(m_fLoading_Per);
 		m_pLoadingUI_Logo->Update(fTimeDelta);
 
+	}
+	if (m_pLoadingUIBack != nullptr)
+	{
+		m_pLoadingUIBack->Update(fTimeDelta);
 	}
 	m_pLoadingUI_GameTitle->Update(fTimeDelta);
 	
@@ -124,34 +126,23 @@ HRESULT CLevel_Loading::Ready_Layer_UI_Loading(const _tchar* pLayerTag)
 
 	CLoading_UI::LOADINGUI_DESC	Desc{};
 	Desc.eLevel = LEVEL_LOADING;
-	Desc.fX = g_iWinSizeX * 0.85f;
-	Desc.fY = g_iWinSizeY * 0.75f;
-	Desc.fSizeX = 270;
-	Desc.fSizeY = 270;
+	Desc.fX = g_iWinSizeX * 0.9f;
+	Desc.fY = g_iWinSizeY * 0.8f;
+	Desc.fSizeX = 150;
+	Desc.fSizeY = 150;
 	Desc.iData = 10;
 	Desc.fDepth = 0.1f;
 	Desc.eTag = CLoading_UI::LOADING_GAGE;
 	m_pLoadingUI->Initialize(&Desc);
-	return S_OK;
 
-		
+
+
+	return S_OK;
 }
 HRESULT CLevel_Loading::Ready_Layer_UI_LOGO(const _tchar* pLayerTag)
 {
-	m_pLoadingUI_Logo = CLoading_UI::Create(m_pDevice, m_pContext);
 
-	CLoading_UI::LOADINGUI_DESC	Desc{};
-	Desc.eLevel = LEVEL_LOADING;
-	Desc.fX = g_iWinSizeX * 0.84f;
-	Desc.fY = g_iWinSizeY * 0.75f;
-	Desc.fSizeX = 180;
-	Desc.fSizeY = 150;
-	Desc.iData = 10;
-	Desc.fDepth = 0.1f;
-	Desc.eTag = CLoading_UI::LOADING_LOGO;
-	m_pLoadingUI_Logo->Initialize(&Desc);
 	return S_OK;
-
 }
 
 HRESULT CLevel_Loading::Ready_Layer_UI_GameTitle(const _tchar* pLayerTag)
@@ -160,14 +151,27 @@ HRESULT CLevel_Loading::Ready_Layer_UI_GameTitle(const _tchar* pLayerTag)
 
 	CLoading_UI::LOADINGUI_DESC	Desc{};
 	Desc.eLevel = LEVEL_LOADING;
-	Desc.fX = g_iWinSizeX * 0.5;
-	Desc.fY = g_iWinSizeY * 0.3;
-	Desc.fSizeX = 500;
-	Desc.fSizeY = 100;
+	Desc.fX = g_iWinSizeX * 0.2f;
+	Desc.fY = g_iWinSizeY * 0.75f;
+	Desc.fSizeX = 500.f;
+	Desc.fSizeY = 50.f;
 	Desc.iData = 10;
 	Desc.fDepth = 0.f;
 	Desc.eTag = CLoading_UI::LOADING_GAMENAME;
 	m_pLoadingUI_GameTitle->Initialize(&Desc);
+
+	m_pLoadingUIBack = CLoading_UI::Create(m_pDevice, m_pContext);
+
+	CLoading_UI::LOADINGUI_DESC	Desc2{};
+	Desc2.eLevel = LEVEL_LOADING;
+	Desc2.fX = g_iWinSizeX * 0.4f;
+	Desc2.fY = g_iWinSizeY * 0.75f;
+	Desc2.fSizeX = g_iWinSizeX * 0.8f;
+	Desc2.fSizeY = g_iWinSizeY * 0.7f;
+	Desc2.iData = 10;
+	Desc2.fDepth = 0.15f;
+	Desc2.eTag = CLoading_UI::LOADING_BACKGROUND_GAMENAME;
+	m_pLoadingUIBack->Initialize(&Desc2);
 
 	return S_OK;
 }
@@ -188,7 +192,8 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_Loading::Free()
 {
 	__super::Free();
-
+	
+	Safe_Release(m_pLoadingUIBack);
 	Safe_Release(m_pLoadingUI_GameTitle);
 	Safe_Release(m_pLoadingUI_Logo);
 	Safe_Release(m_pLoadingUI);

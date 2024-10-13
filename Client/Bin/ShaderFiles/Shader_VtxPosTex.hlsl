@@ -6,7 +6,7 @@
 
 float2              g_Index;
 
-float               g_Percent, g_ImgSize;
+float               g_Percent, g_ImgSize, g_fGageAmount;
 matrix              g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D           g_Texture;
 
@@ -92,6 +92,7 @@ SV_POSITIONÀº ¹öÅØ½º ¼ÎÀÌ´õ¿¡¼­ ³ª¿À°í ÇÈ¼¿ ¼ÎÀÌ´õ·Î µé¾î°¥ ¶§ Z³ª´©±â¿Í ·¹½ºÅÍÈ
 TEXCOORD´Â ¹öÅØ½º »çÀÌÀÇ º¸°£¸¸ ¹ß»ýÇÏ°í, ÇÈ¼¿ ÁÂÇ¥°è·Î º¯È¯µÇÁö ¾Ê´Â´Ù. Áï, ºä½ºÆäÀÌ½º·Î º¯È¯µÇÁö ¾ÊÀº »óÅÂÀÌ´Ù.
 
 */
+// ±×³É Ãâ·Â
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -100,12 +101,11 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
  //   Out.vColor.gb = Out.vColor.r; // °°À¸¸é È¸»ö, Á×¾úÀ» ¶§¸¦ Ç¥ÇöÇÏ¸é ÁÁÀ»µí
     
-    
     // ¾ËÆÄÅ×½ºÆ® : ¾ËÆÄ°ªÀ» ±âÁØÀ¸·Î ±×¸°´Ù ¾È±×¸°´Ù¸¦ °í·ÁÇÑ´Ù. Dx11 ¿¡¼± ¾ËÆÄÅ×½ºÆ®°¡ »ç¶óÁö°í ¼ÎÀÌÆÄÆÄÀÏ¿¡¼­ ºñ±³ÇÏ´Â ¹æ½ÄÀ¸·Î ¹Ù²ñ
     // ±íÀÌ Å×½ºÆ®¸¦ Åë°úÇÏ¿© ·¹½ºÅÍ¶óÀÌÁî¸¦ °ÅÃÆÀ¸³ª ¾ËÆÄ Å×½ºÆ® Åë°ú ¸øÇÑ °ªÀº ÆÄ±«ÇÑ´Ù. µû¶ó¼­ ±íÀÌ °ª ±â·Ï ¾ÈÇÑ´Ù!
-    if(Out.vColor.a == 0.f) 
-        discard;// ÆÄ±«ÇÑ´Ù. 
-    
+    //if(Out.vColor.a == 0.f) 
+    //    discard;// ÆÄ±«ÇÑ´Ù. 
+
     //// Åõ¿µº¯È¯Àº x,y¸¦ º¯È¯ÀüÀÇ z°ªÀÎ w·Î ³ª´®À¸·Î½á ¿Ï¼ºµÈ´Ù.
     //float2 vProjPos = In.vProjPos.xy / In.vProjPos.w;
     
@@ -113,14 +113,11 @@ PS_OUT PS_MAIN(PS_IN In)
     //if(vProjPos.x <= 1.f)
     //    Out.vColor.r = 0.1;
     
-   
-
-    
     return Out;
 
 }
 
-
+// »¡°£»öÀ¸·Î º¯°æ
 PS_OUT PS_MAIN2(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -141,27 +138,25 @@ PS_OUT PS_MAIN2(PS_IN In)
     // Åõ¿µº¯È¯Àº x,y¸¦ º¯È¯ÀüÀÇ z°ªÀÎ w·Î ³ª´®À¸·Î½á ¿Ï¼ºµÈ´Ù.
 //    float2 vProjPos = In.vProjPos.xy / In.vProjPos.w;
     
-
-
-    
     return Out;
 
 }
 
+
+// API½Ä ¾Ö´Ï¸ÞÀÌ¼Ç
 PS_OUT PS_MAIN3(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
   
     Out.vColor = g_Texture.Sample(PointSampler, In.vTexcoord);
-    float2 fStart = float2(g_Index.x * 0.125f, g_Index.y * 0.125f); // ½ÃÀÛÁ¡ °è»ê
-   
-    
-    float2 fSize = float2(0.125 , 0.125 );
-    float2 UV = fStart + In.vTexcoord * fSize;
+// ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ ÃÑ ¾ÆÀÌÄÜ ¼ö
+// ½ÃÀÛÁ¡ °è»ê
+    float2 fSize = float2(0.108, 0.108);
+    float2 fStart = { g_Index.x * fSize.x + 0.216, g_Index.y * fSize.y + 0.216};
+
+    float2 UV = fStart + fSize * In.vTexcoord;
     
     Out.vColor = g_Texture.Sample(PointSampler, UV);
-    
-
  
     if (Out.vColor.a == 0.f) 
         discard;  
@@ -171,6 +166,72 @@ PS_OUT PS_MAIN3(PS_IN In)
     return Out;
 
 }
+
+// Á¡Á¡ Åõ¸íÇØÁö´Â ¹Ú½º
+PS_OUT PS_MAIN4(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+ //   Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
+    // »öÀ¸·Î Ã¤¿ì´Â °ÍÀÌ ÀÌ¹ÌÁö¸¦ °¡Á®¿Í¼­ »öÀ» Ã¤¿öÁÜ
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+ //   Out.vColor.gb = Out.vColor.r; // °°À¸¸é È¸»ö, Á×¾úÀ» ¶§¸¦ Ç¥ÇöÇÏ¸é ÁÁÀ»µí
+    
+    // ¾ËÆÄÅ×½ºÆ® : ¾ËÆÄ°ªÀ» ±âÁØÀ¸·Î ±×¸°´Ù ¾È±×¸°´Ù¸¦ °í·ÁÇÑ´Ù. Dx11 ¿¡¼± ¾ËÆÄÅ×½ºÆ®°¡ »ç¶óÁö°í ¼ÎÀÌÆÄÆÄÀÏ¿¡¼­ ºñ±³ÇÏ´Â ¹æ½ÄÀ¸·Î ¹Ù²ñ
+    // ±íÀÌ Å×½ºÆ®¸¦ Åë°úÇÏ¿© ·¹½ºÅÍ¶óÀÌÁî¸¦ °ÅÃÆÀ¸³ª ¾ËÆÄ Å×½ºÆ® Åë°ú ¸øÇÑ °ªÀº ÆÄ±«ÇÑ´Ù. µû¶ó¼­ ±íÀÌ °ª ±â·Ï ¾ÈÇÑ´Ù!
+    Out.vColor.r = 0.f;
+    Out.vColor.g = 0.f;
+    Out.vColor.b = 0.f;
+    Out.vColor.a = In.vTexcoord.x;
+    return Out;
+}
+
+// ¿¡³ÊÁö °ÔÀÌÁö ¹Ù ( Áß°£ Áß°£ Àß¸² )
+PS_OUT PS_MAIN5(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+ //   Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
+    // »öÀ¸·Î Ã¤¿ì´Â °ÍÀÌ ÀÌ¹ÌÁö¸¦ °¡Á®¿Í¼­ »öÀ» Ã¤¿öÁÜ
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    //   Out.vColor.gb = Out.vColor.r; // °°À¸¸é È¸»ö, Á×¾úÀ» ¶§¸¦ Ç¥ÇöÇÏ¸é ÁÁÀ»µí
+    // ¾ËÆÄÅ×½ºÆ® : ¾ËÆÄ°ªÀ» ±âÁØÀ¸·Î ±×¸°´Ù ¾È±×¸°´Ù¸¦ °í·ÁÇÑ´Ù. Dx11 ¿¡¼± ¾ËÆÄÅ×½ºÆ®°¡ »ç¶óÁö°í ¼ÎÀÌÆÄÆÄÀÏ¿¡¼­ ºñ±³ÇÏ´Â ¹æ½ÄÀ¸·Î ¹Ù²ñ
+    // ±íÀÌ Å×½ºÆ®¸¦ Åë°úÇÏ¿© ·¹½ºÅÍ¶óÀÌÁî¸¦ °ÅÃÆÀ¸³ª ¾ËÆÄ Å×½ºÆ® Åë°ú ¸øÇÑ °ªÀº ÆÄ±«ÇÑ´Ù. µû¶ó¼­ ±íÀÌ °ª ±â·Ï ¾ÈÇÑ´Ù!
+  
+    float fXPos = In.vTexcoord.x;
+    if (frac(fXPos * 10.f) < 0.4f)
+    {
+        Out.vColor.a = 1.0f; // Á¡ÀÌ ±×·ÁÁú ºÎºÐ
+    }
+    else
+    {
+        Out.vColor.a = 0.0f; // Á¡ÀÌ ±×·ÁÁöÁö ¾ÊÀ» ºÎºÐ
+    }
+    
+    float fCurrentGage = g_fGageAmount * 1.25f * 0.01;
+    if (fCurrentGage <= In.vTexcoord.x)
+        Out.vColor.a = 0.0f;
+    
+    return Out;
+}
+  
+// ¹Ù ÁÙ¾îµé°Ô
+PS_OUT PS_MAIN6(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+ //   Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
+    // »öÀ¸·Î Ã¤¿ì´Â °ÍÀÌ ÀÌ¹ÌÁö¸¦ °¡Á®¿Í¼­ »öÀ» Ã¤¿öÁÜ
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    //   Out.vColor.gb = Out.vColor.r; // °°À¸¸é È¸»ö, Á×¾úÀ» ¶§¸¦ Ç¥ÇöÇÏ¸é ÁÁÀ»µí
+    // ¾ËÆÄÅ×½ºÆ® : ¾ËÆÄ°ªÀ» ±âÁØÀ¸·Î ±×¸°´Ù ¾È±×¸°´Ù¸¦ °í·ÁÇÑ´Ù. Dx11 ¿¡¼± ¾ËÆÄÅ×½ºÆ®°¡ »ç¶óÁö°í ¼ÎÀÌÆÄÆÄÀÏ¿¡¼­ ºñ±³ÇÏ´Â ¹æ½ÄÀ¸·Î ¹Ù²ñ
+    // ±íÀÌ Å×½ºÆ®¸¦ Åë°úÇÏ¿© ·¹½ºÅÍ¶óÀÌÁî¸¦ °ÅÃÆÀ¸³ª ¾ËÆÄ Å×½ºÆ® Åë°ú ¸øÇÑ °ªÀº ÆÄ±«ÇÑ´Ù. µû¶ó¼­ ±íÀÌ °ª ±â·Ï ¾ÈÇÑ´Ù!
+  
+  
+    float fCurrentGage = g_fGageAmount   * 0.01;
+    if (fCurrentGage <= In.vTexcoord.x)
+        Out.vColor.a = 0.0f;
+    
+    return Out;
+}
+
 // Pass ´Â ±×·¡ÇÈ ÆÄÀÌÇÁ¶óÀÎ »óÅÂ¸¦ ¼³Á¤ÇÑ´Ù
 // Pass´Â ¿©·¯°³ ÇÒ ¼ö ÀÖÀ½ , Áö±ÝÀº 1°³»Ó, ±×·¡¼­ Begin ÇÔ¼ö ¸Å°³º¯¼ö°¡ 0ÀÌ¾úÀ½
 // VertexShader ¿Í PixelShader ´Â °¢°¢ÀÇ ÆÐ½º¿¡¼­ »ç¿ëÇÒ ¼ÎÀÌ´õÀÇ ÇÁ·Î±×·¥À» ÁöÁ¤ÇÑ´Ù.  À§ÀÇ VS_MAIN À» ÁöÁ¤ÇÔ
@@ -199,7 +260,21 @@ technique11 DefaultTechnique // Technique : ¾î¶² ¹öÀüÀ¸·Î ÀûÇû´ÂÁö ±¸ºÐÇÑ´Ù.
         PixelShader = compile ps_5_0 PS_MAIN3();
 
     }
-
+    pass DefaultPass3
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN4();
+    }
+    pass DefaultPass4
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN5();
+    }
+    pass DefaultPass5
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN6();
+    }
 	//pass DefaultPass1
 	//{
 	//	VertexShader = compile vs_5_0 VS_MAIN();

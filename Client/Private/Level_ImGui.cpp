@@ -6,6 +6,7 @@
 #include "Monster.h"
 #include "Level_Loading.h"
 
+
 CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
 {
@@ -13,17 +14,21 @@ CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_ImGui::Initialize()
 {
+	ShowCursor(true);
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 카메라 생성
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
-	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))			return E_FAIL;	// 몬스터
-	if (FAILED(Ready_Lights()))										return E_FAIL;	// 빛
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))			return E_FAIL;	// 몬스터
+//	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;	// 플레이어
 
+	if (FAILED(Ready_Lights()))										return E_FAIL;	// 빛
 	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// 로딩 닫기
 
+	// 터레인 피킹을 위해 터레인 컴포넌트 가져오기
 	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_IMGUI, TEXT("Layer_Terrain"), TEXT("Com_VIBuffer")));
 
+	// 저장 로드 버튼(이미지 버튼)
 	Create_ImageButton();
-	
+
     return S_OK;
 }
 
@@ -31,38 +36,126 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-	
-	
-	if (GetKeyState(VK_ADD) & 0x8000)
-	{
-		_float3 fScale = dynamic_cast<CEnvironment*>(pGameObj)->Get_Scale();
-	}
 
-	// 모드 변경
+	// ESC 누르면 창 나가짐
+	// 애니메이션 없는 툴
 	if (GetAsyncKeyState(VK_F1) & 0x0001)  // 애니 없는 모델
 	{
+		for (auto& pBuild : m_vecBuild)
+		{
+			pBuild->Set_PickingCheck(false);
+			pBuild->Set_ImGuiMode(IMGUI_OBJECT_NONANIM);
+		}
+		for (auto& pEnviron : m_vecEnvironment)
+		{
+			pEnviron->Set_ImGuiMode(IMGUI_OBJECT_NONANIM);
+		}
 		m_eImGui_Type = IMGUI_OBJECT_NONANIM;
+		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
 	}
+	// 애니메이션 모델 툴
 	if (GetAsyncKeyState(VK_F2) & 0x0001)  // 애니 있는 모델
 	{
 		m_eImGui_Type = IMGUI_OBJECT_ANIM;
+		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
 	}
-	if (GetAsyncKeyState(VK_F3) & 0x0001) // 맵툴
+	// 건축툴
+	if (GetAsyncKeyState(VK_F3) & 0x0001) // 건물툴
+	{
+		for (auto& pEnviron : m_vecEnvironment)
+		{
+			pEnviron->Set_PickingCheck(false);
+			pEnviron->Set_ImGuiMode(IMGUI_BUILD);
+		}
+		for (auto& pBuild : m_vecBuild)
+		{
+			pBuild->Set_ImGuiMode(IMGUI_BUILD);
+		}
+		m_eImGui_Type = IMGUI_BUILD;
+		m_iModelIndex = 0;
+		m_fPickingPos = { 0.f,0.f,0.f };
+	}
+	// 맵툴
+	if (GetAsyncKeyState(VK_F4) & 0x0001) // 맵툴
 	{
 		m_eImGui_Type = IMGUI_MAPTOOL;
+		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
 	}
-
-
-	// ESC 누르면 창 나가짐
-	if (GetKeyState(VK_ESCAPE) & 0x8000)
+	// 모드 선택 ,   create   select 모드 
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_TAB))
 	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_IMGUI, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
-			return;
+		if (m_iModeSelect == IMGUI_SELECT)
+		{
+			_float3 fPos{}, fScale{}, fCollisionPos{}, fCollisionScale{};
+			_vector vPos{}, vCollisionPos{};
+			
+			switch (m_eImGui_Type)
+			{
+			case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
+				
+				if(m_iEnvironment_Count > 0)
+				{
+					for (auto& pEnviron : m_vecEnvironment)
+					{
+						pEnviron->Set_PickingCheck(false);
+					}
+					vPos = m_vecEnvironment.back()->Get_Pos();
+					fScale = m_vecEnvironment.back()->Get_Scale();
+					m_vecEnvironment.back()->Set_PickingCheck(true);
+					vCollisionPos = m_vecEnvironment.back()->Get_CollisionBoxPos();
+					fCollisionScale = m_vecEnvironment.back()->Get_CollisionBoxScale();
+					XMStoreFloat3(&fPos, vPos);
+					XMStoreFloat3(&fCollisionPos, vCollisionPos);
+				}
+				break;
+			case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
+				break;
+			case Client::CLevel_ImGui::IMGUI_BUILD:
+				
+				if(m_iBuild_Count > 0)
+				{
+					for (auto& pBuild : m_vecBuild)
+					{
+						pBuild->Set_PickingCheck(false);
+					}
+					vPos = m_vecBuild.back()->Get_Pos();
+					fScale = m_vecBuild.back()->Get_Scale();
+					m_vecBuild.back()->Set_PickingCheck(true);
+					vCollisionPos = m_vecBuild.back()->Get_CollisionBoxPos();
+					fCollisionScale = m_vecBuild.back()->Get_CollisionBoxScale();
+					XMStoreFloat3(&fPos, vPos);
+					XMStoreFloat3(&fCollisionPos, vCollisionPos);
+				}
+				break;
+			case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+				break;
+			case Client::CLevel_ImGui::IMGUI_END:
+				break;
+			default:
+				break;
+			}
+			Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
+			Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
+			CollisionBox_Pos[0] = fCollisionPos.x;					CollisionBox_Pos[1] = fCollisionPos.y;					CollisionBox_Pos[2] = fCollisionPos.z;
+			CollisionBox_Scale[0] = fCollisionScale.x;				CollisionBox_Scale[1] = fCollisionScale.y;				CollisionBox_Scale[2] = fCollisionScale.z;
+			m_iModeSelect = IMGUI_CREATE;
+		}
+		else if (m_iModeSelect == IMGUI_CREATE)
+		{
+			m_iModeSelect = IMGUI_SELECT;
+		}
+	}  
+	// 선택 혹은 생성 가능하게 해주는 bool 값 변경
+	if ((m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN) && (bAble_Select == false)))
+	{
+		bAble_Select = true;
 	}
-
+	
+	
+	// 툴에 따른 업데이트 
 	switch (m_eImGui_Type)
 	{
 	case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
@@ -70,6 +163,8 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 		break;
 	case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
 		break;
+	case Client::CLevel_ImGui::IMGUI_BUILD:
+		Build_Update(fTimeDelta);
 	case Client::CLevel_ImGui::IMGUI_MAPTOOL:
 		break;
 	case Client::CLevel_ImGui::IMGUI_END:
@@ -77,15 +172,24 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 	default:
 		break;
 	}
+
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	{
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_IMGUI, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
+			return;
+	}
 }
 
 HRESULT CLevel_ImGui::Render()
 {
-    __super::Render();
-	ImGui::SetWindowPos("ParentWindow", ImVec2(0, 200));
-	ImGui::SetNextWindowSize(ImVec2(400,600)); // 가로 400, 세로 300 크기로 설정
+	__super::Render();
+	if(m_bWindowsMove == false)
+	{
+		ImGui::SetWindowPos("ParentWindow", ImVec2(0, 200)); // 초기 위치 설정
+	}
+	ImGui::SetNextWindowSize(ImVec2(400, 600)); // 가로 400, 세로 600 크기로 설정
 	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(800, 600)); // 최소 크기 200x200, 최대 크기 800x600
-	ImGui::Begin("ParentWindow");
+	ImGui::Begin("ParentWindow", nullptr, ImGuiWindowFlags_None); // 창 이동 가능
 	// ImGui 코드 작성칸
 	switch (m_eImGui_Type)
 	{
@@ -95,6 +199,9 @@ HRESULT CLevel_ImGui::Render()
 	case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
 		Object_Anim();
 		break;
+	case Client::CLevel_ImGui::IMGUI_BUILD:
+		Object_Build();
+		break;
 	case Client::CLevel_ImGui::IMGUI_MAPTOOL:
 		MapTool();
 		break;
@@ -103,27 +210,43 @@ HRESULT CLevel_ImGui::Render()
 	default:
 		break;
 	}
-
-
 	ImGui::End();
     
-
-	ImGui::SetWindowPos("Save_Load", ImVec2(0, 0));
+	if (m_bWindowsMove == false)
+	{
+		m_bWindowsMove = true;
+		ImGui::SetWindowPos("Save_Load", ImVec2(0, 0));
+	}
 	ImGui::SetNextWindowSize(ImVec2(300, 100)); // 가로 400, 세로 300 크기로 설정
 	ImGui::SetNextWindowSizeConstraints(ImVec2(30, 30), ImVec2(150, 100)); // 최소 크기 200x200, 최대 크기 800x600
-	ImGui::Begin("Save_Load");
+	ImGui::Begin("Save_Load", nullptr, ImGuiWindowFlags_None);
 	if (ImGui::ImageButton("Save", my_Savetexture, ImVec2(50, 50), ImVec2(0, 0)))
 	{
 		Save = true;
+		
 	}
 	ImGui::SameLine();
 	if (ImGui::ImageButton("Load", my_Loadtexture, ImVec2(50, 50), ImVec2(0, 0)))
 	{
-		Environment_Load();
+		switch (m_eImGui_Type)
+		{
+		case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
+			Environment_Load();
+			break;
+		case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
+			break;
+		case Client::CLevel_ImGui::IMGUI_BUILD:
+			Build_Load();
+			break;
+		case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+			break;
+		case Client::CLevel_ImGui::IMGUI_END:
+			break;
+		default:
+			break;
+		}
 	}
 	ImGui::End();
-
-
 
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("ImGui레벨입니다."));
@@ -140,61 +263,9 @@ HRESULT CLevel_ImGui::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_ImGui::Ready_Layer_Camera(const _tchar* pLayerTag)
-{
-	CCamera_Free::CAMERA_FREE_DESC			Desc{};
-
-	Desc.vEye = _float4(0.f, 10.f, -5.f, 1.f);
-	Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	Desc.fFovy = XMConvertToRadians(60.0f);
-	Desc.fNearZ = 0.1f;
-	Desc.fFar = 500.f;
-	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
-	Desc.fSpeedPerSec = 20.f;
-	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
-	Desc.fMouseSensor = 0.05f;
-	Desc.eLevel = LEVEL_IMGUI;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free_ImGui"), &Desc)))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CLevel_ImGui::Ready_Lights()
-{
-
-	LIGHT_DESC	LightDesc{};
-
-	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CLevel_ImGui::Ready_Layer_Monster(const _tchar* pLayerTag)
-{
-	CMonster::MONSTER_DESC			Desc{};
-	Desc.eID = LEVEL_IMGUI;
-	
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-		TEXT("Prototype_GameObject_Monster_ImGui"),&Desc)))
-		return E_FAIL;
-
-
-	return S_OK;
-}
-
-
 HRESULT CLevel_ImGui::Picking_Create()
 {
-	if ((GetAsyncKeyState(VK_LBUTTON) & 0x0001) && (bAble_Select == true))
+	if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)) && (bAble_Select == true) && m_iModeSelect == IMGUI_CREATE)
 	{
 		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
@@ -210,58 +281,41 @@ HRESULT CLevel_ImGui::Picking_Create()
 		_uint VtxCountZ = pVIBuffer_Terrain->Get_VtxCountZ();
 
 	
-			m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
-			Environment_Add();
+		m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+			
+			switch (m_eImGui_Type)
+			{
+			case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
+				Environment_Add();
+				break;
+			case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
+				break;
+			case Client::CLevel_ImGui::IMGUI_BUILD:
+				Build_Add();
+				break;
+			case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+				break;
+			case Client::CLevel_ImGui::IMGUI_END:
+				break;
+			default:
+				break;
+			}
+	
 
 	
 	}
 	return S_OK;
 }
 
-HRESULT CLevel_ImGui::Picking_Select()
-{
-	return S_OK;
-}
+
 
 void CLevel_ImGui::Object_NonAnim_Update(_float fTimeDelta)
-{	/*
-	if (m_iEnvironment_Count > 0)
-	{
-		for (auto iter = m_vecEnvironment.begin(); iter != m_vecEnvironment.end();)
-		{
-			if (nullptr != (*iter))
-			{
-				if ((*iter)->Get_Dead() == true)
-				{
-					iter = m_vecEnvironment.erase(iter);
-					m_iEnvironment_Count--;
-				}
-				else
-					++iter;
-			}
-			else
-			{
-				++iter;
-			}
-		}
-	}
-	*/
+{	
 	
 	if (m_iEnvironment_Count > 0)
 		Environment_DataChange(fTimeDelta);
-	Picking_Create();
-	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
-	{
-		if (GetAsyncKeyState('S') & 0x8000)
-		{
-			Environment_Save();
-		}
-	}
-
-	if(GetAsyncKeyState(VK_TAB))
-	{
-		Environment_Load();
-	}
+	Picking_Create();  // Create 모드
+	Environment_Select();  // Select 모드
 
 	if (Save == true)
 	{
@@ -274,6 +328,33 @@ void CLevel_ImGui::Object_Anim_Update(_float fTimeDelta)
 {
 }
 
+void CLevel_ImGui::Build_Update(_float fTimeDelta)
+{
+
+	if (m_iBuild_Count > 0)
+		Build_DataChange(fTimeDelta);
+	Picking_Create();
+	Build_Select();
+	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
+	{
+		if (GetAsyncKeyState('S') & 0x8000)
+		{
+			Build_Save();
+		}
+	}
+
+	if (GetAsyncKeyState(VK_TAB))
+	{
+		Build_Load();
+	}
+
+	if (Save == true)
+	{
+		Build_Save();
+		Save = false;
+	}
+}
+
 void CLevel_ImGui::MapTool_Update(_float fTimeDelta)
 {
 }
@@ -284,101 +365,170 @@ void CLevel_ImGui::Object_NonAnim()
 	ImGui::Text(pText);
 	ImGui::Text(" ");
 
+	if (m_iModeSelect == IMGUI_CREATE)
+	{
+		const char* pModeText = "Create Mode";
+		ImGui::Text(pModeText);
+	}
+	if (m_iModeSelect == IMGUI_SELECT)
+	{
+		const char* pModeText = "Select Mode";
+		ImGui::Text(pModeText);
+	}
+
 	// 위치 크기 방향 수정창
 	ImGui::Text("Object Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -90.f, 90.f);
-	ImGui::DragFloat3("Scale", Scale, 0.1f, -90.f, 90.f);
+	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
+	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::Text(" ");
+	ImGui::Text("CollisionBox");
+	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
+	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
+
 	// 모델 선택창
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 	ImGui::Text(" ");
-//	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
 	ImGui::Text("Environment List ");
 	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
 	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
-	Environment_List(); // ImGui 선택 리스트 ( Environment 리스트 )
+	ButtonImage_List(); // ImGui 선택 리스트 ( Environment 리스트 )
 	ImGui::EndChild();
-//	ImGui::PopStyleVar();
-
-
-
 }
 
 void CLevel_ImGui::Object_Anim()
 {
 	const char* pText = "Anim Object Tool";
 	ImGui::Text(pText);
+	ImGui::Text(" ");
+	if (m_iModeSelect == IMGUI_CREATE)
+	{
+		const char* pModeText = "Create Mode";
+		ImGui::Text(pModeText);
+	}
+	if (m_iModeSelect == IMGUI_SELECT)
+	{
+		const char* pModeText = "Select Mode";
+		ImGui::Text(pModeText);
+	}
+	// 위치 크기 방향 수정창
+	ImGui::Text("Object Data");
+	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
+	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::Text(" ");
+	ImGui::Text("CollisionBox");
+	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
+	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
+	// 모델 선택창
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+	ImGui::Text(" ");
 
+	ImGui::Text("MapObject List ");
+	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
 
+	ImGui::EndChild();
+}
+
+void CLevel_ImGui::Object_Build()
+{
+	const char* pText = "Build Tool";
+	ImGui::Text(pText);
+	ImGui::Text(" ");
+	if (m_iModeSelect == IMGUI_CREATE)
+	{
+		const char* pModeText = "Create Mode";
+		ImGui::Text(pModeText);
+	}
+	if (m_iModeSelect == IMGUI_SELECT)
+	{
+		const char* pModeText = "Select Mode";
+		ImGui::Text(pModeText);
+	}
+	// 위치 크기 방향 수정창
+	ImGui::Text("Build Data");
+	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
+	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::Text(" ");
+	ImGui::Text("CollisionBox");
+	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
+	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
+
+	// 모델 선택창
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+
+	ImGui::Text("Build List ");
+	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
+	ButtonImage_List(); // ImGui 선택 리스트 ( Environment 리스트 )
+	ImGui::EndChild();
 }
 
 void CLevel_ImGui::MapTool()
 {
 	const char* pText = "MapTool";
 	ImGui::Text(pText);
+	ImGui::Text(" ");
+
 
 }
 
-void CLevel_ImGui::Environment_List()
+void CLevel_ImGui::ButtonImage_List()
 {
-
 	ImGui::BeginChild("Choose Environment");
-	if (ImGui::ImageButton("Chair0", SRV_m_pChair0, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 0;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Chair1", SRV_m_pChair1, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 1;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Chair2", SRV_m_pChair2, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 2;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Chair3", SRV_m_pChair3, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 3;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Chair4", SRV_m_pChair4, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 4;
-	if (ImGui::ImageButton("Chair5", SRV_m_pChair5, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 5;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("AidKit", SRV_AidKit, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 6;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Card0", SRV_Card0, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 7;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("WasteBin", SRV_WasteBin, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 8;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Desk0", SRV_Desk0, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 9;
-	if (ImGui::ImageButton("Desk1", SRV_Desk1, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 10;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Desk2", SRV_Desk2, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 11;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Desk3", SRV_Desk3, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 12;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("KeyPad", SRV_KeyPad, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 13;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Vent1", SRV_Vent1, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 14;
-	if (ImGui::ImageButton("Sprinkler", SRV_Sprinkler, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 15;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Trim", SRV_Trim0, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 16;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("Vent0", SRV_Vent0, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 17;
-	ImGui::SameLine();
-	if (ImGui::ImageButton("card1", SRV_Card1, ImVec2(50, 50), ImVec2(0, 0)))
-		m_iModelIndex = 18;
-	ImGui::SameLine();
+	int iButton = 0;	
 
-	ImGui::EndChild();
+	switch (m_eImGui_Type)
+	{
+	case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
+	{
+		auto& SRVs = m_pEnviron->Get_SRV();
+		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		{
+			if (iButton % 4 != 0)
+				ImGui::SameLine();
+			string tag = "Environment" + to_string(iButton);
+			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			{
+				m_iModelIndex = iButton;
+			}
+			iButton++;
+		}
+		ImGui::EndChild();
+	}
+		break;
+	case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
+		break;
+	case Client::CLevel_ImGui::IMGUI_BUILD:
+	{
+		auto& SRVs = m_pBuild->Get_SRV();
+		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		{
+			if (iButton % 4 != 0)
+				ImGui::SameLine();
+			string tag = "Build" + to_string(iButton);
+			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			{
+				m_iModelIndex = iButton;
+			}
+			iButton++;
+		}
+		ImGui::EndChild();
+	}
+		break;
+	case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+		break;
+	case Client::CLevel_ImGui::IMGUI_END:
+		break;
+	default:
+		break;
+	}
+
+
 }
 
 HRESULT CLevel_ImGui::Environment_Add()
@@ -391,103 +541,193 @@ HRESULT CLevel_ImGui::Environment_Add()
 	Desc.fPosition = m_fPickingPos;
 	Desc.iModelComponentIndex = m_iModelIndex;
 	Desc.fScale = { 1.f,1.f ,1.f };
-	Position[0] = m_fPickingPos.x;
-	Position[1] = m_fPickingPos.y;
-	Position[2] = m_fPickingPos.z;
-	Scale[0] = Desc.fScale.x;
-	Scale[1] = Desc.fScale.y;
-	Scale[2] = Desc.fScale.z;
+	Desc.iImGuiMode = IMGUI_OBJECT_NONANIM;
+	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
+	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
+	
+	CollisionBox_Pos[0] = m_fPickingPos.x;		CollisionBox_Pos[1] = m_fPickingPos.y;		CollisionBox_Pos[2] = m_fPickingPos.z;
+	CollisionBox_Scale[0] = Desc.fScale.x;		CollisionBox_Scale[1] = Desc.fScale.y;		CollisionBox_Scale[2] = Desc.fScale.z;
+
 	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
 		TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
 	if (pGameObj != nullptr)
 	{
-		
+		for (auto& pEnviron : m_vecEnvironment)
+		{
+			pEnviron->Set_PickingCheck(false);
+		}
 		m_vecEnvironment.push_back(dynamic_cast<CEnvironment*>(pGameObj));
+		m_vecEnvironment.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+		m_vecEnvironment.back()->Set_PickingCheck(true);
 		m_iEnvironment_Count++;
 		bAble_Select = false;
+
 	}
 
 	return S_OK;
 }
-
 HRESULT CLevel_ImGui::Environment_DataChange(_float fTimeDelta)
 {
-	// 가장 최근 설치한 Environment 삭제하기
-	if ((GetAsyncKeyState(VK_RBUTTON) & 0x0001) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+	if(m_iModeSelect == IMGUI_CREATE)   // Create 모드 일 때 가장 최근 설치 항목에 대한 수정 가능 기능
 	{
-			m_vecEnvironment.back()->Set_Dead();
+		// 가장 최근 설치한 Environment 삭제하기
+		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iEnvironment_Count > 0)
+		{
+			m_vecEnvironment.back()->Set_DeadEnviron();
 			m_vecEnvironment.erase(m_vecEnvironment.end() - 1);
 			--m_iEnvironment_Count;
-			bAble_Select = true;
+			cout << "남은 Environment 개수 : " << m_iEnvironment_Count << endl;
+
 			if (m_iEnvironment_Count > 0)
 			{
 				_float3 fPos, fScale;
 				_vector vPos = m_vecEnvironment.back()->Get_Pos();
 				fScale = m_vecEnvironment.back()->Get_Scale();
+				m_vecEnvironment.back()->Set_PickingCheck(true);
+				_float3 fCollisionBoxScale = m_vecEnvironment.back()->Get_CollisionBoxScale();
+				_vector vecCollisionBoxPos = m_vecEnvironment.back()->Get_CollisionBoxPos();
+				_float3 fEnvironPos{}, fCollisionBoxPos{};
+
+				XMStoreFloat3(&fCollisionBoxPos, vecCollisionBoxPos);
+
 				XMStoreFloat3(&fPos, vPos);
 				Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
 				Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
+
+				CollisionBox_Pos[0] = fCollisionBoxPos.x;				CollisionBox_Pos[1] = fCollisionBoxPos.y;				CollisionBox_Pos[2] = fCollisionBoxPos.z;
+				CollisionBox_Scale[0] = fCollisionBoxScale.x;				CollisionBox_Scale[1] = fCollisionBoxScale.y;				CollisionBox_Scale[2] = fCollisionBoxScale.z;
+
+
 			}
 			else
 			{
 				Position[0] = 0.f;				Position[1] = 0.f;				Position[2] = 0.f;
 				Scale[0] = 0.f;					Scale[1] = 0.f;					Scale[2] = 0.f;
+				CollisionBox_Pos[0] = 0.f;				CollisionBox_Pos[1] = 0.f;				CollisionBox_Pos[2] = 0.f;
+				CollisionBox_Scale[0] = 0.f;					CollisionBox_Scale[1] = 0.f;					CollisionBox_Scale[2] = 0.f;
 			}
-		return S_OK;
-	}
+			return S_OK;
+		}
 
-	m_vecEnvironment.back()->MovePos(fTimeDelta,Position[0], Position[1], Position[2]);
-	m_vecEnvironment.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
-	
-	
-	XMVECTOR vTemp = {0.f, 0.f ,0.f ,1.f };
-	_bool bGetKey = false;
-	if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
-	{
-		bGetKey = true;
-		vTemp = { 0.f, 0.f, -1.f, 1.f };
-	}
-	else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
-	{
-		bGetKey = true;
-		vTemp = { 0.f, 0.f, 1.f, 1.f };
-	}
-	else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
-	{
-		bGetKey = true;
-		vTemp = { 0.f, -1.f, 0.f, 1.f };
-	}
-	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-	{
-		bGetKey = true;
-		vTemp = { 0.f, 1.f, 0.f, 1.f };
-	}
-	else if (GetAsyncKeyState(VK_UP) & 0x8000)
-	{
-		bGetKey = true;
-	
-		vTemp = { 1.f, 0.f, 0.f, 1.f };
-	}
-	else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-	{
-		bGetKey = true;
-		vTemp = { -1.f, 0.f, 0.f, 1.f };
-	}
 
-	else
-		bGetKey = false;
+		m_vecEnvironment.back()->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
+		m_vecEnvironment.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
+		m_vecEnvironment.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
 
-	if(bGetKey == true)
-		m_vecEnvironment.back()->Set_Turn(fTimeDelta, vTemp);
-
-	if ((GetAsyncKeyState(VK_RETURN) & 0x8000) && (bAble_Select == false))
-	{
-		bAble_Select = true;
-	}
 	
+		XMVECTOR vTemp = {0.f, 0.f ,0.f ,1.f }; // 회전축
+		_bool bGetKey = false;
+		if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		{
+			bGetKey = true;
+			vTemp = { 0.f, 0.f, -1.f, 1.f };
+		}
+		else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		{
+			bGetKey = true;
+			vTemp = { 0.f, 0.f, 1.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		{
+			bGetKey = true;
+			vTemp = { 0.f, -1.f, 0.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		{
+			bGetKey = true;
+			vTemp = { 0.f, 1.f, 0.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_UP) & 0x8000)
+		{
+			bGetKey = true;
+	
+			vTemp = { 1.f, 0.f, 0.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		{
+			bGetKey = true;
+			vTemp = { -1.f, 0.f, 0.f, 1.f };
+		}
+		else
+		{
+			bGetKey = false;
+		}
+
+		if(bGetKey == true)
+			m_vecEnvironment.back()->Set_Turn(fTimeDelta, vTemp);
+	
+	}
+	else if (m_iModeSelect == IMGUI_SELECT)
+	{
+		_uint iEnvironmentIndex = 0;
+		for (auto& pEnviron : m_vecEnvironment)
+		{
+
+			if (true == pEnviron->Get_PickingCheck())
+			{
+
+				if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iEnvironment_Count > 0)
+				{
+					pEnviron->Set_DeadEnviron();
+					m_vecEnvironment.erase(m_vecEnvironment.begin() + iEnvironmentIndex);
+					--m_iEnvironment_Count;
+					cout << "남은 Environment 개수 : " << m_iEnvironment_Count << endl;
+
+					break;
+				}
+
+				pEnviron->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
+				pEnviron->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
+				pEnviron->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+
+				XMVECTOR vTemp = { 0.f, 0.f ,0.f ,1.f }; // 회전축
+				_bool bGetKey = false;
+				if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				{
+					bGetKey = true;
+					vTemp = { 0.f, 0.f, -1.f, 1.f };
+				}
+				else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				{
+					bGetKey = true;
+					vTemp = { 0.f, 0.f, 1.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+				{
+					bGetKey = true;
+					vTemp = { 0.f, -1.f, 0.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+				{
+					bGetKey = true;
+					vTemp = { 0.f, 1.f, 0.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_UP) & 0x8000)
+				{
+					bGetKey = true;
+
+					vTemp = { 1.f, 0.f, 0.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+				{
+					bGetKey = true;
+					vTemp = { -1.f, 0.f, 0.f, 1.f };
+				}
+
+				else
+					bGetKey = false;
+
+				if (bGetKey == true)
+					pEnviron->Set_Turn(fTimeDelta, vTemp);
+
+				break;
+			}
+			iEnvironmentIndex++;
+		}
+
+	}
 	return S_OK;
 }
-
 void CLevel_ImGui::Environment_Save()
 {
 	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -508,47 +748,43 @@ void CLevel_ImGui::Environment_Save()
 	
 			LEVELID iLevel = environment->Get_Level();
 			_int  iModelIndex = environment->Get_ModelIndex();
+			_uint iImGuiMode = environment->Get_ImGuiMode();
 			_vector vPos = environment->Get_Pos();
 			XMStoreFloat3(&fPos, vPos);
 			_float3 fScale = environment->Get_Scale();
-
+			_float3 fCollisionScale = environment->Get_CollisionBoxScale();
+			_vector vecCollisionPos = environment->Get_CollisionBoxPos();
 			_vector	vRight{};
 			_vector	vUp{};
 			_vector	vLook{};
 
 			environment->Get_Rotation(vRight, vUp, vLook);
-			//_float3 a, b, c;
-			//XMStoreFloat3(&a, vRight);
-			//cout << a.x << "     " << a.y << "       " << a.z << endl;
-
-			//XMStoreFloat3(&b, vUp);
-			//cout << b.x << "     " << b.y << "       " << b.z << endl;
-
-			//XMStoreFloat3(&c, vLook);
-			//cout << c.x << "     " << c.y << "       " << c.z << endl;
-
 
 			WriteFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr);
 			WriteFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
 			WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
 			WriteFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile, &fCollisionScale, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
 
+			WriteFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
 			WriteFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
 			WriteFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 			WriteFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
-
 
 		}
 	}
 
 	CloseHandle(hFile);
 	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
-
-
 }
-
 void CLevel_ImGui::Environment_Load()
 {
+	for (auto& pEnviron : m_vecEnvironment)
+	{
+		pEnviron->Set_DeadEnviron();
+	}
+	m_vecEnvironment.clear();
 	m_iEnvironment_Count = 0;
 	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -587,25 +823,437 @@ void CLevel_ImGui::Environment_Load()
 			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
 		if (pGameObj != nullptr)
 		{
+
 			Position[0] = fPos.x;			Position[1] = fPos.y;			Position[2] = fPos.z;
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
 	
 			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
-		
-
+			if(m_vecEnvironment.size() >0 )
+				m_vecEnvironment.back()->Set_PickingCheck(false);
 			m_vecEnvironment.push_back(dynamic_cast<CEnvironment*>(pGameObj));
+			m_vecEnvironment.back()->Set_PickingCheck(true);
 			m_iEnvironment_Count++;
 		}
 	}
-
-
 
 	CloseHandle(hFile);
 	MessageBox(NULL, L"Environment Loaded Successfully", L"Success", MB_OK);
 }
 
+HRESULT CLevel_ImGui::Environment_Select()
+{
+	if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000) && m_iModeSelect == IMGUI_SELECT && bAble_Select == true)
+	{
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
+		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
+		XMVECTOR RayPos, RayDir;
+		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+		RayDir = XMVector3Normalize(RayDir);
 
+		for (auto& pEnvironment : m_vecEnvironment)
+		{
+			XMFLOAT3 fBoxPos{}, fMinPoint{}, fMaxPoint{};
+			_vector vBoxPos = pEnvironment->Get_CollisionBoxPos();
+			XMStoreFloat3(&fBoxPos, vBoxPos);
+			 XMFLOAT3 fBoxSize = pEnvironment->Get_CollisionBoxScale();
+		
+			m_pGameInstance->CreateBoundingBox(fBoxPos, fBoxSize, fMinPoint, fMaxPoint);
+			_bool bPickCheck = false;
+			float distance;
+			if (m_pGameInstance->Picking_Box(RayPos, RayDir, fMinPoint, fMaxPoint, distance, pEnvironment->Get_BoundingBox()))
+			{
+				bPickCheck = true;
+				pEnvironment->Set_PickingCheck(bPickCheck);
+				_vector vecEnvironPos = pEnvironment->Get_Pos();
+				_float3 fEnvironScale = pEnvironment->Get_Scale();
+
+				_float3 fEnvironPos{};
+				XMStoreFloat3(&fEnvironPos, vecEnvironPos);
+
+
+				Position[0] = fEnvironPos.x;		Position[1] = fEnvironPos.y;		Position[2] = fEnvironPos.z;
+				Scale[0] = fEnvironScale.x;			Scale[1] = fEnvironScale.y;			Scale[2] = fEnvironScale.z;
+
+				if (fBoxSize.x > 20.f)
+					fBoxSize.x = 5.f;
+				if (fBoxSize.y > 20.f)
+					fBoxSize.y = 5.f;
+				if (fBoxSize.z > 20.f)
+					fBoxSize.z = 5.f;
+
+				CollisionBox_Pos[0] = fBoxPos.x;			CollisionBox_Pos[1] = fBoxPos.y;			CollisionBox_Pos[2] = fBoxPos.z;
+				CollisionBox_Scale[0] = fBoxSize.x;		CollisionBox_Scale[1] = fBoxSize.y;		CollisionBox_Scale[2] = fBoxSize.z;
+
+				bAble_Select = false;
+				
+			}
+			pEnvironment->Set_PickingCheck(bPickCheck);
+
+		}
+	}
+	
+	return S_OK;
+}
+
+HRESULT CLevel_ImGui::Build_Add()
+{
+	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+		return S_OK;
+
+	CEnvironment::ENVIRONMENT_DESC			Desc{};
+	Desc.eID = LEVEL_IMGUI;
+	Desc.fPosition = m_fPickingPos;
+	Desc.iModelComponentIndex = m_iModelIndex + ENVIRONMENT_EA;
+	Desc.fScale = { 1.f,1.f ,1.f };
+	Desc.iImGuiMode = IMGUI_BUILD;
+	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
+	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
+
+	CollisionBox_Pos[0] = m_fPickingPos.x;		CollisionBox_Pos[1] = m_fPickingPos.y;		CollisionBox_Pos[2] = m_fPickingPos.z;
+	CollisionBox_Scale[0] = Desc.fScale.x;		CollisionBox_Scale[1] = Desc.fScale.y;		CollisionBox_Scale[2] = Desc.fScale.z;
+
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
+		TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
+	if (pGameObj != nullptr)
+	{
+		for (auto& pBuild : m_vecBuild)
+		{
+			pBuild->Set_PickingCheck(false);
+		}
+		m_vecBuild.push_back(dynamic_cast<CEnvironment*>(pGameObj));
+		m_vecBuild.back()->Set_PickingCheck(true);
+		m_vecBuild.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+
+		m_iBuild_Count++;
+		bAble_Select = false;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevel_ImGui::Build_DataChange(_float fTimeDelta)
+{
+
+	if (m_iModeSelect == IMGUI_CREATE)   // Create 모드 일 때 가장 최근 설치 항목에 대한 수정 가능 기능
+	{
+		// 가장 최근 설치한 Build 삭제하기
+		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB) ) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iBuild_Count > 0)
+		{
+
+			m_vecBuild.back()->Set_DeadEnviron();
+			m_vecBuild.erase(m_vecBuild.end() - 1);
+			--m_iBuild_Count;
+			cout << "남은 Build 개수 : " << m_iBuild_Count << endl;
+
+			bAble_Select = true;
+			if (m_iBuild_Count > 0)
+			{
+				_float3 fPos, fScale;
+				_vector vPos = m_vecBuild.back()->Get_Pos();
+				fScale = m_vecBuild.back()->Get_Scale();
+				m_vecBuild.back()->Set_PickingCheck(true);
+				_float3 fCollisionBoxScale = m_vecBuild.back()->Get_CollisionBoxScale();
+				_vector vecCollisionBoxPos = m_vecBuild.back()->Get_CollisionBoxPos();
+				_float3 fEnvironPos{}, fCollisionBoxPos{};
+
+				XMStoreFloat3(&fCollisionBoxPos, vecCollisionBoxPos);
+
+				XMStoreFloat3(&fPos, vPos);
+				Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
+				Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
+
+				CollisionBox_Pos[0] = fCollisionBoxPos.x;				CollisionBox_Pos[1] = fCollisionBoxPos.y;				CollisionBox_Pos[2] = fCollisionBoxPos.z;
+				CollisionBox_Scale[0] = fCollisionBoxScale.x;				CollisionBox_Scale[1] = fCollisionBoxScale.y;				CollisionBox_Scale[2] = fCollisionBoxScale.z;
+
+			}
+			else
+			{
+				Position[0] = 0.f;				Position[1] = 0.f;				Position[2] = 0.f;
+				Scale[0] = 0.f;					Scale[1] = 0.f;					Scale[2] = 0.f;
+
+				CollisionBox_Pos[0] = 0.f;				CollisionBox_Pos[1] = 0.f;				CollisionBox_Pos[2] = 0.f;
+				CollisionBox_Scale[0] = 0.f;				CollisionBox_Scale[1] = 0.f;				CollisionBox_Scale[2] = 0.f;
+
+			}
+			return S_OK;
+		}
+
+		m_vecBuild.back()->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
+		m_vecBuild.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
+		m_vecBuild.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+
+
+
+		XMVECTOR vTemp = { 0.f, 0.f ,0.f ,1.f }; // 회전축
+		_bool bGetKey = false;
+		if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		{
+			bGetKey = true;
+			vTemp = { 0.f, 0.f, -1.f, 1.f };
+		}
+		else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		{
+			bGetKey = true;
+			vTemp = { 0.f, 0.f, 1.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		{
+			bGetKey = true;
+			vTemp = { 0.f, -1.f, 0.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		{
+			bGetKey = true;
+			vTemp = { 0.f, 1.f, 0.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_UP) & 0x8000)
+		{
+			bGetKey = true;
+
+			vTemp = { 1.f, 0.f, 0.f, 1.f };
+		}
+		else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		{
+			bGetKey = true;
+			vTemp = { -1.f, 0.f, 0.f, 1.f };
+		}
+		else
+		{
+			bGetKey = false;
+		}
+
+		if (bGetKey == true)
+			m_vecBuild.back()->Set_Turn(fTimeDelta, vTemp);
+
+
+	}
+	else if (m_iModeSelect == IMGUI_SELECT)
+	{
+		_uint iBuildIndex = 0;
+		for (auto& pBuild : m_vecBuild)
+		{
+			if (true == pBuild->Get_PickingCheck())
+			{
+				if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iBuild_Count > 0)
+				{
+					pBuild->Set_DeadEnviron();
+					m_vecBuild.erase(m_vecBuild.begin() + iBuildIndex);
+					--m_iBuild_Count;
+					cout << "남은 Environment 개수 : " << m_iBuild_Count << endl;
+
+					break;
+				}
+
+				pBuild->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
+				pBuild->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
+				pBuild->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+				XMVECTOR vTemp = { 0.f, 0.f ,0.f ,1.f }; // 회전축
+				_bool bGetKey = false;
+				if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				{
+					bGetKey = true;
+					vTemp = { 0.f, 0.f, -1.f, 1.f };
+				}
+				else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				{
+					bGetKey = true;
+					vTemp = { 0.f, 0.f, 1.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+				{
+					bGetKey = true;
+					vTemp = { 0.f, -1.f, 0.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+				{
+					bGetKey = true;
+					vTemp = { 0.f, 1.f, 0.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_UP) & 0x8000)
+				{
+					bGetKey = true;
+
+					vTemp = { 1.f, 0.f, 0.f, 1.f };
+				}
+				else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+				{
+					bGetKey = true;
+					vTemp = { -1.f, 0.f, 0.f, 1.f };
+				}
+
+				else
+					bGetKey = false;
+
+				if (bGetKey == true)
+					pBuild->Set_Turn(fTimeDelta, vTemp);
+
+				break;
+			}
+			iBuildIndex++;
+		}
+
+	}
+	return S_OK;
+}
+
+void CLevel_ImGui::Build_Save()
+{
+	HANDLE hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Save Build File Creation Failed", L"Error", MB_OK);
+		return;
+	}
+	DWORD dwByte = 0;
+	_float3 fPos;
+	for (auto& pBuild : m_vecBuild)
+	{
+		if (pBuild)
+		{
+			LEVELID iLevel = pBuild->Get_Level();
+			_int  iModelIndex = pBuild->Get_ModelIndex();
+			_uint iImGuiMode = pBuild->Get_ImGuiMode();
+
+			_vector vPos = pBuild->Get_Pos();
+			XMStoreFloat3(&fPos, vPos);
+			_float3 fScale = pBuild->Get_Scale();
+			_float3 fCollisionScale = pBuild->Get_CollisionBoxScale();
+			_vector vecCollisionPos = pBuild->Get_CollisionBoxPos();
+			_vector	vRight{};
+			_vector	vUp{};
+			_vector	vLook{};
+
+			pBuild->Get_Rotation(vRight, vUp, vLook);
+
+			WriteFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr);
+			WriteFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
+			WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile, &fCollisionScale, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+
+
+			WriteFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+			WriteFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
+			WriteFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
+			WriteFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		}
+	}
+	CloseHandle(hFile);
+	MessageBox(NULL, L"Build Saved Successfully", L"Success", MB_OK);
+}
+
+void CLevel_ImGui::Build_Load()
+{
+	for (auto& pBuild : m_vecBuild)
+	{
+		pBuild->Set_DeadEnviron();
+	}
+	m_vecBuild.clear();
+
+
+	m_iBuild_Count = 0;
+	HANDLE hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+		return;
+	}
+	DWORD dwByte = 0;
+	LEVELID iLevel;
+	_int  iModelIndex;
+	_float3 fPos;
+	_float3 fScale;
+	_vector	vRight{};
+	_vector	vUp{};
+	_vector	vLook{};
+
+	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	{
+		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
+		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+
+		CEnvironment::ENVIRONMENT_DESC			Desc{};
+		Desc.eID = iLevel;
+		Desc.fPosition = fPos;
+		Desc.iModelComponentIndex = iModelIndex;
+		Desc.fScale = fScale;
+		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
+		if (pGameObj != nullptr)
+		{
+			Position[0] = fPos.x;			Position[1] = fPos.y;			Position[2] = fPos.z;
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
+			if(m_iBuild_Count > 0)
+				m_vecBuild.back()->Set_PickingCheck(false);
+			m_vecBuild.push_back(dynamic_cast<CEnvironment*>(pGameObj));
+			m_vecBuild.back()->Set_PickingCheck(true);
+			m_iBuild_Count++;
+		}
+	}
+
+	CloseHandle(hFile);
+	MessageBox(NULL, L"Build Loaded Successfully", L"Success", MB_OK);
+}
+
+HRESULT CLevel_ImGui::Build_Select()
+{
+	if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000) && m_iModeSelect == IMGUI_SELECT && bAble_Select == true)
+	{
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
+		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
+		XMVECTOR RayPos, RayDir;
+		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+		RayDir = XMVector3Normalize(RayDir);
+
+		for (auto& pBuild : m_vecBuild)
+		{
+			_vector vBoxPos = pBuild->Get_CollisionBoxPos();
+			XMFLOAT3 fBoxPos{};
+			XMStoreFloat3(&fBoxPos, vBoxPos);
+			XMFLOAT3 fBoxSize = pBuild->Get_CollisionBoxScale();
+
+			XMFLOAT3 fMinPoint, fMaxPoint;
+			m_pGameInstance->CreateBoundingBox(fBoxPos, fBoxSize, fMinPoint, fMaxPoint);
+			_bool bPickCheck = false;
+			float distance;
+			if (m_pGameInstance->Picking_Box(RayPos, RayDir, fMinPoint, fMaxPoint, distance, pBuild->Get_BoundingBox()))
+			{
+				bPickCheck = true;
+				pBuild->Set_PickingCheck(bPickCheck);
+				_vector vecBuildPos = pBuild->Get_Pos();
+				_float3 fBuildScale = pBuild->Get_Scale();
+				_float3 fBuildPos{};
+				XMStoreFloat3(&fBuildPos, vecBuildPos);
+
+
+				Position[0] = fBuildPos.x;				Position[1] = fBuildPos.y;				Position[2] = fBuildPos.z;
+				Scale[0] = fBuildScale.x;				Scale[1] = fBuildScale.y;				Scale[2] = fBuildScale.z;
+
+				CollisionBox_Pos[0] = fBoxPos.x;				CollisionBox_Pos[1] = fBoxPos.y;				CollisionBox_Pos[2] = fBoxPos.z;
+				CollisionBox_Scale[0] = fBoxSize.x;				CollisionBox_Scale[1] = fBoxSize.y;				CollisionBox_Scale[2] = fBoxSize.z;
+
+				bAble_Select = false;
+
+				
+			}
+			pBuild->Set_PickingCheck(bPickCheck);
+
+		}
+	}
+
+	return S_OK;
+}
 
 CLevel_ImGui* CLevel_ImGui::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -623,84 +1271,83 @@ CLevel_ImGui* CLevel_ImGui::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 void CLevel_ImGui::Free()
 {
 	__super::Free();
-	Button_Free();
-
+	Safe_Release(m_pSave);
+	Safe_Release(m_pLoad);
+	Safe_Release(m_pEnviron);
+	Safe_Release(m_pBuild);
 
 }
 
 void CLevel_ImGui::Create_ImageButton()
 {
-	// 저장 로드 버튼
 	m_pSave = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Save.jpg"));
 	m_pLoad = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Load.jpg"));
 
-	m_pChair0	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Chair0.png"));
-	m_pChair1	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Chair1.png"));
-	m_pChair2	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Chair2.png"));
-	m_pChair3	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Chair3.png"));
-	m_pChair4	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Chair4.png"));
-	m_pChair5	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Chair5.png"));
-	AidKit		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/AidKit.png"));
-	Card0		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Card0.png"));
-	Card1		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Card1.png"));
-	Desk0		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Desk0.png"));
-	Desk1		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Desk1.png"));
-	Desk2		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Desk2.png"));
-	Desk3		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Desk3.png"));
-	KeyPad		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/KeyPad.png"));
-	Sprinkler	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Sprinkler.png"));
-	Trim0		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Trim0.png"));
-	Vent0		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Vent0.png"));
-	Vent1		= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/Vent1.png"));
-	WasteBin	= CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Environment/WasteBin.png"));
+	m_pEnviron = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/ImGui/Button/Environment%d.png"), ENVIRONMENT_EA);
+	m_pBuild = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/ImGui/Button/Build%d.png"), BUILD_EA);
 
 	// 사진의 리소스뷰 가져오기
 	my_Savetexture = *m_pSave->Get_SRV().begin();
 	my_Loadtexture = *m_pLoad->Get_SRV().begin();
-
-
-	SRV_m_pChair0			= *m_pChair0->Get_SRV().begin();
-	SRV_m_pChair1			= *m_pChair1->Get_SRV().begin();
-	SRV_m_pChair2			= *m_pChair2->Get_SRV().begin();
-	SRV_m_pChair3			= *m_pChair3->Get_SRV().begin();
-	SRV_m_pChair4			= *m_pChair4->Get_SRV().begin();
-	SRV_m_pChair5			= *m_pChair5->Get_SRV().begin();
-	SRV_AidKit				= *AidKit->Get_SRV().begin();
-	SRV_Card0				= *Card0->Get_SRV().begin();
-	SRV_Card1				= *Card1->Get_SRV().begin();
-	SRV_Desk0				= *Desk0->Get_SRV().begin();
-	SRV_Desk1				= *Desk1->Get_SRV().begin();
-	SRV_Desk2				= *Desk2->Get_SRV().begin();
-	SRV_Desk3				= *Desk3->Get_SRV().begin();
-	SRV_KeyPad				= *KeyPad->Get_SRV().begin();
-	SRV_Sprinkler			= *Sprinkler->Get_SRV().begin();
-	SRV_Trim0				= *Trim0->Get_SRV().begin();
-	SRV_Vent0				= *Vent0->Get_SRV().begin();
-	SRV_Vent1				= *Vent1->Get_SRV().begin();
-	SRV_WasteBin			= *WasteBin->Get_SRV().begin();
+	
 }
 
-void CLevel_ImGui::Button_Free()
+
+
+HRESULT CLevel_ImGui::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
-	Safe_Release(	m_pSave		);
-	Safe_Release(	m_pLoad		);
-	Safe_Release(	m_pChair0	);
-	Safe_Release(	m_pChair1	);
-	Safe_Release(	m_pChair2	);
-	Safe_Release(	m_pChair3	);
-	Safe_Release(	m_pChair4	);
-	Safe_Release(	m_pChair5	);
-	Safe_Release(	AidKit		);
-	Safe_Release(	Card0		);
-	Safe_Release(	Card1		);
-	Safe_Release(	Desk0		);
-	Safe_Release(	Desk1		);
-	Safe_Release(	Desk2		);
-	Safe_Release(	Desk3		);
-	Safe_Release(	KeyPad		);
-	Safe_Release(	Sprinkler	);
-	Safe_Release(	Trim0		);
-	Safe_Release(	Vent0		);
-	Safe_Release(	Vent1		);
-	Safe_Release(	WasteBin);
+	CCamera_Free::CAMERA_FREE_DESC			Desc{};
+
+	Desc.vEye = _float4(0.f, 10.f, -5.f, 1.f);
+	Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	Desc.fFovy = XMConvertToRadians(60.0f);
+	Desc.fNearZ = 0.1f;
+	Desc.fFar = 500.f;
+	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	Desc.fSpeedPerSec = 30.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	Desc.fMouseSensor = 0.05f;
+	Desc.eLevel = LEVEL_IMGUI;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+		TEXT("Prototype_GameObject_Camera_Free_ImGui"), &Desc)))
+		return E_FAIL;
+
+	return S_OK;
 }
+HRESULT CLevel_ImGui::Ready_Lights()
+{
+
+	LIGHT_DESC	LightDesc{};
+
+	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+HRESULT CLevel_ImGui::Ready_Layer_Monster(const _tchar* pLayerTag)
+{
+	CMonster::MONSTER_DESC			Desc{};
+	Desc.eID = LEVEL_IMGUI;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+		TEXT("Prototype_GameObject_Monster_ImGui"), &Desc)))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+HRESULT CLevel_ImGui::Ready_Layer_Player(const _tchar* pLayerTag)
+{
+	//CGameObject::GAMEOBJ_DESC Desc{};
+	//CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
+	//m_pPlayer = static_cast<CPlayer*>(pPlayer);
+	return S_OK;
+}
+

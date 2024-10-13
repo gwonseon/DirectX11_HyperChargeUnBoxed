@@ -3,6 +3,7 @@
 // 정점 버퍼와 인덱스 버퍼를 가지는 모든 클래스들의 부모 클래스
 // 추상 클래스라 Create 함수는 따로 없다.
 #include "Component.h"
+#include <Shader.h>
 
 BEGIN(Engine)
 
@@ -23,6 +24,7 @@ public:
 	void	Chang_Topology();
 public:
 	HRESULT Bind_Buffers(); // 그리기 위해 필요한 값들을 장치에 올린다.
+	HRESULT Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 protected:
 	ID3D11Buffer*					m_pVB = { nullptr };		// 정점을 저장하는 버퍼, 정점 데이터를 GPU메모리에 저장, 엑세스 할 수 있게 해준다
 	ID3D11Buffer*					m_pIB = { nullptr };		// 인덱스를 저장하는 버퍼, 인덱스는 정점 버퍼 내의 정점들을 참조하여 효율적으로 렌더링하게 한다.
@@ -43,6 +45,7 @@ protected:
 
 public:
 	const _float3* Get_VtxPos() const { return m_fVertexPos; }
+	_float3*	Get_VtxPosition() { return m_fVertexPos; }
 	_uint	Get_VtxCountX() { return m_iNumVerticesX; }
 	_uint	Get_VtxCountZ() { return m_iNumVerticesZ; }
 	_uint					m_iNumVerticesX = {};

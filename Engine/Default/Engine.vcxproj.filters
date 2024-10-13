@@ -118,6 +118,18 @@
     <Filter Include="01. Utility\04. Component\Model\Animation\Channel">
       <UniqueIdentifier>{2a0c7c9b-bd97-40e6-adaf-c1bef7c5bddb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\02. GameObjects\ContainerObject">
+      <UniqueIdentifier>{a7f10d24-d9d2-4b55-b5af-bfdd0447ce91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\02. GameObjects\ContainerObject\PartObject">
+      <UniqueIdentifier>{1e39453a-6f6e-4af2-b91d-67740e655527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Box">
+      <UniqueIdentifier>{c2f4671c-6fec-4105-9024-3a17238f1d93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\SphereCollider">
+      <UniqueIdentifier>{f86d28e5-656d-459b-8125-92fd3cab7926}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -221,6 +233,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Channel.cpp">
       <Filter>01. Utility\04. Component\Model\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PartObject.cpp">
+      <Filter>01. Utility\02. GameObjects\ContainerObject\PartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ContainerObject.cpp">
+      <Filter>01. Utility\02. GameObjects\ContainerObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Box.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Box</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SphereCollider.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\SphereCollider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -337,6 +361,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Channel.h">
       <Filter>01. Utility\04. Component\Model\Animation\Channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PartObject.h">
+      <Filter>01. Utility\02. GameObjects\ContainerObject\PartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ContainerObject.h">
+      <Filter>01. Utility\02. GameObjects\ContainerObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Box.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Box</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SphereCollider.h">
+      <Filter>01. Utility\04. Component\VIBuffer\SphereCollider</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

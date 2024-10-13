@@ -4,70 +4,116 @@
 
 BEGIN(Engine)
 
+/* 1. ID3D11Device, ID3D11DeviceContext라는 객체를 우선 생성한다. */
+/* 2. IDXGISwapChain를 생성한다.(백버퍼(ID3D11Texture2D)도 같이 생성한거야.) */
+/* 3. 백버퍼뷰를 생성한다. */
+/* 4. 깊이버퍼 텍스쳐를 생성하고 깊이버퍼 뷰를 생성한다. */
+
 class CGraphic_Device final : public CBase
 {
+public:
+    enum BLEND_STATE
+    {
+        BS_NONALPHA,
+        BS_ALPHA,
+        BS_END
+    };
+
 private:
-	CGraphic_Device();
-	virtual ~CGraphic_Device() = default;
+    CGraphic_Device();
+    virtual ~CGraphic_Device() = default;
 
 public:
-	// 그래픽 디바이스 초기화, 핸들, 윈도우 사이즈, 디바이스랑 컨텍스트 피룡
-	HRESULT Initialize(HWND hWnd, _bool isWindowed, _uint iWinSizeX, _uint iWinSizeY, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppDeviceContext);
-	HRESULT Clear_BackBuffer_View(_float4 vClearColor); // 백버퍼 인자 색으로 지운다
-	HRESULT Clear_DepthStencil_View(); // 깊이 버퍼 + 스텐실 버퍼를 지운다
-	HRESULT Present(); // 후면 버퍼를 전면 버퍼로 교체한다. ( 백 버퍼를 화면에 직접 보여준다) 
+    /* 그래픽 디바이스의 초기화. */
+    HRESULT Initialize(HWND hWnd, _bool isWindowed, _uint iWinSizeX, _uint iWinSizeY, _Inout_ ID3D11Device** ppDevice,
+        _Inout_ ID3D11DeviceContext** ppContext);
+
+    /* 백버퍼를 지운다. */
+    HRESULT Clear_BackBuffer_View(_float4 vClearColor);
+
+    /* 깊이버퍼 + 스텐실버퍼를 지운다. */
+    HRESULT Clear_DepthStencil_View();
+
+    /* 후면 버퍼를 전면버퍼로 교체한다.(백버퍼를 화면에 직접 보여준다.) */
+    HRESULT Present();
+
+    // 블렌드 스테이트를 세팅한다.
+    HRESULT Set_BlendState(const BLEND_STATE& BS);
+
+    ID3D11Device* Get_Device() { return m_pDevice; }
+    ID3D11DeviceContext* Get_Context() { return m_pDeviceContext; }
 
 private:
-	// 메모리 할당 ( 정점 버퍼, 인덱스 버퍼, 텍스처 로드, 쉐이더 객체를 생성한다. ) 컴객체의 생성과 관련된 역할
-	// 추가적으로 생성된 모든 스레드에서 상용하는데 전혀 문제가 없다
-	ID3D11Device*				m_pDevice = { nullptr }; 
+    // IDirect3DDevice9* == LPDIRECT3DDEVICE9 == ID3D11Device + ID3D11DeviceContext
 
-	// 기능 실행 ( 바인딩 작업, 정점 버퍼를 SetVertexBuffer(), SetIndexBuffer(), Apply())
-	// 그린다 DrawIndexed()
-	// 컨텍스트 객체를 생성해낸 스레드 외에 스레드에서는 사용해서는 안된다
-	// 고정기능렌더링파이프라인 : 월드 뷰 투영행렬을 바인딩 + 텍스처 정보를 바인딩
-	// 생성된 스레드로 그려도 된다.
-	ID3D11DeviceContext*		m_pDeviceContext = { nullptr };
+    /* 스레드를 생성한다 : 내 코드를 읽는 흐름을 하나 더 만들어주낟. */
+    /* 내 코드를 읽는 프로세스가 두개구나. (X) */
+    /* 하나의 프로세스로 읽는 흐름을 다수 생성하는 작업(O) */
+    /* 메인 스레드가 출력시에 메인스레드는 논다. 이 때 놀고 있는 메인스레드로 다른 역활을 좀더 수행하고싶다.(추가
+     * 스레드를 생성하여 처리하는것이다.)*/
 
-	// 후면 버퍼와 전면 버퍼를 교체해가면서 화면에 보여주는 역할을 한다.
-	IDXGISwapChain* m_pSwapChain = { nullptr };
+     /* 리소스 로드 및 출력. */
+     /* 연산. */
 
+     /* 메모리 할당. (정점버퍼, 인덱스버퍼, 텍스쳐로드, 쉐이더객체를 생성한다. ) 컴객체의 생성과 관련된 역할 */
+     /* 추가적으로 생성된 모든 스레드에서 사용하는데 전혀 문제가 없다. */
+    ID3D11Device* m_pDevice = { nullptr };
+
+    /* 기능실행.(바인딩작업, 정점버퍼를 SetVertexBuffers(), SetIndexBuffer(), Apply() */
+    /* 그린다. DrawIndexed() */
+    /* 컨텍스트 객체를 생성해낸 스레드 외에 스레드에서는 사용해서는 안된다. */
+    /* 고정기능렌더링파이프라인 : 월드, 뷰, 투영행렬을 바인딩 + 텍스쳐 정보를 바인딩. */
+
+    /* 생성된 스레드로 그리면 안돼?(X) */
+    ID3D11DeviceContext* m_pDeviceContext = { nullptr };
+
+    /* 후면버퍼와 전면버퍼를 교체해가면서 화면에 보여주는 역할 */
+    IDXGISwapChain* m_pSwapChain = { nullptr };
+
+    /* IDirect3DTexture9 */
+    /* ID3D11Texture2D : 텍스쳐를 표현하는 사전객체 타입이다. 실제 이 타입으로는 아무 역활도 못함.
+    why? 용도에 맞는 실질적으로 사용하기 위한 텍스쳐객체를 만들어내기위해.  */
+    /* ID3D11Texture2D를 통해 픽셀의 락언락을 통해 색을 강제로 바꾸거나 파일로 출력하거나 등등의 일은 가능 */
+    /* ID3D11Texture2D를 통해 픽셀의 색을 샘플링해서 화면에 그리는 작업(x), 렌더타겟용으로 사용(x), 깊이 버퍼용으로
+     * 사용(x)  */
+
+     /* dx11에선느 실제 사용하기위한 텍스쳐타입뒤에 View를 붙여놨다. */
+     /* ID3D11ShaderResourceView : 셰이더에 전달될 수 있는 텍스처 타입. */
+     /* ID3D11RenderTargetView : 렌더타겟용으로 사용될 수 있는 텍스처 타입. */
+     /* ID3D11DepthStencilView : 깊이스텐실 버퍼로서 사용될 수 있는 타입.  */
+    ID3D11RenderTargetView* m_pBackBufferRTV = { nullptr };
+    ID3D11DepthStencilView* m_pDepthStencilView = { nullptr };
+    ID3D11RasterizerState* m_pRasterizerSate{};
+
+    ID3D11Texture2D* m_pDepthTexture = { nullptr };
+
+    // 뎁스 스텐실 스테이트
+    ID3D11DepthStencilState* m_pBasicDSS{};      // 일반적인 그리기
+    ID3D11DepthStencilState* m_pMaskDSS{};       // 스텐실 버퍼에 마스킹하기
+    ID3D11DepthStencilState* m_pDrawMaskedDSS{}; // 마스킹 된 곳만 그리기
+
+    // 레스터라이저 스테이트
+    ID3D11RasterizerState* m_pSolid_CW_RS{};
+    ID3D11RasterizerState* m_pSolid_CCW_RS{};
+    ID3D11RasterizerState* m_pWire_CW_RS{};
+    ID3D11RasterizerState* m_pWire_CCW_RS{};
+
+    // 블렌드 스테이트
+    ID3D11BlendState* m_pMirrorAlpha_BS{};
+    ID3D11BlendState* m_pNonAlpha_BS{};
+    ID3D11BlendState* m_pAlpha_BS{};
 
 private:
-	// 실제로 사용하기 위한 텍스쳐 타입 뒤에는 View 가 붙여져 있다.
-
-
-	// 셰이더에 전달할 수 있는 텍스처 타입
-	/// ID3D11ShaderResourceView 
-
-	// 렌더 타겟으로 사용될 수 있는 텍스처 타입
-	ID3D11RenderTargetView*		m_pBackBufferRTV = { nullptr };
-
-	// 텍스처를 표현하는 사전 객체 타입이다.
-	// 실제 그리기를 수행하는 역할이 아닌 실제 용도에 맞게 그리기위한 텍스처 객체를 만들기 위해 존재하는 느낌이다.
-	// 픽셀의 락언락을 통해 색을 강제로 바꾸거나 파일로 출력하거나 등등의 일은 가능하다
-	// 픽셀의 색을 샘플링해서 화면에 그리는 작업은 불가능하다.
-	// 렌더 타겟용으로 사용이 불가능하다
-	// 깊이 버퍼용으로 사용이 불가능하다.
-
-	ID3D11Texture2D*			m_pDepthTexture = { nullptr };
-
-	// 깊이 스텐실 버퍼로서 사용될 수 있는 타입
-	ID3D11DepthStencilView*		m_pDepthStencilView = { nullptr };
-
-
-private:
-	// 스왑체인에게 필수적으로 필요한 데이터는 백버퍼가 필요하여 백버퍼를 생성하기 위한 정보를 던져준다.
-	// 스왑체인을 만들었다 == 백버퍼(텍스처) 가 생성된다.
-	//SwapChain 객체를 만들면서 백버퍼에 해당하는 ID3D11Texture2D 객체를 만들어서 스왑체인 객체가 내장하게 한다.
-	HRESULT Ready_SwapChain(HWND hWnd, _bool isWindowed, _uint iWinCX, _uint iWinCY);
-	HRESULT Ready_BackBufferRenderTargetView(); // 내가 앞으로 사용하기 위한 용도의 텍스쳐를 만드는 함수
-	HRESULT Ready_DepthStencilView(_uint iWinCX, _uint iWinCY); // 깊이 스텐실 텍스처를 만드는 함수
+    /* 스왑체인에게 필수적으로 필요한 데이터는 백버퍼가 필요하여 백버퍼를 생성하기위한 정보를 던져준다. */
+    /* 스왑체인을 만들었다 == 백버퍼(텍스쳐)가 생성된다. */
+    HRESULT Ready_SwapChain(HWND hWnd, _bool isWindowed, _uint iWinCX, _uint iWinCY);
+    HRESULT Ready_BackBufferRenderTargetView();
+    HRESULT Ready_DepthStencilView(_uint iWinCX, _uint iWinCY);
 
 public:
-	static CGraphic_Device* Create(HWND hWnd, _bool isWindowed, _uint iWinSizeX, _uint iWinSizeY, _Out_ ID3D11Device** ppDeviceOut, _Out_ ID3D11DeviceContext** ppDeviceContextOut);
-	virtual void Free() override;
-
+    static CGraphic_Device* Create(HWND hWnd, _bool isWindowed, _uint iWinSizeX, _uint iWinSizeY,
+        _Out_ ID3D11Device** ppDevice, _Out_ ID3D11DeviceContext** ppDeviceContextOut);
+    virtual void Free() override;
 };
 
 END

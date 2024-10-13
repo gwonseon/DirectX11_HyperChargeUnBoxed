@@ -14,7 +14,7 @@ public:
 		_float	fAspect{ 0.f };
 		_float	fNearZ{ 0.f };
 		_float	fFar = { 0.f };
-		 
+
 	}CAMERA_DESC;
 
 protected:
@@ -29,13 +29,13 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	
 protected:
 	_float	m_fFovy = { 0.f };
 	_float	m_fAspect = { 0.f };
 	_float	m_fNearZ = { 0.f };
 	_float	m_fFar = { 0.f };
-
+	_float4 m_vEye{}, m_vAt{};
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free();

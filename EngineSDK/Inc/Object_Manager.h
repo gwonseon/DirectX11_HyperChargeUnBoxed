@@ -21,6 +21,7 @@ public:
 	HRESULT Add_Prototype(const _wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_GameObject_ToLayer(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg);
 	class CGameObject* Add_GameObject_ToLayer_ReturnObject(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg);
+	class CGameObject* Clone_Prototype(const _wstring& strPrototypeTag, void* pArg);
 
 	
 	class CGameObject* Get_Prototype(_uint iLevelIndex, const _tchar* pLayerTag, const _wstring& strPrototypeTag);

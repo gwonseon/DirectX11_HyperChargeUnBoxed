@@ -15,7 +15,7 @@ BEGIN(Client)
 class CLoading_UI final : public CUIObject
 {
 public:
-	enum UITAG{ LOADING_GAGE, LOADING_LOGO, LOADING_GAMENAME, LOADING_END};
+	enum UITAG{ LOADING_GAGE, LOADING_LOGO, LOADING_GAMENAME, LOADING_BACKGROUND_GAMENAME,LOADING_END};
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
 		enum UITAG eTag{};
@@ -56,11 +56,11 @@ private:
 	CTexture* m_pTextureCom_Loading0 = { nullptr };
 	CTexture* m_pTextureCom_Loading1 = { nullptr };
 	CTexture* m_pTextureCom_Loading2 = { nullptr };
-	_float2		m_fIndex = {};
+	_uint		m_iIndex = 0;
 	_float		m_fPercent = 0.f;
 	_float		m_fPrePercent = 0.f;
 	UITAG		m_eTag{};
-
+	_float		m_fTick{};
 public:
 	static CLoading_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

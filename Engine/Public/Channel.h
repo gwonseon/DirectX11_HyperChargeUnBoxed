@@ -11,8 +11,23 @@ private:
 	virtual ~CChannel() = default;
 
 public:
-//	HRESULT Initialize(class CModel* pModel, const aiNodeAnim* pAIChannel);
-	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentPosition);
+	HRESULT Initialize(class CModel* pModel, HANDLE hFileRead);
+	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _uint* pCurrentKeyFrameIndex, _float fCurrentPosition);
+	void Update_TransformationMatrix_UpperBody(const vector<class CBone*>& Bones, _uint* pCurrentKeyFrameIndex, _float fCurrentPosition);
+	void Update_TransformationMatrix_LowerBody(const vector<class CBone*>& Bones, _uint* pCurrentKeyFrameIndex, _float fCurrentPosition);
+
+
+public:
+	_bool Update_LinearInterPolation( const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta);
+	_bool Update_LinearInterPolation_UpperBody(const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta);
+	_bool Update_LinearInterPolation_LowerBody(const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta);
+
+	void Set_InterPolationCurrentTime_Init() { m_fInterPolation_CurrentTime = 0.f; }
+public:
+	KEYFRAME&		Get_LastKeyFrame() { return LastKeyFrame; }
+
+	_char* Get_szName() { return m_szName; }
+	string Get_strName() { return m_strName; }
 
 private:
 	_char								m_szName[MAX_PATH];
@@ -22,12 +37,24 @@ private:
 
 	_uint								m_iBoneIndex = {};
 
-	/* 현재 재생되고 있는 위치기준으로 왼쪽에 존재하는 키프레임의 인덱스*/
-	_uint								m_iCurrentKeyFrameIndex = {};
-
+	KEYFRAME		LastKeyFrame;
+	KEYFRAME		LastKeyFrame_UpperBody;
+	KEYFRAME		LastKeyFrame_LowerBody;
+	_float			m_fInterPolation_CurrentTime{};
+	_float			m_fInterPolation_TargetTime{};
+	_bool			m_bInitOnce = false;
+	_bool			m_bInitOnce_UpperBody = false;
+	_bool			m_bInitOnce_LowerBody = false;
+	_float			fTemp = 0.f;
+	_float			fTemp_UpperBody = 0.f;
+	_float			fTemp_LowerBody = 0.f;
+	string			m_strName = {};
 public:
-//	static CChannel* Create(class CModel* pModel, const aiNodeAnim* pAIChannel);
+	static CChannel* Create(class CModel* pModel, HANDLE hFileRead);
 	virtual void Free() override;
+
+private:
+	DWORD			dwByte = 0;
 };
 
 END

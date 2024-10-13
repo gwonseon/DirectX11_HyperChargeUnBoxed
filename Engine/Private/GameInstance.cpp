@@ -72,10 +72,12 @@ void CGameInstance::Update(_float fTimeDelta)
 {
 	/* 엔진에있는 객체들 중 반복적인 갱신이 필요한 녀석이라면 여기서 다 호출. */
 	m_pInput_Device->Update_InputDev();
+	
+	m_pPipeLine->Update();
 
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
-	m_pPipeLine->Update();
+
 
 	m_pObject_Manager->Update(fTimeDelta);
 
@@ -88,6 +90,7 @@ void CGameInstance::Update(_float fTimeDelta)
 void CGameInstance::Draw()
 {
 	/* 게임내에 필요한 대다수의 객체들을 모두 그려낸다. */
+	
 	m_pRenderer->Draw();
 
 	/* 할일이 없어. 디버그모드에서만 디버그내용만 출력하는 용도 .*/
@@ -140,6 +143,17 @@ HRESULT CGameInstance::Render_End()
 	return S_OK;
 }
 
+HRESULT CGameInstance::Set_BlendState(const CGraphic_Device::BLEND_STATE& BS)
+{
+	if (nullptr == m_pGraphic_Device) return E_FAIL;
+
+	return m_pGraphic_Device->Set_BlendState(BS);
+}
+
+ID3D11Device* CGameInstance::Get_Device() { return m_pGraphic_Device->Get_Device(); }
+
+ID3D11DeviceContext* CGameInstance::Get_Context() { return m_pGraphic_Device->Get_Context(); }
+
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)
@@ -164,14 +178,44 @@ void CGameInstance::Update_TimeDelta(const _wstring& strTimerTag)
 	return m_pTimer_Manager->Update_TimeDelta(strTimerTag);
 }
 
-_byte CGameInstance::Get_DIKeyState(_ubyte byKeyID)
+_ubyte CGameInstance::Get_DIKeyState(_ubyte byKeyID)
 {
 	return m_pInput_Device->Get_DIKeyState(byKeyID);
 }
 
-_byte CGameInstance::Get_DIMouseState(MOUSEKEYSTATE eMouse)
+_ubyte CGameInstance::Get_DIKeyState_Pressing(_ubyte byKeyID)
+{
+	return m_pInput_Device->Get_DIKeyState_Pressing(byKeyID);
+}
+
+_ubyte CGameInstance::Get_DIKeyState_Up(_ubyte byKeyID)
+{
+	return m_pInput_Device->Get_DIKeyState_Up(byKeyID);
+}
+
+_ubyte CGameInstance::Get_DIKeyState_Down(_ubyte byKeyID)
+{
+	return m_pInput_Device->Get_DIKeyState_Down(byKeyID);
+}
+
+_ubyte CGameInstance::Get_DIMouseState(MOUSEKEYSTATE eMouse)
 {
 	return m_pInput_Device->Get_DIMouseState(eMouse);
+}
+
+_ubyte CGameInstance::Get_DIMouseState_Down(MOUSEKEYSTATE eMouse)
+{
+	return m_pInput_Device->Get_DIMouseState_Down(eMouse);
+}
+
+_ubyte CGameInstance::Get_DIMouseState_Pressing(MOUSEKEYSTATE eMouse)
+{
+	return m_pInput_Device->Get_DIMouseState_Pressing(eMouse);
+}
+
+_ubyte CGameInstance::Get_DIMouseState_Up(MOUSEKEYSTATE eMouse)
+{
+	return m_pInput_Device->Get_DIMouseState_Up(eMouse);
 }
 
 _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
@@ -243,6 +287,14 @@ CLayer* CGameInstance::Find_Layer(_uint iLevelIndex, const _wstring& strLayerTag
 	if (nullptr == m_pObject_Manager)
 		return nullptr;
 	return m_pObject_Manager->Find_Layer(iLevelIndex, strLayerTag);
+}
+
+CGameObject* CGameInstance::Clone_Prototype(const _wstring& strPrototypeTag, void* pArg)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Clone_Prototype(strPrototypeTag, pArg);
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, CComponent* pPrototype)
@@ -328,6 +380,22 @@ void CGameInstance::Get_MouseRayDirection(_float3 fPosition, XMMATRIX invProj, X
 _float3 CGameInstance::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ)
 {
 	return m_pPicking_Manager->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+}
+
+_float3 CGameInstance::Picking_Box_FAILED(_vector RayPos, _vector RayDir, const _float3* VtxPos)
+{
+	return m_pPicking_Manager->Picking_Box_FAILED(RayPos, RayDir, VtxPos);
+}
+
+void CGameInstance::CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint)
+{
+	return m_pPicking_Manager->CreateBoundingBox(center, size, fMinPoint, fMaxPoint);
+
+}
+
+bool CGameInstance::Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box)
+{
+	return m_pPicking_Manager->Picking_Box(rayOrigin, rayDirection, fMinPoint, fMaxPoint, distance, box);
 }
 
 void CGameInstance::Release_Engine()

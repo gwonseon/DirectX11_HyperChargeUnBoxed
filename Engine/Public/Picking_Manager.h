@@ -25,6 +25,15 @@ public:
 
 	// 터레인 피킹
 	_float3 Picking_Terrain(XMVECTOR  RayPos, XMVECTOR  RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ);
+	_float3 Picking_Box_FAILED(XMVECTOR  RayPos, XMVECTOR  RayDir, const _float3* VtxPos);
+
+
+
+	void CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint);
+	bool Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box);
+	
+
+
 
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };

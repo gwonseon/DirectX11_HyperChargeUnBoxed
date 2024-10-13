@@ -136,10 +136,15 @@ HRESULT CRenderer::Render_Blend()
 
 HRESULT CRenderer::Render_UI()
 {
+
+
 	for (auto& pRenderGameObject : m_RenderGameObjects[RG_UI])
 	{
+		
+
 		if (nullptr != pRenderGameObject)
 			pRenderGameObject->Render();
+		
 
 		Safe_Release(pRenderGameObject);
 	}

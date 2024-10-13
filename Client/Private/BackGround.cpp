@@ -58,8 +58,8 @@ void CBackGround::Priority_Update(_float fTimeDelta)
 void CBackGround::Update(_float fTimeDelta)
 {
 	_uint iData = 10;
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
-		return;
+    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
+        return;
 }
 
 void CBackGround::Late_Update(_float fTimeDelta)
@@ -69,7 +69,7 @@ void CBackGround::Late_Update(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
-
+	m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL; 

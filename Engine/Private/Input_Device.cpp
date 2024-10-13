@@ -2,8 +2,10 @@
 
 Engine::CInput_Device::CInput_Device(void)
 {
-
+	ZeroMemory(m_byKeyState, sizeof(m_byKeyState));
+	ZeroMemory(m_byPrevKeyState, sizeof(m_byPrevKeyState));
 }
+
 
 HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 {
@@ -50,8 +52,11 @@ HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 
 void Engine::CInput_Device::Update_InputDev(void)
 {
+	memcpy(m_byPrevKeyState, m_byKeyState, sizeof(m_byKeyState));
+	memcpy(&m_tPrevMouseState, &m_tMouseState, sizeof(m_tMouseState));
+
 	m_pKeyBoard->GetDeviceState(256, m_byKeyState);
- 	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);
+	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);
 }
 
 CInput_Device * CInput_Device::Create(HINSTANCE hInst, HWND hWnd)
@@ -66,6 +71,55 @@ CInput_Device * CInput_Device::Create(HINSTANCE hInst, HWND hWnd)
 
 	return pInstance;
 }
+
+
+_ubyte CInput_Device::Get_DIKeyState(_ubyte byKeyID)
+{
+	return m_byKeyState[byKeyID];
+}
+
+
+_ubyte CInput_Device::Get_DIKeyState_Pressing(_ubyte byKeyID)
+{
+	return (m_byKeyState[byKeyID] & 0x80) ? 1 : 0;
+}
+
+_ubyte CInput_Device::Get_DIKeyState_Up(_ubyte byKeyID)
+{
+	return (!(m_byKeyState[byKeyID] & 0x80) && (m_byPrevKeyState[byKeyID] & 0x80)) ? 1 : 0;
+}
+
+_ubyte CInput_Device::Get_DIKeyState_Down(_ubyte byKeyID)
+{
+	return ((m_byKeyState[byKeyID] & 0x80) && !(m_byPrevKeyState[byKeyID] & 0x80)) ? 1 : 0;
+}
+
+_ubyte CInput_Device::Get_DIMouseState(MOUSEKEYSTATE eMouse)
+{
+	return m_tMouseState.rgbButtons[eMouse];
+}
+
+_ubyte CInput_Device::Get_DIMouseState_Pressing(MOUSEKEYSTATE eMouse)
+{
+	return (m_tMouseState.rgbButtons[eMouse] & 0x80) ? 1 : 0;
+}
+
+_ubyte CInput_Device::Get_DIMouseState_Up(MOUSEKEYSTATE eMouse)
+{
+	return (!(m_tMouseState.rgbButtons[eMouse] & 0x80) && (m_tPrevMouseState.rgbButtons[eMouse] & 0x80)) ? 1 : 0;
+}
+
+_ubyte CInput_Device::Get_DIMouseState_Down(MOUSEKEYSTATE eMouse)
+{
+	return ((m_tMouseState.rgbButtons[eMouse] & 0x80) && !(m_tPrevMouseState.rgbButtons[eMouse] & 0x80)) ? 1 : 0;
+}
+
+
+_long CInput_Device::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
+{
+	return *(((_long*)&m_tMouseState) + eMouseState);
+}
+
 
 void Engine::CInput_Device::Free(void)
 {
