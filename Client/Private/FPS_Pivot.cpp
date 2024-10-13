@@ -33,7 +33,7 @@ HRESULT CFPS_Pivot::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	Position = { 5.f,0.3f,1.2f};
+	Position = { 3.9f,-0.9f,0.4f};
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
 	//m_pTransformCom->Set_Scaling(3.f, 3.f, 3.f);
 
@@ -54,11 +54,7 @@ void CFPS_Pivot::Priority_Update(_float fTimeDelta)
 
 void CFPS_Pivot::Update(_float fTimeDelta)
 {
-	/*
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
-	m_pTransformCom->Rotation(Rotation.x, Rotation.y, Rotation.z);
-	*/
 	/*if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
 	{
 		Position.x += 0.1f;
@@ -110,11 +106,9 @@ void CFPS_Pivot::Update(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_P))
 	{
 		cout << Position.x << "    " << Position.y << "    " << Position.z << endl;
-		cout << Rotation.x << "    " << Rotation.y << "    " << Rotation.z << endl;
 	}
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
-	m_pTransformCom->Rotation(Rotation.x, Rotation.y, Rotation.z);*/
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));*/
 
 }
 
@@ -127,21 +121,7 @@ void CFPS_Pivot::Late_Update(_float fTimeDelta)
 
 HRESULT CFPS_Pivot::Render()
 {
-	/*if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
 
-	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
-
-	for (size_t i = 0; i < iNumMeshes; i++)
-	{
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
-
-		m_pModelCom->Render(i);
-	}*/
 
 	return S_OK;
 }
@@ -152,11 +132,6 @@ HRESULT CFPS_Pivot::Add_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-
-	///* For.Com_Model */
-	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Weapon1"),
-	//	TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-	//	return E_FAIL;
 
 	return S_OK;
 

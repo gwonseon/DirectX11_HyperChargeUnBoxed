@@ -382,20 +382,16 @@ CChannel* CChannel::Create(CModel* pModel, HANDLE hFileRead)
 
 HRESULT CChannel::Initialize(CModel* pModel, HANDLE hFileRead)
 {
-	_uint iChannelLen = 0;
-	ReadFile(hFileRead, &iChannelLen, sizeof(_uint), &dwByte, nullptr);
-//	cout << iChannelLen << endl;
-	for (int i = 0; i < iChannelLen; i++)
-	{
-		ReadFile(hFileRead, &m_szName[i], sizeof(_char), &dwByte, nullptr);
+	_uint iChannelNameLen = 0;
+	ReadFile(hFileRead, &iChannelNameLen, sizeof(_uint), &dwByte, nullptr);
+	char* szName = new char[iChannelNameLen + 1]; // +1 for null terminator
+	ReadFile(hFileRead, szName, iChannelNameLen, &dwByte, nullptr);
+	szName[iChannelNameLen] = '\0';
 
-//		cout << m_szName[i];
-	}
-//	cout << endl;
-	m_szName[iChannelLen] = '\0';
-	
-	string strName(m_szName);
-	m_strName = strName;
+	strcpy_s(m_szName, szName);
+//	cout << strChannelName << endl;
+	delete[] szName;
+
 	m_iBoneIndex = pModel->Get_BoneIndex(m_szName);
 	cout << m_szName << "   :     " << m_iBoneIndex << endl;
 

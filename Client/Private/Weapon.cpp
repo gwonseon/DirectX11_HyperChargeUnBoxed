@@ -41,7 +41,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_iViewState = pDesc->m_iViewState;
 
 	Position = {-0.67, 0.48, -0.29 };
-	Scale = { 1.93f };
+	Scale = { 2.5f };
 	Rotation = {-24.4402,-102.899,6.4f };
 	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
 	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
@@ -54,7 +54,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
-	/*if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
+	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
 	{
 		Position.x += 0.01f;
 	}
@@ -109,7 +109,7 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 	}
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f)); 
-	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));*/
+	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 	m_pTransformCom->LookAt(*m_vecCameraAt * -1.f);
 }
 

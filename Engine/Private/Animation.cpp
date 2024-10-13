@@ -242,17 +242,14 @@ CAnimation* CAnimation::Create(CModel* pModel, HANDLE hFileRead)
 HRESULT CAnimation::Initialize(CModel* pModel, HANDLE hFileRead)
 {
 
-	_uint iAnimationLen = 0;
-	
-	ReadFile(hFileRead, &iAnimationLen, sizeof(_uint), &dwByte, nullptr);
-	for (int i = 0; i < iAnimationLen; i++)
-	{
-		ReadFile(hFileRead, &m_szName[i], sizeof(_char), &dwByte, nullptr);
-//		cout << m_szName[i];
-	}
-//	cout << endl;
-	m_szName[iAnimationLen] = '\0';
-
+	_uint iAnimationNameLen = 0;
+	ReadFile(hFileRead, &iAnimationNameLen, sizeof(_uint), &dwByte, nullptr);
+	char* m_szName = new char[iAnimationNameLen + 1]; // +1 for null terminator
+	ReadFile(hFileRead, m_szName, iAnimationNameLen * sizeof(_char), &dwByte, nullptr);
+	m_szName[iAnimationNameLen] = '\0';
+	string strAnimationName(m_szName);
+	// cout << strAnimationName << std::endl;
+	delete[] m_szName;
 
 	ReadFile(hFileRead, &m_fDuration, sizeof(_float), &dwByte, nullptr);			// for Export 
 //	cout << m_fDuration << endl;
