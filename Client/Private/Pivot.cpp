@@ -54,7 +54,7 @@ void CPivot::Priority_Update(_float fTimeDelta)
 
 void CPivot::Update(_float fTimeDelta)
 {
-	
+	/*
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
 	{
 		Position.x += 0.01f;
@@ -109,7 +109,7 @@ void CPivot::Update(_float fTimeDelta)
 		cout << Rotation.x << "    " << Rotation.y << "    " << Rotation.z << endl;
 	}
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));*/
 
 
 }

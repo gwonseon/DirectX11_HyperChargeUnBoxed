@@ -39,8 +39,8 @@ HRESULT CBody_Player::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	m_iViewState = pDesc->m_iViewState;
-	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Rifle, true);
-	m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Rifle, true);
+	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed, true);
+	m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Shotgun, true);
 
 	return S_OK;
 }
@@ -136,7 +136,7 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 		if(m_iWeaponState == WEAPON_KATANA)
 			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Katana, true);
 		else
-			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Rifle, true);
+			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Shotgun, true);
 
 	}
 }

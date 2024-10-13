@@ -54,13 +54,16 @@ HRESULT CMesh::Initialize_Prototype_NonAnim(CModel::TYPE eModelType, CModel* pMo
 {
 	_uint iLen{};
 	ReadFile(hFileRead, &iLen, sizeof(_uint), &dwByte, nullptr);
-	for (_uint k = 0; k < iLen; k++)
-	{
-		ReadFile(hFileRead, &m_szName[k], sizeof(_char), &dwByte, nullptr);
-		
-	}
-//	cout << m_szName << endl;
-	m_szName[iLen] = '\0';
+	char* buffer = new char[iLen + 1]; // +1 for null terminator
+	ReadFile(hFileRead, buffer, iLen * sizeof(_char), &dwByte, nullptr);
+	buffer[iLen] = '\0';
+	strcpy_s(m_szName, iLen + 1, buffer); // +1 to include the null terminator
+	// 메모리 해제
+	delete[] buffer;
+
+	// cout을 통해 문자열 출력
+	// cout << m_szName << endl;
+
 
 
 	ReadFile(hFileRead, &m_iMaterialIndex, sizeof(_uint), &dwByte, nullptr);

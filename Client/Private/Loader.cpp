@@ -538,6 +538,8 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	const _wstring Ext = TEXT(".dat");
 	// PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	cout << "Environment ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
 	while(iPathIndex < ENVIRONMENT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
@@ -548,8 +550,10 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 		iEnvironmentIndex++;
 		iPathIndex++;
 	}
-	const _wstring Model_Build_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim_Build");
+	const _wstring Model_Build_Path = TEXT("../Bin/Resources/Model/ModelData_Build");
 	iPathIndex = 0;
+	cout << "BUILD ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
 	while (iPathIndex <BUILD_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
@@ -567,6 +571,8 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
 	iPathIndex = 0;
 	_uint iCharacterIndex = 0;
+	cout << "Character ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
 	while (iPathIndex < 2)
 	{
 		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
@@ -583,6 +589,9 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	const _wstring Model_Weapon_Path = TEXT("../Bin/Resources/Model/ModelData_Weapon");
 	iPathIndex = 0;
 	_uint iWeaponIndex = 0;
+	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+
 	while (iPathIndex < WEAPON_EA)
 	{
 
@@ -602,6 +611,8 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
+	cout << "애니메이션 ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
 
 	while (iAnimModelIndex < 8)
 	{

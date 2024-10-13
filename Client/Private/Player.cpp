@@ -259,11 +259,18 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_R))
 	{
-		if (!(m_iState_Upper & RELOADING))
+		if(m_iWeaponState != WEAPON_KATANA)
 		{
-			if (m_iState_Upper & STATE_IDLE)
-				m_iState_Upper ^= STATE_IDLE;
-			m_iState_Upper |= RELOADING;
+			if (!(m_iState_Upper & RELOADING))
+			{
+				if (m_iState_Upper & STATE_IDLE)
+					m_iState_Upper ^= STATE_IDLE;
+				m_iState_Upper |= RELOADING;
+			}
+		}
+		else
+		{
+			m_iState_Upper |= STATE_IDLE;
 		}
 	}
 	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB))
