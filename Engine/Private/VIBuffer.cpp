@@ -89,6 +89,11 @@ HRESULT CVIBuffer::Bind_Buffers()
 	return S_OK;
 }
 
+HRESULT CVIBuffer::Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName)
+{
+	return E_NOTIMPL;
+}
+
 HRESULT CVIBuffer::Create_Buffer(ID3D11Buffer** ppOut)
 {
 	return m_pDevice->CreateBuffer(&m_BufferDesc, &m_InitialDesc, ppOut);

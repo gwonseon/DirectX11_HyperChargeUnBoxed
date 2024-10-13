@@ -29,6 +29,8 @@ private:
 	CLoading_UI* m_pLoadingUI = { nullptr };
 	CLoading_UI* m_pLoadingUI_Logo = { nullptr };
 	CLoading_UI* m_pLoadingUI_GameTitle = { nullptr };
+	CLoading_UI* m_pLoadingUIBack = { nullptr };
+	
 	CBackGround* m_pBackGround = { nullptr };
 public:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);

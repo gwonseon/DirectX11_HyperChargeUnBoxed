@@ -29,11 +29,13 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
+	 
 
 public:
 	bool IsValid() const { return !m_bDead; }
 	bool Get_Dead() { return m_bDead; }
 	void Set_Dead() { m_bDead = true; }
+
 
 public:
 	_float3	Get_PickingPos() { return m_fPickingPos; }
@@ -54,9 +56,8 @@ protected:
 protected:
 	_uint							m_iData = {};
 	_float3							m_fPickingPos{};
-	_bool m_bDead = false;
-
-
+	_bool							m_bDead = false;
+	_vector							m_vecPosition{};
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 

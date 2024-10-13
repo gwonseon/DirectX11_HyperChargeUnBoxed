@@ -19,31 +19,53 @@ public:
 	}
 
 	_uint Get_BoneIndex(const _char* pBoneName) const;
-
+	const _float4x4* Get_BoneMatrix(const _char* pBoneName) const;
 public:
 	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
+		m_bLinearInterpolation = false; // 선형보간 하도록 false 로 바꿔줌
+	}
+	void Set_Animation_UpperBody(_uint iAnimIndex, _bool isLoop = false) {
+		m_iCurrentAnimIndex_UpperBody = iAnimIndex;
+		m_isLoop_UpperBody = isLoop;
+		m_bLinearInterpolation_UpperBody = false; // 선형보간 하도록 false 로 바꿔줌
 	}
 
-public:
-//	HRESULT Initialize_Prototype_For_Export(TYPE eModelType, const _char* pModelFilePath, _uint iIndex, _fmatrix PreTransformMatrix = XMMatrixIdentity());
+	void Set_Animation_LowerBody(_uint iAnimIndex, _bool isLoop = false) {
+		m_iCurrentAnimIndex_LowerBody = iAnimIndex;
+		m_isLoop_LowerBody = isLoop;
+		m_bLinearInterpolation_LowerBody = false; // 선형보간 하도록 false 로 바꿔줌
+	}
 
-//	virtual HRESULT Initialize_Prototype(TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity());
+	_uint Get_CurrentAnimationIndex() { return m_iCurrentAnimIndex; }
+	_uint Get_CurrentAnimationIndex_UpperBody() { return m_iCurrentAnimIndex_UpperBody; }
+	_uint Get_CurrentAnimationIndex_LowerBody() { return m_iCurrentAnimIndex_LowerBody; }
+
+	void Set_SecondPreTransform(const _float4x4& mat) { m_PreTransformMatrix_Second = mat; }
+	_float4x4* Get_SecondPreTransform() { return &m_PreTransformMatrix_Second; }
+public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
 	HRESULT Bind_Material_ShaderResource(class CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 	HRESULT Bind_Mesh_BoneMatrices(class CShader* pShader, _uint iMeshIndex, const _char* pConstantName);
-	_bool Play_Animation(_float fTimeDelta);
-	HRESULT Render(_uint iMeshIndex);
+	_bool Play_Animation(_float fTimeDelta, _bool Once);
+	_bool Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle);
+	_bool Play_Animation_LowerBody(_float fTimeDelta);
 
-private:
+
+	HRESULT Render(_uint iMeshIndex);
 
 
 private:
 	TYPE							m_eModelType = { TYPE_END };
 	_float4x4						m_PreTransformMatrix = {};
+
+
+	_float4x4						m_PreTransformMatrix_Second{};
+
+
 
 	_uint							m_iNumMeshes = { 0 };
 	vector<class CMesh*>			m_Meshes;
@@ -54,22 +76,43 @@ private:
 	vector<class CBone*>			m_Bones;
 
 	_bool							m_isLoop = { false };
-	_uint							m_iCurrentAnimIndex = {};
+	_bool							m_isLoop_UpperBody = { false };
+	_bool							m_isLoop_LowerBody = { false };
+
+	_uint							m_iCurrentAnimIndex = {0};
+	_uint							m_iCurrentAnimIndex_UpperBody = { 0 };
+	_uint							m_iCurrentAnimIndex_LowerBody = { 0 };
+
 	_uint							m_iNumAnimations = { 0 };
-	_float							m_fCurrentPosition = { 0.f };
-	vector<vector<_uint>>			m_ChannelCurrentKeyFrameIndex;
+
+
 	vector<class CAnimation*>		m_Animations;
 
+
+	_bool							m_bAnim_NoneLoop = false;
+	_bool							m_bAnim_NoneLoop_UpperBody = false;
+	_bool							m_bAnim_NoneLoop_LowerBody = false;
+
+	_bool							isFinished{};
+	_bool							isFinished_UpperBody{};
+	_bool							isFinished_LowerBody{};
+private:
+	_uint							m_iPrevAnimIndex = {0};		// 보간을 위한 인덱스 저장
+	_uint							m_iPrevAnimIndex_UpperBody = { 0 };		// 보간을 위한 인덱스 저장
+	_uint							m_iPrevAnimIndex_LowerBody = { 0 };		// 보간을 위한 인덱스 저장
+
+
+	_bool							m_bLinearInterpolation = {};
+	_bool							m_bLinearInterpolation_UpperBody = {};
+	_bool							m_bLinearInterpolation_LowerBody = {};
+
+	KEYFRAME						PrevKeyFrame{};
+	KEYFRAME						PrevKeyFrame_UpperBody{};
+	KEYFRAME						PrevKeyFrame_LowerBody{};
+	_uint	m_iPrevNumChannels{};
+	_bool bAnimChange = false;
+
 public:
-	//HRESULT Ready_Meshes();
-	//HRESULT Ready_Materials(const _char* pModelFilePath);
-	//HRESULT Ready_Bones(const aiNode* pAINode, _int iParentIndex);
-	//HRESULT Ready_Animations();
-
-
-public:
-//	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
-
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 
@@ -77,11 +120,17 @@ public:
 public: // Data파일 Read용
 	static CModel* Create_ReadDataFile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex);
 	HRESULT Initialize_Prototype_ReadDataFile(TYPE eModelType, const wstring pDataFile, _uint iIndex, _fmatrix PreTransformMatrix = XMMatrixIdentity());
-
 	HRESULT Ready_Meshes_ReadData_NonAnim(HANDLE hFileRead);
 	HRESULT Ready_Materials_ReadData_NonAnim(HANDLE hFileRead);
 
-	HRESULT Read_DataFile(wstring pDataFile, HANDLE hFileRead);
+
+
+	static CModel* Create_ReadDataFile_For_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex);
+	HRESULT Initialize_Prototype_ReadDataFile_For_Anim(TYPE eModelType, const wstring pDataFile, _uint iIndex, _fmatrix PreTransformMatrix = XMMatrixIdentity());
+	HRESULT Ready_Bones( _int iParentIndex, HANDLE hFileRead);
+	HRESULT Ready_Animations(HANDLE hFileRead);
+	HRESULT Ready_Meshes_ReadData(HANDLE hFileRead);
+
 
 
 private:

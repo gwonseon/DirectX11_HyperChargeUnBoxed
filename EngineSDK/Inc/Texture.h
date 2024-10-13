@@ -31,8 +31,7 @@ public:
 
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iTextureIndex);
-	vector<ID3D11ShaderResourceView*> Get_SRV() { return m_SRVs; }
-
+	vector<ID3D11ShaderResourceView*>& Get_SRV() { return m_SRVs; }
 public:
 	/* 쉐이더에 지정한 텍스쳐르 ㄹ전달한다. */
 

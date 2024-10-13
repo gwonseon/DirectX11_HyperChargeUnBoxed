@@ -114,6 +114,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../EngineSDK/Inc/;../Public/;../Public/ImGui/;./</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,6 +140,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../../EngineSDK/Inc/;../Public/;../Public/ImGui/;./</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,12 +159,19 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Camera_TPS.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\BackGround.h" />
+    <ClInclude Include="..\Public\Body_Player.h" />
     <ClInclude Include="..\Public\ButtonUI.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\CollisionBox.h" />
     <ClInclude Include="..\Public\CrossLine.h" />
     <ClInclude Include="..\Public\Environment.h" />
+    <ClInclude Include="..\Public\FPS_Pivot.h" />
+    <ClInclude Include="..\Public\Head_Player.h" />
     <ClInclude Include="..\Public\InGameUI.h" />
     <ClInclude Include="..\Public\Level_ImGui.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -171,7 +182,14 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MenuUI.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\Pivot.h" />
+    <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\Player_FPS.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\UI_CircleGuage.h" />
+    <ClInclude Include="..\Public\Weapon.h" />
+    <ClInclude Include="..\Public\Weapon_Item.h" />
+    <ClInclude Include="..\Public\Weapon_Katana.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Resource.h" />
@@ -179,10 +197,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Camera_TPS.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionBox.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
     <ClCompile Include="..\Private\Environment.cpp" />
+    <ClCompile Include="..\Private\FPS_Pivot.cpp" />
+    <ClCompile Include="..\Private\Head_Player.cpp" />
     <ClCompile Include="..\Private\InGameUI.cpp" />
     <ClCompile Include="..\Private\Level_ImGui.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
@@ -193,7 +218,14 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MenuUI.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\Pivot.cpp" />
+    <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\Player_FPS.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\UI_CircleGuage.cpp" />
+    <ClCompile Include="..\Private\Weapon.cpp" />
+    <ClCompile Include="..\Private\Weapon_Item.cpp" />
+    <ClCompile Include="..\Private\Weapon_Katana.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -209,6 +241,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxBoxColor.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCircle_Gauge.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxItem.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">

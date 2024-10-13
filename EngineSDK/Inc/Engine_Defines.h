@@ -16,12 +16,14 @@
 #include "DirectXTK\WICTextureLoader.h"
 #include "DirectXTK\VertexTypes.h"
 
+
 #include "Effects11\d3dx11effect.h"
 
 
 
-
 using namespace DirectX;
+
+
 
 #include <string>
 #include <vector>

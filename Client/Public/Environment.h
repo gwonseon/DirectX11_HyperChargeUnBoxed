@@ -2,6 +2,8 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "VIBuffer_Box.h"
+#include "CollisionBox.h"
 
 BEGIN(Engine)
 class CShader;
@@ -17,6 +19,7 @@ public:
 	{
 		LEVELID eID = {};
 		_int	iModelComponentIndex{};
+		_uint	iImGuiMode{};
 	}ENVIRONMENT_DESC;
 
 private:
@@ -37,6 +40,10 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	void		Picking();
+
+public:
 	void	MovePos(_float fTimeDelta, _float PosX, _float PosY, _float PosZ)
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, { PosX,PosY,PosZ,1 });
@@ -48,6 +55,12 @@ public:
 		m_fScale.y = PosY;
 		m_fScale.z = PosZ;
 	}
+	void Set_DeadEnviron() {
+		if (m_eLevel == LEVEL_IMGUI)
+			static_cast<CCollisionBox*>(m_pCollisionBox)->Set_Dead();
+		m_bChecking = false;
+		m_bDead = true;
+	}
 	void	Set_Turn(_float fTimeDelta, _fvector vAxis)
 	{
 		m_pTransformCom->Turn(vAxis, fTimeDelta);
@@ -58,9 +71,7 @@ public:
 			return m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		return { 0.f,0.f, 0.f, 0.f };
 	}
-	_int		Get_ModelIndex()	{		return m_iModelIndex;	}
-	LEVELID		Get_Level()			{		return m_eLevel;		}
-	_float3		Get_Scale()			{		return m_fScale;		}
+
 	void		Get_Rotation(_vector&	vRight, _vector&	vUp, _vector&	vLook) {
 		vRight = m_pTransformCom-> Get_State(CTransform::STATE_RIGHT);
 		vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
@@ -71,16 +82,60 @@ public:
 		m_pTransformCom->Set_State(CTransform::STATE_UP, vUp);
 		m_pTransformCom->Set_State(CTransform::STATE_LOOK, vLook);
 	}
-	void		Picking();
+
+
+	_int		Get_ModelIndex() { return m_iModelIndex; }
+	LEVELID		Get_Level() { return m_eLevel; }
+	_float3		Get_Scale() { return m_fScale; }
+
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	
+private:
 	LEVELID	m_eLevel = {};
 	_int	m_iModelIndex = {};
 	_float3	m_fScale = {};
+
+	
+
+public:	// CollisionBox 
+	void	Set_PickingCheck(_bool bCheck) { m_bChecking = bCheck; }
+	_bool	Get_PickingCheck() { return m_bChecking; }
+	void	Set_CollisionBox(_float fSizeX, _float fSizeY, _float fSizeZ, _float fPosX, _float fPosY, _float fPosZ) {
+		m_fCollisionBoxScale.x = fSizeX; 		m_fCollisionBoxScale.y = fSizeY; 		m_fCollisionBoxScale.z = fSizeZ;
+		_float3 fCollisionPos{}; _vector vecCollisionPos{};
+		fCollisionPos.x = fPosX; fCollisionPos.y = fPosY; fCollisionPos.z = fPosZ;
+		vecCollisionPos = XMLoadFloat3(&fCollisionPos);
+		m_vecCollisionBoxPos = vecCollisionPos;
+	}
+	_float3 Get_CollisionBoxScale() { return m_fCollisionBoxScale; }
+	_vector Get_CollisionBoxPos() { return m_vecCollisionBoxPos; }
+	_uint Get_ImGuiMode() { return m_iImGuiMode; }
+	void	Set_ImGuiMode(_uint iMode) { m_iCurrentImGuiMode = iMode; }
+private:	// CollisionBox 
+	CGameObject* m_pCollisionBox = nullptr;
+	_bool m_bChecking = false;
+	_float3 m_fCollisionBoxScale{};
+	_vector m_vecCollisionBoxPos{};
+	_uint	m_iImGuiMode = 0;
+	_uint m_iCurrentImGuiMode = 0;
+
+
+private:
+	DirectX::BoundingBox BoundingBox;
+
+public:
+	void Set_BoundingBos(DirectX::BoundingBox Box) { BoundingBox = Box; }
+	DirectX::BoundingBox Get_BoundingBox() { return BoundingBox;	}
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
+
+
+
 
 
 public:

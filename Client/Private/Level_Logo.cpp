@@ -18,7 +18,7 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Logo::Initialize()
 {
-
+	
 	if (FAILED(Ready_Layer_Menu_UI(TEXT("Layer_Menu_UI"))))
 		return E_FAIL;
 
@@ -32,7 +32,7 @@ HRESULT CLevel_Logo::Initialize()
 		return E_FAIL;
 	
 
-	
+
 
 	return S_OK;
 }
@@ -40,7 +40,7 @@ HRESULT CLevel_Logo::Initialize()
 void CLevel_Logo::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
-
+	ShowCursor(TRUE);
 	if (GetKeyState(VK_NUMPAD1) & 0x8000)
 	{
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
@@ -148,10 +148,10 @@ HRESULT CLevel_Logo::Ready_Layer_GameTitle(const _tchar* pLayerTag)
 
 	CMenuUI::MENUUI_DESC	Desc{};
 	Desc.eLevel = LEVEL_LOGO;
-	Desc.fX = g_iWinSizeX * 0.4;
+	Desc.fX = g_iWinSizeX * 0.35;
 	Desc.fY = g_iWinSizeY * 0.2;
-	Desc.fSizeX = 600;
-	Desc.fSizeY = 100;
+	Desc.fSizeX = 700;
+	Desc.fSizeY = 150;
 	Desc.iData = 10;
 	Desc.fDepth = 0.1f;
 	Desc.eTag = CMenuUI::LOGO_GAMENAME;

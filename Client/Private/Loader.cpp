@@ -14,6 +14,14 @@
 #include "MenuUI.h"
 #include "ButtonUI.h"
 
+#include "Head_Player.h"
+#include "Body_Player.h"
+#include "Weapon.h"
+#include "Player.h"
+#include "Pivot.h"
+#include "CollisionBox.h"
+#include "UI_CircleGuage.h"
+#include "FPS_Pivot.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -100,7 +108,7 @@ HRESULT CLoader::Loading_For_LogoLevel()
 
 		// 뒷배경
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Menu_Back"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Menu.png")))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_BackgroundStats_Background.png")))))
 		return E_FAIL;
 
 	// UI
@@ -157,49 +165,132 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 
 	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
 
-
+#pragma region UI텍스처 생성
 	// 크로스 라인
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Logo2"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CrossLine/CrossLine%d.png"), 24))))
 		return E_FAIL;
 
-	// HP
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI0"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ClovA_system%d.png"), 6))))
+	// LButton
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_LButton"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/LButton.dds")))))
 		return E_FAIL;
 
-	// ArmCannon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI1"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/AmmoCount%d.png"), 3))))
+	// RButton
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RButton"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/RButton.dds")))))
 		return E_FAIL;
 
+	// V_Icon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_VIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/VKey_ICon.dds")))))
+		return E_FAIL;
+	// F_Icon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/FKey_ICon.dds")))))
+		return E_FAIL;
+	// C_Icon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CKey_ICon.dds")))))
+		return E_FAIL;
+
+	// Shift
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Shift"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ShiftUI.dds")))))
+		return E_FAIL;
+
+	// Space
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Space"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Space.dds")))))
+		return E_FAIL;
+
+	// EnergyIcon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_EnergyIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/EnergyIcon.dds")))))
+		return E_FAIL;
+
+	// HPIcon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_HpIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/HP_ICon.dds")))))
+		return E_FAIL;
+
+	// CreditIcon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CreditIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Credit_Icon.dds")))))
+		return E_FAIL;
+
+	// RunIcon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RunIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Run_Icon.dds")))))
+		return E_FAIL;
+
+	// JumpIcon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_JumpIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Jump_Icon.dds")))))
+		return E_FAIL;
+
+	// ModeChangeIcon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_ModeChangeIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ModeChange_Icon%d.dds"),2))))
+		return E_FAIL;
+
+	// Punch_Icon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_PuchIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Punch_Icon.dds")))))
+		return E_FAIL;
+
+	// ViewChange_Icon
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_ViewChangeIcon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/View_Icon.dds")))))
+		return E_FAIL;
+
+	// Death
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Death"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Death.dds")))))
+		return E_FAIL;
+
+	// Battery
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Battery"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Battery%d.dds"),5))))
+		return E_FAIL;
+
+	// Character_UI
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Character"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Character/UI_Character%d.png"), 12))))
+		return E_FAIL;
+
+	// UI_BackGround 글씨 띄우는거 뒷 배경
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBackGround"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/UI_BackGround%d.png"), 2))))
+		return E_FAIL;
+	
+	// UI_Bar  체력 에너지 배터리 등등
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/UI_Bar%d.dds"), 5))))
+		return E_FAIL;
+
+	// 데미지 입었을 때 배경
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIDamaged"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/DamageIndicator.png")))))
+		return E_FAIL;
+	
+	//CircleGuage
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CircleGuage"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CircleGuage.png")))))
+		return E_FAIL;	
+	
+#pragma endregion UI텍스처 생성
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
 
-	// 몬스터
-	_matrix			PreTransformMatrix = XMMatrixIdentity();
-
-	PreTransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.f));
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/Models/Fiona/Fiona.fbx", PreTransformMatrix))))
-	//	return E_FAIL;
+	Loading_DataFile(LEVEL_GAMEPLAY);
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("셰이더 로딩중입니다.");
 
-
-	/* For.Prototype_Component_Shader_VtxMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
-	/* For.Prototype_Component_Shader_VtxAnimMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
-		return E_FAIL;
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
@@ -213,20 +304,21 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CCrossLine::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-	//HP
+	//UI
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI")) == nullptr)
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI"),
 			CInGameUI::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-	// ArmCannon
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_ArmCannon")) == nullptr)
+	//UI_circle
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Circle_UI")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ArmCannon"),
-			CInGameUI::Create(m_pDevice, m_pContext))))
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Circle_UI"),
+			CUI_CircleGuage::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+
 	// 터레인
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
 	{
@@ -241,6 +333,80 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CCamera_Free::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	{
+
+		/* Prototype GameObject Player*/
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSBody_Player")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSBody_Player"),
+			CPlayer_FPS::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
+			CHead_Player::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
+			CPivot::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
+			CFPS_Pivot::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
+			CWeapon_Katana::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
+			CWeapon_Item::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
 	/* 몬스터 */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Monster")) == nullptr)
 	{
@@ -248,6 +414,15 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CMonster::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+
+	// Environment
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("로딩 완료되었습니다.");
 	m_fPersent += 20.f;
@@ -260,22 +435,15 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 {
 	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
 
-
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
-
-	Loading_DataFile();
-	
+	Loading_DataFile(LEVEL_IMGUI);
 	// 몬스터
 
 	//----------------------------------------------------------------------------------------------------
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("셰이더 로딩중입니다.");
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Shader_VtxMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
@@ -302,6 +470,36 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 			return E_FAIL;
 	}
 
+	/* Prototype GameObject Player*/
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSBody_Player")) == nullptr)
+	{
+
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSBody_Player"),
+			CPlayer_FPS::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
 	// Environment
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
@@ -316,7 +514,12 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 			CBackGround::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
+			CCollisionBox::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("로딩 완료되었습니다.");
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
@@ -325,124 +528,108 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_DataFile()
+HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 {
 	_int iEnvironmentIndex = 0;
+	_int iPathIndex = 0;
 	_matrix			PreTransformMatrix = XMMatrixIdentity();
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
-
-
-	const _wstring Model_Path = TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim");
+	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
 	const _wstring Ext = TEXT(".dat");
-
-
 	// PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-
-	while(iEnvironmentIndex < 19)
+	while(iPathIndex < ENVIRONMENT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
-		const _wstring Model_Path_Result = Model_Path + to_wstring(iEnvironmentIndex) + Ext;
-
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, Model_Component_Result,
+		const _wstring Model_Path_Result = Model_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
 			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
+		iPathIndex++;
 	}
-	
-	//Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment1"),
-	//	CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Component_Result, PreTransformMatrix, iEnvironmentIndex))))
-	//	return E_FAIL;
-	//iEnvironmentIndex++;
+	const _wstring Model_Build_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim_Build");
+	iPathIndex = 0;
+	while (iPathIndex <BUILD_EA)
+	{
+		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
+		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+			return E_FAIL;
+		iEnvironmentIndex++;
+		iPathIndex++;
+	}
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment2"),
-	//	CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim2.dat"), PreTransformMatrix, iEnvironmentIndex))))
-	//	return E_FAIL;
-	//iEnvironmentIndex++;
+	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment3"),
-	//	CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim3.dat"), PreTransformMatrix, iEnvironmentIndex))))
-	//	return E_FAIL;
-	//iEnvironmentIndex++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment4"),
-	//	CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim4.dat"), PreTransformMatrix, iEnvironmentIndex))))
-	//	return E_FAIL;
-	//iEnvironmentIndex++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment5"),
-	//	CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim5.dat"), PreTransformMatrix, iEnvironmentIndex))))
-	//	return E_FAIL;
-	//iEnvironmentIndex++;
-
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment6"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim6.dat"), PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
+	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
+	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
+	iPathIndex = 0;
+	_uint iCharacterIndex = 0;
+	while (iPathIndex < 2)
+	{
+		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
+		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+			return E_FAIL;
+		iCharacterIndex++;
+		iPathIndex++;
+	}
 
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment7"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim7.dat"), PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
+	const _wstring Model_Component_Weapon = TEXT("Prototype_Component_Model_Weapon");
+	const _wstring Model_Weapon_Path = TEXT("../Bin/Resources/Model/ModelData_Weapon");
+	iPathIndex = 0;
+	_uint iWeaponIndex = 0;
+	while (iPathIndex < WEAPON_EA)
+	{
+
+		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
+		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+			return E_FAIL;
+		iWeaponIndex++;
+		iPathIndex++;
+	}
 
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment8"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim8.dat"), PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
+	// 애니메이션
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	_int iAnimModelIndex = 0;
+	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
+	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment9"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Model_Bin/ModelData_NonAnim9.dat"), PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment10"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Desk1.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
+	while (iAnimModelIndex < 8)
+	{
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment11"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Desk2.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
+		if (  iAnimModelIndex == 7)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(178.f));
+		}
+		else if (iAnimModelIndex == 6)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
+		}
+		else
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f)) ;
+		}
+//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
+		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
+		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
+		cout << iAnimModelIndex << "번 애님모델" << endl;
+		cout << "--------------------------------------------------" << endl;
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+			return E_FAIL;
+		iAnimModelIndex++;
+	}
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment12"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Desk3.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment13"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/KeyPad.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment14"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Vent1.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment15"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Sprinkler.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment16"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Trim.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment17"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/Vent0.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Model_Environment18"),
-	//	CModel::Create_For_FBX(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Models/Environment/card1.fbx", PreTransformMatrix, iNumber))))
-	//	return E_FAIL;
-	//iNumber++;
 
 	return S_OK;
 }

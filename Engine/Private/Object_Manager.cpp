@@ -14,7 +14,7 @@ HRESULT CObject_Manager::Initialize(_uint iNumLevels)
 	m_pLayers = new map<const _wstring, class CLayer*>[iNumLevels];
 
 	m_iNumLevels = iNumLevels;
-
+	
 	return S_OK;
 }
 
@@ -82,6 +82,19 @@ CGameObject* CObject_Manager::Add_GameObject_ToLayer_ReturnObject(_uint iLevelIn
 	else
 		pLayer->Add_GameObject(pGameObject);
 
+
+	return pGameObject;
+}
+
+CGameObject* CObject_Manager::Clone_Prototype(const _wstring& strPrototypeTag, void* pArg)
+{
+	CGameObject* pPrototype = Find_Prototype(strPrototypeTag);
+	if (nullptr == pPrototype)
+		return nullptr;
+
+	CGameObject* pGameObject = pPrototype->Clone(pArg);
+	if (nullptr == pGameObject)
+		return nullptr;
 
 	return pGameObject;
 }

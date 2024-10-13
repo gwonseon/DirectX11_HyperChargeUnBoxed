@@ -62,7 +62,7 @@ private:
 	HRESULT Loading_For_ImGuiLevel();
 
 	
-	HRESULT Loading_DataFile();
+	HRESULT Loading_DataFile(LEVELID eLevelID);
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);
 	virtual void Free() override;

@@ -64,6 +64,7 @@ HRESULT CMeshMaterial::Bind_ShaderResource(CShader* pShader, aiTextureType eText
 {
 	if (iIndex >= m_Materials[eTextureType].size())
 		return E_FAIL;
+
 	return pShader->Bind_SRV(pConstantName, m_Materials[eTextureType][iIndex]);
 }
 
@@ -91,11 +92,11 @@ HRESULT CMeshMaterial::Initialize_ReadData(HANDLE hFileRead)
 			{
 				ReadFile(hFileRead, &szFullPath[k], sizeof(_char), &dwByte, nullptr);
 			}
-	
+
 
 			_tchar		szPerfectPath[MAX_PATH] = {};
 			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szPerfectPath, MAX_PATH);
-
+			//cout << szFullPath << endl;
 
 			if (false == strcmp(szExt, ".dds"))
 			{
@@ -109,7 +110,7 @@ HRESULT CMeshMaterial::Initialize_ReadData(HANDLE hFileRead)
 			}
 
 			m_Materials[i].push_back(pSRV);
-			m_Materials[i].size();
+		
 		}
 	}
 
@@ -128,19 +129,6 @@ CMeshMaterial* CMeshMaterial::Create_ReadData(ID3D11Device* pDevice, ID3D11Devic
 
 	return pInstance;
 }
-
-//CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial)
-//{
-//	CMeshMaterial* pInstance = new CMeshMaterial(pDevice, pContext);
-//
-//	if (FAILED(pInstance->Initialize(pModelFilePath, pAIMaterial)))
-//	{
-//		MSG_BOX("Failed to Created : CMeshMaterial");
-//		Safe_Release(pInstance);
-//	}
-//
-//	return pInstance;
-//}
 
 void CMeshMaterial::Free()
 {

@@ -42,6 +42,7 @@ namespace Engine
 	typedef		FXMMATRIX					_fmatrix;
 	typedef		CXMMATRIX					_cmatrix;
 
+
 	/*
 	연산의 최적화를 위해 저장용과 연산용을 따로 한다.
 	연산을 할 때는 저장용타입을 연산용 타입으로 치환해서 사용할덧

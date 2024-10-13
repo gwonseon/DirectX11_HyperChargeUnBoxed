@@ -34,6 +34,7 @@ HRESULT CGameObject::Initialize(void* pArg)
 	{
 		GAMEOBJ_DESC* pDesc = static_cast<GAMEOBJ_DESC*>(pArg);
 		m_iData = pDesc->iData;
+
 	}
 
 	m_pTransformCom = CTransform::Create(m_pDevice, m_pContext, pArg);
@@ -54,6 +55,7 @@ void CGameObject::Priority_Update(_float fTimeDelta)
 
 void CGameObject::Update(_float fTimeDelta)
 {
+	
 }
 
 void CGameObject::Late_Update(_float fTimeDelta)

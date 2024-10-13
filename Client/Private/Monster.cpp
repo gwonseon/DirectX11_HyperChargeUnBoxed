@@ -16,23 +16,27 @@ CMonster::CMonster(const CMonster& Prototype)
 HRESULT CMonster::Initialize_Prototype()
 {
 	/* 패킷, 파일입ㅇ출력을 통한 초기화. */
-
+	
 	return S_OK;
 }
 
 HRESULT CMonster::Initialize(void* pArg)
 {
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
+	MONSTER_DESC* pDesc = static_cast<MONSTER_DESC*>(pArg);
+
+	m_eLevel = pDesc->eID;
+	m_iModelIndex = pDesc->iModelComponentIndex;
+
 	if (FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(0, true);
-
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(	m_pGameInstance->Compute_Random(0.f, 10.f), 0.f, m_pGameInstance->Compute_Random(0.f, 10.f), 1.f));
-
+	m_pModelCom->Set_Animation(1, true);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z,1.f));
+	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
 	return S_OK;
 }
 
@@ -43,7 +47,8 @@ void CMonster::Priority_Update(_float fTimeDelta)
 
 void CMonster::Update(_float fTimeDelta)
 {
-	if (true == m_pModelCom->Play_Animation(fTimeDelta))
+	
+	if (true == m_pModelCom->Play_Animation(fTimeDelta, false))
 		_uint iData = 10;
 }
 
@@ -84,12 +89,14 @@ HRESULT CMonster::Add_Components()
 	/* 2. 다른 객체가 내 컴포넌트를 검색하고자 할때 스위치케이스가 겁나 늘어나는 상황. */
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+	const _wstring Model_Component = TEXT("Prototype_Component_Model_Anim");
+	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
+	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 

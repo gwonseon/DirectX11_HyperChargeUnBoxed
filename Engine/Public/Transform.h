@@ -15,8 +15,8 @@ public:
 
 	typedef struct
 	{
-		_float		fSpeedPerSec;
-		_float		fRotationPerSec;
+		_float		fSpeedPerSec = 3;
+		_float		fRotationPerSec = 3;
 		_float3		fPosition;
 		_float3		fScale;
 	}TRANSFORM_DESC;
@@ -42,13 +42,19 @@ public:
 		// r[2] : Z축 방향 벡터
 		// r[3] : 위치 정보
 	}
+
+	const _float4x4* Get_WorldMatrixPtr() const {
+		return &m_WorldMatrix;
+	}
 	_matrix Get_WorldMatrix_Inverse()
 	{
 		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
 	}
-	_matrix Get_WorldMatrix() 
-	{ 
+	_matrix Get_WorldMatrix() const {
 		return XMLoadFloat4x4(&m_WorldMatrix);
+	}
+	_float4x4* Get_WorldMatrixPtr_Camera() {
+		return &m_WorldMatrix;
 	}
 	_float3 Get_Scaled()
 	{
@@ -65,14 +71,16 @@ public:
 public:
 	void Set_Scaling(_float fScaleX, _float fScaleY, _float fScaleZ);
 	void LookAt(_fvector vAt);
-	void Go_Straight(_float fTimeDelta);
+	void Go_Straight(_float fTimeDelta); 
+	void Go_Straight(_float fTimeDelta, _float AddfSpeed);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
 	void Go_Backward(_float fTimeDelta);
 	void Turn(_fvector vAxis, _float fTimeDelta);
-
-
-
+	void Turn(_bool bX, _bool bY, _bool bZ, _float fTimeDelta);
+	void Rotation(_float fX, _float fY, _float fZ);
+	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState);
+	void Set_Min_Height();
 
 
 public:

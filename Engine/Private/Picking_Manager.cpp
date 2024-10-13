@@ -69,12 +69,13 @@ void CPicking_Manager::Get_MouseRayDirection(_float3 fPosition,  XMMATRIX invPro
     *RayPos_Output = vRayPos;
     *RayDir_Output = vRayDir;
  
-    /* 레이 방향 위치 확인
+   //  레이 방향 위치 확인
     _float3 fRayPos, fRayDir;
      XMStoreFloat3(&fRayPos, vRayPos);
    XMStoreFloat3(&fRayDir, vRayDir);
-   cout << fRayDir.x << " " << fRayDir.z << " " << fRayDir.y << endl;
-    */
+   if(GetKeyState(VK_NUMPAD6))
+       cout <<"레이 위치" << fRayPos.x << " " << fRayPos.y << " " << fRayPos.z << endl;
+    
 
 }
 
@@ -149,7 +150,53 @@ _float3 CPicking_Manager::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, cons
     return hitPoint;  // 가장 가까운 충돌 지점을 반환
 }
 
+_float3 CPicking_Manager::Picking_Box_FAILED(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos)
+{
+    const _float3* pBoxVtx = VtxPos;
+    float closestDist = 0.f;  // 가장 가까운 충돌 거리를 저장할 변수
+    _float3 hitPoint = _float3(0.f, 0.f, 0.f);  // 충돌 지점을 저장할 변수
+    RayDir = XMVector3Normalize(RayDir);
 
+    for (_ulong i = 0; i < 12; ++i)
+    {
+            _ulong dwIndex = i * 3;
+
+            _float3 v0 = pBoxVtx[dwIndex];
+            _float3 v1 = pBoxVtx[dwIndex + 1];
+            _float3 v2 = pBoxVtx[dwIndex + 2];
+
+            float dist = 0.0f;
+            // 충돌 검사
+            if (DirectX::TriangleTests::Intersects(
+                RayPos,
+                RayDir,
+                XMLoadFloat3(&v0),
+                XMLoadFloat3(&v1),
+                XMLoadFloat3(&v2),
+                dist))
+            {
+                XMVECTOR xmHitPoint = RayPos + RayDir * dist;
+                XMStoreFloat3(&hitPoint, xmHitPoint);
+ //                 cout << "충돌 위치 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
+            }
+    }
+    return hitPoint;  // 가장 가까운 충돌 지점을 반환
+}
+
+void CPicking_Manager::CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint)
+{
+    fMinPoint = _float3(center.x - size.x * 0.5f, center.y - size.y * 0.5f, center.z - size.z * 0.5f); 
+    fMaxPoint = _float3(center.x + size.x * 0.5f, center.y + size.y * 0.5f, center.z + size.z * 0.5f);
+}
+bool CPicking_Manager::Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box)
+{
+    // 넓이
+    box.Extents = _float3((fMaxPoint.x - fMinPoint.x), (fMaxPoint.y - fMinPoint.y) , (fMaxPoint.z - fMinPoint.z) );
+    // 중점
+    box.Center = _float3((fMaxPoint.x + fMinPoint.x) * 0.5f, (fMaxPoint.y + fMinPoint.y) * 0.5f, (fMaxPoint.z + fMinPoint.z) * 0.5f);
+
+    return box.Intersects(rayOrigin, rayDirection, distance);
+}
 
 
 

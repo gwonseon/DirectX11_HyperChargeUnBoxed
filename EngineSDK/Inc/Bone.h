@@ -25,16 +25,20 @@ public:
 	_matrix Get_CombinedTransformationMatrix() {
 		return XMLoadFloat4x4(&m_CombinedTransformationMatrix);
 	}
-
+	const _float4x4* Get_CombinedTransformationFloat4x4Ptr() const {
+		return &m_CombinedTransformationMatrix;
+	}
 	void Set_TransformationMatrix(_fmatrix TransformationMatrix)
 	{
 		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);
 	}
+	_float4x4 Get_TransformationMatrix() {	return m_TransformationMatrix;	}
+
 
 public:
-//	HRESULT Initialize(const aiNode* pAINode, _uint iParentBoneIndex);
+	HRESULT Initialize(_uint iParentBoneIndex, HANDLE hFileRead);
 	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix);
-
+	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle);
 
 private:
 	_char				m_szName[MAX_PATH] = {};
@@ -53,9 +57,18 @@ private:
 
 
 public:
-//	static CBone* Create(const aiNode* pAINode, _uint iParentBoneIndex);
+	static CBone* Create(_uint iParentBoneIndex, HANDLE hFileRead);
 	CBone* Clone();
 	virtual void Free() override;
+
+
+
+public:
+
+
+private:
+	DWORD			dwByte = 0;
+
 };
 
 END
