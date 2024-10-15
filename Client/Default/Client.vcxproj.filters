@@ -109,6 +109,27 @@
     <Filter Include="02. GameObjects\Monster">
       <UniqueIdentifier>{f3644440-5474-4a53-8e7b-2bfee04ed2c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Monster\Tank">
+      <UniqueIdentifier>{45ea96bd-5d59-4896-af2c-75fbb219cdad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build">
+      <UniqueIdentifier>{b38e715d-0a77-4140-8724-ef6911f8e083}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\BrainCore">
+      <UniqueIdentifier>{3aa66dd5-e383-409e-a0a1-15796e4e7336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Helicopter">
+      <UniqueIdentifier>{1913bef7-68e3-4827-bd7e-dfa6a7b8be01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Alien">
+      <UniqueIdentifier>{81843730-7028-46c8-9190-8f42ca3bdf57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony">
+      <UniqueIdentifier>{da0e7df8-edb2-4fab-949a-81cdf498bef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\91. MonsterPath">
+      <UniqueIdentifier>{1ef96131-5657-435e-911a-f642d4adc65d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -210,6 +231,27 @@
     <ClInclude Include="..\Public\FPS_Pivot.h">
       <Filter>02. GameObjects\Player\Pivot</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Tank.h">
+      <Filter>02. GameObjects\Monster\Tank</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_Build.h">
+      <Filter>02. GameObjects\Player_Build</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrainCore.h">
+      <Filter>02. GameObjects\Player_Build\BrainCore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Helicopter.h">
+      <Filter>02. GameObjects\Monster\Helicopter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Alien.h">
+      <Filter>02. GameObjects\Monster\Alien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Pony.h">
+      <Filter>02. GameObjects\Monster\Pony</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_Path.h">
+      <Filter>01. Levels\91. MonsterPath</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -301,6 +343,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\FPS_Pivot.cpp">
       <Filter>02. GameObjects\Player\Pivot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tank.cpp">
+      <Filter>02. GameObjects\Monster\Tank</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Build.cpp">
+      <Filter>02. GameObjects\Player_Build</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrainCore.cpp">
+      <Filter>02. GameObjects\Player_Build\BrainCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Helicopter.cpp">
+      <Filter>02. GameObjects\Monster\Helicopter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Alien.cpp">
+      <Filter>02. GameObjects\Monster\Alien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pony.cpp">
+      <Filter>02. GameObjects\Monster\Pony</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_Path.cpp">
+      <Filter>01. Levels\91. MonsterPath</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

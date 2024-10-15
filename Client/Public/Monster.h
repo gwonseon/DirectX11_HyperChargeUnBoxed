@@ -3,33 +3,24 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
-BEGIN(Engine)
-class CShader;
-class CModel;
-END
-
 BEGIN(Client)
 
-class CMonster final : public CGameObject
+class CMonster : public CGameObject
 {
 public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID eID = {};
 		_int	iModelComponentIndex{};
+		const _float4x4* matPlayerWorld = { nullptr };
+		const _float4x4* matBrainCoreWorld = { nullptr };
+		_vector* vecTargetPos{};
 	}MONSTER_DESC;
 
-	enum HELICOPTER_ANIM {CENTER, EAST, NORTH_EAST, NORTH_WEST, NOTRH, SOUTH, WEST, DIORAMA};
 	
 	enum EVILDAMAGE_ANIM
 	{
 
-	};
-	enum TANK_ANIM
-	{
-		Stage,
-		ForwardStart,
-		Drive
 	};
 	enum BLIMP_ANIM
 	{
@@ -58,37 +49,36 @@ public:
 		Meatgbag_Landing,
 	};
 
-private:
+protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CMonster(const CMonster& Prototype);
 	virtual ~CMonster() = default;
 
 public:
 	/* 원형생성시 호출 : 생성시 필요한 상당히 무거운 작업들을 수행한다.(패킷, 파일 입출력) */
-	virtual HRESULT Initialize_Prototype() override;
+	virtual HRESULT Initialize_Prototype() ;
 
 	/* 패킷이나 파일 입출력을 통해서 받아오지 못하는 정보들도 분명히 존재한다. */
 	/* 원형에게 존재하는 않는 추가적인 초기화가 필요한 경우 호출한ㄴ다. */
-	virtual HRESULT Initialize(void* pArg) override;
-	virtual void Priority_Update(_float fTimeDelta) override;
-	virtual void Update(_float fTimeDelta) override;
-	virtual void Late_Update(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
+	virtual HRESULT Initialize(void* pArg) ;
+	virtual void Priority_Update(_float fTimeDelta) ;
+	virtual void Update(_float fTimeDelta) ;
+	virtual void Late_Update(_float fTimeDelta) ;
+	virtual HRESULT Render();
 
 
-private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
+protected:
 	LEVELID	m_eLevel = {};
 	_int	m_iModelIndex = {};
-private:
-	HRESULT Add_Components();
-	HRESULT Bind_ShaderResources();
+	const _float4x4* m_matPlayerWorld = { nullptr };
+	const _float4x4* m_matBrainCoreWorld = { nullptr };
 
+
+protected:
+	_vector* m_vecTargetPos;
 
 public:
-	static CMonster* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;
 
 

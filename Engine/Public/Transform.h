@@ -82,7 +82,10 @@ public:
 	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState);
 	void Set_Min_Height();
 
-
+	_float Cal_Distance(_float3 fObj, _float3 fTarget);
+	_float Cal_Distance_vec(_vector vObj, _vector vTarget);
+	_float Cal_Distance_No_Height(_float3 fObj, _float3 fTarget);
+	_float Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget);
 
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);

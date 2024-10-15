@@ -246,7 +246,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
 				m_bLinearInterpolation = m_Animations[m_iCurrentAnimIndex]->Update_LinearInterPolation(&PrevKeyFrame, m_Bones, strName, fTimeDelta);
 				for (auto& pBone : m_Bones)
 				{
-					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fTimeDelta);
 				}
 			}
 
@@ -271,7 +271,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
 			// 모든 뼈들의 CombinedTransformationMatrix를 갱신한다.
 			for (auto& pBone : m_Bones)
 			{
-				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fTimeDelta);
 			}
 
 			m_bAnim_NoneLoop = isFinished; // 애니메이션의 종료 여부를 설정

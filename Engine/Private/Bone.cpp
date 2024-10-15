@@ -12,8 +12,32 @@ void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fm
 			XMLoadFloat4x4(&m_TransformationMatrix) * PreTransformMatrix);
 
 		return;
+	}	
+
+	XMStoreFloat4x4(&m_CombinedTransformationMatrix,
+		XMLoadFloat4x4(&m_TransformationMatrix) * Bones[m_iParentBoneIndex]->Get_CombinedTransformationMatrix());
+}
+
+void CBone::Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fTimeDelta)
+{
+	if (-1 == m_iParentBoneIndex)
+	{
+		XMStoreFloat4x4(&m_CombinedTransformationMatrix,
+			XMLoadFloat4x4(&m_TransformationMatrix) * PreTransformMatrix);
+
+		return;
 	}
-	
+	string strName(m_szName);
+	if (strName == "prop1" || strName == "prop2" || strName == "prop3" || strName == "prop4")
+	{
+		XMMATRIX rotationMatrix = XMMatrixRotationZ(fTimeDelta * 50.f);
+		_float4x4 floatMatrix{};
+		XMStoreFloat4x4(&floatMatrix, rotationMatrix);
+		XMMATRIX transformationMatrix = XMLoadFloat4x4(&m_TransformationMatrix);
+		XMMATRIX resultMatrix = transformationMatrix * rotationMatrix;
+		XMStoreFloat4x4(&m_TransformationMatrix, resultMatrix);
+	}
+
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix,
 		XMLoadFloat4x4(&m_TransformationMatrix) * Bones[m_iParentBoneIndex]->Get_CombinedTransformationMatrix());
 }
