@@ -38,7 +38,9 @@ public:
 		RUNSTATE_NORTHWEST			= 0x00002000,
 		RUNSTATE_NORTHEAST			= 0x00004000,
 		RELOADING					= 0x00008000,
-		FIRE						= 0x00010000
+		FIRE						= 0x00010000,
+		FIRE_RB						= 0x00020000,
+		MELEE						= 0x00040000,
 	};
 
 	enum TPS_JUMPSTATE
@@ -103,11 +105,15 @@ public:
 	CTransform* Get_Transform() {	return m_pTransformCom; }
 	_vector* Get_TPSPosptr()	{	return m_vecTPS_CamPos;	}
 	_vector* Get_FPSPosptr()	{	return m_vecFPS_CamPos; }
+	_vector* Get_WeaponPos()	{	return m_vecWeaponPos; }
+	_vector* Get_WeaponDir()	{	return m_vecWeaponDir; }
 
 private:
 	_vector* m_vecTPS_CamPos{};
 	_vector* m_vecFPS_CamPos{};
 	_vector* m_vecCameraAt{};
+	_vector* m_vecWeaponPos{};
+	_vector* m_vecWeaponDir{};
 
 	_uint	m_iViewState{};
 
@@ -116,7 +122,6 @@ private:
 	_uint					m_iState_Lower = {};
 	_bool					m_bJumpStart = false;
 	
-
 private:
 	_bool					m_bKey_A = false;
 	_bool					m_bKey_W = false;

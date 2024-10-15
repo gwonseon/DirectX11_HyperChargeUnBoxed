@@ -123,15 +123,25 @@ void CObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (size_t i = 0; i < m_iNumLevels; i++)
 	{
+		/*auto it = m_pLayers[i].find(L"Layer_Player");  
+		if (it != m_pLayers[i].end())
+		{
+			CLayer* pLayer = it->second;
+			if (pLayer)
+			{
+				pLayer->Priority_Update(fTimeDelta);
+			}
+		}*/
+
 		for (auto& Pair : m_pLayers[i])
 		{
-		
 			if (nullptr != Pair.second)
 			{
 				Pair.second->Priority_Update(fTimeDelta);
 			}
 		}
 	}
+
 }
 
 void CObject_Manager::Update(_float fTimeDelta)

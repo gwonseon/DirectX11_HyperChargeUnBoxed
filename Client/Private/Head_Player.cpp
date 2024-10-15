@@ -26,29 +26,61 @@ HRESULT CHead_Player::Initialize(void* pArg)
 
 	m_pParentState = pDesc->pParentState;
 	m_pSocketMatrix = pDesc->pSocketMatrix;
-
+	m_iViewState = pDesc->m_iViewState;
+	m_iWeaponState =  pDesc->m_iWeaponState;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-	m_iViewState = pDesc->m_iViewState;
 
+	Position = { 0.9, 0.f, 0.f };
+	Rotation = { 65.3996f, 34.5f, -45.2999f };
 	m_pTransformCom->Set_Scaling(3.f, 3.f, 3.f);
-	//m_pTransformCom->Rotation(XMConvertToRadians(90.f), XMConvertToRadians(90.f), XMConvertToRadians(270.f));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -0.5f, 0.5f, 1.f));
+	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
 
 	return S_OK;
 }
 
 void CHead_Player::Priority_Update(_float fTimeDelta)
 {
-	int a = 10;
+
+
 }
 
 void CHead_Player::Update(_float fTimeDelta)
 {
+	if (m_bTPSState == true)
+	{
+		_long MouseMoveY = { 0 };
+		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		{
+			if (m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
+				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
+			if (m_fAngle_Y > 60.f)
+				m_fAngle_Y = 60.f;
+			if (m_fAngle_Y < -60.f)
+				m_fAngle_Y = -60.f;
+		}
+		//	m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
+		m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * -0.1f);
+	}
+	else
+	{
+		_long MouseMoveY = { 0 };
+		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		{
+			if (m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
+				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
+			if (m_fAngle_Y > 60.f)
+				m_fAngle_Y = 60.f;
+			if (m_fAngle_Y < -60.f)
+				m_fAngle_Y = -60.f;
+		}
+		m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
+	}
 }
 
 void CHead_Player::Late_Update(_float fTimeDelta)
@@ -66,7 +98,7 @@ void CHead_Player::Late_Update(_float fTimeDelta)
 
 HRESULT CHead_Player::Render()
 {
-	/*if(m_bTPSState == true)
+	if(m_bTPSState == true)
 	{
 		if (FAILED(Bind_ShaderResources()))
 			return E_FAIL;
@@ -84,7 +116,7 @@ HRESULT CHead_Player::Render()
 			m_pModelCom->Render(i);
 		}
 
-	}*/
+	}
 	return S_OK;
 }
 

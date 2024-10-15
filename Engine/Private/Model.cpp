@@ -283,30 +283,30 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
 
 }
 
-_bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle)
+_bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle, _uint iUpperMotion)
 {
 	if (m_bAnim_NoneLoop_UpperBody == true) // 마지막 동작을 한 번 더 하는 문제를 해결하기 위해 루프가 끝났을 때를 기억해 초기화만 해준다
 	{
 		m_Animations[m_iCurrentAnimIndex_UpperBody]->CurrentPosition_UpperBody_Init(m_Bones);
 		m_bAnim_NoneLoop_UpperBody = false;
 	}
-
 	else
 	{
-		if (m_iCurrentAnimIndex_UpperBody != m_iPrevAnimIndex_UpperBody)
+		if (m_iCurrentAnimIndex_UpperBody != m_iPrevAnimIndex_UpperBody) // 애니메이션이 달라졌을 때 들어옴
 		{
 			// 이전 애니메이션 인덱스가 유효한지 확인
-			if (m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() != nullptr)
+			if (m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() != nullptr )
 			{
-				m_Animations[m_iCurrentAnimIndex_UpperBody]->CurrentPosition_UpperBody_Init(m_Bones);
-
+			
 				PrevKeyFrame_UpperBody = *m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody();
 				const vector<string> strName = m_Animations[m_iPrevAnimIndex_UpperBody]->Get_ChannelNames();
 				m_bLinearInterpolation_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_LinearInterPolation_Player(&PrevKeyFrame_UpperBody, m_Bones, strName, fTimeDelta, true);
+			
 				for (auto& pBone : m_Bones)
 				{
-					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fRotation_Angle);
+					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fRotation_Angle, iUpperMotion);
 				}
+				
 			}
 			if (m_Animations[m_iCurrentAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() == nullptr)
 			{
@@ -324,11 +324,12 @@ _bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle
 		if (m_iPrevAnimIndex_UpperBody == m_iCurrentAnimIndex_UpperBody)
 		{
 			// 모델의 뼈의 행렬(TransformationMatrix)을 현재 애니메이션에 맞는 상태로 갱신해준다.
-			isFinished_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_UpperBody, fTimeDelta, true);
+			isFinished_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_UpperBody, fTimeDelta, true, iUpperMotion);
 			// 모든 뼈들의 CombinedTransformationMatrix를 갱신한다.
+		
 			for (auto& pBone : m_Bones)
 			{
-				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fRotation_Angle);
+				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fRotation_Angle, iUpperMotion);
 			}
 			m_bAnim_NoneLoop_UpperBody = isFinished_UpperBody; // 애니메이션의 종료 여부를 설정
 			m_iPrevAnimIndex_UpperBody = m_iCurrentAnimIndex_UpperBody;
@@ -352,11 +353,9 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 		{
 			// 이전 애니메이션 인덱스가 유효한지 확인
 
-
+			
 			if (m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame() != nullptr)
 			{
-				m_Animations[m_iCurrentAnimIndex_LowerBody]->CurrentPosition_Init(m_Bones);
-
 				PrevKeyFrame = *m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame();
 				const vector<string> strName = m_Animations[m_iPrevAnimIndex_LowerBody]->Get_ChannelNames();
 				m_bLinearInterpolation_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_LinearInterPolation_Player(&PrevKeyFrame, m_Bones, strName, fTimeDelta,false);
@@ -382,7 +381,7 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 		if (m_iPrevAnimIndex_LowerBody == m_iCurrentAnimIndex_LowerBody)
 		{
 			// 모델의 뼈의 행렬(TransformationMatrix)을 현재 애니메이션에 맞는 상태로 갱신해준다.
-			isFinished_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_LowerBody, fTimeDelta,false);
+			isFinished_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_LowerBody, fTimeDelta,false,true);
 
 			// 모든 뼈들의 CombinedTransformationMatrix를 갱신한다.
 			for (auto& pBone : m_Bones)
@@ -393,8 +392,15 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 			m_bAnim_NoneLoop_LowerBody = isFinished_LowerBody; // 애니메이션의 종료 여부를 설정
 			m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
 		}
-	}
+		
 
+			m_bAnim_NoneLoop_LowerBody = isFinished_LowerBody; // 애니메이션의 종료 여부를 설정
+			m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
+
+
+
+		}
+	
 	return isFinished_LowerBody;
 }
 

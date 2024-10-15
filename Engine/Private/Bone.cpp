@@ -18,64 +18,65 @@ void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fm
 		XMLoadFloat4x4(&m_TransformationMatrix) * Bones[m_iParentBoneIndex]->Get_CombinedTransformationMatrix());
 }
 
-void CBone::Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle)
+void CBone::Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle, _uint iUpperMotion)
 {
 	if (-1 == m_iParentBoneIndex)
 	{
+
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix,
 			XMLoadFloat4x4(&m_TransformationMatrix) * PreTransformMatrix);
 
 		return;
 	}
-	
+
 	string strName(m_szName);
-	if (strName == "upperarm_R_SKEL" || strName == "upperarm_L_SKEL")
+	/*if (GetAsyncKeyState(VK_UP))
 	{
-		XMMATRIX rotationMatrix = XMMatrixRotationZ(XMConvertToRadians(fRotation_Angle));
-		// XMFLOAT4X4 구조체 선언
-		_float4x4 floatMatrix;
-		// rotationMatrix 값을 floatMatrix에 저장
-		XMStoreFloat4x4(&floatMatrix, rotationMatrix);
-		// m_TransformationMatrix를 XMMATRIX로 변환
-		XMMATRIX transformationMatrix = XMLoadFloat4x4(&m_TransformationMatrix);
-		// 변환된 행렬과 rotationMatrix를 곱셈
-		XMMATRIX resultMatrix = transformationMatrix * rotationMatrix;
-		// 결과를 다시 _float4x4 형식에 저장
-		XMStoreFloat4x4(&m_TransformationMatrix, resultMatrix);
+		fChest += 0.1f;
 	}
-	if (strName == "chest_SKEL" )
+	if (GetAsyncKeyState(VK_DOWN))
 	{
-		XMMATRIX rotationMatrix = XMMatrixRotationZ(XMConvertToRadians(fRotation_Angle * 2.f));
-		rotationMatrix = XMMatrixRotationX(XMConvertToRadians(30.f));
+		fChest -= 0.1f;
+	}
+	if (GetAsyncKeyState(VK_LEFT))
+	{
+		fLowerBody += 0.1f;
+	}
+	if (GetAsyncKeyState(VK_RIGHT))
+	{
+		fLowerBody -= 0.1f;
+	}
 
-		// XMFLOAT4X4 구조체 선언
-		_float4x4 floatMatrix;
-		// rotationMatrix 값을 floatMatrix에 저장
-		XMStoreFloat4x4(&floatMatrix, rotationMatrix);
-		// m_TransformationMatrix를 XMMATRIX로 변환
-		XMMATRIX transformationMatrix = XMLoadFloat4x4(&m_TransformationMatrix);
-		// 변환된 행렬과 rotationMatrix를 곱셈
-		XMMATRIX resultMatrix = transformationMatrix * rotationMatrix;
-		// 결과를 다시 _float4x4 형식에 저장
-		XMStoreFloat4x4(&m_TransformationMatrix, resultMatrix);
-	}
-	if (strName == "thigh_L_SKEL" || strName == "thigh_R_SKEL" || strName == "pelvis_SKEL")
+	if (GetAsyncKeyState('P'))
 	{
-		XMMATRIX rotationMatrix = XMMatrixRotationX(XMConvertToRadians(-30.f));
+		cout << "fChest		: " << fChest << endl;
+		cout << "fLowerBody : " << fLowerBody << endl;
 
-		// XMFLOAT4X4 구조체 선언
-		_float4x4 floatMatrix;
-		// rotationMatrix 값을 floatMatrix에 저장
-		XMStoreFloat4x4(&floatMatrix, rotationMatrix);
-		// m_TransformationMatrix를 XMMATRIX로 변환
-		XMMATRIX transformationMatrix = XMLoadFloat4x4(&m_TransformationMatrix);
-		// 변환된 행렬과 rotationMatrix를 곱셈
-		XMMATRIX resultMatrix = transformationMatrix * rotationMatrix;
-		// 결과를 다시 _float4x4 형식에 저장
-		XMStoreFloat4x4(&m_TransformationMatrix, resultMatrix);
+	}*/
+
+	if (iUpperMotion == ATTACK_KATANA_MOTION)
+	{
+		if (strName == "upperarm_R_SKEL" || strName == "upperarm_L_SKEL" )
+		{
+			// 뼈 위치 위로 올려주기
+			XMMATRIX positionMatrix = XMMatrixTranslation(9.f, 0.f, 0.f);
+			_float4x4 floatMatrix{};
+			XMStoreFloat4x4(&floatMatrix, positionMatrix);
+			XMMATRIX transformationMatrix = XMLoadFloat4x4(&m_TransformationMatrix);
+			XMMATRIX resultMatrix = transformationMatrix * positionMatrix;
+			XMStoreFloat4x4(&m_TransformationMatrix, resultMatrix);
+		}
 	}
+
+
+	
+
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix,
 		XMLoadFloat4x4(&m_TransformationMatrix) * Bones[m_iParentBoneIndex]->Get_CombinedTransformationMatrix());
+
+	
+
+
 }
 
 HRESULT CBone::Initialize(_uint iParentBoneIndex, HANDLE hFileRead)
@@ -86,9 +87,8 @@ HRESULT CBone::Initialize(_uint iParentBoneIndex, HANDLE hFileRead)
 	char* szName = new char[iBoneNameLen + 1];
 	ReadFile(hFileRead, szName, iBoneNameLen * sizeof(_char), &dwByte, nullptr);
 	szName[iBoneNameLen] = '\0'; 
-
+	cout << szName << endl;
 	strcpy_s(m_szName, szName);  
-
 	delete[] szName;
 
 	
@@ -104,6 +104,7 @@ HRESULT CBone::Initialize(_uint iParentBoneIndex, HANDLE hFileRead)
 	//cout << "---------------------------------------------------------------------------------------------------------" << endl;
 	ReadFile(hFileRead, &m_iParentBoneIndex, sizeof(_uint), &dwByte, nullptr);
 	// cout << "부모 뼈 : " <<m_iParentBoneIndex << endl;
+	
 	return S_OK;
 }
 

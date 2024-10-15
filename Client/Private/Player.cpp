@@ -56,12 +56,15 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 	m_vecTPS_CamPos = m_pTPSPivot->Get_TPS_CameraPos();
 	m_vecFPS_CamPos = m_pFPSPivot->Get_FPS_CameraPos();
+	m_vecWeaponPos = m_pWaepon->Get_WeaponPos();
+	m_vecWeaponDir = m_pWaepon->Get_WeaponDir();
 
 	return S_OK;
 }
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {	
+
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_C))
 	{
 		if (m_iViewState == PLAYER_TPS_VIEW)
@@ -94,8 +97,10 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		m_pHead->Set_PlayerViewState(false);
 		m_pFPS->Set_PlayerViewState(true);
 		m_pBody->Set_PlayerViewState(false);
-		const _float4x4* FPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
-		m_pWaepon->Set_SocketMatrix(FPSMatrix);
+	//	const _float4x4* FPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
+	//	m_pWaepon->Set_SocketMatrix(FPSMatrix);
+		m_pWaepon->Set_TPSState(false);
+
 	}
 	else if(m_iViewState == PLAYER_TPS_VIEW)
 	{
@@ -103,9 +108,9 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		m_pHead->Set_PlayerViewState(true);
 		m_pFPS->Set_PlayerViewState(false);
 		m_pBody->Set_PlayerViewState(true);
-		const _float4x4* TPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
-		m_pWaepon->Set_SocketMatrix(TPSMatrix);
-
+	//	const _float4x4* TPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
+		//m_pWaepon->Set_SocketMatrix(TPSMatrix);
+		m_pWaepon->Set_TPSState(true);
 
 	}
 	// 카메라 At 보내주기
@@ -119,6 +124,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	// 칼에게 무기 상태 보내주기
 	if (m_iWeaponState == WEAPON_KATANA)			
 	{
+		m_iViewState = PLAYER_TPS_VIEW;	// 카타나는 무조건 3인칭 
 		m_pKatana->Set_KatanaState(true);
 	}
 	else
@@ -185,9 +191,9 @@ HRESULT CPlayer::Add_PartObjects()
 	HeadDesc.fSpeedPerSec = 0.f;
 	HeadDesc.fRotationPerSec = 0.f;
 	HeadDesc.pParentState = &m_iState_Upper;
-	HeadDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("head_SKEL");
+	HeadDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("chest_SKEL");
 	HeadDesc.m_iViewState = &m_iViewState;
-
+	HeadDesc.m_iWeaponState = &m_iWeaponState;
 		/*head_SKEL*/
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Head_Player"), TPS_PART_HEAD, &HeadDesc)))
 		return E_FAIL;
@@ -195,7 +201,7 @@ HRESULT CPlayer::Add_PartObjects()
 	CWeapon::WEAPON_DESC	WeaponDesc{};
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.fSpeedPerSec = 0.f;
-	WeaponDesc.fRotationPerSec = 0.f;
+	WeaponDesc.fRotationPerSec = XMConvertToRadians(40.0f);
 	WeaponDesc.pParentState = &m_iState_Upper;
 	WeaponDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	WeaponDesc.m_iViewState = &m_iViewState;
@@ -230,7 +236,7 @@ HRESULT CPlayer::Add_PartObjects()
 	FPSPivotDesc.fSpeedPerSec = 0.f;
 	FPSPivotDesc.fRotationPerSec = 0.f;
 	FPSPivotDesc.pParentState = &m_iState_Upper;
-	FPSPivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("root");
+	FPSPivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	FPSPivotDesc.m_iViewState = &m_iViewState;
 
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_FPSPivot"), FPS_PART_PIVOT, &FPSPivotDesc)))
@@ -284,8 +290,31 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB))
 	{
-		m_iState_Upper = STATE_IDLE;
+		if (m_iWeaponState != WEAPON_KATANA)
+		{
+			m_iState_Upper = STATE_IDLE;
+		}
 	}
+	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_RB))
+	{
+		if (!(m_iState_Upper & FIRE_RB))
+		{
+			if (m_iState_Upper & STATE_IDLE)
+				m_iState_Upper ^= STATE_IDLE;
+			m_iState_Upper |= FIRE_RB;
+		}
+	}
+	
+	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V))
+	{
+		if (!(m_iState_Upper & MELEE))
+		{
+			if (m_iState_Upper & STATE_IDLE)
+				m_iState_Upper ^= STATE_IDLE;
+			m_iState_Upper |= MELEE;
+		}
+	}
+
 
 
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_S))

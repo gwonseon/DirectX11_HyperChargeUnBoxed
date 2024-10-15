@@ -40,9 +40,12 @@ HRESULT CWeapon::Initialize(void* pArg)
 	Rotation = { 2.22,0.2,0.f };*/
 	m_iViewState = pDesc->m_iViewState;
 
-	Position = {-0.67, 0.48, -0.29 };
-	Scale = { 2.5f };
-	Rotation = {-24.4402,-102.899,6.4f };
+
+
+
+	Position = {-0.86f, 0.12f, -0.39f };
+	Scale = { 2.3f };
+	Rotation = { 8.87969f, -115.2f, 6.4f };
 	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
 	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
@@ -54,68 +57,50 @@ HRESULT CWeapon::Initialize(void* pArg)
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
-	{
-		Position.x += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_2))
-	{
-		Position.y += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_3))
-	{
-		Position.z += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_4))
-	{
-		Position.x -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_5))
-	{
-		Position.y -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_6))
-	{
-		Position.z -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_J))
-	{
-		Rotation.x += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_K))
-	{
-		Rotation.y += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_L))
-	{
-		Rotation.y += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_U))
-	{
-		Rotation.x -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_I))
-	{
-		Rotation.y -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_O))
-	{
-		Rotation.z -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_P))
-	{
-		cout << Position.x << "    " << Position.y << "    " << Position.z << endl;
-		cout << Rotation.x << "    " << Rotation.y << "    " << Rotation.z << endl;
-	}
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f)); 
-	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
-	m_pTransformCom->LookAt(*m_vecCameraAt * -1.f);
+	if (*m_pParentState & CPlayer::MELEE || *m_pParentState & CPlayer::RELOADING)
+	{
+		m_pTransformCom->Rotation(XMConvertToRadians(8.87969f), XMConvertToRadians(-115.2f), XMConvertToRadians(6.4f));
+
+	}
+	else
+	{
+	if (m_bTPSState == false)
+	{
+		_long MouseMoveY = { 0 };
+		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		{
+			if (m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
+				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
+			if (m_fAngle_Y > 60.f)
+				m_fAngle_Y = 60.f;
+			if (m_fAngle_Y < -60.f)
+				m_fAngle_Y = -60.f;
+		}
+		m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
+	//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
+	}
+	else
+	{
+		_long MouseMoveY = { 0 };
+		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		{
+			if (m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
+				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
+			if (m_fAngle_Y > 60.f)
+				m_fAngle_Y = 60.f;
+			if (m_fAngle_Y < -60.f)
+				m_fAngle_Y = -60.f;
+		}	
+		m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
+
+	//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
+	}
+	}
 }
 
 void CWeapon::Update(_float fTimeDelta)
 {
-	
 
 
 }
@@ -128,7 +113,8 @@ void CWeapon::Late_Update(_float fTimeDelta)
 		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
 
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-
+	 m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1.f);
+	 m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31, m_WorldMatrix._32, m_WorldMatrix._33, 0.f);
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
 
