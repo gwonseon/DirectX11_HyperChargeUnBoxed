@@ -49,6 +49,7 @@ public:
 public:
 	HRESULT Initialize(_uint iParentBoneIndex, HANDLE hFileRead);
 	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix);
+	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fTimeDelta);
 	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle, _uint iUpperMotion);
 
 private:

@@ -51,7 +51,6 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 
-
 }
 
 void CTransform::Go_Straight(_float fTimeDelta)
@@ -180,6 +179,44 @@ void CTransform::Set_Min_Height()
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	vPosition = XMVectorSetY(vPosition, 0.f);
 	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+_float CTransform::Cal_Distance(_float3 fObj, _float3 fTarget)
+{
+	_float fDistance = ((fObj.x - fTarget.x) * (fObj.x - fTarget.x)) +
+		((fObj.y - fTarget.y) * (fObj.y - fTarget.y)) +
+		((fObj.z - fTarget.z) * (fObj.z - fTarget.z));
+	return fDistance;
+}
+
+_float CTransform::Cal_Distance_vec(_vector vObj, _vector vTarget)
+{
+	_float3 fObj{}, fTarget{};
+	XMStoreFloat3(&fObj, vObj);
+	XMStoreFloat3(&fTarget, vTarget);
+	_float fDistance = ((fObj.x - fTarget.x) * (fObj.x - fTarget.x)) +
+		((fObj.y - fTarget.y) * (fObj.y - fTarget.y)) +
+		((fObj.z - fTarget.z) * (fObj.z - fTarget.z));
+	
+	return fDistance;
+}
+
+_float CTransform::Cal_Distance_No_Height(_float3 fObj, _float3 fTarget)
+{
+	_float fDistance = ((fObj.x - fTarget.x) * (fObj.x - fTarget.x)) +
+		((fObj.z - fTarget.z) * (fObj.z - fTarget.z));
+	return fDistance;
+}
+
+_float CTransform::Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget)
+{
+	_float3 fObj{}, fTarget{};
+	XMStoreFloat3(&fObj, vObj);
+	XMStoreFloat3(&fTarget, vTarget);
+	_float fDistance = ((fObj.x - fTarget.x) * (fObj.x - fTarget.x)) +
+		((fObj.z - fTarget.z) * (fObj.z - fTarget.z));
+
+	return fDistance;
 }
 
 

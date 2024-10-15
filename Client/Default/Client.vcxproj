@@ -159,6 +159,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Alien.h" />
+    <ClInclude Include="..\Public\BrainCore.h" />
     <ClInclude Include="..\Public\Camera_TPS.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -172,6 +174,7 @@
     <ClInclude Include="..\Public\Environment.h" />
     <ClInclude Include="..\Public\FPS_Pivot.h" />
     <ClInclude Include="..\Public\Head_Player.h" />
+    <ClInclude Include="..\Public\Helicopter.h" />
     <ClInclude Include="..\Public\InGameUI.h" />
     <ClInclude Include="..\Public\Level_ImGui.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -182,9 +185,15 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MenuUI.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\Monster_Path.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\Pivot.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\Player_Build.h" />
     <ClInclude Include="..\Public\Player_FPS.h" />
+    <ClInclude Include="..\Public\Pony.h" />
+    <ClInclude Include="..\Public\Tank.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\UI_CircleGuage.h" />
     <ClInclude Include="..\Public\Weapon.h" />
@@ -196,8 +205,10 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Alien.cpp" />
     <ClCompile Include="..\Private\BackGround.cpp" />
     <ClCompile Include="..\Private\Body_Player.cpp" />
+    <ClCompile Include="..\Private\BrainCore.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_TPS.cpp">
@@ -208,6 +219,7 @@
     <ClCompile Include="..\Private\Environment.cpp" />
     <ClCompile Include="..\Private\FPS_Pivot.cpp" />
     <ClCompile Include="..\Private\Head_Player.cpp" />
+    <ClCompile Include="..\Private\Helicopter.cpp" />
     <ClCompile Include="..\Private\InGameUI.cpp" />
     <ClCompile Include="..\Private\Level_ImGui.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
@@ -218,9 +230,15 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MenuUI.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\Monster_Path.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\Pivot.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />
+    <ClCompile Include="..\Private\Pony.cpp" />
+    <ClCompile Include="..\Private\Tank.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\UI_CircleGuage.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />

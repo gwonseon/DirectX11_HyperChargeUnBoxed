@@ -5,14 +5,22 @@
 #include "BackGround.h"
 #include "CrossLine.h"
 #include "InGameUI.h"
+#include "MenuUI.h"
+#include "ButtonUI.h"
+
 
 #include "Terrain.h"
 #include "Camera_Free.h"
-#include "Monster.h"
-#include "Environment.h"
 
-#include "MenuUI.h"
-#include "ButtonUI.h"
+#include "Tank.h"
+#include "Helicopter.h"
+#include "Alien.h"
+#include "Pony.h"
+
+
+
+#include "Environment.h"
+#include "BrainCore.h"
 
 #include "Head_Player.h"
 #include "Body_Player.h"
@@ -22,6 +30,8 @@
 #include "CollisionBox.h"
 #include "UI_CircleGuage.h"
 #include "FPS_Pivot.h"
+
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -407,11 +417,36 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	}
 
 
-	/* 몬스터 */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Monster")) == nullptr)
+	/* Tank */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster"),
-			CMonster::Create(m_pDevice, m_pContext))))
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tank"),
+			CTank::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	/* Heli */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Helicopter")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Helicopter"),
+			CHelicopter::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	/* Alien */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Alien")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Alien"),
+			CAlien::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
+	/* PONY */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pony")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pony"),
+			CPony::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
 
@@ -420,6 +455,14 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
 			CEnvironment::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// BrainCore
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
 
@@ -462,13 +505,13 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 			CCamera_Free::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-	/* 몬스터 */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Monster_ImGui")) == nullptr)
-	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_ImGui"),
-			CMonster::Create(m_pDevice, m_pContext))))
-			return E_FAIL;
-	}
+	///* 몬스터 */
+	//if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Monster_ImGui")) == nullptr)
+	//{
+	//	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_ImGui"),
+	//		CMonster::Create(m_pDevice, m_pContext))))
+	//		return E_FAIL;
+	//}
 
 	/* Prototype GameObject Player*/
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
@@ -614,16 +657,27 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	cout << "애니메이션 ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iAnimModelIndex < 8)
+	while (iAnimModelIndex < 12)
 	{
-
-		if (  iAnimModelIndex == 7)
+		if (iAnimModelIndex == 0)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		}
+		else if (iAnimModelIndex == 2) // Tank
+		{
+			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		}
+		else if (  iAnimModelIndex == 7)
 		{
 			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
 		}
 		else if (iAnimModelIndex == 6)
 		{
 			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
+		}
+		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
 		}
 		else
 		{
