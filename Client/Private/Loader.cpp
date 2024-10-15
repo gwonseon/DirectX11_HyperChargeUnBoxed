@@ -540,7 +540,7 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	cout << "Environment ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while(iPathIndex < ENVIRONMENT_EA)
+	while(iPathIndex < 3 /*ENVIRONMENT_EA*/)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Path + to_wstring(iPathIndex) + Ext;
@@ -554,7 +554,7 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	iPathIndex = 0;
 	cout << "BUILD ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex <BUILD_EA)
+	while (iPathIndex < 3 /*BUILD_EA*/)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iPathIndex) + Ext;
@@ -619,7 +619,7 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 
 		if (  iAnimModelIndex == 7)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(178.f));
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
 		}
 		else if (iAnimModelIndex == 6)
 		{

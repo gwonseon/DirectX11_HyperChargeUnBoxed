@@ -17,7 +17,23 @@ public:
 	{
 		const _uint* pParentState = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr };
+		_uint* m_iWeaponState{};
 	}HEADPLAYER_DESC;
+
+	enum WEAPONSTATE
+	{
+		WEAPON_UNARMED,
+		WEAPON_RIFLE,
+		WEAPON_SHOTGUN,
+		WEAPON_PULSECANNON,
+		WEAPON_TELEPORT,
+		WEAPON_LOCKETLAUNCHER,
+		WEAPON_RIFLE_SECOND,
+		WEAPON_KATANA,
+		WEAPON_END
+	};
+
+
 private:
 	CHead_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHead_Player(const CHead_Player& Prototype);
@@ -42,9 +58,10 @@ public:
 private:
 	_bool m_bTPSState = false;
 
-
+	_uint* m_iWeaponState{};
 	_uint* m_iViewState{};
-
+	_float3 Position{}, Rotation{};
+	_float		m_fAngle_Y{};
 
 private:
 	CShader* m_pShaderCom = { nullptr };

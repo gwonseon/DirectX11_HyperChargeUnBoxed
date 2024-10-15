@@ -21,6 +21,7 @@ public:
 
 	}WEAPON_DESC;
 
+
 	enum WEAPON_INDEX_LIST
 	{
 		WEAPONPARTS_BASE,
@@ -69,6 +70,8 @@ public:
 
 
 public:
+	void	Set_TPSState(_bool State) { m_bTPSState = State; }
+
 	void Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
 	HRESULT Weapon_Exchange();
 
@@ -76,6 +79,8 @@ public:
 
 	void   Set_CameraAt(_vector* pAt) { m_vecCameraAt = pAt; }
 
+	_vector*	Get_WeaponPos() { return &m_vecWeaponPos; }
+	_vector*	Get_WeaponDir() { return &m_vecWeaponDir; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };
@@ -88,6 +93,9 @@ private:
 	_float3 Position{};
 	_float3	Rotation{};
 
+	_vector	m_vecWeaponPos{};
+	_vector	m_vecWeaponDir{};
+	
 	_uint m_iWeaponState{};
 	WEAPONSTATE m_eWeaponState = WEAPON_END;
 private:
@@ -96,8 +104,18 @@ private:
 
 private:
 	_uint* m_iViewState{};
-
 	_vector* m_vecCameraAt{};
+
+
+
+private:
+	_uint		m_iCurrent_Bullet = 0;
+	_uint		m_iEntire_Bullet  = 0;
+
+	_bool		m_bTPSState{};
+
+
+	_float		m_fAngle_Y{};
 public:
 	static CWeapon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

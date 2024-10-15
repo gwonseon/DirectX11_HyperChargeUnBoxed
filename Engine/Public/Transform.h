@@ -83,6 +83,7 @@ public:
 	void Set_Min_Height();
 
 
+
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
 

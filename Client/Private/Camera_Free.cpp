@@ -33,8 +33,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
     m_vecFPSPos = pDesc->m_vecFPS_CamPos;
     m_iViewState = pDesc->iViewState;
     m_bMouseLock = false;
-
-
+    m_vecWeaponPos = pDesc->m_vecWeaponPos;
+    m_vecWeaponDir = pDesc->m_vecWeaponDir;
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
@@ -45,51 +45,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
-    if(m_eLevelID == LEVEL_GAMEPLAY)
-    {
-        XMMATRIX matWorld = XMLoadFloat4x4(&*m_matPlayerWorld);
-
-        if (*m_iViewState == PLAYER_TPS_VIEW) // 3인칭
-        {
-            _long MouseMoveY = { 0 };  _matrix RotationMatrix{};
-            if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
-            {
-                if (m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
-                    m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 2.f;
-                if (m_fAngle_Y > 4.f)
-                    m_fAngle_Y = 4.f;
-                if (m_fAngle_Y < -4.f)
-                    m_fAngle_Y = -4.f;
-            }
-            // 카메라 위치 조정
-            XMVECTOR vCamPos = *m_vecTPSPos;
-            vCamPos = XMVectorSetY(vCamPos, XMVectorGetY(vCamPos) + m_fAngle_Y);
-            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
-            // 바라보는 방향 조정
-            vAt = *m_vecTPSPos + matWorld.r[2] * 5.f;
-            m_pTransformCom->LookAt(vAt);
-        }
-        else if (*m_iViewState == PLAYER_FPS_VIEW)// 1인칭
-        {
-            _long MouseMoveY = { 0 };  _matrix RotationMatrix{};
-            if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
-            {
-                if (m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
-                    m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 2.f;
-                if (m_fAngle_Y > 4.f)
-                    m_fAngle_Y = 4.f;
-                if (m_fAngle_Y < -4.f)
-                    m_fAngle_Y = -4.f;
-            }
-            // 카메라 위치 조정
-            XMVECTOR vCamPos = *m_vecFPSPos;
-            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
-            // 바라보는 방향 조정
-            vAt = *m_vecFPSPos + matWorld.r[2] * 8.f;
-            vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y);
-            m_pTransformCom->LookAt(vAt);
-        }
-    }
+    
 
     if (m_eLevelID == LEVEL_IMGUI)
     {
@@ -129,9 +85,9 @@ void CCamera_Free::Update(_float fTimeDelta)
         ShowCursor(TRUE);
         break;
     case Client::LEVEL_GAMEPLAY:
-  /*      ClientToScreen(g_hWnd, &clientPos);
+       ClientToScreen(g_hWnd, &clientPos);
         SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
-        ShowCursor(FALSE);*/
+        ShowCursor(FALSE);
         break;
     case Client::LEVEL_IMGUI:
         if (GetKeyState('S') & 0x8000)
@@ -170,7 +126,52 @@ void CCamera_Free::Update(_float fTimeDelta)
 
 void CCamera_Free::Late_Update(_float fTimeDelta)
 {
+    if (m_eLevelID == LEVEL_GAMEPLAY)
+    {
+        XMMATRIX matWorld = XMLoadFloat4x4(&*m_matPlayerWorld);
+        _long MouseMoveY = { 0 };  _matrix RotationMatrix{};
+        if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+        {
+            if (m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
+                m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
+            if (m_fAngle_Y > 2.f)
+                m_fAngle_Y = 2.f;
+            if (m_fAngle_Y < -4.f)
+                m_fAngle_Y = -4.f;
+        }
+        if (*m_iViewState == PLAYER_TPS_VIEW) // 3인칭
+        {
+            // 카메라 위치 조정
+            XMVECTOR vCamPos = *m_vecTPSPos;
+            vCamPos = XMVectorSetY(vCamPos, XMVectorGetY(vCamPos) + m_fAngle_Y);
+            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
+            // 바라보는 방향 조정
+            vAt = *m_vecTPSPos + matWorld.r[2] * 7.f;
+            if (m_fAngle_Y > 0)
+            {
+                vAt = vAt + matWorld.r[0] * m_fAngle_Y;
+                vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y / 2);
+            }
+            else
+            {
+                vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y);
+            }
+            m_pTransformCom->LookAt(vAt);
+        }
+        else if (*m_iViewState == PLAYER_FPS_VIEW)// 1인칭
+        {
 
+            // 카메라 위치 조정
+            XMVECTOR vCamPos = *m_vecFPSPos;
+            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
+            // 바라보는 방향 조정
+
+            vAt = *m_vecWeaponPos + XMVector3Normalize(*m_vecWeaponDir) * 7.f;
+
+            /*  vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y);*/
+            m_pTransformCom->LookAt(vAt);
+        }
+    }
 }
 
 HRESULT CCamera_Free::Render()

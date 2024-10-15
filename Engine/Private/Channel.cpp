@@ -143,6 +143,9 @@ void CChannel::Update_TransformationMatrix_UpperBody(const vector<class CBone*>&
 		_vector		vSourRotation, vDestRotation;
 		_vector		vSourPosition, vDestPosition;
 
+
+
+
 		vSourScale = XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex].vScale);
 		vSourRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyFrameIndex].vRotation);
 		vSourPosition = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex].vPosition), 1.f);
@@ -154,10 +157,13 @@ void CChannel::Update_TransformationMatrix_UpperBody(const vector<class CBone*>&
 		vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
 		vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
 		vPosition = XMVectorLerp(vSourPosition, vDestPosition, fRatio);
+
+
 	}
 	_matrix			TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
-	if (m_iBoneIndex <=  34)
+	
+	if (m_iBoneIndex <=  26)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 
 }
@@ -212,7 +218,7 @@ void CChannel::Update_TransformationMatrix_LowerBody(const vector<class CBone*>&
 
 	_matrix			TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
-	if( m_iBoneIndex >= 35)
+	if( m_iBoneIndex >= 27)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 
 }
@@ -300,7 +306,11 @@ _bool CChannel::Update_LinearInterPolation_UpperBody(const vector<class CBone*>&
 	vScale = XMVectorLerp(vCurrentScale, vDestScale, fRatio);
 
 	_matrix	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
-	if (m_iBoneIndex <= 34)
+
+
+
+
+	if (m_iBoneIndex <= 26)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 
 	if (fTemp_UpperBody >= m_fInterPolation_TargetTime)
@@ -348,7 +358,7 @@ _bool CChannel::Update_LinearInterPolation_LowerBody(const vector<class CBone*>&
 	vScale = XMVectorLerp(vCurrentScale, vDestScale, fRatio);
 
 	_matrix	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
-	if (m_iBoneIndex > 34)
+	if (m_iBoneIndex >= 27)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 
 	if (fTemp_LowerBody >= m_fInterPolation_TargetTime)
@@ -359,7 +369,6 @@ _bool CChannel::Update_LinearInterPolation_LowerBody(const vector<class CBone*>&
 
 	return false;
 }
-
 
 void CChannel::Free()
 {
@@ -393,7 +402,7 @@ HRESULT CChannel::Initialize(CModel* pModel, HANDLE hFileRead)
 	delete[] szName;
 
 	m_iBoneIndex = pModel->Get_BoneIndex(m_szName);
-	cout << m_szName << "   :     " << m_iBoneIndex << endl;
+//	cout << m_szName << "   :     " << m_iBoneIndex << endl;
 
 	_uint iNumScalingKeys{}, iNumRotationKeys{}, iNumPositionKeys{};
 	ReadFile(hFileRead, &iNumScalingKeys, sizeof(_uint), &dwByte, nullptr);		// for Export 

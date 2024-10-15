@@ -182,6 +182,8 @@ void CTransform::Set_Min_Height()
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
+
+
 HRESULT CTransform::Bind_ShaderResource(CShader* pShader, const _char* pConstantName)
 {
 	

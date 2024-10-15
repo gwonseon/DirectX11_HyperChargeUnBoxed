@@ -33,7 +33,8 @@ HRESULT CFPS_Pivot::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	Position = { 3.9f,-0.9f,0.4f};
+	
+	Position = { 3.8f, 2.f, 0.3f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
 	//m_pTransformCom->Set_Scaling(3.f, 3.f, 3.f);
 
@@ -55,60 +56,37 @@ void CFPS_Pivot::Priority_Update(_float fTimeDelta)
 void CFPS_Pivot::Update(_float fTimeDelta)
 {
 
-	/*if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
-	{
-		Position.x += 0.1f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_2))
-	{
-		Position.y += 0.1f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_3))
-	{
-		Position.z += 0.1f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_4))
-	{
-		Position.x -= 0.1f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_5))
-	{
-		Position.y -= 0.1f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_6))
-	{
-		Position.z -= 0.1f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_J))
-	{
-		Rotation.x += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_K))
-	{
-		Rotation.y += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_L))
-	{
-		Rotation.y += 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_U))
-	{
-		Rotation.x -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_I))
-	{
-		Rotation.y -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_O))
-	{
-		Rotation.z -= 0.01f;
-	}
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_P))
-	{
-		cout << Position.x << "    " << Position.y << "    " << Position.z << endl;
-	}
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD1))
+	//{
+	//	Position.x += 0.1f;
+	//}
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD2))
+	//{
+	//	Position.y += 0.1f;
+	//}
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD3))
+	//{
+	//	Position.z += 0.1f;
+	//}
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD4))
+	//{
+	//	Position.x -= 0.1f;
+	//}
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD5))
+	//{
+	//	Position.y -= 0.1f;
+	//}
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD6))
+	//{
+	//	Position.z -= 0.1f;
+	//}
+	//
+	//if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_P))
+	//{
+	//	cout << Position.x << "    " << Position.y << "    " << Position.z << endl;
+	//}
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));*/
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
 
 }
 

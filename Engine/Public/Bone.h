@@ -14,6 +14,17 @@ BEGIN(Engine)
 
 class CBone final : public CBase
 {
+public:
+	enum ATTACK_MOTION
+	{
+		IDLE_MOTION,
+		ATTACK_FIRE_MOTION,
+		ATTACK_KATANA_MOTION,
+		ATTACK_MELEE_MOTION,
+		RELOAD_MOTION,
+		IDLE_KATANA_MOTION
+	};
+
 private:
 	CBone();
 	virtual ~CBone() = default;
@@ -38,11 +49,10 @@ public:
 public:
 	HRESULT Initialize(_uint iParentBoneIndex, HANDLE hFileRead);
 	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix);
-	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle);
+	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle, _uint iUpperMotion);
 
 private:
 	_char				m_szName[MAX_PATH] = {};
-
 	/* 부모 기준으로 표현된 나만의 상태를 표현하기위한 행렬. */
 	_float4x4			m_TransformationMatrix = {};
 
@@ -55,12 +65,13 @@ private:
 
 	// CBone*				m_pParent = { nullptr };
 
-
+	_float fChest = 51.f;
+	_float fLowerBody = -3.5f;
+	_float4x4 floatMatrix;
 public:
 	static CBone* Create(_uint iParentBoneIndex, HANDLE hFileRead);
 	CBone* Clone();
 	virtual void Free() override;
-
 
 
 public:

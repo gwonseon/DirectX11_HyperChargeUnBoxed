@@ -23,6 +23,14 @@ public:
 	_bool Update_LinearInterPolation_LowerBody(const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta);
 
 	void Set_InterPolationCurrentTime_Init() { m_fInterPolation_CurrentTime = 0.f; }
+
+
+
+
+
+
+
+
 public:
 	KEYFRAME&		Get_LastKeyFrame() { return LastKeyFrame; }
 
@@ -37,6 +45,8 @@ private:
 
 	_uint								m_iBoneIndex = {};
 
+
+	KEYFRAME		TempKey;
 	KEYFRAME		LastKeyFrame;
 	KEYFRAME		LastKeyFrame_UpperBody;
 	KEYFRAME		LastKeyFrame_LowerBody;

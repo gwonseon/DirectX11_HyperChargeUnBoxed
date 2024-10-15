@@ -71,7 +71,7 @@ _bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones,
 	return false;
 }
 
-_bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper)
+_bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion)
 {
 	if(bUpper == true)
 	{
@@ -80,8 +80,9 @@ _bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>&
 			m_vecName_UpperBody.resize(m_iNumChannels);
 			LastKeyFrame = nullptr; // LastKeyFrame을 nullptr로 초기화
 		}
+		if(iUpperMotion != 0)
+			m_fCurrentPosition_UpperBody += m_fTickPerSecond * fTimeDelta;
 
-		m_fCurrentPosition_UpperBody += m_fTickPerSecond * fTimeDelta;
 		if (m_fCurrentPosition_UpperBody >= m_fDuration &&
 			true == isLoop)
 		{
@@ -135,8 +136,8 @@ _bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>&
 			m_Channels[i]->Update_TransformationMatrix_LowerBody(Bones, &m_iChannelKeyFrameIndices[i], m_fCurrentPosition_LowerBody);
 			LastKeyFrame_LowerBody = &m_Channels[i]->Get_LastKeyFrame();
 			m_vecName_LowerBody[i] = m_Channels[i]->Get_strName();
-
-
+			
+			
 		}
 	}
 

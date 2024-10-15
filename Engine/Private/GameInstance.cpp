@@ -77,8 +77,6 @@ void CGameInstance::Update(_float fTimeDelta)
 
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
-
-
 	m_pObject_Manager->Update(fTimeDelta);
 
 	m_pObject_Manager->Late_Update(fTimeDelta);

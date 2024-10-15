@@ -14,6 +14,8 @@ public:
 
 		_vector* m_vecTPS_CamPos{};
 		_vector* m_vecFPS_CamPos{};
+		_vector* m_vecWeaponPos{};
+		_vector* m_vecWeaponDir{};
 
 		_uint* iViewState{};
 		const _float4x4* matPlayerWorld = { nullptr };
@@ -65,6 +67,8 @@ private:
 
 	_vector* m_vecTPSPos = {nullptr};
 	_vector* m_vecFPSPos = { nullptr };
+	_vector* m_vecWeaponPos = { nullptr };
+	_vector* m_vecWeaponDir = { nullptr };
 
 	
 	XMMATRIX RotationMatrix{};

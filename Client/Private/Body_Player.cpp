@@ -40,7 +40,9 @@ HRESULT CBody_Player::Initialize(void* pArg)
 		return E_FAIL;
 	m_iViewState = pDesc->m_iViewState;
 	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed, true);
-	m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Shotgun, true);
+	m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
+	m_iUpperMotion = IDLE_MOTION;
+
 
 	return S_OK;
 }
@@ -52,32 +54,39 @@ void CBody_Player::Priority_Update(_float fTimeDelta)
 
 void CBody_Player::Update(_float fTimeDelta)
 {
-
+	
 		// È¸Àü
 		_long   MouseMove = { 0 };
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
 		{
-			m_fArmAngle += (MouseMove * -0.01f);
-			if (m_fArmAngle > 25.f)
-				m_fArmAngle = 25.f;
-			if (m_fArmAngle < -15.f)
-				m_fArmAngle = -15.f;
+			if (m_bTPSState == true)
+			{
+				m_fArmAngle += (MouseMove * -0.05f);
+				if (m_fArmAngle > 25.f)
+					m_fArmAngle = 25.f;
+				if (m_fArmAngle < -15.f)
+					m_fArmAngle = -15.f;
 
-			m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle);
-			m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta);
-
+				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion);
+			}
+			else
+			{
+				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, 0.f, m_iUpperMotion);
+			}
 		}
 		else
 		{
-			m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle);
-			m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta);
-
+			m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion);
 		}		
-
+		m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta);
 	
 		UpperBody_Anim(fTimeDelta);
 		LowerBody_Anim(fTimeDelta);
 		
+
+
+
+
 
 }
 
@@ -122,21 +131,50 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 {
 	if (*m_pParentState_Upper & CPlayer::FIRE)
 	{
-		m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
+		if (m_iWeaponState == WEAPON_KATANA)
+		{
+			m_iUpperMotion = ATTACK_KATANA_MOTION;
+			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_NinjaSweepAttack, false);
+		}
+		else
+		{
+			m_iUpperMotion = ATTACK_FIRE_MOTION;
+			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
+		}
 	}
-
+	if (*m_pParentState_Upper & CPlayer::FIRE_RB)
+	{
+		if (m_iWeaponState == WEAPON_KATANA)
+		{
+			m_iUpperMotion = ATTACK_KATANA_MOTION;
+			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_NinjaSwiftAttack, false);
+		}
+	}
+	if (*m_pParentState_Upper & CPlayer::MELEE)
+	{
+		m_iUpperMotion = ATTACK_MELEE_MOTION;
+		m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_DualDagger_Attack_1, false);
+	}
 	if (*m_pParentState_Upper & CPlayer::RELOADING)
 	{
-		 m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Pistol_Reload);
+		m_iUpperMotion = RELOAD_MOTION;
+		 m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_WeaponReload);
 	}
 
 
 	if (*m_pParentState_Upper & CPlayer::STATE_IDLE)
 	{
+		
 		if(m_iWeaponState == WEAPON_KATANA)
+		{
 			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Katana, true);
+			m_iUpperMotion = IDLE_KATANA_MOTION;
+		}
 		else
-			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_Idle_Shotgun, true);
+		{
+			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
+			m_iUpperMotion = IDLE_MOTION;
+		}
 
 	}
 }

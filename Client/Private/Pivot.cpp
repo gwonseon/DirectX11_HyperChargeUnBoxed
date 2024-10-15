@@ -32,8 +32,9 @@ HRESULT CPivot::Initialize(void* pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-	Position = { 1.99,1.97,-3.71525 };
 
+	// Position = { -0.329998,-0.729998,1.74475 };
+	Position = { -0.439998f,-0.109998f,1.84475 };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
 
 
@@ -54,8 +55,8 @@ void CPivot::Priority_Update(_float fTimeDelta)
 
 void CPivot::Update(_float fTimeDelta)
 {
-	/*
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
+	
+	/*if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
 	{
 		Position.x += 0.01f;
 	}
