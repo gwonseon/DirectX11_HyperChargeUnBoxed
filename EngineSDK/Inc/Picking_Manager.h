@@ -25,6 +25,8 @@ public:
 
 	// 터레인 피킹
 	_float3 Picking_Terrain(XMVECTOR  RayPos, XMVECTOR  RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ);
+	_float3 Picking_Terrain_Quad(XMVECTOR  RayPos, XMVECTOR  RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ);
+
 	_float3 Picking_Box_FAILED(XMVECTOR  RayPos, XMVECTOR  RayDir, const _float3* VtxPos);
 
 

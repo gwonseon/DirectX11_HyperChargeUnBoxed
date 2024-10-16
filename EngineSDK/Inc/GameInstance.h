@@ -74,6 +74,7 @@ public: /* For.Object_Manager*/
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	class CComponent* Find_Prototype_Component(_uint iLevelIndex, const _wstring& strPrototypeTag);
 
 public: /* For.Renderer	*/
 	HRESULT Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);

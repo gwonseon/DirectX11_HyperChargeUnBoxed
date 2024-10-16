@@ -73,6 +73,7 @@ public:
 	void LookAt(_fvector vAt);
 	void Go_Straight(_float fTimeDelta); 
 	void Go_Straight(_float fTimeDelta, _float AddfSpeed);
+	void Go_Straight_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
 	void Go_Backward(_float fTimeDelta);

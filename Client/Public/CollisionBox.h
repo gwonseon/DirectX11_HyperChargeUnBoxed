@@ -17,7 +17,10 @@ class CCollisionBox final : public CGameObject
 public:
 	typedef struct : CGameObject::GAMEOBJ_DESC
 	{
+		LEVELID eLevel{};
+		_uint iPoint_Number{};
 		_uint iImGuiMode{};
+		_uint iIndexNumber{};
 	}COLLISIONBOX_DESC;
 
 
@@ -49,6 +52,11 @@ public:
 
 	void	Set_ImGuiMode(_uint iMode) { m_iCurrentImGuiMode = iMode; }
 
+public:
+	void Set_BoundingBos(DirectX::BoundingBox Box) { BoundingBox = Box; }
+	DirectX::BoundingBox Get_BoundingBox() { return BoundingBox; }
+
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
@@ -56,18 +64,39 @@ private:
 	const _float4x4* m_pSocketMatrix = { nullptr };
 	const _uint* m_pParentState = { nullptr };
 	_float3* VtxPos{};
+
+
 private:
 	_float3 m_fScale{};
 	_float3 m_fClolor{255.f,0.f,0.f};
 	_vector m_vecPosition{0.f,0.f,0.f,1.f};
-	_bool m_bChecking = false;
+
 	_uint m_iImGuiMode = 0;
 	_uint m_iCurrentImGuiMode{};
+
+	// navigation
+private:
+	_uint m_iPointNumber{};  // 배열에 들어가는 인덱스 넘버
+	_uint m_iIndexNumber{};	 // 네비에서 찍은 전체 포인트 중에서 인덱스 넘버
+	LEVELID	m_eLevel{};
+	_bool m_bnavigationMode = false;
+	_bool m_bChecking = false;
+	_bool m_bBouncing = false;
+public:
+	_uint Get_IndexNumber() { return m_iIndexNumber; } // 전체 인덱스 번호 
+	_uint Get_ArrayNumber() { return m_iPointNumber; } // 배열 인덱스 번호 
+
+
+
+	void Set_IndexNumber(_uint iIndex) { m_iIndexNumber = iIndex; } // 전체 인덱스 번호
+
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
+
+	DirectX::BoundingBox BoundingBox;
 
 
 public:

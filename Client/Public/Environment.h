@@ -20,6 +20,7 @@ public:
 		LEVELID eID = {};
 		_int	iModelComponentIndex{};
 		_uint	iImGuiMode{};
+		_float3 CollisionBoxScale{}, CollisionBoxPos{};
 	}ENVIRONMENT_DESC;
 
 private:

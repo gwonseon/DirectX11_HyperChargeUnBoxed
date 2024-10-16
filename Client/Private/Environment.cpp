@@ -34,7 +34,7 @@ HRESULT CEnvironment::Initialize(void* pArg)
 	m_eLevel = pDesc->eID;
 	Desc.eID = m_eLevel;
 	Desc.fRotationPerSec = 2.f;
-	m_iImGuiMode = pDesc->iImGuiMode;
+	
 	
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
@@ -51,7 +51,8 @@ HRESULT CEnvironment::Initialize(void* pArg)
 		// 콜리전박스 초기값 세팅
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
 		CollisionDesc.iImGuiMode = pDesc->iImGuiMode;
-		m_pCollisionBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc);
+		CollisionDesc.eLevel = LEVEL_IMGUI;
+		m_pCollisionBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc);
 		m_fCollisionBoxScale = m_fScale;
 		m_vecCollisionBoxPos = vPosition;
 	}
@@ -191,7 +192,7 @@ CGameObject* CEnvironment::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Created : CEnvironment");
+ 		MSG_BOX("Failed to Created : CEnvironment");
 		Safe_Release(pInstance);
 	}
 

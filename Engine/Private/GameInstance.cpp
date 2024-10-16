@@ -311,6 +311,12 @@ CComponent* CGameInstance::Clone_Component(_uint iLevelIndex, const _wstring& st
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
 }
 
+CComponent* CGameInstance::Find_Prototype_Component(_uint iLevelIndex, const _wstring& strPrototypeTag)
+{
+
+	return m_pComponent_Manager->Find_Prototype(iLevelIndex, strPrototypeTag);
+}
+
 HRESULT CGameInstance::Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, CGameObject* pRenderGameObject)
 {
 	if (nullptr == m_pRenderer)

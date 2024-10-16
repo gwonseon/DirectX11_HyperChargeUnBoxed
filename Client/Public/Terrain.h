@@ -7,12 +7,18 @@ BEGIN(Engine)
 class CShader;
 class CTexture;
 class CVIBuffer_Terrain;
+class CNavigation;
 END
 
 BEGIN(Client)
 
 class CTerrain final : public CGameObject
 {
+public:
+	typedef struct : public CGameObject::GAMEOBJ_DESC
+	{
+		LEVELID eID = {};
+	}TERRAIN_DESC;
 
 private:
 	CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -40,6 +46,7 @@ public:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
+	CNavigation* m_pNavigationCom = { nullptr };
 	CVIBuffer_Terrain* m_pVIBufferCom = { nullptr };
 
 private:

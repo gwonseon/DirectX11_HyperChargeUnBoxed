@@ -56,7 +56,7 @@ HRESULT CLevel_GamePlay::Initialize()
 
 
 
-	// Load_Map();
+	Load_Map();
 
 	return S_OK;
 }
@@ -163,8 +163,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
-
-	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
+	CTerrain::TERRAIN_DESC pDesc{};
+	pDesc.eID = LEVEL_GAMEPLAY;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"),&pDesc)))
 		return E_FAIL;
 	return S_OK;
 }
@@ -323,12 +324,11 @@ void CLevel_GamePlay::Load_Map()
 	}
 	DWORD dwByte = 0;
 	LEVELID iLevel;
-	_int  iModelIndex;
-	_float3 fPos;
-	_float3 fScale;
-	_vector	vRight{};
-	_vector	vUp{};
-	_vector	vLook{};
+	_uint iImGuiMode{};
+	_int  iModelIndex{};
+	_float3 fPos{}, fCollisionBoxScale{}, fScale{};
+	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+
 
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
 	{
@@ -336,6 +336,11 @@ void CLevel_GamePlay::Load_Map()
 		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
 		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
 		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+
 		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
@@ -365,9 +370,15 @@ void CLevel_GamePlay::Load_Map()
 
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
 	{
+
 		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
 		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
 		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+
 		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);

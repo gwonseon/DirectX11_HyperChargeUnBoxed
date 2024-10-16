@@ -32,6 +32,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
+
 	if (FAILED(Ready_Prototype_Component_For_Static()))
 		return E_FAIL;
 
