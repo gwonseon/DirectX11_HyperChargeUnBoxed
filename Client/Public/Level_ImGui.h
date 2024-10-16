@@ -88,6 +88,12 @@ private:
 
 
 
+	vector<_int> m_vecModelIndex; // Environment Index 저장용
+	vector<_int> m_vecBuildIndex; // Build Index 저장용
+
+
+
+
 private:
 	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // 터레인 피킹
 

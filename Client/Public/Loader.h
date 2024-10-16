@@ -60,9 +60,11 @@ private:
 	HRESULT Loading_For_LogoLevel();
 	HRESULT Loading_For_GamePlayLevel();
 	HRESULT Loading_For_ImGuiLevel();
-
+	HRESULT Loading_For_NavigationLevel();
 	
 	HRESULT Loading_DataFile(LEVELID eLevelID);
+	HRESULT Loading_DataFile_For_GameLevel();
+	HRESULT Loading_DataFile_For_NavigationLevel();
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);
 	virtual void Free() override;

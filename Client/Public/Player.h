@@ -12,7 +12,7 @@
 #include "Player_FPS.h"
 
 BEGIN(Engine)
-
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -140,6 +140,8 @@ private:
 	CWeapon_Katana* m_pKatana = nullptr;
 	CPlayer_FPS* m_pFPS = nullptr;
 	CHead_Player* m_pHead = nullptr;
+	CNavigation* m_pNavigationCom = nullptr;
+
 
 private:
 	_float	m_fHeight{};		// 점프 높이

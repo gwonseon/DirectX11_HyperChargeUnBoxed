@@ -5,6 +5,7 @@
 #include "Camera_Free.h"
 #include "Monster.h"
 #include "Level_Loading.h"
+#include <Terrain.h>
 
 
 CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -257,8 +258,9 @@ HRESULT CLevel_ImGui::Render()
 
 HRESULT CLevel_ImGui::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_Terrain_ImGui"))))
+	CTerrain::TERRAIN_DESC pDesc{};
+	pDesc.eID= LEVEL_IMGUI;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_Terrain_ImGui"), &pDesc)))
 		return E_FAIL;
 	return S_OK;
 }
@@ -335,18 +337,6 @@ void CLevel_ImGui::Build_Update(_float fTimeDelta)
 		Build_DataChange(fTimeDelta);
 	Picking_Create();
 	Build_Select();
-	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
-	{
-		if (GetAsyncKeyState('S') & 0x8000)
-		{
-			Build_Save();
-		}
-	}
-
-	if (GetAsyncKeyState(VK_TAB))
-	{
-		Build_Load();
-	}
 
 	if (Save == true)
 	{
@@ -545,6 +535,8 @@ HRESULT CLevel_ImGui::Environment_Add()
 	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
 	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
 	
+
+
 	CollisionBox_Pos[0] = m_fPickingPos.x;		CollisionBox_Pos[1] = m_fPickingPos.y;		CollisionBox_Pos[2] = m_fPickingPos.z;
 	CollisionBox_Scale[0] = Desc.fScale.x;		CollisionBox_Scale[1] = Desc.fScale.y;		CollisionBox_Scale[2] = Desc.fScale.z;
 
@@ -745,7 +737,7 @@ void CLevel_ImGui::Environment_Save()
 		if (environment)
 		{
 			
-	
+			
 			LEVELID iLevel = environment->Get_Level();
 			_int  iModelIndex = environment->Get_ModelIndex();
 			_uint iImGuiMode = environment->Get_ImGuiMode();
@@ -772,11 +764,37 @@ void CLevel_ImGui::Environment_Save()
 			WriteFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 			WriteFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
 
+			m_vecModelIndex.push_back(iModelIndex);
 		}
 	}
 
 	CloseHandle(hFile);
 	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+
+	sort(m_vecModelIndex.begin(), m_vecModelIndex.end());
+	vector<_int>::iterator iter = unique(m_vecModelIndex.begin(), m_vecModelIndex.end());
+	m_vecModelIndex.erase(iter, m_vecModelIndex.end());
+
+	HANDLE hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (INVALID_HANDLE_VALUE == hIndexFile)
+	{
+		MessageBox(NULL, L"Save GamePlayLevel_Env_Index File Creation Failed", L"Error", MB_OK);
+		return;
+	}
+
+	dwByte = 0;
+
+	for (auto& pIndex : m_vecModelIndex)
+	{
+		WriteFile(hIndexFile, &pIndex, sizeof(_int), &dwByte, nullptr);
+	}
+
+	CloseHandle(hIndexFile);
+	MessageBox(NULL, L"GamePlayLevel_Env_Index Saved Successfully", L"Success", MB_OK);
+
+
+
 }
 void CLevel_ImGui::Environment_Load()
 {
@@ -796,18 +814,20 @@ void CLevel_ImGui::Environment_Load()
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_int  iModelIndex;
-	_float3 fPos;
-	_float3 fScale;
-	_vector	vRight{};
-	_vector	vUp{};
-	_vector	vLook{};
-
+	_float3 fPos{}, fCollisionScale{}, fScale{}, fCollisionPos{};
+	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+	_uint iImGuiMode{};
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
 	{
 		
 		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
 		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
 		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		ReadFile(hFile, &fCollisionScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+
 		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
@@ -829,6 +849,20 @@ void CLevel_ImGui::Environment_Load()
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
 	
 			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
+
+			XMStoreFloat3(&fCollisionPos, vecCollisionPos);
+			
+			Desc.CollisionBoxScale.x = fCollisionScale.x;		Desc.CollisionBoxScale.y = fCollisionScale.y;		Desc.CollisionBoxScale.z = fCollisionScale.z;
+			Desc.CollisionBoxPos.x = fCollisionPos.x;			Desc.CollisionBoxPos.y = fCollisionPos.y;			Desc.CollisionBoxPos.z = fCollisionPos.z;
+			/*
+						CollisionBox_Pos[0] = fPos.x;		CollisionBox_Pos[1] = fPos.y;		CollisionBox_Pos[2] = fPos.z;
+						CollisionBox_Scale[0] = fCollisionBox_Scale.x;		CollisionBox_Scale[1] = fCollisionBox_Scale.y;		CollisionBox_Scale[2] = fCollisionBox_Scale.z;
+			*/
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_CollisionBox(fCollisionScale.x, fCollisionScale.y, fCollisionScale.z, fCollisionPos.x, fCollisionPos.y, fCollisionPos.z);
+
+		
+
+
 			if(m_vecEnvironment.size() >0 )
 				m_vecEnvironment.back()->Set_PickingCheck(false);
 			m_vecEnvironment.push_back(dynamic_cast<CEnvironment*>(pGameObj));
@@ -876,13 +910,7 @@ HRESULT CLevel_ImGui::Environment_Select()
 				Position[0] = fEnvironPos.x;		Position[1] = fEnvironPos.y;		Position[2] = fEnvironPos.z;
 				Scale[0] = fEnvironScale.x;			Scale[1] = fEnvironScale.y;			Scale[2] = fEnvironScale.z;
 
-				if (fBoxSize.x > 20.f)
-					fBoxSize.x = 5.f;
-				if (fBoxSize.y > 20.f)
-					fBoxSize.y = 5.f;
-				if (fBoxSize.z > 20.f)
-					fBoxSize.z = 5.f;
-
+			
 				CollisionBox_Pos[0] = fBoxPos.x;			CollisionBox_Pos[1] = fBoxPos.y;			CollisionBox_Pos[2] = fBoxPos.z;
 				CollisionBox_Scale[0] = fBoxSize.x;		CollisionBox_Scale[1] = fBoxSize.y;		CollisionBox_Scale[2] = fBoxSize.z;
 
@@ -1139,10 +1167,38 @@ void CLevel_ImGui::Build_Save()
 			WriteFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
 			WriteFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 			WriteFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+
+			m_vecBuildIndex.push_back(iModelIndex);
 		}
 	}
 	CloseHandle(hFile);
 	MessageBox(NULL, L"Build Saved Successfully", L"Success", MB_OK);
+
+	sort(m_vecBuildIndex.begin(), m_vecBuildIndex.end());
+	vector<_int>::iterator iter = unique(m_vecBuildIndex.begin(), m_vecBuildIndex.end());
+	m_vecBuildIndex.erase(iter, m_vecBuildIndex.end());
+
+	HANDLE hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (INVALID_HANDLE_VALUE == hIndexFile)
+	{
+		MessageBox(NULL, L"Save GamePlayLevel_Build_Index File Creation Failed", L"Error", MB_OK);
+		return;
+	}
+
+	dwByte = 0;
+
+	for (auto& pIndex : m_vecBuildIndex)
+	{
+		pIndex -= ENVIRONMENT_EA;
+		WriteFile(hIndexFile, &pIndex, sizeof(_int), &dwByte, nullptr);
+		cout << pIndex << endl;
+	}
+
+	CloseHandle(hIndexFile);
+	MessageBox(NULL, L"GamePlayLevel_Build_Index Saved Successfully", L"Success", MB_OK);
+
+
 }
 
 void CLevel_ImGui::Build_Load()
@@ -1164,17 +1220,19 @@ void CLevel_ImGui::Build_Load()
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_int  iModelIndex;
-	_float3 fPos;
-	_float3 fScale;
-	_vector	vRight{};
-	_vector	vUp{};
-	_vector	vLook{};
-
+	_float3 fPos{}, fScale{}, fCollisionBoxPos{}, fCollisionBoxScale{};
+	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+	_uint iImGuiMode{};
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
 	{
 		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
 		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
 		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+
 		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
 		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
@@ -1193,6 +1251,15 @@ void CLevel_ImGui::Build_Load()
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
 			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
+
+
+			XMStoreFloat3(&fCollisionBoxPos, vecCollisionPos);
+			Desc.CollisionBoxScale.x = fCollisionBoxScale.x;		Desc.CollisionBoxScale.y = fCollisionBoxScale.y;		Desc.CollisionBoxScale.z = fCollisionBoxScale.z;
+			Desc.CollisionBoxPos.x = fCollisionBoxPos.x;			Desc.CollisionBoxPos.y = fCollisionBoxPos.y;			Desc.CollisionBoxPos.z = fCollisionBoxPos.z;
+
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_CollisionBox(fCollisionBoxScale.x, fCollisionBoxScale.y, fCollisionBoxScale.z, fCollisionBoxPos.x, fCollisionBoxPos.y, fCollisionBoxPos.z);
+
+
 			if(m_iBuild_Count > 0)
 				m_vecBuild.back()->Set_PickingCheck(false);
 			m_vecBuild.push_back(dynamic_cast<CEnvironment*>(pGameObj));
@@ -1332,12 +1399,12 @@ HRESULT CLevel_ImGui::Ready_Lights()
 }
 HRESULT CLevel_ImGui::Ready_Layer_Monster(const _tchar* pLayerTag)
 {
-	CMonster::MONSTER_DESC			Desc{};
-	Desc.eID = LEVEL_IMGUI;
+	//CMonster::MONSTER_DESC			Desc{};
+	//Desc.eID = LEVEL_IMGUI;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-		TEXT("Prototype_GameObject_Monster_ImGui"), &Desc)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+	//	TEXT("Prototype_GameObject_Monster_ImGui"), &Desc)))
+	//	return E_FAIL;
 
 
 	return S_OK;

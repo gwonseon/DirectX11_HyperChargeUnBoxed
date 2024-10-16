@@ -22,6 +22,7 @@ HRESULT CCollisionBox::Initialize(void* pArg)
 {
 	COLLISIONBOX_DESC* pDesc = static_cast<COLLISIONBOX_DESC*>(pArg);
 	m_iImGuiMode = pDesc->iImGuiMode;
+	m_eLevel = pDesc->eLevel;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -29,7 +30,16 @@ HRESULT CCollisionBox::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	
+	if (m_eLevel == LEVEL_NAVIGATION)
+	{
+		m_fScale = { 0.3f, 0.3f, 0.3f };
+		m_iPointNumber = pDesc->iPoint_Number; // ¹è¿­ ÀÎµ¦½º
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
+		m_pTransformCom->Set_Scaling(0.3f, 0.3f, 0.3f);
+		m_vecPosition = { pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f };
+		XMStoreFloat3(&m_fPickingPos, m_vecPosition);
+		m_iIndexNumber = pDesc->iIndexNumber; // ÀüÃ¼ ÀÎµ¦½º
+	}
 
 	return S_OK;
 }
@@ -42,21 +52,60 @@ void CCollisionBox::Update(_float fTimeDelta)
 {
 	if (m_bDead)
 		return;
-	if (m_iImGuiMode == m_iCurrentImGuiMode)
+	if(m_eLevel == LEVEL_IMGUI)
 	{
-		if (m_bChecking == false)
+		if (m_iImGuiMode == m_iCurrentImGuiMode)
 		{
-			m_fClolor = { 0.f,0.f,0.f };
+			if (m_bChecking == false)
+			{
+				m_fClolor = { 0.f,0.f,0.f };
+			}
+			else
+			{
+				m_fClolor = { 255.f,0.f,0.f };
+			}
+
+			// YÁÂÇ¥ ¿Ã·ÁÁÖ±â
+			m_vecPosition = XMVectorSetByIndex(m_vecPosition, 1.f, 3);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+			m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+		}
+	}
+	if (m_eLevel == LEVEL_NAVIGATION)
+	{
+		if (m_iPointNumber == 0)
+		{
+			m_fClolor = { 255.f,0.f,0.f }; 
+		}
+		else if (m_iPointNumber == 1)
+		{
+			m_fClolor = { 0.f,255.f,0.f };
+		}
+		else if (m_iPointNumber == 2)
+		{
+			m_fClolor = { 0.f,0.f,255.f };
+
+		}
+
+		if (m_bChecking == true)
+		{
+			if (m_fScale.y > 0.7f)
+				m_bBouncing = true;
+			if (m_fScale.y < 0.3f)
+				m_bBouncing = false;
+			if (m_bBouncing == false)
+				m_fScale.y += fTimeDelta;
+			else
+				m_fScale.y -= fTimeDelta;
 		}
 		else
 		{
-			m_fClolor = { 255.f,0.f,0.f };
+			m_fScale.y = 0.3f;
 		}
-
-		m_vecPosition = XMVectorSetByIndex(m_vecPosition, 1.f, 3);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 		m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+
 	}
+
 }
 
 void CCollisionBox::Late_Update(_float fTimeDelta)
@@ -68,7 +117,23 @@ void CCollisionBox::Late_Update(_float fTimeDelta)
 
 HRESULT CCollisionBox::Render()
 {
-	if(m_iImGuiMode == m_iCurrentImGuiMode)
+	if(m_eLevel == LEVEL_IMGUI)
+	{
+		if (m_iImGuiMode == m_iCurrentImGuiMode)
+		{
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(0)))
+				return E_FAIL;
+
+			if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+				return E_FAIL;
+
+			if (FAILED(m_pVIBufferCom->Render()))
+				return E_FAIL;
+		}
+	}
+	if(m_eLevel == LEVEL_NAVIGATION)
 	{
 		if (FAILED(Bind_ShaderResources()))
 			return E_FAIL;

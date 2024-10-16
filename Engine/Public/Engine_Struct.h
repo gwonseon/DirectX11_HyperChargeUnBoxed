@@ -53,7 +53,14 @@ namespace Engine
 		float			fTrackPosition;
 	}KEYFRAME;
 
+	typedef struct ENGINE_DLL
+	{
+		/* 정점의 위치 (Position)*/
+		XMFLOAT3		vPosition;
 
+		static const unsigned int		iNumElements = 1;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[1];
+	}VTXPOS;
 
 	typedef struct ENGINE_DLL
 	{
@@ -65,6 +72,8 @@ namespace Engine
 		static const unsigned int		iNumElements = 2;
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
 	}VTXPOSTEX;
+
+
 
 	typedef struct ENGINE_DLL
 	{

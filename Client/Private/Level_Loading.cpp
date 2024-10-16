@@ -6,7 +6,7 @@
 #include "Level_Logo.h"
 #include "Level_gamePlay.h"
 #include "Level_ImGui.h"
-
+#include "Navigation_Leve.h"
 #include "BackGround.h"
 
 
@@ -86,6 +86,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
 		case LEVEL_IMGUI:
 			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CLevel_ImGui::Create(m_pDevice, m_pContext));
+			break;
+		case LEVEL_NAVIGATION:
+			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CNavigation_Leve::Create(m_pDevice, m_pContext));
 			break;
 		}
 

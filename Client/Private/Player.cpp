@@ -28,7 +28,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 	Desc.iNumPartObjects = PART_END;
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.f);
-	Desc.fPosition = _float3(418.755f, 0.f, 245.710f);
+	// Desc.fPosition = _float3(418.755f, 0.f, 245.710f);
+	Desc.fPosition = _float3(0.f, 0.f, 0.f);
 	m_fMouseSensor = 0.1f;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(&Desc)))
@@ -42,7 +43,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 	
 
 	//m_pTransformCom->Rotation(0.f, 180.f, 0.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(418.755f, 1.5f, 245.710f, 1.f));
+	// m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(418.755f, 1.5f, 245.710f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Desc.fPosition.x, Desc.fPosition.y, Desc.fPosition.z, 1.f));
 	m_iWeaponState = WEAPON_RIFLE;
 	m_pBody = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY]);
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
@@ -157,6 +159,14 @@ HRESULT CPlayer::Render()
 }
 HRESULT CPlayer::Add_Components()
 {
+	// For.Com_Navigation
+	CNavigation::NAVIGATION_DESC		Desc{};
+
+	Desc.iCurrentCellIndex = 0;
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
+		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		return E_FAIL;
 
 
 	return S_OK;
@@ -370,7 +380,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
 				m_pTransformCom->Go_Left(fTimeDelta * 0.8f);
-				m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
+			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHWEST))
@@ -384,7 +395,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
 				m_pTransformCom->Go_Right(fTimeDelta * 0.8f);
-				m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
+			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHEAST))
@@ -397,7 +409,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else
 			{
-				m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
+			//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTH))
@@ -447,7 +460,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			{
 				if (iJumpState == LANDING_STATE)
 				{
-					m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
+				//	m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
+					m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
 					m_pTransformCom->Go_Left(fTimeDelta * 0.7f);
 					if (!(m_iState_Lower & WALKSTATE_NORTHWEST))
 					{
@@ -461,7 +475,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			{
 				if (iJumpState == LANDING_STATE)
 				{
-					m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
+			//		m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
+					m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
 					m_pTransformCom->Go_Right(fTimeDelta * 0.7f);
 					if (!(m_iState_Lower & WALKSTATE_NORTHEAST))
 					{
@@ -473,7 +488,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else
 			{
-				m_pTransformCom->Go_Straight(fTimeDelta);
+		//		m_pTransformCom->Go_Straight(fTimeDelta);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & WALKSTATE_NORTH))
@@ -598,5 +614,5 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
-
+	Safe_Release(m_pNavigationCom);
 }

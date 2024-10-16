@@ -3,7 +3,7 @@
 #include "Model.h"
 #include "Shader.h"
 #include "Texture.h"
-
+#include "Navigation.h"
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
 
@@ -36,7 +36,7 @@ private:
 	typedef map<const _wstring, class CComponent*>	PROTOTYPES;
 
 
-private:
+public:
 	class CComponent* Find_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag);
 
 public:

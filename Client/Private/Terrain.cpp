@@ -24,6 +24,8 @@ HRESULT CTerrain::Initialize_Prototype()
 
 HRESULT CTerrain::Initialize(void* pArg)
 {
+	TERRAIN_DESC* pDesc = static_cast<TERRAIN_DESC*>(pArg);
+	m_eLevel = pDesc->eID;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
@@ -37,7 +39,7 @@ HRESULT CTerrain::Initialize(void* pArg)
 
 void CTerrain::Priority_Update(_float fTimeDelta)
 {
-	_uint iData = 10;
+	m_pNavigationCom->Update(m_pTransformCom->Get_WorldMatrixPtr());
 }
 
 void CTerrain::Update(_float fTimeDelta)
@@ -74,34 +76,40 @@ HRESULT CTerrain::Render()
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
+
+#ifdef _DEBUG
+	m_pNavigationCom->Render();
+#endif
+
+
 	return S_OK;
 }
 
 void CTerrain::Picking()
 {
-	if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
-	{
-		// 피킹
-		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
-		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
-		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-		XMVECTOR RayPos, RayDir;
+	//if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+	//{
+	//	// 피킹
+	//	_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+	//	XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
+	//	XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
+	//	XMVECTOR RayPos, RayDir;
 
-		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+	//	m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
 
-		// RayDir을 정규화하고 결과를 다시 RayDir에 저장
-		RayDir = XMVector3Normalize(RayDir);
-		
-		const _float3* VtxPos = m_pVIBufferCom->Get_VtxPos();  // _float3 배열의 시작 주소 반환
-		_uint VtxCountX = m_pVIBufferCom->Get_VtxCountX();
-		_uint VtxCountZ = m_pVIBufferCom->Get_VtxCountZ();
+	//	// RayDir을 정규화하고 결과를 다시 RayDir에 저장
+	//	RayDir = XMVector3Normalize(RayDir);
+	//	
+	//	const _float3* VtxPos = m_pVIBufferCom->Get_VtxPos();  // _float3 배열의 시작 주소 반환
+	//	_uint VtxCountX = m_pVIBufferCom->Get_VtxCountX();
+	//	_uint VtxCountZ = m_pVIBufferCom->Get_VtxCountZ();
 
-		// Picking_Terrain 함수 호출에 정규화된 RayDir 사용
-		m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+	//	// Picking_Terrain 함수 호출에 정규화된 RayDir 사용
+	//	m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
 
-		cout << "final X : " << m_fPickingPos.x << "Z : " << m_fPickingPos.z << "Y : " << m_fPickingPos.y << endl;
+	////	cout << "final X : " << m_fPickingPos.x << "Z : " << m_fPickingPos.z << "Y : " << m_fPickingPos.y << endl;
 
-	}
+	//}
 }
 
  
@@ -126,7 +134,10 @@ HRESULT CTerrain::Add_Components()
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
-
+	/* For.Com_Navigation */
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Navigation"),
+		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -196,6 +207,6 @@ void CTerrain::Free()
 
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pTextureCom);
-
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 }

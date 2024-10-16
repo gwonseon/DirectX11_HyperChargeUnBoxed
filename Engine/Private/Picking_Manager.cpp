@@ -82,15 +82,9 @@ void CPicking_Manager::Get_MouseRayDirection(_float3 fPosition,  XMMATRIX invPro
 _float3 CPicking_Manager::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ)
 {
     const _float3* pTerrainVtx = VtxPos;
-    
     _ulong dwVtxIdx[3]{};
     float closestDist = 0.f;  // 가장 가까운 충돌 거리를 저장할 변수
     _float3 hitPoint = _float3(0.f, 0.f, 0.f);  // 충돌 지점을 저장할 변수
-
-    // 레이 위치랑 방향 확인
-    //_float3 fRayPos, fRayDir;
-    //XMStoreFloat3(&fRayPos, RayDir);
-    //cout << fRayPos.x << "  " << fRayPos.z << "  " << fRayPos.y << endl;
 
     RayDir = XMVector3Normalize(RayDir);  
   
@@ -120,6 +114,7 @@ _float3 CPicking_Manager::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, cons
             {
                 XMVECTOR xmHitPoint = RayPos + RayDir * dist;
                 XMStoreFloat3(&hitPoint, xmHitPoint);
+                return hitPoint;
    //             cout << "1 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
             }
 
@@ -142,12 +137,24 @@ _float3 CPicking_Manager::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, cons
             {
                 XMVECTOR xmHitPoint = RayPos + RayDir * dist;
                 XMStoreFloat3(&hitPoint, xmHitPoint);
+                return hitPoint;
      //           cout << "2 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
             }
         }
     }
 
     return hitPoint;  // 가장 가까운 충돌 지점을 반환
+}
+
+_float3 CPicking_Manager::Picking_Terrain_Quad(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ)
+{
+    const _float3* pTerrainVtx = VtxPos;
+    _ulong dwVtxIdx[3]{};
+    float closestDist = 0.f;  // 가장 가까운 충돌 거리를 저장할 변수
+    _float3 hitPoint = _float3(0.f, 0.f, 0.f);  // 충돌 지점을 저장할 변수
+    RayDir = XMVector3Normalize(RayDir);
+
+    return hitPoint;
 }
 
 _float3 CPicking_Manager::Picking_Box_FAILED(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos)
