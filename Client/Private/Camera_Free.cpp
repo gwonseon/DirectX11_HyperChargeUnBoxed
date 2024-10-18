@@ -160,12 +160,24 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
         _long MouseMoveY = { 0 };  _matrix RotationMatrix{};
         if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
         {
-            if (m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
-                m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
-            if (m_fAngle_Y > 2.f)
-                m_fAngle_Y = 2.f;
-            if (m_fAngle_Y < -4.f)
-                m_fAngle_Y = -4.f;
+            if (*m_iViewState == PLAYER_TPS_VIEW)
+            {
+                if (m_fAngle_Y <= 8.f && m_fAngle_Y >= -8.f)
+                    m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
+                if (m_fAngle_Y > 4.f)
+                    m_fAngle_Y = 4.f;
+                if (m_fAngle_Y < -6.f)
+                    m_fAngle_Y = -6.f;
+            }
+            else
+            {
+                if (m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
+                    m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
+                if (m_fAngle_Y > 2.f)
+                    m_fAngle_Y = 2.f;
+                if (m_fAngle_Y < -4.f)
+                    m_fAngle_Y = -4.f;
+            }
         }
         if (*m_iViewState == PLAYER_TPS_VIEW) // 3ÀÎÄª
         {
@@ -177,7 +189,7 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
             vAt = *m_vecTPSPos + matWorld.r[2] * 7.f;
             if (m_fAngle_Y > 0)
             {
-                vAt = vAt + matWorld.r[0] * m_fAngle_Y;
+                vAt = vAt + matWorld.r[0] * (m_fAngle_Y * 0.3f);
                 vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y / 2);
             }
             else

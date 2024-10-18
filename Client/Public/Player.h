@@ -9,9 +9,9 @@
 #include "Pivot.h"
 #include "Weapon_Katana.h"
 #include "Weapon_Item.h"
-#include "Player_FPS.h"
 
 BEGIN(Engine)
+
 class CNavigation;
 END
 
@@ -138,7 +138,7 @@ private:
 	CWeapon* m_pWaepon = nullptr;
 	CBody_Player* m_pBody = nullptr;
 	CWeapon_Katana* m_pKatana = nullptr;
-	CPlayer_FPS* m_pFPS = nullptr;
+
 	CHead_Player* m_pHead = nullptr;
 	CNavigation* m_pNavigationCom = nullptr;
 
@@ -158,6 +158,13 @@ private:
 
 
 	_uint					m_iWeaponState = WEAPON_RIFLE;
+
+public:
+	_float*					Get_PlayerHP() { return &m_fHp; }
+	_float*					Get_PlayerEnergy() { return &m_fEnergy; }
+
+private:
+
 
 private:
 	HRESULT Add_Components();

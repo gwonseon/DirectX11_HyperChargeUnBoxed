@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Collider.h"
 #include "Navigation.h"
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
@@ -10,6 +11,13 @@
 /* 보관하는역활. */
 /* 컴포넌트 원형을 보관한다. */
 /* 컴포넌트 원형은 객체 원형과 달리 덩치가 크다. 레벨별로 구분하여 저장할께. */
+
+#pragma region ETC
+#include "Bounding_AABB.h"
+#include "Bounding_OBB.h"
+#include "Bounding_Sphere.h"
+#pragma endregion
+
 
 BEGIN(Engine)
 

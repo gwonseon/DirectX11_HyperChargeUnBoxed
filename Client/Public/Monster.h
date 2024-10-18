@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include "Player.h"
 BEGIN(Client)
 
 class CMonster : public CGameObject

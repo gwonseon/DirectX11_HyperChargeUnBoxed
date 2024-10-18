@@ -2,7 +2,7 @@
 
 #include <process.h>
 
-#define BUILD_EA	40
+#define BUILD_EA	41
 #define ENVIRONMENT_EA 165
 #define WEAPON_EA		11
 #define OBJ_DEAD 1

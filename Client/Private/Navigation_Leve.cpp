@@ -4,7 +4,7 @@
 #include "GameInstance.h"
 
 #include "Environment.h"
-#include "Terrain.h"
+
 
 CNavigation_Leve::CNavigation_Leve(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -13,6 +13,9 @@ CNavigation_Leve::CNavigation_Leve(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CNavigation_Leve::Initialize()
 {
+	// 네비게이션
+
+
 	ShowCursor(true);
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 카메라 생성
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
@@ -23,12 +26,65 @@ HRESULT CNavigation_Leve::Initialize()
 	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_NAVIGATION, TEXT("Layer_Terrain"), TEXT("Com_VIBuffer")));
 	Load_Map();
 
-
 	m_pSave = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Save.jpg"));
 	m_pLoad = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Load.jpg"));
-
 	my_Savetexture = *m_pSave->Get_SRV().begin();
 	my_Loadtexture = *m_pLoad->Get_SRV().begin();
+
+	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+		return E_FAIL;
+	}
+	DWORD dwByte = 0;
+
+
+	while(ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr) && dwByte > 0)
+	{
+		_vector vA = XMVectorSet(vPoints[0].x, vPoints[0].y, vPoints[0].z, 1.f);
+		_vector vB = XMVectorSet(vPoints[1].x, vPoints[1].y, vPoints[1].z, 1.f);
+		_vector vC = XMVectorSet(vPoints[2].x, vPoints[2].y, vPoints[2].z, 1.f);
+		_vector vCross = XMVector3Cross(vB - vA, vC - vB);
+		_float fDot{};
+		_vector vUp = { 0.f,1.f,0.f,0.f };
+
+		XMVECTOR vDot = XMVector3Dot(vCross, vUp);
+		XMStoreFloat(&fDot, vDot);
+		if (fDot < 0)
+		{
+			_float3 fNewB{}, fNewC{};
+			XMStoreFloat3(&fNewB, vC);
+			XMStoreFloat3(&fNewC, vB);
+			vPoints[1] = fNewB;
+			vPoints[2] = fNewC;
+		}
+	
+
+		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
+		CollisionDesc.iImGuiMode = NAVIGATION;
+		CollisionDesc.eLevel = LEVEL_NAVIGATION;
+		CollisionDesc.iPoint_Number = 0;		// 배열의 뒷자리 숫자
+		CollisionDesc.fPosition = vPoints[0];   // 점 위치 
+		CollisionDesc.iIndexNumber = m_iIndex;
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		++m_iIndex;
+
+		CollisionDesc.iPoint_Number = 1;		// 배열의 뒷자리 숫자
+		CollisionDesc.fPosition = vPoints[1];   // 점 위치 
+		CollisionDesc.iIndexNumber = m_iIndex;
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		++m_iIndex;
+		
+		CollisionDesc.iPoint_Number = 2;		// 배열의 뒷자리 숫자
+		CollisionDesc.fPosition = vPoints[2];   // 점 위치 
+		CollisionDesc.iIndexNumber = m_iIndex;
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		++m_iIndex;
+
+	}
+	CloseHandle(hFile);
+
 	return S_OK;
 }
 
@@ -48,19 +104,26 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		else
 			eNaviMode = CREATE_NAVIPOINT;
 	}
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
+	{
+		m_bClick = true;
+	}
 	// 컨트롤 우클릭은 맨 뒤 삭제
 	if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)) && eNaviMode == CREATE_NAVIPOINT)
 	{
 		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
 		{
-			if(m_vecCollision.size() > 0)
+			if(m_vecCollision.size() > 0 && m_iCount > 0)
 			{
 				m_vecCollision.back()->Set_Dead();
 				m_vecCollision.pop_back();
+				m_iCount--;
+				if (m_iIndex < 0)
+					m_iIndex = 0;
 			}
 		}
 	}
-
+	
 
 	if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)))
 	{
@@ -87,7 +150,7 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 					m_fPickingPos = fBoxPos;
 					if (eNaviMode == SELECT_NAVIPOINT)
 					{
-						m_iSelected_index = pCollisionBox->Get_IndexNumber();
+						m_iSelected_index = pCollisionBox->Get_IndexNumber();				
 					}
 
 					break;
@@ -120,6 +183,7 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 				m_iCount++;
 				if (m_iCount == 3)
 					m_iCount = 0;
+				m_bClick = false;
 			}
 		}
 		
@@ -131,8 +195,16 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 	{
 		if (m_iSelected_index != -1)
 		{
+			m_bClick = false;
 			auto pSelected = m_vecCollision[m_iSelected_index];
 			
+			// 위치 변경이 되도록
+
+
+
+
+
+			// 삭제
 			if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)))
 			{
 				if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
@@ -140,17 +212,70 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 					if (m_vecCollision.size() > 0)
 					{
 						// 선택된 객체 삭제
-						pSelected->Set_Dead();
-						m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
-						m_iSelected_index = -1;
-						// 인덱스 번호 새로 부여하기
-						int i = 0;
+						_uint iNum = pSelected->Get_ArrayNumber();
+						if (iNum == 0)
+						{
+							m_pTerrain->Get_NaviCom()->Delete_Cell(m_iSelected_index / 3);
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+
+							pSelected = m_vecCollision[m_iSelected_index];
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+							
+							pSelected = m_vecCollision[m_iSelected_index];
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+							m_iIndex -= 3;
+							if (m_iIndex < 0)
+								m_iIndex = 0;
+						}
+						else if (iNum == 1)
+						{
+							m_pTerrain->Get_NaviCom()->Delete_Cell((m_iSelected_index - 1) / 3);
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+
+							pSelected = m_vecCollision[m_iSelected_index];
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+
+							--m_iSelected_index;
+							pSelected = m_vecCollision[m_iSelected_index];
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+							m_iIndex -= 3;
+							if (m_iIndex < 0)
+								m_iIndex = 0;
+							
+						}
+						else if (iNum == 2)
+						{
+							m_pTerrain->Get_NaviCom()->Delete_Cell((m_iSelected_index - 2) / 3);
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+
+							--m_iSelected_index;
+							pSelected = m_vecCollision[m_iSelected_index];
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+
+							--m_iSelected_index;
+							pSelected = m_vecCollision[m_iSelected_index];
+							pSelected->Set_Dead();
+							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
+							m_iIndex -= 3;
+							if (m_iIndex < 0)
+								m_iIndex = 0;
+						}
+						
 						for (auto& pCol : m_vecCollision)
 						{
-							pCol->Set_IndexNumber(i);
-							++i;
+							_uint iIndex = pCol->Get_IndexNumber();
+							if(iIndex >= m_iSelected_index)
+								pCol->Set_IndexNumber(iIndex - 3);
 						}
-
+						m_iSelected_index = -1;
 					}
 				}
 			}
@@ -283,11 +408,22 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		m_iIndex++;
 		vPoints[2] = { fPointPos.x,fPointPos.y,fPointPos.z };
-		
-		//if (m_pGameInstance->Find_Prototype_Component(LEVEL_NAVIGATION, TEXT("Prototype_Component_Navigation")) != nullptr)
-		//{
-		//	static_cast<CNavigation*>(m_pGameInstance->Find_Prototype_Component(LEVEL_NAVIGATION, TEXT("Prototype_Component_Navigation")))->Create_Cell(vPoints);
-		//}
+
+
+		// 네비게이션에 삼각형 추가
+		if (vPoints[0].y == 0)
+		{
+			vPoints[0].y = 0.1f;
+		}
+		if (vPoints[1].y == 0)
+		{
+			vPoints[1].y = 0.1f;
+		}
+		if (vPoints[2].y == 0)
+		{
+			vPoints[2].y = 0.1f;
+		}
+		m_pTerrain->Get_NaviCom()->Create_Cell(vPoints);
 		break;
 	}
 
@@ -298,13 +434,7 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 
 }
 
-void CNavigation_Leve::Select_Point(_float fTimeDelta, _float3 fPointPos)
-{
 
-
-
-
-}
 
 HRESULT CNavigation_Leve::Save_Navigation(_float fTimeDelta)
 {
@@ -361,24 +491,24 @@ HRESULT CNavigation_Leve::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_NAVIGATION;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_NAVIGATION, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc)))
-		return E_FAIL;
+	CGameObject* pTerrain =	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc);
+	m_pTerrain = static_cast<CTerrain*>(pTerrain);
 	return S_OK;
 }
 HRESULT CNavigation_Leve::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC			Desc{};
-
-	Desc.vEye = _float4(0.f, 10.f, -5.f, 1.f);
+	Desc.vEye = _float4(386.295f, 10.f, 450.425f, 1.f);
 	Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
 	Desc.fFar = 500.f;
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
-	Desc.fSpeedPerSec = 30.f;
+	Desc.fSpeedPerSec = 60.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 	Desc.fMouseSensor = 0.05f;
 	Desc.eLevel = LEVEL_NAVIGATION;
+
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_NAVIGATION, pLayerTag,
 		TEXT("Prototype_GameObject_Camera_Free"), &Desc)))
 		return E_FAIL;

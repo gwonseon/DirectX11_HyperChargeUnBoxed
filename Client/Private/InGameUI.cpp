@@ -26,11 +26,24 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_iCount = pDesc->m_iCount; // ArmCannon Count
     m_eUIType = pDesc->eUITag;
     m_iIndex = pDesc->iIndex;
+    
+
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
     if (FAILED(Add_Components(pDesc->iData)))
         return E_FAIL;
+    if(m_eUIType == UI_PLAYER_HP )
+        m_fPlayerHp = pDesc->fPlayerHP;
+    if(m_eUIType == UI_PLAYER_ENERGY)
+        m_fPlayerEnergy = pDesc->fPlayerEnergy;
+    if (m_eUIType == UI_MACHINE_HP)
+        m_fMachineHP = pDesc->fBrainHP;
+    if (m_eUIType == UI_MACHINE_ENERGY)
+        m_fMachineEnergy = pDesc->fBrainEnergy;
+       
+
 
     return S_OK;
 }
@@ -358,28 +371,28 @@ HRESULT CInGameUI::Bind_ShaderResources()
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fMachineHP, sizeof(float))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fMachineHP, sizeof(float))))
             return E_FAIL;
     }
     else if (m_eUIType == UI_MACHINE_ENERGY)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fMachineEnergy, sizeof(float))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fMachineEnergy, sizeof(float))))
             return E_FAIL;
     }
     else if (m_eUIType == UI_PLAYER_HP)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fPlayerHp, sizeof(float))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fPlayerHp, sizeof(float))))
             return E_FAIL;
     }
     else if (m_eUIType == UI_PLAYER_ENERGY)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fPlayerEnergy, sizeof(float))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fPlayerEnergy, sizeof(float))))
             return E_FAIL;
     }
     else
@@ -459,7 +472,7 @@ void CInGameUI::Battery_UI(_float fTimeDelta)
 void CInGameUI::Machine_HP_UI(_float fTimeDelta)
 {
     
-    m_fMachineHP -= fTimeDelta * 10.f;
+   
 
 }
 
@@ -504,12 +517,12 @@ void CInGameUI::UI_Bar(_float fTimeDelta)
 
 void CInGameUI::Machine_UI_Energy(_float fTimeDelta)
 {
-    m_fMachineEnergy -= fTimeDelta * 10.f;
+  
 }
 
 void CInGameUI::Player_UI_Hp(_float fTimeDelta)
 {
-
+    
 }
 
 void CInGameUI::Player_UI_Energy(_float fTimeDelta)

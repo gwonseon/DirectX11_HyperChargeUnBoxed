@@ -25,6 +25,10 @@ public:
 
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
+		_float* fPlayerHP;
+		_float* fPlayerEnergy;
+		_float* fBrainHP;
+		_float* fBrainEnergy;
 		GAMEUI eUITag{};
 		_uint	iIndex{};
 	
@@ -75,15 +79,15 @@ private:
 	_uint						m_iIndex = 0;
 	
 	// 기계 HP
-	float						m_fMachineHP = 100.f;
+	float*						m_fMachineHP;
 
 	// 기계 Energy
-	float						m_fMachineEnergy = 100.f;
+	float*						m_fMachineEnergy;
 
 	// 플레이어 HP
-	float						m_fPlayerHp = 100.f;
+	float*						m_fPlayerHp;
 	// 플레이어 Energy
-	float						m_fPlayerEnergy = 100.f;
+	float*						m_fPlayerEnergy;
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };

@@ -33,10 +33,11 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_PlayerBuild"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster_Attack_Near"))))
 		return E_FAIL;
 
-
+	if (FAILED(Ready_Layer_Monster_Attack_Far(TEXT("Layer_Monster_Attack_Far"))))
+		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
@@ -47,16 +48,18 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI_MACHINE_HP(TEXT("Layer_UIHp"))))
 		return E_FAIL;
 
-
 	if (FAILED(Ready_Layer_UI_Button(TEXT("Layer_UI"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;
-
-
-
 	Load_Map();
+
+
+
+	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Player"));
+	pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"));
+	pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
 
 	return S_OK;
 }
@@ -64,17 +67,17 @@ HRESULT CLevel_GamePlay::Initialize()
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
+	Interaction_Weapon();
+	// m_pGameInstance
+	// 플레이어 몸에서 몬스터와 충돌
+	
+	 
+	
+	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);
+	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA);
+	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA);
 
 	
-		
-
-	Interaction_Weapon();
-
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
-	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
-			return;
-	}
 
 }
 
@@ -85,7 +88,11 @@ HRESULT CLevel_GamePlay::Render()
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 #endif
-
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	{
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 
@@ -98,7 +105,7 @@ void CLevel_GamePlay::Interaction_Weapon()
 	{
 	_vector vWeaponPos = m_pWeaponItem[i]->Get_Position();
 	XMStoreFloat3(&fWeaponPos, vWeaponPos);
-	if (((fPlayerPos.x - fWeaponPos.x) * (fPlayerPos.x - fWeaponPos.x) + (fPlayerPos.y - fWeaponPos.y) * (fPlayerPos.y - fWeaponPos.y) + (fPlayerPos.z - fWeaponPos.z) * (fPlayerPos.z - fWeaponPos.z)) <= 50.f)
+	if (((fPlayerPos.x - fWeaponPos.x) * (fPlayerPos.x - fWeaponPos.x) + (fPlayerPos.y - fWeaponPos.y) * (fPlayerPos.y - fWeaponPos.y) + (fPlayerPos.z - fWeaponPos.z) * (fPlayerPos.z - fWeaponPos.z)) <= 80.f)
 	{
 
 		m_pWeaponItem[i]->Set_Interation(true);
@@ -178,21 +185,21 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar* pLayerTag)
 
 	return S_OK;
 }
-
+ 
 
 HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 {
 	CWeapon_Item::WEAPONITEM_DESC Desc{};
 	Desc.eID = LEVEL_GAMEPLAY;
 	Desc.iModelIndex = 5;
-	Desc.fScale = { 5.f,5.f,5.f };
-	Desc.fPosition = { 400.f, 2.f, 245.f };
+	Desc.fScale = { 30.f,30.f,30.f };
+	Desc.fPosition = { 469.82f, 3.f, 442.094f };
 	CGameObject*  pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
 	m_pWeaponItem[0] = static_cast<CWeapon_Item*>(pItem);
 
-	
+	Desc.fScale = { 10.f,10.f,10.f };
 	Desc.iModelIndex = 7;
-	Desc.fPosition = { 380.f, 2.f, 255.f };
+	Desc.fPosition = { 433.203f, 2.f, 457.242f };
 	pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
 	m_pWeaponItem[1] = static_cast<CWeapon_Item*>(pItem);
 
@@ -203,9 +210,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 {
 	CBrainCore::BRAIN_CORE_DESC pDesc{};
 	pDesc.eID = LEVEL_GAMEPLAY;
-	pDesc.fPosition = _float3(408.f, 0.1f, 220.f);
-	pDesc.fScale = { 2.f,2.f,2.f };
-	pDesc.iModelComponentIndex = 0;
+	pDesc.fPosition = _float3(490.f, 0.1f, 505.066f);
+	pDesc.fScale = { 4.f,4.f,4.f };
+	pDesc.iModelComponentIndex = 205;
 	
 	m_pBrain = static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
 
@@ -258,37 +265,13 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar* pLayerTag)
 {
 
-	CTank::TANK_DESC Tank_Desc{};
-	Tank_Desc.eID = LEVEL_GAMEPLAY;
-	Tank_Desc.fPosition = _float3(400.755f, 0.f, 255.710f);
-	Tank_Desc.fSpeedPerSec = 5.f;
-	Tank_Desc.fScale = _float3(1.f, 1.f, 1.f);
-	Tank_Desc.iModelComponentIndex = ANIM_TANK;
-	Tank_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
-	Tank_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
-	Tank_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-		TEXT("Prototype_GameObject_Tank"), &Tank_Desc)))
-		return E_FAIL;
 	
-	CHelicopter::HELICOPTER_DESC Helicopter_Desc{};
-	Helicopter_Desc.eID = LEVEL_GAMEPLAY;
-	Helicopter_Desc.fPosition = _float3(380.755f, 5.f,300.710f);
-	Helicopter_Desc.fSpeedPerSec = 10.f;
-	Helicopter_Desc.fScale = _float3(1.f, 1.f, 1.f);
-	Helicopter_Desc.iModelComponentIndex = ANIM_HELICOPTER;
-	Helicopter_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
-	Helicopter_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
-	Helicopter_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-		TEXT("Prototype_GameObject_Helicopter"), &Helicopter_Desc)))
-		return E_FAIL;
 
 	CAlien::ALIEN_DESC Alien_Desc{};
 	Alien_Desc.eID = LEVEL_GAMEPLAY;
 	Alien_Desc.fPosition = _float3(400.f, 3.f, 300.710f);
 	Alien_Desc.fSpeedPerSec = 10.f;
-	Alien_Desc.fScale = _float3(0.8f, 0.8f, 0.8f);
+	Alien_Desc.fScale = _float3(2.f, 2.f, 2.f);
 	Alien_Desc.iModelComponentIndex = ANIM_ALIEN;
 	Alien_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
 	Alien_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
@@ -300,16 +283,46 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar* pLayerTag)
 	CPony::PONY_DESC Pony_Desc{};
 	Pony_Desc.eID = LEVEL_GAMEPLAY;
 	Pony_Desc.fPosition = _float3(410.f, 1.f, 310.710f);
-	Pony_Desc.fSpeedPerSec = 10.f;
-	Pony_Desc.fScale = _float3(0.8f, 0.8f, 0.8f);
+	Pony_Desc.fSpeedPerSec = 8.f;
+	Pony_Desc.fScale = _float3(2.f, 2.f, 2.f);
 	Pony_Desc.iModelComponentIndex = ANIM_PONY;
 	Pony_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
 	Pony_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
 	Pony_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-		TEXT("Prototype_GameObject_Alien"), &Pony_Desc)))
+		TEXT("Prototype_GameObject_Pony"), &Pony_Desc)))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag)
+{
+	CTank::TANK_DESC Tank_Desc{};
+	Tank_Desc.eID = LEVEL_GAMEPLAY;
+	Tank_Desc.fPosition = _float3(400.755f, 0.f, 255.710f);
+	Tank_Desc.fSpeedPerSec = 5.f;
+	Tank_Desc.fScale = _float3(3.f, 3.f, 3.f);
+	Tank_Desc.iModelComponentIndex = ANIM_TANK;
+	Tank_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
+	Tank_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
+	Tank_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
+		TEXT("Prototype_GameObject_Tank"), &Tank_Desc)))
+		return E_FAIL;
+
+	CHelicopter::HELICOPTER_DESC Helicopter_Desc{};
+	Helicopter_Desc.eID = LEVEL_GAMEPLAY;
+	Helicopter_Desc.fPosition = _float3(380.755f, 5.f, 300.710f);
+	Helicopter_Desc.fSpeedPerSec = 10.f;
+	Helicopter_Desc.fScale = _float3(3.f, 3.f, 3.f);
+	Helicopter_Desc.iModelComponentIndex = ANIM_HELICOPTER;
+	Helicopter_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
+	Helicopter_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
+	Helicopter_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
+		TEXT("Prototype_GameObject_Helicopter"), &Helicopter_Desc)))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -417,7 +430,7 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 void CLevel_GamePlay::Free()
 {
 	__super::Free();
-
+	
 	ShowCursor(true);
 
 
@@ -632,7 +645,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pDesc10.iData = 0;
 	pDesc10.fX = 140;
 	pDesc10.fY = 100;
-
+	pDesc10.fBrainHP = m_pBrain->Get_BrainHp();
 	pDesc10.fDepth = 0.2f;
 	pDesc10.iIndex = 4;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc10)))
@@ -654,6 +667,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pDesc11.fY = 80;
 	pDesc11.fDepth = 0.3f;
 	pDesc11.iIndex = 4;
+	pDesc11.fBrainEnergy = m_pBrain->Get_BrainEnergy();
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc11)))
 		return E_FAIL;
 
@@ -685,7 +699,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pDesc13.iData = 0;
 	pDesc13.fX = g_iWinSizeX - 90.f;
 	pDesc13.fY = g_iWinSizeY - 45.f;
-
+	pDesc13.fPlayerHP = m_pPlayer->Get_PlayerHP();
 	pDesc13.fDepth = 0.3f;
 	pDesc13.iIndex = 4;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc13)))
@@ -707,6 +721,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pDesc14.fY = g_iWinSizeY - 70.f;
 	pDesc14.fDepth = 0.3f;
 	pDesc14.iIndex = 4;
+	pDesc14.fPlayerEnergy = m_pPlayer->Get_PlayerEnergy();
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc14)))
 		return E_FAIL;
 

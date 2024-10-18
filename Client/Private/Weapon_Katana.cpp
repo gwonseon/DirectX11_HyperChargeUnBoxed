@@ -58,19 +58,25 @@ void CWeapon_Katana::Priority_Update(_float fTimeDelta)
 
 void CWeapon_Katana::Update(_float fTimeDelta)
 {
-}
-
-void CWeapon_Katana::Late_Update(_float fTimeDelta)
-{
-	if(m_bKatanaState == true)
+	if (m_bKatanaState == true)
 	{
 		_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
 		for (size_t i = 0; i < 3; i++)
 			SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
-
 		XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
 
+		m_pColliderCom->Update(XMLoadFloat4x4(&m_WorldMatrix));
+	}
+}
+
+
+
+void CWeapon_Katana::Late_Update(_float fTimeDelta)
+{
+	if(m_bKatanaState == true)
+	{
+		
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;
 	}
@@ -87,12 +93,16 @@ HRESULT CWeapon_Katana::Render()
 		for (size_t i = 0; i < iNumMeshes; i++)
 		{
 			if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
+				return E_FAIL; 
 			if (FAILED(m_pShaderCom->Begin(0)))
 				return E_FAIL;
 
 			m_pModelCom->Render(i);
 		}
+#ifdef _DEBUG
+		m_pColliderCom->Render();
+#endif
+
 	}
 	return S_OK;
 }
@@ -106,6 +116,17 @@ HRESULT CWeapon_Katana::Add_Components()
 
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Model_Weapon8"), TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
+
+	/* For.Com_Collider_Sphere */
+	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+
+	SphereDesc.fRadius = 0.7f;
+	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -168,7 +189,7 @@ CGameObject* CWeapon_Katana::Clone(void* pArg)
 void CWeapon_Katana::Free()
 {
 	__super::Free();
-
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

@@ -77,6 +77,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\Bin\</OutDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -161,9 +162,6 @@
   <ItemGroup>
     <ClInclude Include="..\Public\Alien.h" />
     <ClInclude Include="..\Public\BrainCore.h" />
-    <ClInclude Include="..\Public\Camera_TPS.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\Public\BackGround.h" />
     <ClInclude Include="..\Public\Body_Player.h" />
     <ClInclude Include="..\Public\ButtonUI.h" />
@@ -194,6 +192,7 @@
     <ClInclude Include="..\Public\Player_Build.h" />
     <ClInclude Include="..\Public\Player_FPS.h" />
     <ClInclude Include="..\Public\Pony.h" />
+    <ClInclude Include="..\Public\PonyState.h" />
     <ClInclude Include="..\Public\Tank.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\UI_CircleGuage.h" />
@@ -212,9 +211,6 @@
     <ClCompile Include="..\Private\BrainCore.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
-    <ClCompile Include="..\Private\Camera_TPS.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\Private\CollisionBox.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
     <ClCompile Include="..\Private\Environment.cpp" />
@@ -240,6 +236,7 @@
     <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />
     <ClCompile Include="..\Private\Pony.cpp" />
+    <ClCompile Include="..\Private\PonyState.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\UI_CircleGuage.cpp" />

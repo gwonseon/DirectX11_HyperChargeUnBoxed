@@ -36,8 +36,6 @@ HRESULT CBrainCore::Initialize(void* pArg)
 void CBrainCore::Priority_Update(_float fTimeDelta)
 {
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
-
 }
 
 void CBrainCore::Update(_float fTimeDelta)

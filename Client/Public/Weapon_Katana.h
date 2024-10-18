@@ -4,6 +4,7 @@
 #include "PartObject.h"
 
 BEGIN(Engine)
+class CCollider;
 class CShader;
 class CModel;
 END
@@ -41,6 +42,7 @@ public:
 	void Set_KatanaState(_bool bState) { m_bKatanaState = bState; }
 
 private:
+	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 

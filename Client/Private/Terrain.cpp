@@ -50,8 +50,7 @@ void CTerrain::Update(_float fTimeDelta)
 		m_pVIBufferCom->Chang_Topology();
 	}
 
-	// ÇÇÅ·
-	// Picking();
+
 
 	m_pVIBufferCom->Update(fTimeDelta);
 }

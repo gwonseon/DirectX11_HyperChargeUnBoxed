@@ -220,7 +220,8 @@ void CChannel::Update_TransformationMatrix_LowerBody(const vector<class CBone*>&
 
 	if( m_iBoneIndex >= 27)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
-
+	if (m_iBoneIndex == 2 || m_iBoneIndex == 3 || m_iBoneIndex == 0 )
+		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 }
 
 _bool CChannel::Update_LinearInterPolation(const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta)
@@ -312,7 +313,6 @@ _bool CChannel::Update_LinearInterPolation_UpperBody(const vector<class CBone*>&
 
 	if (m_iBoneIndex <= 26)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
-
 	if (fTemp_UpperBody >= m_fInterPolation_TargetTime)
 	{
 		m_bInitOnce_UpperBody = false;
@@ -359,6 +359,8 @@ _bool CChannel::Update_LinearInterPolation_LowerBody(const vector<class CBone*>&
 
 	_matrix	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 	if (m_iBoneIndex >= 27)
+		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
+	if (m_iBoneIndex == 2 || m_iBoneIndex == 3 || m_iBoneIndex == 0 )
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 
 	if (fTemp_LowerBody >= m_fInterPolation_TargetTime)
