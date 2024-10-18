@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Alien.h"
 
+
 #include "GameInstance.h"
 CAlien::CAlien(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -33,6 +34,11 @@ HRESULT CAlien::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true);
+//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
+	m_fAttack = 10.f;
+	m_fEnergy = 0.f;
+	m_fHp = 60.f;
+	
 	
 	return S_OK;
 }
@@ -54,13 +60,14 @@ void CAlien::Update(_float fTimeDelta)
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
-	
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CAlien::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
+	__super::Late_Update(fTimeDelta);
+//	m_pColliderCom->Intersect(pTargetCollider);
+
 }
 
 HRESULT CAlien::Render()
@@ -84,6 +91,10 @@ HRESULT CAlien::Render()
 		m_pModelCom->Render(i);
 	}
 
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
+
 	return S_OK;
 }
 
@@ -99,6 +110,15 @@ HRESULT CAlien::Add_Components()
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
+	/* For.Com_Collider_OBB */
+	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	SphereDesc.fRadius = 1.8f;
+	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -158,6 +178,7 @@ CGameObject* CAlien::Clone(void* pArg)
 void CAlien::Free()
 {
 	__super::Free();
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

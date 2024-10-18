@@ -91,9 +91,6 @@
     <Filter Include="02. GameObjects\Environment\CollisionBox">
       <UniqueIdentifier>{662bfdc2-493f-4ce2-b2ca-bc0e80252a78}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Camera\Camera_TPS">
-      <UniqueIdentifier>{3651e037-023f-47d7-a322-fa8646fa529f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Player\Weapon\Weapon_Katana">
       <UniqueIdentifier>{287e9917-dce8-4422-820f-2abe31bb590e}</UniqueIdentifier>
     </Filter>
@@ -132,6 +129,9 @@
     </Filter>
     <Filter Include="01. Levels\92. NavigationTool">
       <UniqueIdentifier>{03d94424-1d3e-4e45-8388-3413907937c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState">
+      <UniqueIdentifier>{6789da16-12d8-452b-9edb-f89660d4faa1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -216,9 +216,6 @@
     <ClInclude Include="..\Public\CollisionBox.h">
       <Filter>02. GameObjects\Environment\CollisionBox</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Camera_TPS.h">
-      <Filter>02. GameObjects\Camera\Camera_TPS</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Weapon_Katana.h">
       <Filter>02. GameObjects\Player\Weapon\Weapon_Katana</Filter>
     </ClInclude>
@@ -257,6 +254,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Navigation_Leve.h">
       <Filter>01. Levels\92. NavigationTool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PonyState.h">
+      <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -332,9 +332,6 @@
     <ClCompile Include="..\Private\CollisionBox.cpp">
       <Filter>02. GameObjects\Environment\CollisionBox</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Camera_TPS.cpp">
-      <Filter>02. GameObjects\Camera\Camera_TPS</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Weapon_Katana.cpp">
       <Filter>02. GameObjects\Player\Weapon\Weapon_Katana</Filter>
     </ClCompile>
@@ -373,6 +370,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Navigation_Leve.cpp">
       <Filter>01. Levels\92. NavigationTool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PonyState.cpp">
+      <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

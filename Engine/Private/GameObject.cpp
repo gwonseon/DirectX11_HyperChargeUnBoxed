@@ -68,14 +68,14 @@ HRESULT CGameObject::Render()
 }
 
 
-
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg)
 {
+
 	CComponent* pComponent = m_pGameInstance->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
 	if (nullptr == pComponent)
 		return E_FAIL;
 
-	if (nullptr != Find_Component(strComponentTag))
+	if (nullptr != CGameObject::Find_Component(strComponentTag))
 		return E_FAIL;
 
 	m_Components.emplace(strComponentTag, pComponent);
@@ -87,15 +87,17 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const _wstring& strPrototy
 	return S_OK;
 }
 
-CComponent* CGameObject::Find_Component(const _wstring& strComponentTag)
+CComponent* CGameObject::Find_Component(const _wstring& strComponentTag, _uint iPartObjID)
 {
 	auto	iter = m_Components.find(strComponentTag);
-
+	
 	if (iter == m_Components.end())
 		return nullptr;
-
+	
 	return iter->second;
 }
+
+
 
 void CGameObject::Free()
 {

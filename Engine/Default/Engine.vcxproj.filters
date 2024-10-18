@@ -142,6 +142,27 @@
     <Filter Include="08. ShaderFiles">
       <UniqueIdentifier>{d7effe59-07a6-450b-a3e9-e5c9b884ba43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. Component\Collider">
+      <UniqueIdentifier>{40bf8348-172c-4bf6-91b3-c60607757761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\Collider\Bounding">
+      <UniqueIdentifier>{927e629d-577f-4cbb-9383-0d53afcb47e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\Collider\Bounding\Bounding_AABB">
+      <UniqueIdentifier>{0c3b5e91-f02f-4e7a-83ce-f8c978751fe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\Collider\Bounding\Bounding_OBB">
+      <UniqueIdentifier>{b47e9f6d-f8a6-4c24-862c-c399d548a982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\Collider\Bounding\Bounding_Sphere">
+      <UniqueIdentifier>{01723f72-f82e-481e-abda-64f547603b28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\Collider\Bounding\DebugDraw">
+      <UniqueIdentifier>{fa33a587-7f6e-4b67-9be5-6da54612052c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\07. Manager\02. CollisionMgr">
+      <UniqueIdentifier>{2b4a2051-1df8-410b-b455-3b2f8a3b7403}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -266,6 +287,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Cell.cpp">
       <Filter>01. Utility\04. Component\VIBuffer\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding.cpp">
+      <Filter>01. Utility\04. Component\Collider\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding_AABB.cpp">
+      <Filter>01. Utility\04. Component\Collider\Bounding\Bounding_AABB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding_Sphere.cpp">
+      <Filter>01. Utility\04. Component\Collider\Bounding\Bounding_Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding_OBB.cpp">
+      <Filter>01. Utility\04. Component\Collider\Bounding\Bounding_OBB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Collider.cpp">
+      <Filter>01. Utility\04. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DebugDraw.cpp">
+      <Filter>01. Utility\04. Component\Collider\Bounding\DebugDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionMgr.cpp">
+      <Filter>01. Utility\07. Manager\02. CollisionMgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -403,6 +445,27 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Cell.h">
       <Filter>01. Utility\04. Component\VIBuffer\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding.h">
+      <Filter>01. Utility\04. Component\Collider\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding_AABB.h">
+      <Filter>01. Utility\04. Component\Collider\Bounding\Bounding_AABB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding_Sphere.h">
+      <Filter>01. Utility\04. Component\Collider\Bounding\Bounding_Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding_OBB.h">
+      <Filter>01. Utility\04. Component\Collider\Bounding\Bounding_OBB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Collider.h">
+      <Filter>01. Utility\04. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugDraw.h">
+      <Filter>01. Utility\04. Component\Collider\Bounding\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CollisionMgr.h">
+      <Filter>01. Utility\07. Manager\02. CollisionMgr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

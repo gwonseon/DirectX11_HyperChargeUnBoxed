@@ -37,7 +37,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
+public:
+	CNavigation* Get_NaviCom() { return m_pNavigationCom; }
 
 public:
 	void	Picking();

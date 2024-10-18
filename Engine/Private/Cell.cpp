@@ -75,7 +75,7 @@ _bool CCell::Compare_Points(_fvector vSour, _fvector vDest)
 
 	return false;
 }
-
+#ifdef _DEBUG
 HRESULT CCell::Render()
 {
 	m_pVIBuffer->Bind_Buffers();
@@ -83,7 +83,7 @@ HRESULT CCell::Render()
 	return m_pVIBuffer->Render();
 
 }
-
+#endif
 CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex)
 {
 	CCell* pInstance = new CCell(pDevice, pContext);

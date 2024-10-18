@@ -78,7 +78,7 @@ HRESULT CRenderer::Render_Shadow()
 	{
 		if (nullptr != pRenderGameObject)
 			pRenderGameObject->Render();
-
+		
 		Safe_Release(pRenderGameObject);
 	}
 

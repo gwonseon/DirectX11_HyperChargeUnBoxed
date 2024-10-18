@@ -38,7 +38,9 @@ public:
 
 public:
 	_vector* Get_BrainPos() { return &m_vecPos; }
-	
+	_float* Get_BrainHp() { return &m_fHp; }
+	_float* Get_BrainEnergy() { return &m_fEnergy; }
+
 
 private:
 	HRESULT Add_Components();
@@ -50,6 +52,7 @@ private:
 
 private:
 	_vector m_vecPos{};
+
 
 
 public:

@@ -61,12 +61,6 @@ void CBody_Player::Update(_float fTimeDelta)
 		{
 			if (m_bTPSState == true)
 			{
-				m_fArmAngle += (MouseMove * -0.05f);
-				if (m_fArmAngle > 25.f)
-					m_fArmAngle = 25.f;
-				if (m_fArmAngle < -15.f)
-					m_fArmAngle = -15.f;
-
 				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion);
 			}
 			else
@@ -78,12 +72,16 @@ void CBody_Player::Update(_float fTimeDelta)
 		{
 			m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion);
 		}		
-		m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta);
-	
+		if(m_bRunState == false)
+			m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta);
+		else
+			m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta * 1.5f);
+
 		UpperBody_Anim(fTimeDelta);
 		LowerBody_Anim(fTimeDelta);
 		
-
+		
+	
 
 
 
@@ -95,8 +93,13 @@ void CBody_Player::Late_Update(_float fTimeDelta)
 	XMStoreFloat4x4(&m_WorldMatrix, XMLoadFloat4x4(m_pParentMatrix) * m_pTransformCom->Get_WorldMatrix());
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
+	m_pColliderCom->Update(XMLoadFloat4x4(&m_WorldMatrix));
+
+	if(m_bDead == false)
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+			return;
+	}
 }
 
 HRESULT CBody_Player::Render()
@@ -122,7 +125,9 @@ HRESULT CBody_Player::Render()
 			m_pModelCom->Render(i);
 		}
 	}
-
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
 	return S_OK;
 }
 
@@ -486,34 +491,35 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			}
 
 		}
-
+		m_bRunState = false;
 		if (*m_pParentState_Lower & CPlayer::RUNSTATE_NORTH)
 		{
+			m_bRunState = true;
 			switch (m_iWeaponState)
 			{
 			case Client::CBody_Player::WEAPON_UNARMED:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N, true);
 				break;
 			case Client::CBody_Player::WEAPON_RIFLE:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_SHOTGUN:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_PULSECANNON:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_TELEPORT:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_RIFLE_SECOND:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_N_Katana, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Katana, true);
 				break;
 			default:
 				break;
@@ -524,31 +530,32 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 
 		if (*m_pParentState_Lower & CPlayer::RUNSTATE_NORTHWEST)
 		{
+			m_bRunState = true;
 			switch (m_iWeaponState)
 			{
 			case Client::CBody_Player::WEAPON_UNARMED:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW, true);
 				break;
 			case Client::CBody_Player::WEAPON_RIFLE:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_SHOTGUN:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_PULSECANNON:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_TELEPORT:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_RIFLE_SECOND:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NW_Katana, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Katana, true);
 				break;
 			default:
 				break;
@@ -558,31 +565,32 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 
 		if (*m_pParentState_Lower & CPlayer::RUNSTATE_NORTHEAST)
 		{
+			m_bRunState = true;
 			switch (m_iWeaponState)
 			{
 			case Client::CBody_Player::WEAPON_UNARMED:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE, true);
 				break;
 			case Client::CBody_Player::WEAPON_RIFLE:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_SHOTGUN:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_PULSECANNON:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_TELEPORT:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_RIFLE_SECOND:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Rifle, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
-				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Run_NE_Katana, true);
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Katana, true);
 				break;
 			default:
 				break;
@@ -644,6 +652,15 @@ HRESULT CBody_Player::Add_Components()
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Anim7"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+		return E_FAIL;
+
+	/* For.Com_Collider_AABB */
+	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
+
+	AABBDesc.vExtents = _float3(0.5f, 1.f, 0.5f);
+	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y + 1.f, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -711,7 +728,7 @@ CGameObject* CBody_Player::Clone(void* pArg)
 void CBody_Player::Free()
 {
 	__super::Free();
-
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

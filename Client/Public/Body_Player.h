@@ -5,6 +5,7 @@
 
 BEGIN(Engine)
 class CShader;
+class CCollider;
 class CModel;
 END
 
@@ -187,7 +188,7 @@ private:
 	_bool	m_bUpperAnimState = false;	// 상체 애니메이션 끝났는지 확인
 	_bool	m_bTPSState = false;		// TPS인지 
 	_bool	m_bShoot_State = false;		// Idle 상태를 위한 bool 함수, Idle상태 = 쏘는 자세 첫 자세
-
+	_bool   m_bRunState = false;		// 뛸 때 애니메이션 속도 다르게
 
 	_float3					Rotation{};
 
@@ -210,6 +211,8 @@ private:
 		const _uint* m_pParentState_Lower = { nullptr };
 		_uint*		 m_iViewState		  = { nullptr };	// 1인칭인지 3인칭인지
 
+		CCollider* m_pColliderCom = { nullptr };
+		CCollider* pTargetCollider = { nullptr };
 
 public:// 점프
 	_uint Get_JumpState() { return m_iJumpState; }

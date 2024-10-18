@@ -57,7 +57,7 @@ private:
 	LEVELID					m_eLevelID = LEVEL_END;
 	_vector					vecEye{};
 	_uint*					m_iViewState{};
-	_vector				vAt{};
+	_vector					vAt{};
 private:
 	const _float4x4* m_matPlayerWorld = { nullptr };
 

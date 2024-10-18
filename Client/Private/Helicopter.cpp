@@ -33,7 +33,8 @@ HRESULT CHelicopter::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(1, true);
-	
+//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
+
 	return S_OK;
 }
 
@@ -48,8 +49,9 @@ void CHelicopter::Update(_float fTimeDelta)
 	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, vPos);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(XMVectorGetX(vPos), 10.f, XMVectorGetZ(vPos),1.f));
 
-	if (fDistance >= 30.f)
+	if (fDistance >= 90.f)
 	{
+		m_pTransformCom->LookAt(*m_vecTargetPos);
 		m_pModelCom->Set_Animation(HELICOPTER_DIORAMA, true);
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
@@ -64,14 +66,14 @@ void CHelicopter::Update(_float fTimeDelta)
 		m_pTransformCom->Rotation(0.f, XMConvertToRadians(m_fRotation), 0.f);
 		m_pModelCom->Set_Animation(HELICOPTER_DIORAMA, true);
 	}
-
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CHelicopter::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
+//	m_pColliderCom->Intersect(pTargetCollider);
 
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CHelicopter::Render()
@@ -94,7 +96,9 @@ HRESULT CHelicopter::Render()
 
 		m_pModelCom->Render(i);
 	}
-
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
 	return S_OK;
 }
 
@@ -109,6 +113,14 @@ HRESULT CHelicopter::Add_Components()
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+		return E_FAIL;
+
+	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	SphereDesc.fRadius = 1.2f;
+	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 	return S_OK;
 }
@@ -171,4 +183,5 @@ void CHelicopter::Free()
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pColliderCom);
 }

@@ -26,6 +26,7 @@ HRESULT CWeapon_Item::Initialize(void* pArg)
     m_eLevel = pDesc->eID;
     m_iModelIndex = pDesc->iModelIndex;
     pDesc->fRotationPerSec = 5.f;
+    fScale = pDesc->fScale;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -60,14 +61,11 @@ void CWeapon_Item::Update(_float fTimeDelta)
         return;
     }
    
-   
-
-
     _vector Axis = { 0.f, 1.f, 0.f };
     
     if (m_bInteration == true)
     {
-        m_pTransformCom->Set_Scaling(7.f, 7.f, 7.f);
+        m_pTransformCom->Set_Scaling(fScale.x + 3.f, fScale.y + 3.f, fScale.z + 3.f);
         m_pTransformCom->Turn(Axis, fTimeDelta * 0.3f);
         if (m_bCharging == true)
         {
@@ -84,15 +82,18 @@ void CWeapon_Item::Update(_float fTimeDelta)
     else
     {
         m_fCharging = 0.f;
-        m_pTransformCom->Set_Scaling(4.f, 4.f, 4.f);
+        m_pTransformCom->Set_Scaling(fScale.x, fScale.y, fScale.z);
     }
 
 }
 
 void CWeapon_Item::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-        return;
+    if(m_bDead == false)
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+            return;
+    }
 }
 
 HRESULT CWeapon_Item::Render()

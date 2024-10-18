@@ -39,8 +39,9 @@ public:
 
 public:
 	_float3	Get_PickingPos() { return m_fPickingPos; }
+	class CTransform* Get_Transform() { return m_pTransformCom; }
 
-	class CComponent* Find_Component(const _wstring& strComponentTag);
+	virtual class CComponent* Find_Component(const _wstring& strComponentTag, _uint iPartObjID = 0);
 
 
 protected:
@@ -58,6 +59,57 @@ protected:
 	_float3							m_fPickingPos{};
 	_bool							m_bDead = false;
 	_vector							m_vecPosition{};
+
+	
+public:
+	void	Set_Hp(_float Hp)				{ m_fHp = Hp; }
+	void	Set_Energy(_float Energy)		{ m_fEnergy = Energy; }
+	void	Set_Attact(_float Attack)		{ m_fAttack = Attack; }
+	void	Set_Coin(_uint Coin)			{ m_iCoin = Coin; }
+
+	void	Set_GetEnergy(_float Energy)	{ m_fEnergy += Energy; }
+	void	Set_Heal(_float Heal)			{ m_fHp += Heal; }
+	void	Set_UseCoin(_uint Price)		{ m_iCoin -= Price; }
+	void	Set_PickUp_Coin(_uint Price)	{ m_iCoin += Price; }
+
+	void	Set_Attacked(_bool bAttacked)	{ m_bAttacked = bAttacked; }  // 공격 당했음을 알려줌
+	void	Set_knockdown(_bool bknockdown) { m_bKnockdown = bknockdown; }
+
+	_float	Get_Hp()						{ return m_fHp; }		// 체력 얼마나 있는지
+	_float	Get_Energy()					{ return m_fEnergy; }	// 쉴드량 얼마나 있는지
+	_float	Get_Attack()					{ return m_fAttack; }	// 공격력 얼마인지 
+	_uint	Get_Coin()						{ return m_iCoin; }		// 돈 얼마나 있는지
+		
+	_bool	Get_Attacked()					{ return m_bAttacked; }    // 공격을 당했는지 알려줌
+	_bool	Get_DontDestroyAble()			{ return m_bDontDestroy; } // 객체 삭제하면 안되는 애인지 아닌지 알려줌
+	_bool	Get_knockdown()					{ return m_bKnockdown; }   // 객체 삭제하면 안되는 애들 죽었다고 알리기 위함
+	_bool	Get_AttackState()				{ return m_bAttackState; } // 공격 모션인지 아닌지 확인용(이때만 충돌이 되어야 함)
+	// 에너지가 있으면 에너지 깎고, 에너지 없으면 Hp깎음
+	void	Set_Damaged(_float Attack) {
+		if (m_fEnergy > 0)	{
+			m_fEnergy -= Attack;
+		}
+		else {
+			m_fHp -= Attack;
+		}
+		if (m_fEnergy < 0)	{
+			// 에너지가 음수면 그만큼 Hp 깎아준다.
+			m_fHp -= m_fEnergy;
+			m_fEnergy = 0.f;
+		}
+	}
+
+
+protected:
+	_float							m_fHp{};
+	_float							m_fEnergy{};
+	_float							m_fAttack{};
+
+	_uint							m_iCoin{};
+	_bool							m_bAttacked		= false; // 공격 받았음을 표시 
+	_bool							m_bDontDestroy	= false;
+	_bool							m_bKnockdown	= false; // 삭제되면 안되는 애들 죽음 상태를 얘로 대체
+	_bool							m_bAttackState	= false;
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 

@@ -23,35 +23,29 @@ HRESULT CPlayer::Initialize_Prototype()
 HRESULT CPlayer::Initialize(void* pArg)
 {
 	CContainerObject::CONTAINEROBJECT_DESC		Desc{};
-
-
 	Desc.iNumPartObjects = PART_END;
-	Desc.fSpeedPerSec = 10.f;
+	Desc.fSpeedPerSec = 25.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.f);
-	// Desc.fPosition = _float3(418.755f, 0.f, 245.710f);
-	Desc.fPosition = _float3(0.f, 0.f, 0.f);
+	Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
 	m_fMouseSensor = 0.1f;
+
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
-
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
 	if (FAILED(Add_PartObjects()))
 		return E_FAIL;
-	
 
-	//m_pTransformCom->Rotation(0.f, 180.f, 0.f);
-	// m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(418.755f, 1.5f, 245.710f, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Desc.fPosition.x, Desc.fPosition.y, Desc.fPosition.z, 1.f));
+	
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(386.295f, 1.f, 450.425f, 1.f));
+//	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Desc.fPosition.x, Desc.fPosition.y, Desc.fPosition.z, 1.f));
+	m_pTransformCom->Set_Scaling(2.f, 2.f, 2.f);
 	m_iWeaponState = WEAPON_RIFLE;
 	m_pBody = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY]);
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
 	m_pKatana = static_cast<CWeapon_Katana*>(m_PartObjects[TPS_PART_KATANA]);
-	m_pFPS = static_cast<CPlayer_FPS*>(m_PartObjects[FPS_PART_BODY]);
 	m_pHead = static_cast<CHead_Player*>(m_PartObjects[TPS_PART_HEAD]);
-
 
 	CPivot* m_pTPSPivot = static_cast<CPivot*>(m_PartObjects[TPS_PART_PIVOT]);
 	CFPS_Pivot* m_pFPSPivot = static_cast<CFPS_Pivot*>(m_PartObjects[FPS_PART_PIVOT]);
@@ -60,20 +54,24 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_vecFPS_CamPos = m_pFPSPivot->Get_FPS_CameraPos();
 	m_vecWeaponPos = m_pWaepon->Get_WeaponPos();
 	m_vecWeaponDir = m_pWaepon->Get_WeaponDir();
-
+	
+	m_fHp = 100.f;
+	m_fEnergy = 100.f;
+	m_fAttack = 20.f;
+	m_bDontDestroy = true;
+	m_bKnockdown = false;
 	return S_OK;
 }
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {	
-
+	
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_C))
 	{
 		if (m_iViewState == PLAYER_TPS_VIEW)
 			m_iViewState = PLAYER_FPS_VIEW;
 		else
 			m_iViewState = PLAYER_TPS_VIEW;
-		
 	}
 
 	// 회전
@@ -86,18 +84,15 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_0))
 	{
-
 		m_iWeaponState++;
 		if (m_iWeaponState > 7)
 			m_iWeaponState = 0;
 	}
 	
-
 	if(m_iViewState == PLAYER_FPS_VIEW)
 	{
 		// FPS
 		m_pHead->Set_PlayerViewState(false);
-		m_pFPS->Set_PlayerViewState(true);
 		m_pBody->Set_PlayerViewState(false);
 	//	const _float4x4* FPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	//	m_pWaepon->Set_SocketMatrix(FPSMatrix);
@@ -108,17 +103,13 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	{
 		 // TPS
 		m_pHead->Set_PlayerViewState(true);
-		m_pFPS->Set_PlayerViewState(false);
 		m_pBody->Set_PlayerViewState(true);
 	//	const _float4x4* TPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 		//m_pWaepon->Set_SocketMatrix(TPSMatrix);
 		m_pWaepon->Set_TPSState(true);
-
 	}
 	// 카메라 At 보내주기
 	m_pWaepon->Set_CameraAt(m_vecCameraAt);
-	// 몸에게 무기 상태 보내주기  FPS
-	m_pFPS->Set_WeaponState(m_iWeaponState);
 	// 몸에게 무기 상태 보내주기   TPS
 	m_pBody->Set_WeaponState(m_iWeaponState);		
 	// 무기에게 무기 상태 보내주기
@@ -135,26 +126,45 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	Player_Movement(fTimeDelta);					// 플레이어 동작
 
 
-
-
-
 	__super::Priority_Update(fTimeDelta);
 }
 
 void CPlayer::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
+
+
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
 	
 	__super::Late_Update(fTimeDelta);
+	//CCollider* pTargetCollider{};
+	//_bool bCol = false;
+	//_uint i = 0;
+	//while(bCol == false)
+	//{
+	//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), TEXT("Com_Collider_Sphere"), i));
+	//	bCol = m_pColliderCom->Intersect(pTargetCollider);
+	//	i++;
+	//	if (i > 3)
+	//		break;
+	//}
+
+	if(m_bDead == false)
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+			return;
+	}
 
 }
 HRESULT CPlayer::Render()
 {
-
+#ifdef _DEBUG
+	
+	m_pNavigationCom->Render();
+#endif
 	return S_OK;
 }
 HRESULT CPlayer::Add_Components()
@@ -162,18 +172,18 @@ HRESULT CPlayer::Add_Components()
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
 
-	Desc.iCurrentCellIndex = 0;
+	Desc.iCurrentCellIndex = 7;
 
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
 		return E_FAIL;
 
+	
 
 	return S_OK;
 }
 HRESULT CPlayer::Add_PartObjects()
 {
-	
 	/* For.Body */
 	CBody_Player::BODY_PLAYER_DESC BodyDesc{};
 	BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
@@ -185,15 +195,6 @@ HRESULT CPlayer::Add_PartObjects()
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"), TPS_PART_BODY, &BodyDesc)))
 		return E_FAIL;
 
-	CPlayer_FPS::FPS_PLAYER_DESC FPSDesc{};
-	FPSDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-	FPSDesc.fSpeedPerSec = 0.f;
-	FPSDesc.fRotationPerSec = 0.f;
-	FPSDesc.pParentState = &m_iState_Upper;
-	FPSDesc.m_iViewState = &m_iViewState;
-
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_FPSBody_Player"), FPS_PART_BODY, &FPSDesc)))
-		return E_FAIL;
 
 	/* For.Body */
 	CHead_Player::HEADPLAYER_DESC HeadDesc{};
@@ -215,7 +216,6 @@ HRESULT CPlayer::Add_PartObjects()
 	WeaponDesc.pParentState = &m_iState_Upper;
 	WeaponDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	WeaponDesc.m_iViewState = &m_iViewState;
-
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Weapon"), TPS_PART_WEAPON, &WeaponDesc)))
 		return E_FAIL;
 
@@ -226,7 +226,6 @@ HRESULT CPlayer::Add_PartObjects()
 	KatanaDesc.pParentState = &m_iState_Upper;
 	KatanaDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	KatanaDesc.m_iViewState = &m_iViewState;
-
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Katana"), TPS_PART_KATANA, &KatanaDesc)))
 		return E_FAIL;
 
@@ -237,7 +236,6 @@ HRESULT CPlayer::Add_PartObjects()
 	PivotDesc.pParentState = &m_iState_Upper;
 	PivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	PivotDesc.m_iViewState = &m_iViewState;
-
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Pivot"), TPS_PART_PIVOT, &PivotDesc)))
 		return E_FAIL;
 
@@ -257,7 +255,6 @@ HRESULT CPlayer::Add_PartObjects()
 
 HRESULT CPlayer::Bind_ShaderResources()
 {
-
 	return S_OK;
 }
 
@@ -381,7 +378,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			{
 				m_pTransformCom->Go_Left(fTimeDelta * 0.8f);
 			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
-				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHWEST))
@@ -396,7 +393,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			{
 				m_pTransformCom->Go_Right(fTimeDelta * 0.8f);
 			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
-				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHEAST))
@@ -410,7 +407,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			else
 			{
 			//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
-				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTH))
@@ -449,7 +446,6 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 					m_iState_Lower |= WALKSTATE_EAST;
 				}
 			}
-
 		}
 	}
 	else
@@ -505,7 +501,6 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
-
 				m_pTransformCom->Go_Left(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
 				{
@@ -519,7 +514,6 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
-
 				if (iJumpState == LANDING_STATE)
 				{
 					m_pTransformCom->Go_Right(fTimeDelta);
@@ -533,8 +527,6 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 			}
 		}
-
-
 	}
 	
 		if ((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE)  // 점프 시작
@@ -555,7 +547,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_bJumpStart == false)
 			{
-				m_fPower = 15.f;
+				m_fPower = 18.f;
 				m_bJumpStart = true;
 			}
 			if (!(m_iState_Lower & JUMP_LOOP))
@@ -579,11 +571,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			m_pTransformCom->Jump(fTimeDelta, m_fHeight, m_fPower, iJumpState);
 			m_pBody->Set_JumpState(m_fHeight, m_fPower);
 		}
-	
-
 }
-
-
 
 CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -614,5 +602,6 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
+
 	Safe_Release(m_pNavigationCom);
 }

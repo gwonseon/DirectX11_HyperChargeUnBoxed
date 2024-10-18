@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 
+
 CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
@@ -34,6 +35,7 @@ HRESULT CTank::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(1, true);
+//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
 
 	return S_OK;
 }
@@ -42,6 +44,7 @@ void CTank::Priority_Update(_float fTimeDelta)
 {
 
 	m_pTransformCom->LookAt(*m_vecTargetPos);
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CTank::Update(_float fTimeDelta)
@@ -61,13 +64,18 @@ void CTank::Update(_float fTimeDelta)
 		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire, true);
 	}
 
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
+
+//	m_pColliderCom->Intersect(pTargetCollider);
+	__super::Update(fTimeDelta);
 
 }
 
 void CTank::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
+	__super::Late_Update(fTimeDelta);
+
 }
 
 HRESULT CTank::Render()
@@ -90,7 +98,9 @@ HRESULT CTank::Render()
 
 		m_pModelCom->Render(i);
 	}
-
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
 	return S_OK;
 }
 
@@ -106,6 +116,16 @@ HRESULT CTank::Add_Components()
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
+
+	/* For.Com_Collider_OBB */
+	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	SphereDesc.fRadius = 1.7f;
+	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -167,4 +187,5 @@ void CTank::Free()
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pColliderCom);
 }

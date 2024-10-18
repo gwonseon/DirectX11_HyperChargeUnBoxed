@@ -32,6 +32,7 @@ private:
 	HRESULT Ready_Layer_Camera(const _tchar* pLayerTag);
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WeaponITem(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
@@ -50,7 +51,11 @@ private:
 
 	_float	m_fDelay{};
 
-
+	// Ãæµ¹¿ë
+private:
+	CLayer* pPlayerLayer = { nullptr };
+	CLayer* pNearMonsterLayer = { nullptr };
+	CLayer* pFarMonsterLayer = { nullptr };
 
 
 	_float XPos{}, ZPos{};

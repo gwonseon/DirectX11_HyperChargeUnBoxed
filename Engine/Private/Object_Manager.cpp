@@ -1,9 +1,19 @@
 #include "..\Public\Object_Manager.h"
 #include "GameObject.h"
 #include "Layer.h"
+//#include <Collider.h>
 
 CObject_Manager::CObject_Manager()
 {
+}
+
+CComponent* CObject_Manager::Get_Component(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex, _uint iPartObjID)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return nullptr;
+	
+	return pLayer->Get_Component(strComponentTag, iIndex, iPartObjID);
 }
 
 HRESULT CObject_Manager::Initialize(_uint iNumLevels)
@@ -91,7 +101,7 @@ CGameObject* CObject_Manager::Clone_Prototype(const _wstring& strPrototypeTag, v
 	CGameObject* pPrototype = Find_Prototype(strPrototypeTag);
 	if (nullptr == pPrototype)
 		return nullptr;
-
+	
 	CGameObject* pGameObject = pPrototype->Clone(pArg);
 	if (nullptr == pGameObject)
 		return nullptr;
@@ -107,14 +117,14 @@ CGameObject* CObject_Manager::Get_Prototype(_uint iLevelIndex, const _tchar* pLa
 
 }
 
-CComponent* CObject_Manager::Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex)
-{
-	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
-	if (nullptr == pLayer)
-		return nullptr;
-
-	return pLayer->Get_Component(pComponentTag, iIndex);
-}
+//CComponent* CObject_Manager::Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex)
+//{
+//	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
+//	if (nullptr == pLayer)
+//		return nullptr;
+//
+//	return pLayer->Get_Component(pComponentTag, iIndex);
+//}
 
 
 
@@ -174,9 +184,12 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 	if (iLevelIndex >= m_iNumLevels)
 		return;
 	for (auto& Pair : m_pLayers[iLevelIndex])
+	{
+		Pair.second->Set_Dead();
 		Safe_Release(Pair.second);
+	}
 	m_pLayers[iLevelIndex].clear();
-
+	
 
 }
 
@@ -202,6 +215,8 @@ CLayer* CObject_Manager::Find_Layer(_uint iLevelIndex, const _wstring& strLayerT
 
 	return iter->second;
 }
+
+
 
 CObject_Manager* CObject_Manager::Create(_uint iNumLevels)
 {

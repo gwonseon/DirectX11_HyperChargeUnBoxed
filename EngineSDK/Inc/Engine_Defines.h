@@ -15,7 +15,9 @@
 #include "DirectXTK\DDSTextureLoader.h"
 #include "DirectXTK\WICTextureLoader.h"
 #include "DirectXTK\VertexTypes.h"
-
+#include "DirectXTK\PrimitiveBatch.h"
+#include "DirectXTK\SpriteBatch.h"
+#include "DirectXTK\Effects.h"
 
 #include "Effects11\d3dx11effect.h"
 

@@ -66,7 +66,7 @@ private:
 	_float fRotation_value{};
 
 	_float3 Rotation{};
-
+	_float3 fScale{};
 
 public:
 	static CWeapon_Item* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

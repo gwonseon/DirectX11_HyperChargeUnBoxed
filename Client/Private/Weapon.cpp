@@ -85,12 +85,12 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 		_long MouseMoveY = { 0 };
 		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
 		{
-			if (m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
-				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
-			if (m_fAngle_Y > 60.f)
-				m_fAngle_Y = 60.f;
-			if (m_fAngle_Y < -60.f)
-				m_fAngle_Y = -60.f;
+			if (m_fAngle_Y <= 35.f && m_fAngle_Y >= -50.f)
+				m_fAngle_Y += fTimeDelta * MouseMoveY * 3.f;
+			if (m_fAngle_Y > 35.f)
+				m_fAngle_Y = 35.f;
+			if (m_fAngle_Y < -50.f)
+				m_fAngle_Y = -50.f;
 		}	
 		m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 

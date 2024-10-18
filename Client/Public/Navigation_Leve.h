@@ -8,7 +8,7 @@
 #include "Environment.h"
 #include "Camera_Free.h"
 #include "CollisionBox.h"
-
+#include "Terrain.h"
 
 BEGIN(Client)
 
@@ -38,11 +38,11 @@ private:
 
 private:
 	void Add_Point(_float fTimeDelta, _float3 fPointPos);
-	void Select_Point(_float fTimeDelta, _float3 fPointPos);
 	HRESULT Save_Navigation(_float fTimeDelta);
 
 private:
 	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // 터레인 피킹
+	CTerrain* m_pTerrain;
 	_bool bAble_Select = true;
 	_float3 m_fPickingPos{};
 
@@ -63,7 +63,7 @@ private:
 	_uint		m_iCount{};		// 이건 배열에 들어가는 인덱스 번호
 
 
-
+	_bool m_bClick = false;
 	_bool Save = false;
 private:
 	CTexture* m_pLoad = nullptr;

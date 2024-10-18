@@ -237,6 +237,12 @@ HRESULT CGameInstance::Close_Level(_uint iLevelID)
 	return m_pLevel_Manager->Close_Level(iLevelID);
 }
 
+CComponent* CGameInstance::Get_Component(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex, _uint iPartObjID)
+{
+	return m_pObject_Manager->Get_Component(iLevelIndex, strLayerTag, strComponentTag, iIndex, iPartObjID);
+}
+
+
 HRESULT CGameInstance::Add_Prototype(const _wstring& strPrototypeTag, CGameObject* pPrototype)
 {
 	if (nullptr == m_pObject_Manager)
@@ -266,12 +272,12 @@ CGameObject* CGameInstance::Get_Prototype(_uint iLevelIndex, const _tchar* pLaye
 	return m_pObject_Manager->Get_Prototype(iLevelIndex, pLayerTag, strPrototypeTag);
 }
 
-CComponent* CGameInstance::Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex)
-{
-	if (nullptr == m_pObject_Manager)
-		return nullptr;
-	return m_pObject_Manager->Get_Component(iLevelIndex, pLayerTag, pComponentTag, iIndex);
-}
+//CComponent* CGameInstance::Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex)
+//{
+//	if (nullptr == m_pObject_Manager)
+//		return nullptr;
+//	return m_pObject_Manager->Get_Component(iLevelIndex, pLayerTag, pComponentTag, iIndex);
+//}
 
 CGameObject* CGameInstance::Find_Prototype(const _wstring& strPrototypeTag)
 {
@@ -401,6 +407,13 @@ bool CGameInstance::Picking_Box(const _vector& rayOrigin, const _vector& rayDire
 {
 	return m_pPicking_Manager->Picking_Box(rayOrigin, rayDirection, fMinPoint, fMaxPoint, distance, box);
 }
+
+void CGameInstance::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID, _uint iDstPartObjID)
+{
+	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iPartObjID, iDstPartObjID);
+}
+
+
 
 void CGameInstance::Release_Engine()
 {

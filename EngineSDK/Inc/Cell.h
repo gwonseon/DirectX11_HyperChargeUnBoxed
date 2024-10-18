@@ -30,7 +30,8 @@ public:
 	_bool isIn(_fvector vLocalPos, _int* pNeighborIndex);
 	_bool Compare_Points(_fvector vSour, _fvector vDest);
 
-
+	_uint	Get_CellIndex() { return m_iIndex; }
+	void	Set_CellIndex(_uint iIndex) { m_iIndex = iIndex; }
 #ifdef _DEBUG
 public:
 	virtual HRESULT Render();

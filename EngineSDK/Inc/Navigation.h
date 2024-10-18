@@ -29,8 +29,8 @@ public:
 
 	//юс╫ц
 public:
-//	void Create_Cell(_float3 vPoints[3]);
-
+	void Create_Cell(_float3 vPoints[3]);
+	void Delete_Cell(_uint iIndex);
 
 
 public:

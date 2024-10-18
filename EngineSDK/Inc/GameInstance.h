@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Component_Manager.h"
 #include "PipeLine.h"
-#include "Picking_Manager.h"
 #include "Graphic_Device.h"
+
+#include "Component_Manager.h"
+#include "Picking_Manager.h"
+#include "CollisionMgr.h"
+
+
 
 /* CGameInstance : */
 /* 내 Engine에 유일하게 존재하는 싱글톤클래스다. */
@@ -60,11 +64,12 @@ public: /* for.Level_Manager */
 	HRESULT Close_Level(_uint iLevelID);
 
 public: /* For.Object_Manager*/
+	class CComponent* Get_Component(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0, _uint iPartObjID = 0);
 	HRESULT Add_Prototype(const _wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_GameObject_ToLayer(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg = nullptr);
 	class CGameObject* Add_GameObject_ToLayer_ReturnObject(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg);
 	class CGameObject* Get_Prototype(_uint iLevelIndex, const _tchar* pLayerTag, const _wstring& strPrototypeTag);
-	class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
+	//class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
 	
 	class CGameObject* Find_Prototype(const _wstring& strPrototypeTag);
 	class CLayer* Find_Layer(_uint iLevelIndex, const _wstring& strLayerTag);
@@ -102,6 +107,9 @@ public:  // 피킹 매니저
 	void CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint);
 	bool Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box);
 
+public: // 콜리전 매니저
+	void Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID = 0, _uint iDstPartObjID = 0);
+
 private:
 	class CGraphic_Device* m_pGraphic_Device = { nullptr };
 	class CInput_Device* m_pInput_Device = { nullptr };
@@ -113,6 +121,7 @@ private:
 	class CPipeLine* m_pPipeLine = { nullptr };
 	class CLight_Manager* m_pLight_Manager = { nullptr };
 	class CPicking_Manager* m_pPicking_Manager = { nullptr };
+	class CCollisionMgr* m_pCollision_Manager = { nullptr };
 public:
 	static void Release_Engine();
 	virtual void Free() override;

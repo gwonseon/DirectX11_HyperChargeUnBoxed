@@ -18,6 +18,7 @@ HRESULT CLevel_Manager::Open_Level(_uint iCurrentLevelID, CLevel* pNewLevel)
 	if (nullptr != m_pCurrentLevel)
 		m_pGameInstance->Clear(m_iCurrentLevelID);
 
+
 	Safe_Release(m_pCurrentLevel);
 
 	m_pCurrentLevel = pNewLevel;
