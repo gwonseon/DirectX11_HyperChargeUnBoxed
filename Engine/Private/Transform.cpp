@@ -77,14 +77,109 @@ void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-
-	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+	{
+		if (m_fJumpSpeed < 1.0f)
+		{
+			m_fJumpSpeed += fTimeDelta;
+		}
+	}
+	else
+	{
+		if (m_fJumpSpeed > 0.1f)
+			m_fJumpSpeed -= (fTimeDelta * 0.2f);
+	}
+	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
 
 	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
 		return;
 
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
+
+void CTransform::Go_Backward_Nav(_float fTimeDelta, CNavigation* pNavigation)
+{
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+	{
+		if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+		{
+			if (m_fJumpSpeed < 1.0f)
+			{
+				m_fJumpSpeed += fTimeDelta;
+			}
+		}
+		else
+		{
+			if (m_fJumpSpeed > 0.1f)
+				m_fJumpSpeed -= (fTimeDelta * 0.2f);
+		}
+	}
+	
+	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
+
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
+		return;
+
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Go_Right_Nav(_float fTimeDelta, CNavigation* pNavigation)
+{
+	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+	{
+		if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+		{
+			if (m_fJumpSpeed < 1.0f)
+			{
+				m_fJumpSpeed += fTimeDelta;
+			}
+		}
+		else
+		{
+			if (m_fJumpSpeed > 0.1f)
+				m_fJumpSpeed -= (fTimeDelta * 0.2f);
+		}
+	}
+
+	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
+
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
+		return;
+
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+void CTransform::Go_Left_Nav(_float fTimeDelta, CNavigation* pNavigation)
+{
+	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+
+	if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+	{
+		if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+		{
+			if (m_fJumpSpeed < 1.0f)
+			{
+				m_fJumpSpeed += fTimeDelta;
+			}
+		}
+		else
+		{
+			if (m_fJumpSpeed > 0.1f)
+				m_fJumpSpeed -= (fTimeDelta * 0.2f);
+		}
+	}
+	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
+
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
+		return;
+
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
 void CTransform::Go_Left(_float fTimeDelta)
 {
 	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
@@ -161,17 +256,25 @@ void CTransform::Rotation(_float fX, _float fY, _float fZ)
 	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
 }
 
-void CTransform::Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState)
+void CTransform::Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount)
 {
 	
 	_vector		vLook = Get_State(CTransform::STATE_UP);
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-
+	m_iCurrent_JumpState = iJumpCount;
 	float fHeight_ = XMVectorGetY(vPosition);
 	if(fHeight_ >= 0.f )
 	{
-		if(iJumpState == 2)
-			fPower -= 0.4f;
+		if(iJumpCount == 1)
+		{
+			if (iJumpState == 2)
+				fPower -= 0.4f;
+		}
+		if (iJumpCount == 2)
+		{
+			if (iJumpState == 2)
+				fPower -= 0.5f;
+		}
 		
 		vPosition += XMVector3Normalize(vLook) * fPower * fTimeDelta;
 		Set_State(CTransform::STATE_POSITION, vPosition);
@@ -179,6 +282,7 @@ void CTransform::Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint 
 	else
 	{
 		fPower = 0.f;
+		m_iCurrent_JumpState = 0;
 		vPosition = XMVectorSetY(vPosition, 0.f);
 		Set_State(CTransform::STATE_POSITION, vPosition);
 	}

@@ -49,6 +49,7 @@ HRESULT CNavigation_Leve::Initialize()
 		_float fDot{};
 		_vector vUp = { 0.f,1.f,0.f,0.f };
 
+		// 잘못된 순서로 찍은 삼각형의 위치 변경
 		XMVECTOR vDot = XMVector3Dot(vCross, vUp);
 		XMStoreFloat(&fDot, vDot);
 		if (fDot < 0)
@@ -60,29 +61,35 @@ HRESULT CNavigation_Leve::Initialize()
 			vPoints[2] = fNewC;
 		}
 	
-
+		// 삼각형의 각 꼭짓점에 콜리전 박스 생성
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
 		CollisionDesc.iImGuiMode = NAVIGATION;
 		CollisionDesc.eLevel = LEVEL_NAVIGATION;
 		CollisionDesc.iPoint_Number = 0;		// 배열의 뒷자리 숫자
 		CollisionDesc.fPosition = vPoints[0];   // 점 위치 
+		fPoints[0] = vPoints[0].x;		fPoints[1] = vPoints[0].y; 		fPoints[2] = vPoints[0].z;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		++m_iIndex;
 
 		CollisionDesc.iPoint_Number = 1;		// 배열의 뒷자리 숫자
 		CollisionDesc.fPosition = vPoints[1];   // 점 위치 
+		fPoints[0] = vPoints[1].x;		fPoints[1] = vPoints[1].y; 		fPoints[2] = vPoints[1].z;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		++m_iIndex;
 		
 		CollisionDesc.iPoint_Number = 2;		// 배열의 뒷자리 숫자
 		CollisionDesc.fPosition = vPoints[2];   // 점 위치 
+		fPoints[0] = vPoints[2].x;		fPoints[1] = vPoints[2].y; 		fPoints[2] = vPoints[2].z;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		++m_iIndex;
 
 	}
+	m_iCount = 0;
+	m_bClick = true;
+	m_bAfter_AddPoints = false;
 	CloseHandle(hFile);
 
 	return S_OK;
@@ -102,30 +109,73 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		if (eNaviMode == CREATE_NAVIPOINT)
 			eNaviMode = SELECT_NAVIPOINT;
 		else
+		{
 			eNaviMode = CREATE_NAVIPOINT;
+
+			fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
+			fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
+			fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
+		}
 	}
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
 	{
+		// 클릭할 수 있는 상태로 바꿔준다.
+		if (eNaviMode == CREATE_NAVIPOINT)
+		{
+			if(m_bAfter_AddPoints == true)
+			{
+				if (m_iCount < 2)
+					m_iCount++;
+				m_bDelete = true;
+			}
+			
+		}
 		m_bClick = true;
 	}
 	// 컨트롤 우클릭은 맨 뒤 삭제
-	if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)) && eNaviMode == CREATE_NAVIPOINT)
+	if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)) && eNaviMode == CREATE_NAVIPOINT && m_bDelete == true)
 	{
 		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
 		{
-			if(m_vecCollision.size() > 0 && m_iCount > 0)
+			if(m_vecCollision.size() > 0 && m_iCount >= 0)
 			{
 				m_vecCollision.back()->Set_Dead();
 				m_vecCollision.pop_back();
-				m_iCount--;
-				if (m_iIndex < 0)
-					m_iIndex = 0;
+				--m_iCount;
+				
+				if (m_iCount < 0)
+				{
+					m_iCount = 0;
+					fPoints[0] =m_vecCollision.back()->Get_PickingPos().x;
+					fPoints[1] =m_vecCollision.back()->Get_PickingPos().y;
+					fPoints[2] =m_vecCollision.back()->Get_PickingPos().z;
+					m_bAfter_AddPoints = false;
+					m_bDelete = false; // 0번 인덱스 삭제한 뒤에는 삭제하면 안됨
+				}
+				else
+				{
+					fPoints[0] = vPoints[m_iCount].x;
+					fPoints[1] = vPoints[m_iCount].y;
+					fPoints[2] = vPoints[m_iCount].z;
+				}
+				--m_iIndex;
 			}
 		}
 	}
-	
 
-	if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)))
+	if (eNaviMode == CREATE_NAVIPOINT )
+	{
+		if(m_bClick == false)
+		{
+			m_vecCollision.back()->Set_Position(XMVectorSet(fPoints[0], fPoints[1], fPoints[2], 1.f));
+			vPoints[m_iCount].x = fPoints[0];
+			vPoints[m_iCount].y = fPoints[1];
+			vPoints[m_iCount].z = fPoints[2];
+
+		}
+	}
+
+	if (m_pGameInstance->Get_DIMouseState_Down(DIM_LB) && m_bClick == true)
 	{
 		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
@@ -180,28 +230,46 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 			else
 			{
 				Add_Point(fTimeDelta, m_fPickingPos);
-				m_iCount++;
-				if (m_iCount == 3)
-					m_iCount = 0;
 				m_bClick = false;
 			}
 		}
-		
 	}
 
+	// 스페이스바 누르면 셀 생성
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE))
+	{
+		// Y가 0일 때 0.1f로 올려줌
+		if (vPoints[2].x != 0.f && vPoints[2].z != 0.f)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				if (vPoints[i].y == 0.f)
+					vPoints[i].y = 0.1f;
+			}
+			// 셀 생성 해줌
+			m_pTerrain->Get_NaviCom()->Create_Cell(vPoints);
+			for (int i = 0; i < 3; i++)
+			{
+				// 생성후 포인트 배열 초기화 해주기
+				vPoints[i].x = 0.f;
+				vPoints[i].y = 0.f;
+				vPoints[i].z = 0.f;
+			}
+			m_bAfter_AddPoints = false;
+			m_bClick = false;
+			m_bDelete = false;
+			m_iCount = 0;
+		}
+	}
 	
 	// 선택모드일 때
 	if (eNaviMode == SELECT_NAVIPOINT)
 	{
 		if (m_iSelected_index != -1)
 		{
-			m_bClick = false;
-			auto pSelected = m_vecCollision[m_iSelected_index];
 			
+			auto pSelected = m_vecCollision[m_iSelected_index];
 			// 위치 변경이 되도록
-
-
-
 
 
 			// 삭제
@@ -269,12 +337,16 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 								m_iIndex = 0;
 						}
 						
+						// 전체 인덱스 넘버가 삭제한 애들 수만큼 앞으로 와야함
 						for (auto& pCol : m_vecCollision)
 						{
 							_uint iIndex = pCol->Get_IndexNumber();
 							if(iIndex >= m_iSelected_index)
 								pCol->Set_IndexNumber(iIndex - 3);
 						}
+						fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
+						fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
+						fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
 						m_iSelected_index = -1;
 					}
 				}
@@ -311,6 +383,9 @@ HRESULT CNavigation_Leve::Render()
 		ImGui::Text("Select Mode");
 		ImGui::Text(" ");		ImGui::Text(" ");
 	}
+	ImGui::Text("Position");
+	ImGui::DragFloat3("Position", fPoints, 0.1f, 0.f, 3000.f);
+
 	if (ImGui::BeginListBox("Positions"))
 	{
 		_uint i = 0;
@@ -338,8 +413,6 @@ HRESULT CNavigation_Leve::Render()
 		// 리스트 박스 끝
 		ImGui::EndListBox();
 	}
-
-
 	ImGui::End();
 
 
@@ -378,10 +451,14 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.eLevel = LEVEL_NAVIGATION;
 		CollisionDesc.iPoint_Number = 0;		// 배열의 뒷자리 숫자
 		CollisionDesc.fPosition = fPointPos;   // 점 위치 
-		CollisionDesc.iIndexNumber = m_iIndex;
+		CollisionDesc.iIndexNumber = m_iIndex; // 전체 포인트의 숫자
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
-		m_iIndex++;
 		vPoints[0] = { fPointPos.x,fPointPos.y,fPointPos.z };
+		fPoints[0] = fPointPos.x;
+		fPoints[1] = fPointPos.y;
+		fPoints[2] = fPointPos.z;
+		m_iIndex++;
+		m_bAfter_AddPoints = true;
 		break;
 	}
 	case 1:
@@ -393,8 +470,12 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.fPosition = fPointPos;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
-		m_iIndex++;
 		vPoints[1] = { fPointPos.x,fPointPos.y,fPointPos.z };
+		fPoints[0] = fPointPos.x;
+		fPoints[1] = fPointPos.y;
+		fPoints[2] = fPointPos.z; 
+		m_iIndex++;
+		m_bAfter_AddPoints = true;
 		break;
 	}
 	case 2:
@@ -406,24 +487,12 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.fPosition = fPointPos;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
-		m_iIndex++;
 		vPoints[2] = { fPointPos.x,fPointPos.y,fPointPos.z };
-
-
-		// 네비게이션에 삼각형 추가
-		if (vPoints[0].y == 0)
-		{
-			vPoints[0].y = 0.1f;
-		}
-		if (vPoints[1].y == 0)
-		{
-			vPoints[1].y = 0.1f;
-		}
-		if (vPoints[2].y == 0)
-		{
-			vPoints[2].y = 0.1f;
-		}
-		m_pTerrain->Get_NaviCom()->Create_Cell(vPoints);
+		fPoints[0] = fPointPos.x;
+		fPoints[1] = fPointPos.y;
+		fPoints[2] = fPointPos.z;
+		m_iIndex++;
+		m_bAfter_AddPoints = true;
 		break;
 	}
 

@@ -103,7 +103,7 @@ void CCollisionBox::Update(_float fTimeDelta)
 			m_fScale.y = 0.3f;
 		}
 		m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 	}
 
 }

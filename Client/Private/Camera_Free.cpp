@@ -26,27 +26,29 @@ HRESULT CCamera_Free::Initialize(void* pArg)
     m_fAspect = pDesc->fAspect;
     m_fNearZ = pDesc->fNearZ;
     m_fFar = pDesc->fFar;
-    m_eLevelID = pDesc->eLevel;
-    m_matPlayerWorld = pDesc->matPlayerWorld;
-    m_fRotationPerSec =  pDesc->fRotationPerSec;
-    m_vecTPSPos = pDesc->m_vecTPS_CamPos;
-    m_vecFPSPos = pDesc->m_vecFPS_CamPos;
-    m_iViewState = pDesc->iViewState;
-    m_bMouseLock = false;
-    m_vecWeaponPos = pDesc->m_vecWeaponPos;
-    m_vecWeaponDir = pDesc->m_vecWeaponDir;
+    m_eLevelID = pDesc->eLevel;                     // 현재 레벨(씬)
+    m_matPlayerWorld = pDesc->matPlayerWorld;       // 플레이어의 월드 메트릭스
+    m_fRotationPerSec =  pDesc->fRotationPerSec;    // 회전 속도
+    m_vecTPSPos = pDesc->m_vecTPS_CamPos;           // 3인칭 카메라의 위차
+    m_vecFPSPos = pDesc->m_vecFPS_CamPos;          // 1인칭 카메라의 위치
+    m_iViewState = pDesc->iViewState;           // 인칭 변화
+
+    m_vecWeaponPos = pDesc->m_vecWeaponPos;     // 무기 위치
+    m_vecWeaponDir = pDesc->m_vecWeaponDir;     // 무기 방향
+    m_pShotNow = pDesc->bShotNow;   // 총 쏘는 타이밍
+    m_pWeaponState = pDesc->iWeaponState; // 어떤 총인지
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
-
+    m_bMouseLock = false;  // 마우스 멈춤
     m_pTransformCom->Rotation(0.f, 0.f, 0.f);
     return S_OK;
 }
 
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
-    
 
+    // 편집툴에서 카메라 조정
     if (m_eLevelID == LEVEL_IMGUI || m_eLevelID == LEVEL_NAVIGATION)
     {
         if (m_bMouseLock == false)
@@ -156,7 +158,8 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
 {
     if (m_eLevelID == LEVEL_GAMEPLAY)
     {
-        XMMATRIX matWorld = XMLoadFloat4x4(&*m_matPlayerWorld);
+        XMMATRIX matWorld = XMLoadFloat4x4(&*m_matPlayerWorld); // 플레이어 월드 매트릭스
+       // 카메라 회전
         _long MouseMoveY = { 0 };  _matrix RotationMatrix{};
         if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
         {
@@ -179,12 +182,26 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
                     m_fAngle_Y = -4.f;
             }
         }
+        // At 설정
         if (*m_iViewState == PLAYER_TPS_VIEW) // 3인칭
         {
             // 카메라 위치 조정
             XMVECTOR vCamPos = *m_vecTPSPos;
             vCamPos = XMVectorSetY(vCamPos, XMVectorGetY(vCamPos) + m_fAngle_Y);
             m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
+          
+#pragma region 카메라쉐이킹
+            if (*m_pShotNow == true && m_bOnce == false)
+            {
+                m_bOnce = true;
+            }
+            if(m_bOnce == true && m_bOnce2 == false)
+            {
+                m_bOnce2 = true; 
+                m_fStore_RandomValue = (float(rand() % 10) * 0.01f);
+                m_fAngle_Y -= m_fStore_RandomValue;
+            }
+#pragma endregion 카메라쉐이킹
             // 바라보는 방향 조정
             vAt = *m_vecTPSPos + matWorld.r[2] * 7.f;
             if (m_fAngle_Y > 0)
@@ -197,6 +214,17 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
                 vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y);
             }
             m_pTransformCom->LookAt(vAt);
+#pragma region 카메라쉐이킹
+            if (m_bOnce == true && m_bOnce2 == true)
+            {
+                m_fAngle_Y += m_fStore_RandomValue;
+            }
+            if (*m_pShotNow == false)
+            {
+                m_bOnce = false;
+                m_bOnce2 = false;
+            }
+#pragma endregion 카메라쉐이킹
         }
         else if (*m_iViewState == PLAYER_FPS_VIEW)// 1인칭
         {
@@ -207,7 +235,7 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
             // 바라보는 방향 조정
 
             vAt = *m_vecWeaponPos + XMVector3Normalize(*m_vecWeaponDir) * 7.f;
-
+            
             /*  vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y);*/
             m_pTransformCom->LookAt(vAt);
         }

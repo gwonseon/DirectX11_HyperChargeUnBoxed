@@ -12,6 +12,28 @@ HRESULT CCollisionMgr::Initialize()
 }
 
 
+_bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos, _uint iTargetPartObjID)
+{
+	_bool Collision{};
+	for (auto& pTarget : Target->Get_GameObject_List())
+	{
+		CCollider* pTargetCollider = static_cast<CCollider*>(pTarget->Find_Component(strTargetComponentTag, iTargetPartObjID));
+		_float3 fCenter =  pTargetCollider->Get_Center();
+		float fRadius = pTargetCollider->Get_Radius();
+		_float fDistance{};
+		Collision = pTargetCollider->Intersect_Mouse(vRayPos, vRayDir, fDistance);
+		if (Collision == true)
+		{
+			pTarget->Set_CollisionChecking(true);
+		}
+		else
+		{
+			pTarget->Set_CollisionChecking(false);
+		}
+	}
+	return Collision;
+}
+
 void CCollisionMgr::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
 {
 	for (auto& pSrc : pSrcLayer->Get_GameObject_List())

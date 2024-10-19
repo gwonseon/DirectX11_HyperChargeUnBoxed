@@ -109,6 +109,8 @@ public:  // 피킹 매니저
 
 public: // 콜리전 매니저
 	void Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID = 0, _uint iDstPartObjID = 0);
+	void Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
+	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _uint iTargetPartObjID = 0);
 
 private:
 	class CGraphic_Device* m_pGraphic_Device = { nullptr };

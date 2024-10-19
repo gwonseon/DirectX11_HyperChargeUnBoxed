@@ -41,6 +41,7 @@ public:
 	_float3	Get_PickingPos() { return m_fPickingPos; }
 	class CTransform* Get_Transform() { return m_pTransformCom; }
 
+
 	virtual class CComponent* Find_Component(const _wstring& strComponentTag, _uint iPartObjID = 0);
 
 
@@ -99,6 +100,11 @@ public:
 		}
 	}
 
+	// 피격 됐는지 확인용 
+	void Set_CollisionChecking(_bool bCheck) { m_bCollision_Check = bCheck; }
+	_bool Get_CollisionChecing() { return m_bCollision_Check; }
+
+
 
 protected:
 	_float							m_fHp{};
@@ -110,6 +116,8 @@ protected:
 	_bool							m_bDontDestroy	= false;
 	_bool							m_bKnockdown	= false; // 삭제되면 안되는 애들 죽음 상태를 얘로 대체
 	_bool							m_bAttackState	= false;
+
+	_bool							m_bCollision_Check = false;
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 

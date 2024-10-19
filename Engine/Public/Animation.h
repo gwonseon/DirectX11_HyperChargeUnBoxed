@@ -17,7 +17,7 @@ private:
 public:
 	HRESULT Initialize(class CModel* pModel, HANDLE hFileRead);
 	_bool Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop,  _float fTimeDelta);
-	_bool Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion);
+	_bool Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion, _bool& bShot);
 
 private:
 	_char					m_szName[MAX_PATH] = {};
@@ -68,6 +68,15 @@ public:
 	virtual void Free() override;
 	CAnimation* Clone();
 	
+//	// √— µÙ∑π¿Ã
+//private:
+//	_float					m_fRiflrDelay = 0.1f;
+//	_float					m_fShotGunDelay = 1.f;
+//	_float					m_fPulseCannonDelay = 2.f;
+//	_float					m_fTeleportDelay = 2.f;
+//	_float					m_fLocketLauncherDelay = 2.f;
+//	_float					m_fCurrentDelay = 0.f;
+
 
 
 public:

@@ -46,7 +46,16 @@ public:
 
 
 public:
-	void	Set_Position(_vector _vPos) { m_vecPosition = _vPos; }
+	void	Set_Position(_vector _vPos) { 
+		m_vecPosition = _vPos;
+		XMStoreFloat3(&m_fPickingPos, m_vecPosition);
+	
+	}
+	void	Set_Height(_float fHeight)
+	{
+		m_vecPosition = XMVectorSetY(m_vecPosition, fHeight);
+	}
+	float	Get_Height() { return XMVectorGetY(m_vecPosition); }
 	void	Set_PickingCheck(_bool bCheck) { m_bChecking = bCheck; }
 	void	Set_Scale(_float3 fSize) { m_fScale = fSize; }
 

@@ -34,7 +34,7 @@ _bool CCell::isIn(_fvector vLocalPos, _int* pNeighborIndex)
 	{
 		_vector		vLine = XMLoadFloat3(&m_vPoints[(i + 1) % POINT_END]) - XMLoadFloat3(&m_vPoints[i]);
 		_vector		vNormal = XMVectorSet(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine), 0.f);
-
+		// _vector vNormal = XMVector3Cross(vLine, XMVectorSet(0.f, 1.f, 0.f, 0.f)); // Y축 포함한 법선 계산
 		_vector		vDir = vLocalPos - XMLoadFloat3(&m_vPoints[i]);
 
 		if (0 < XMVectorGetX(XMVector3Dot(XMVector3Normalize(vNormal), XMVector3Normalize(vDir))))
@@ -43,7 +43,7 @@ _bool CCell::isIn(_fvector vLocalPos, _int* pNeighborIndex)
 			return false;
 		}
 	}
-
+	// 여기서 각도 계산해서 각도에 따라 이동 가능 여부 판단하면 좋을 듯
 	return true;
 }
 

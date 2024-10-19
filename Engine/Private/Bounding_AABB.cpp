@@ -28,6 +28,10 @@ void CBounding_AABB::Update(_fmatrix WorldMatrix)
 	TransformMatrix.r[2] = XMVectorSet(0.f, 0.f, 1.f, 0.f) * XMVector3Length(TransformMatrix.r[2]);
 
 	m_pBoundDesc_Original->Transform(*m_pBoundDesc, TransformMatrix);
+	m_fCenter = m_pBoundDesc->Center;
+	m_fExtents = m_pBoundDesc->Extents;
+
+	
 }
 
 _bool CBounding_AABB::Intersect(CCollider::TYPE eType, CBounding* pTargetBounding)

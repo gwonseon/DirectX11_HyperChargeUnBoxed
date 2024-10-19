@@ -49,29 +49,66 @@ HRESULT CBody_Player::Initialize(void* pArg)
 
 void CBody_Player::Priority_Update(_float fTimeDelta)
 {
-	_uint iData = 10;
+	if (m_iUpperMotion >= 6)
+	{
+		m_fCurrentDelay += fTimeDelta;
+	}
+
+
 }
 
 void CBody_Player::Update(_float fTimeDelta)
 {
+		
+	// »óÃ¼
 	
-		// È¸Àü
-		_long   MouseMove = { 0 };
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		if(m_iUpperMotion < 6)
 		{
-			if (m_bTPSState == true)
+			_long   MouseMove = { 0 };
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
 			{
-				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion);
+				if (m_bTPSState == true)
+				{
+					m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bTemp);
+				}
+				else
+				{
+					m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, 0.f, m_iUpperMotion, m_bTemp);
+				}
 			}
 			else
 			{
-				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, 0.f, m_iUpperMotion);
+				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bTemp);
 			}
 		}
 		else
 		{
-			m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion);
-		}		
+			// ÃÑ ½î´Â °ÍÀº µô·¹ÀÌ ½Ã°£ÀÌ ³¡³µÀ» ¶§¸¸ ½ò ¼ö ÀÖ°Ô º°·Îµµ ³ª´²ÁÜ
+			if (m_bShotNow == true)
+			{
+				m_fCurrentDelay = 0.f;
+				_long   MouseMove = { 0 };
+				if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+				{
+					if (m_bTPSState == true)
+					{
+						m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bShotNow);
+					}
+					else
+					{
+						m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, 0.f, m_iUpperMotion, m_bShotNow);
+					}
+				}
+				else
+				{
+					m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bShotNow);
+				}
+			}
+			
+		}
+
+
+		// ÇÏÃ¼
 		if(m_bRunState == false)
 			m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta);
 		else
@@ -81,11 +118,6 @@ void CBody_Player::Update(_float fTimeDelta)
 		LowerBody_Anim(fTimeDelta);
 		
 		
-	
-
-
-
-
 }
 
 void CBody_Player::Late_Update(_float fTimeDelta)
@@ -143,7 +175,47 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 		}
 		else
 		{
-			m_iUpperMotion = ATTACK_FIRE_MOTION;
+			switch (m_iWeaponState)
+			{
+			case Client::CBody_Player::WEAPON_RIFLE:
+			{
+				if (m_fCurrentDelay >= m_fRiflrDelay)
+					m_bShotNow = true;
+				m_iUpperMotion = RIFLE_FIRE_MOTION;
+				break;
+			}
+			case Client::CBody_Player::WEAPON_SHOTGUN:
+			{
+				if (m_fCurrentDelay >= m_fShotGunDelay)
+					m_bShotNow = true;
+				m_iUpperMotion = SHOTGUN_FIRE_MOTION;
+				break;
+			}
+			case Client::CBody_Player::WEAPON_PULSECANNON:
+			{
+				if (m_fCurrentDelay >= m_fPulseCannonDelay)
+					m_bShotNow = true;
+				m_iUpperMotion = PULSECANNON_FIRE_MOTION;
+				break;
+			}
+			case Client::CBody_Player::WEAPON_TELEPORT:
+			{
+				if (m_fCurrentDelay >= m_fTeleportDelay)
+					m_bShotNow = true;
+				m_iUpperMotion = TELEPORTGUN_FIRE_MOTION;
+				break;
+			}
+			case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
+			{
+				if (m_fCurrentDelay >= m_fLocketLauncherDelay)
+					m_bShotNow = true;
+				m_iUpperMotion = LOCKETLAUNCHER_FIRE_MOTION;
+				break;
+			}
+		
+			default:
+				break;
+			}
 			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
 		}
 	}

@@ -151,7 +151,12 @@ public:
 		ATTACK_KATANA_MOTION,
 		ATTACK_MELEE_MOTION,
 		RELOAD_MOTION,
-		IDLE_KATANA_MOTION
+		IDLE_KATANA_MOTION,
+		RIFLE_FIRE_MOTION,
+		SHOTGUN_FIRE_MOTION,
+		PULSECANNON_FIRE_MOTION,
+		TELEPORTGUN_FIRE_MOTION,
+		LOCKETLAUNCHER_FIRE_MOTION,
 	};
 private: 
 	CBody_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -193,7 +198,6 @@ private:
 	_float3					Rotation{};
 
 
-
 	_uint	m_iUpperMotion = 0;			// 상체 모션, 애니메이션 마다 본 위치나 currentPosition이 달라짐
 
 
@@ -227,7 +231,21 @@ public:
 	void	Set_PlayerViewState(_bool bTPS) { m_bTPSState = bTPS; }
 	void	Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
 
-	
+
+	// 총 딜레이용
+private:
+	_float					m_fRiflrDelay = 0.03f;
+	_float					m_fShotGunDelay = 1.f;
+	_float					m_fPulseCannonDelay = 2.f;
+	_float					m_fTeleportDelay = 2.f;
+	_float					m_fLocketLauncherDelay = 2.f;
+	_float					m_fCurrentDelay = 0.f;
+
+	_bool					m_bShotNow = false;
+	_bool					m_bTemp = false;
+
+public:
+	_bool*					Get_ShotNow()	{ return &m_bShotNow; }
 private:
 	WEAPONSTATE m_eWeapon{}; // 스위치문 편하게 만드려고 임시 생성
 

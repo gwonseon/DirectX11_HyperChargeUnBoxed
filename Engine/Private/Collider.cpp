@@ -68,7 +68,7 @@ HRESULT CCollider::Initialize(void* pArg)
 		m_pBounding = CBounding_Sphere::Create(pDesc);
 		break;
 	}
-
+	
 	if (nullptr == m_pBounding)
 		return E_FAIL;
 
@@ -79,6 +79,26 @@ _bool CCollider::Intersect(CCollider* pTargetCollider)
 {
 	return m_isColl = m_pBounding->Intersect(pTargetCollider->m_eColliderType, pTargetCollider->m_pBounding);
 
+}
+
+_float3 CCollider::Get_Center()
+{
+	return m_pBounding->Get_Center();
+}
+
+_float3 CCollider::Get_Extents()
+{
+	return m_pBounding->Get_Extents();
+}
+
+float CCollider::Get_Radius()
+{
+	return m_pBounding->Get_Radius();
+}
+
+_bool CCollider::Intersect_Mouse(_vector rayOrigin, _vector rayDirection, float& fDistance)
+{
+	return m_isColl = m_pBounding->Intersect_Mouse(rayOrigin, rayDirection, fDistance);
 }
 
 

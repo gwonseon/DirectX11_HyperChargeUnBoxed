@@ -107,7 +107,8 @@ public:
 	_vector* Get_FPSPosptr()	{	return m_vecFPS_CamPos; }
 	_vector* Get_WeaponPos()	{	return m_vecWeaponPos; }
 	_vector* Get_WeaponDir()	{	return m_vecWeaponDir; }
-
+	_bool*	 Get_ShotNow()		{	return m_pBody->Get_ShotNow(); }
+	_uint* Get_WeaponState()	{ return &m_iWeaponState; }
 private:
 	_vector* m_vecTPS_CamPos{};
 	_vector* m_vecFPS_CamPos{};
@@ -121,7 +122,7 @@ private:
 	_uint					m_iState_Upper = {};
 	_uint					m_iState_Lower = {};
 	_bool					m_bJumpStart = false;
-	
+	_uint					m_iJumpCount = 0;
 private:
 	_bool					m_bKey_A = false;
 	_bool					m_bKey_W = false;
@@ -130,6 +131,8 @@ private:
 	_bool					m_bKey_Shift = false;
 	_bool					m_bKey_R = false;
 
+	float					m_fRun_FourDirection{};
+	float					m_fRun_EightDirection{};
 
 public:
 	_float m_fRotation_Value{};
