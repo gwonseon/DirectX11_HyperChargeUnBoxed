@@ -20,6 +20,8 @@ HRESULT CBounding_Sphere::Initialize(const BOUND_DESC* pBoundDesc)
 void CBounding_Sphere::Update(_fmatrix WorldMatrix)
 {
 	m_pBoundDesc_Original->Transform(*m_pBoundDesc, WorldMatrix);
+	m_fCenter = m_pBoundDesc->Center;
+	m_fRadius = m_pBoundDesc->Radius;
 }
 
 _bool CBounding_Sphere::Intersect(CCollider::TYPE eType, CBounding* pTargetBounding)
@@ -39,7 +41,13 @@ _bool CBounding_Sphere::Intersect(CCollider::TYPE eType, CBounding* pTargetBound
 		break;
 	}
 	return isColl;
+	
+}
 
+_bool CBounding_Sphere::Intersect_Mouse(_vector rayOrigin, _vector rayDirection, float& fDistance)
+{
+	_bool Result = m_pBoundDesc->Intersects(rayOrigin, rayDirection, fDistance);
+	return Result;
 }
 
 

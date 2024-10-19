@@ -73,15 +73,21 @@ public:
 	void LookAt(_fvector vAt);
 	void Go_Straight(_float fTimeDelta); 
 	void Go_Straight(_float fTimeDelta, _float AddfSpeed);
-	void Go_Straight_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
 	void Go_Backward(_float fTimeDelta);
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Turn(_bool bX, _bool bY, _bool bZ, _float fTimeDelta);
 	void Rotation(_float fX, _float fY, _float fZ);
-	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState);
+	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount);
 	void Set_Min_Height();
+
+
+	void Go_Left_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
+	void Go_Right_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
+	void Go_Straight_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
+	void Go_Backward_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
+
 
 	_float Cal_Distance(_float3 fObj, _float3 fTarget);
 	_float Cal_Distance_vec(_vector vObj, _vector vTarget);
@@ -98,7 +104,8 @@ private:
 	_float3						m_fPosition = {};
 	_float3						m_fScale = {};
 
-
+	_uint						m_iCurrent_JumpState{};
+	_float						m_fJumpSpeed{};
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pTransformDesc);
 	virtual CComponent* Clone(void* pArg) override;

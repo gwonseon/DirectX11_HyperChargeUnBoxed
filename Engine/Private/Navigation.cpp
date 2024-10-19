@@ -186,7 +186,7 @@ _bool CNavigation::isMove(_fvector vWorldPos)
 				if (-1 == iNeighborIndex)
 					return false;
 			}
-			cout <<"Áö±Ý¼¿ : " << m_iCurrentCellIndex << endl;
+			// cout <<"Áö±Ý¼¿ : " << m_iCurrentCellIndex << endl;
 			m_iCurrentCellIndex = iNeighborIndex;
 			return true;
 		}

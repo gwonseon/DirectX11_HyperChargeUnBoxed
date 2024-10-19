@@ -17,7 +17,9 @@ public:
 		_vector* m_vecWeaponPos{};
 		_vector* m_vecWeaponDir{};
 
+		_bool* bShotNow{}; // ÃÑ ½î´Â Å¸ÀÌ¹Ö
 		_uint* iViewState{};
+		_uint* iWeaponState{};
 		const _float4x4* matPlayerWorld = { nullptr };
 	}CAMERA_FREE_DESC;
 private:
@@ -70,11 +72,18 @@ private:
 	_vector* m_vecWeaponPos = { nullptr };
 	_vector* m_vecWeaponDir = { nullptr };
 
-	
+	_bool* m_pShotNow = { nullptr };
+	_uint* m_pWeaponState = { nullptr };
+
+
 	XMMATRIX RotationMatrix{};
 	XMMATRIX matWorld{};
 
 
+
+	_bool m_bOnce = false;
+	_bool m_bOnce2 = false;
+	_float m_fStore_RandomValue{};
 public:
 	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

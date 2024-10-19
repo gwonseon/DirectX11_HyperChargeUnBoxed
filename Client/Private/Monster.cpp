@@ -34,6 +34,10 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
+	if (m_bCollision_Check == true)
+	{
+		
+	}
 }
 
 void CMonster::Update(_float fTimeDelta)

@@ -71,7 +71,7 @@ _bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones,
 	return false;
 }
 
-_bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion)
+_bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion, _bool& bShot )
 {
 	if(bUpper == true)
 	{
@@ -81,11 +81,16 @@ _bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>&
 			LastKeyFrame = nullptr; // LastKeyFrame을 nullptr로 초기화
 		}
 		if(iUpperMotion != 0)
+		{
 			m_fCurrentPosition_UpperBody += m_fTickPerSecond * fTimeDelta;
+			
+		}
+
 
 		if (m_fCurrentPosition_UpperBody >= m_fDuration &&
 			true == isLoop)
 		{
+			bShot = false;
 			m_fCurrentPosition_UpperBody = 0.f;
 		}
 

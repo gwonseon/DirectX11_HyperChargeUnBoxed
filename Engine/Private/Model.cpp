@@ -283,7 +283,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
 
 }
 
-_bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle, _uint iUpperMotion)
+_bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle, _uint iUpperMotion, _bool& bShot)
 {
 	if (m_bAnim_NoneLoop_UpperBody == true) // 마지막 동작을 한 번 더 하는 문제를 해결하기 위해 루프가 끝났을 때를 기억해 초기화만 해준다
 	{
@@ -324,7 +324,7 @@ _bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle
 		if (m_iPrevAnimIndex_UpperBody == m_iCurrentAnimIndex_UpperBody)
 		{
 			// 모델의 뼈의 행렬(TransformationMatrix)을 현재 애니메이션에 맞는 상태로 갱신해준다.
-			isFinished_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_UpperBody, fTimeDelta, true, iUpperMotion);
+			isFinished_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_UpperBody, fTimeDelta, true, iUpperMotion, bShot);
 			// 모든 뼈들의 CombinedTransformationMatrix를 갱신한다.
 		
 			for (auto& pBone : m_Bones)
@@ -380,8 +380,9 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 		}
 		if (m_iPrevAnimIndex_LowerBody == m_iCurrentAnimIndex_LowerBody)
 		{
+			_bool Temp{}; // 상체에 필요한 매개변수 때문에 만든 빈 불값
 			// 모델의 뼈의 행렬(TransformationMatrix)을 현재 애니메이션에 맞는 상태로 갱신해준다.
-			isFinished_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_LowerBody, fTimeDelta,false,true);
+			isFinished_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_LowerBody, fTimeDelta,false,true, Temp);
 
 			// 모든 뼈들의 CombinedTransformationMatrix를 갱신한다.
 			for (auto& pBone : m_Bones)

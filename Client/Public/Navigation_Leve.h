@@ -48,7 +48,7 @@ private:
 
 private:
 	XMFLOAT3		vPoints[3];
-
+	float			fPoints[3];
 	vector<CCollisionBox*> m_vecCollision{};  // 콜리전 박스 담아두기
 
 	NAVIGATION_MODE		eNaviMode = CREATE_NAVIPOINT;
@@ -60,9 +60,11 @@ private:
 
 	_uint		m_iSelected_index = -1;  // 선택한 인덱스 번호
 	_uint		m_iIndex{}; // 전체 인덱스 
-	_uint		m_iCount{};		// 이건 배열에 들어가는 인덱스 번호
+	_int		m_iCount{};		// 이건 배열에 들어가는 인덱스 번호
 
 
+	_bool m_bAfter_AddPoints = false;
+	_bool m_bDelete = false;
 	_bool m_bClick = false;
 	_bool Save = false;
 private:

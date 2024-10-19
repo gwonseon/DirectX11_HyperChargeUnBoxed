@@ -413,6 +413,16 @@ void CGameInstance::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const 
 	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iPartObjID, iDstPartObjID);
 }
 
+void CGameInstance::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+{
+	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
+}
+
+_bool CGameInstance::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _uint iTargetPartObjID)
+{
+	return m_pCollision_Manager->Collision_Bullet(Target, strTargetComponentTag, vRayDior, vRayPos, iTargetPartObjID);
+}
+
 
 
 void CGameInstance::Release_Engine()

@@ -22,8 +22,10 @@ public:
 
 public:
 	_bool Intersect(CCollider* pTargetCollider);
-
-
+	_float3 Get_Center();
+	_float3 Get_Extents();
+	float Get_Radius();
+	_bool Intersect_Mouse(_vector rayOrigin, _vector rayDirection, float& fDistance);
 #ifdef _DEBUG
 public:
 	HRESULT Render();

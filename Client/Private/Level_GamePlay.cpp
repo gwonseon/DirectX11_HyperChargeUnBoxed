@@ -73,11 +73,26 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	
 	 
 	
-	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);
-	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA);
-	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA);
+	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
+	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
+	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
+	
+	
 
 	
+	_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+	XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
+	XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
+	XMVECTOR RayPos, RayDir;
+	m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+	RayDir = XMVector3Normalize(RayDir);
+	
+	// 레이 값이 쓰레기 값인 경우 검사 패스~
+	if (!XMVector3IsInfinite(RayPos) && !XMVector3IsNaN(RayPos) &&
+		!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
+	{
+		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos);
+	}
 
 }
 
@@ -240,6 +255,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.iViewState = m_pPlayer->Get_ViewState();
 	Desc.m_vecWeaponPos = m_pPlayer->Get_WeaponPos();
 	Desc.m_vecWeaponDir = m_pPlayer->Get_WeaponDir();
+	Desc.bShotNow = m_pPlayer->Get_ShotNow();
+	Desc.iWeaponState = m_pPlayer->Get_WeaponState();
 	m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &Desc));
 	m_pPlayer->Set_CameraAt(m_pCamera->Get_Camera_At());
 	return S_OK;

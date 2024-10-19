@@ -25,6 +25,9 @@ public:
 	virtual void Update(_fmatrix WorldMatrix) override;
 	virtual _bool Intersect(CCollider::TYPE eType, CBounding* pTargetBounding) override;
 
+	virtual _float3 Get_Center() { return m_fCenter; }
+	virtual _float3 Get_Extents() { return m_fExtents; }
+
 #ifdef _DEBUG
 public:
 	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor) override;
@@ -36,6 +39,8 @@ private:
 	BoundingBox* m_pBoundDesc_Original = { nullptr };
 	BoundingBox* m_pBoundDesc = { nullptr };
 
+
+	_float3		m_fCenter{}, m_fExtents{};
 public:
 	static CBounding_AABB* Create(const BOUND_DESC* pBoundDesc);
 	virtual void Free() override;

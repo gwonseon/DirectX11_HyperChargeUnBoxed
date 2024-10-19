@@ -125,6 +125,8 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 
 	Player_Movement(fTimeDelta);					// 플레이어 동작
 
+	m_fRun_FourDirection = 1.5f;
+	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
 
 	__super::Priority_Update(fTimeDelta);
 }
@@ -326,12 +328,14 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_S))
 	{
+		// 뒤 왼쪽으로 걷기 
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
-			m_pTransformCom->Go_Left(fTimeDelta * 0.5f);
-			m_pTransformCom->Go_Backward(fTimeDelta * 0.5f);
+			
 			if (iJumpState == LANDING_STATE)
 			{
+				m_pTransformCom->Go_Left_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
+				m_pTransformCom->Go_Backward_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 				if (!(m_iState_Lower & WALKSTATE_SOUTHWEST))
 				{
 					if (m_iState_Lower & STATE_IDLE)
@@ -339,11 +343,13 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 					m_iState_Lower |= WALKSTATE_SOUTHWEST;
 				}
 			}
+
 		}
+		// 뒤 오른쪽 으로 걷기
 		else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
-			m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
-			m_pTransformCom->Go_Backward(fTimeDelta * 0.5f);
+			m_pTransformCom->Go_Right_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
+			m_pTransformCom->Go_Backward_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_SOUTHEAST))
@@ -354,9 +360,10 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 				}
 			}
 		}
+		// 그냥 뒤로 걷기
 		else
 		{
-			m_pTransformCom->Go_Backward(fTimeDelta);
+			m_pTransformCom->Go_Backward_Nav(fTimeDelta, m_pNavigationCom);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_SOUTH))
@@ -376,9 +383,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
-				m_pTransformCom->Go_Left(fTimeDelta * 0.8f);
-			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
-				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
+				m_pTransformCom->Go_Left_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHWEST))
@@ -391,9 +397,9 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
-				m_pTransformCom->Go_Right(fTimeDelta * 0.8f);
+				m_pTransformCom->Go_Right_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
-				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHEAST))
@@ -407,7 +413,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			else
 			{
 			//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
-				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta * m_fRun_FourDirection, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTH))
@@ -422,7 +428,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
-			m_pTransformCom->Go_Left(fTimeDelta);
+			m_pTransformCom->Go_Left_Nav(fTimeDelta, m_pNavigationCom);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_WEST))
@@ -435,10 +441,9 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
-
+			m_pTransformCom->Go_Right_Nav(fTimeDelta, m_pNavigationCom);
 			if (iJumpState == LANDING_STATE)
 			{
-				m_pTransformCom->Go_Right(fTimeDelta);
 				if (!(m_iState_Lower & WALKSTATE_EAST))
 				{
 					if (m_iState_Lower & STATE_IDLE)
@@ -454,11 +459,12 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->Go_Left_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 				//	m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
-					m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
-					m_pTransformCom->Go_Left(fTimeDelta * 0.7f);
+					
 					if (!(m_iState_Lower & WALKSTATE_NORTHWEST))
 					{
 						if (m_iState_Lower & STATE_IDLE)
@@ -469,11 +475,12 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
+				m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->Go_Right_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 			//		m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
-					m_pTransformCom->Go_Straight_Nav(fTimeDelta, m_pNavigationCom);
-					m_pTransformCom->Go_Right(fTimeDelta * 0.7f);
+					
 					if (!(m_iState_Lower & WALKSTATE_NORTHEAST))
 					{
 						if (m_iState_Lower & STATE_IDLE)
@@ -501,7 +508,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
-				m_pTransformCom->Go_Left(fTimeDelta);
+				m_pTransformCom->Go_Left_Nav(fTimeDelta, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & WALKSTATE_WEST))
@@ -514,9 +521,9 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
+				m_pTransformCom->Go_Right_Nav(fTimeDelta, m_pNavigationCom);
 				if (iJumpState == LANDING_STATE)
 				{
-					m_pTransformCom->Go_Right(fTimeDelta);
 					if (!(m_iState_Lower & WALKSTATE_EAST))
 					{
 						if (m_iState_Lower & STATE_IDLE)
@@ -528,12 +535,15 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 		}
 	}
+
 	
-		if ((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE)  // 점프 시작
+		if ((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE && m_iJumpCount == 0)  // 점프 시작
 		{
 			iJumpState = JUMPING_START_STATE;
+
 			m_bJumpStart = false;
 			m_fPower = 0.f;
+			m_iJumpCount = 1;
 			if (!(m_iState_Lower & JUMP_START))
 			{
 				{
@@ -565,10 +575,17 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 					m_iState_Lower ^= STATE_IDLE;
 				m_iState_Lower |= JUMP_END;
 			}
+			m_iJumpCount = 0;
+
 		}
-		if (iJumpState >= 2)
+		if (iJumpState >= JUMPING_LOOP_STATE)
 		{
-			m_pTransformCom->Jump(fTimeDelta, m_fHeight, m_fPower, iJumpState);
+			if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE) && m_iJumpCount == 1)
+			{
+				m_fPower = 18.f;
+				m_iJumpCount = 2;
+			}
+			m_pTransformCom->Jump(fTimeDelta, m_fHeight, m_fPower, iJumpState, m_iJumpCount);
 			m_pBody->Set_JumpState(m_fHeight, m_fPower);
 		}
 }
