@@ -29,7 +29,8 @@ HRESULT CBrainCore::Initialize(void* pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
+	m_fHp = 100.f;
+	m_fEnergy = 100.f;
 	return S_OK;
 }
 

@@ -36,15 +36,15 @@ HRESULT CTank::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(1, true);
 //	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
-
+	m_fHp = 100.f;
+	m_fEnergy = 0.f;
 	return S_OK;
 }
 
 void CTank::Priority_Update(_float fTimeDelta)
 {
-
-	m_pTransformCom->LookAt(*m_vecTargetPos);
 	__super::Priority_Update(fTimeDelta);
+	m_pTransformCom->LookAt(*m_vecTargetPos);
 }
 
 void CTank::Update(_float fTimeDelta)

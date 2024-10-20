@@ -6,6 +6,7 @@
 #include "Collider.h"
 #include "Navigation.h"
 #include "VIBuffer_Rect.h"
+#include "VIBuffer_Cube.h"
 #include "VIBuffer_Terrain.h"
 
 /* 보관하는역활. */

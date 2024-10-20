@@ -21,6 +21,7 @@
 
 #include "Environment.h"
 #include "BrainCore.h"
+#include "Bullet.h"
 
 #include "Head_Player.h"
 #include "Body_Player.h"
@@ -31,7 +32,7 @@
 #include "UI_CircleGuage.h"
 #include "FPS_Pivot.h"
 
-
+#include "Sky.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -179,6 +180,12 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 
 	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
 
+	/* For.Prototype_Component_Texture_Sky */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+		return E_FAIL;
+
+
 #pragma region UI텍스처 생성
 	// 크로스 라인
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Logo2"),
@@ -299,18 +306,37 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
 
+	/* For.Prototype_Component_VIBuffer_Cube */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	Loading_DataFile_For_GameLevel();
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("셰이더 로딩중입니다.");
 
+	/* For.Prototype_Component_Shader_VtxCube */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxCube"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+		return E_FAIL;
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
 	/* For.Prototype_GameObject_BackGround */
 
+
+	/* Prototype_GameObject_Sky */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
+			CSky::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	
 	// 크로스 라인
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CrossLine")) == nullptr)
 	{
@@ -457,6 +483,13 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
 			CBrainCore::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	//Bullet
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
 
@@ -641,7 +674,14 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 			CEnvironment::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	//Bullet
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	
 	// BrainCore
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
@@ -871,7 +911,24 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
+	const _wstring Model_Bullet_Path = TEXT("../Bin/Resources/Model/ModelData_Bullet");
+	cout << "Bullet ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+	const _wstring Model_Bullet_Component = TEXT("Prototype_Component_Model_Bullet");
+	PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
+	for(int i = 0; i <3;i++)
+	{
+		const _wstring Model_Component_Bullet_Result = Model_Bullet_Component + to_wstring(i);
+		const _wstring Model_Path_Bullet_Result = Model_Bullet_Path + to_wstring(i) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Bullet_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Bullet_Result, PreTransformMatrix, i))))
+			return E_FAIL;
+	}
+	cout << "Bullet Read 완료" << endl;
 
+
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------------------------------------------------------------		
 	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");

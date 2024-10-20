@@ -108,7 +108,7 @@ void CLoading_UI::Late_Update(_float fTimeDelta)
 
 HRESULT CLoading_UI::Render()
 {
-    m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
+    // m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
    

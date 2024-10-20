@@ -103,15 +103,6 @@
     <Filter Include="01. Utility\04. Component\Model\Bone">
       <UniqueIdentifier>{79be93a7-33cd-4dbc-afe7-073bc2b603be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\07. Manager">
-      <UniqueIdentifier>{fa2f0863-d9ff-4e3a-964c-ddc799539e3b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\07. Manager\00. TerrainMgr">
-      <UniqueIdentifier>{ab4b6c02-42b7-403f-9172-8b4b57e13c86}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\07. Manager\01. PickingMgr">
-      <UniqueIdentifier>{de78e3cc-65af-4cc1-829f-ba7becd3543c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Utility\04. Component\Model\Animation">
       <UniqueIdentifier>{9b500047-bb7d-43c0-b246-4b39b25ad3a2}</UniqueIdentifier>
     </Filter>
@@ -160,8 +151,26 @@
     <Filter Include="01. Utility\04. Component\Collider\Bounding\DebugDraw">
       <UniqueIdentifier>{fa33a587-7f6e-4b67-9be5-6da54612052c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\07. Manager\02. CollisionMgr">
+    <Filter Include="01. Utility\04. Component\VIBuffer\Cube">
+      <UniqueIdentifier>{8b920d31-118a-4a70-ad97-20a785b5294b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. Manager">
+      <UniqueIdentifier>{fa2f0863-d9ff-4e3a-964c-ddc799539e3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. Manager\00. TerrainMgr">
+      <UniqueIdentifier>{ab4b6c02-42b7-403f-9172-8b4b57e13c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. Manager\01. PickingMgr">
+      <UniqueIdentifier>{de78e3cc-65af-4cc1-829f-ba7becd3543c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. Manager\02. CollisionMgr">
       <UniqueIdentifier>{2b4a2051-1df8-410b-b455-3b2f8a3b7403}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\07. Font">
+      <UniqueIdentifier>{1f7a9001-03c2-4a6a-bb39-54db6146fcc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. Manager\03. FontMgr">
+      <UniqueIdentifier>{40719d10-ee86-4bca-b7b2-92d46607a3ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -247,7 +256,7 @@
       <Filter>01. Utility\04. Component\Model</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain_Manager.cpp">
-      <Filter>01. Utility\07. Manager\00. TerrainMgr</Filter>
+      <Filter>01. Utility\08. Manager\00. TerrainMgr</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeshMaterial.cpp">
       <Filter>01. Utility\04. Component\Model\Material</Filter>
@@ -256,7 +265,7 @@
       <Filter>01. Utility\04. Component\Model\Bone</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Picking_Manager.cpp">
-      <Filter>01. Utility\07. Manager\01. PickingMgr</Filter>
+      <Filter>01. Utility\08. Manager\01. PickingMgr</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Engine_Struct.cpp">
       <Filter>99. Defines</Filter>
@@ -307,7 +316,16 @@
       <Filter>01. Utility\04. Component\Collider\Bounding\DebugDraw</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CollisionMgr.cpp">
-      <Filter>01. Utility\07. Manager\02. CollisionMgr</Filter>
+      <Filter>01. Utility\08. Manager\02. CollisionMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Cube.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CustomFont.cpp">
+      <Filter>01. Utility\07. Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Font_Manager.cpp">
+      <Filter>01. Utility\08. Manager\03. FontMgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -408,7 +426,7 @@
       <Filter>01. Utility\04. Component\Model</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain_Manager.h">
-      <Filter>01. Utility\07. Manager\00. TerrainMgr</Filter>
+      <Filter>01. Utility\08. Manager\00. TerrainMgr</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeshMaterial.h">
       <Filter>01. Utility\04. Component\Model\Material</Filter>
@@ -417,7 +435,7 @@
       <Filter>01. Utility\04. Component\Model\Bone</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Picking_Manager.h">
-      <Filter>01. Utility\07. Manager\01. PickingMgr</Filter>
+      <Filter>01. Utility\08. Manager\01. PickingMgr</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Animation.h">
       <Filter>01. Utility\04. Component\Model\Animation</Filter>
@@ -465,7 +483,16 @@
       <Filter>01. Utility\04. Component\Collider\Bounding\DebugDraw</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CollisionMgr.h">
-      <Filter>01. Utility\07. Manager\02. CollisionMgr</Filter>
+      <Filter>01. Utility\08. Manager\02. CollisionMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Cube.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CustomFont.h">
+      <Filter>01. Utility\07. Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Font_Manager.h">
+      <Filter>01. Utility\08. Manager\03. FontMgr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

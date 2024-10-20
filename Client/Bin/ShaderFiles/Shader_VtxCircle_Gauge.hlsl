@@ -1,4 +1,4 @@
-
+#include "Engine_Shader_Defines.hlsli"
 //      전역변수들 : 컨스턴트 테이블
 //      같은 파일 내에 존재하는 모든 함수에서 전역변수를 사용할 수 있다. 대입은 불가하다.
 //      외부프로젝트에서 쉐이더 전역으로 특정 데이터를 던지고 받기 위한 메모리 공간을 의미한다.
@@ -140,6 +140,11 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
 {
     pass DefaultPass
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
 

@@ -198,6 +198,9 @@ private:
 	_float3					Rotation{};
 
 
+public:
+	_uint* Get_UpperMotion() {	return &m_iUpperMotion;	}
+private:
 	_uint	m_iUpperMotion = 0;			// 상체 모션, 애니메이션 마다 본 위치나 currentPosition이 달라짐
 
 
@@ -241,11 +244,13 @@ private:
 	_float					m_fLocketLauncherDelay = 2.f;
 	_float					m_fCurrentDelay = 0.f;
 
-	_bool					m_bShotNow = false;
+	_bool					m_bShotStart = false;  // 쏘는 시작을 알려줌 (이때 총알 발사와 반동)
+	_bool					m_bShotNow = false;		// 애니메이션 작동의 시작과 끝을 알려줌 ( 딜레이 계산)
 	_bool					m_bTemp = false;
 
 public:
 	_bool*					Get_ShotNow()	{ return &m_bShotNow; }
+	_bool*					Get_ShotStart() { return &m_bShotStart; }
 private:
 	WEAPONSTATE m_eWeapon{}; // 스위치문 편하게 만드려고 임시 생성
 

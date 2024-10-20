@@ -1,4 +1,4 @@
-
+#include "Engine_Shader_Defines.hlsli"
 
 matrix              g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
@@ -118,7 +118,9 @@ PS_OUT PS_MAIN(PS_IN In)
     // 최종 픽셀 색을 계산한다.
     // (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade): 디퓨즈 색상
     //  (g_vLightSpecular * g_vMtrlSpecular) * fSpecular : 스페큘러 색상
-    // 둘을 합하여 최종 색 결정한다.
+    // 둘을 합하여 최종 색 결정한다.+
+    
+    
     Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) + (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     
@@ -131,6 +133,10 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
 {
     pass DefaultPass
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
 

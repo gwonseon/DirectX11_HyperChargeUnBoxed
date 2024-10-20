@@ -57,7 +57,7 @@ private:
 	CLayer* pNearMonsterLayer = { nullptr };
 	CLayer* pFarMonsterLayer = { nullptr };
 
-
+	_bool* m_pReloading = { nullptr };
 	_float XPos{}, ZPos{};
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

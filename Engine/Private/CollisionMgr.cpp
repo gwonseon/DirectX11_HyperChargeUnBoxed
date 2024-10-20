@@ -12,7 +12,7 @@ HRESULT CCollisionMgr::Initialize()
 }
 
 
-_bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos, _uint iTargetPartObjID)
+_bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos,  _bool* bShot, _float fDamage, _uint iTargetPartObjID)
 {
 	_bool Collision{};
 	for (auto& pTarget : Target->Get_GameObject_List())
@@ -25,6 +25,10 @@ _bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetC
 		if (Collision == true)
 		{
 			pTarget->Set_CollisionChecking(true);
+			if (*bShot == true)
+			{
+				pTarget->Set_Damaged(fDamage);
+			}
 		}
 		else
 		{

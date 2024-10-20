@@ -45,8 +45,9 @@ HRESULT CAlien::Initialize(void* pArg)
 
 void CAlien::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
 	m_pModelCom->Set_Animation(0, true);
-	
+	cout << m_fHp << endl;
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
 	m_pTransformCom->LookAt(vPlayerPos);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);

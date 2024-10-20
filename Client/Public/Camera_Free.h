@@ -17,9 +17,11 @@ public:
 		_vector* m_vecWeaponPos{};
 		_vector* m_vecWeaponDir{};
 
-		_bool* bShotNow{}; // ÃÑ ½î´Â Å¸ÀÌ¹Ö
+		_bool* bShotStart{}; // ÃÑ ½î´Â ½ÃÀÛ Å¸ÀÌ¹Ö
+		_bool* bShotNow{}; // ÃÑ ½î´Â ¸ð¼ÇÀÇ ÀüÃ¼½Ã°£
 		_uint* iViewState{};
 		_uint* iWeaponState{};
+		_uint* iUpperMotion{};
 		const _float4x4* matPlayerWorld = { nullptr };
 	}CAMERA_FREE_DESC;
 private:
@@ -49,40 +51,43 @@ public:
 
 	_vector Get_Dir() { return m_pTransformCom->Get_State(CTransform::STATE_LOOK); }
 	_vector* Get_Camera_At() { return &vAt; }
+	_vector* Get_Camera_Pos() { return &m_vecPos; }
 
 
 private:
 	_float					m_fMouseSensor = { 0.f };
 	_bool					m_bMouseLock = true;
 	_vector					m_vecDir{};
-	_vector					m_vecPos{};
+
+	_vector					m_vecStore_Dir{};
+
 	LEVELID					m_eLevelID = LEVEL_END;
 	_vector					vecEye{};
 	_uint*					m_iViewState{};
 	_vector					vAt{};
+	_vector					m_vecPos{};
 private:
 	const _float4x4* m_matPlayerWorld = { nullptr };
 
 private:
 	_float					m_fRotationPerSec{};
 	_float					m_fAngle_Y{};
+	_float					m_fMotion_Delay{};
 
+private:
 	_vector* m_vecTPSPos = {nullptr};
 	_vector* m_vecFPSPos = { nullptr };
 	_vector* m_vecWeaponPos = { nullptr };
 	_vector* m_vecWeaponDir = { nullptr };
 
 	_bool* m_pShotNow = { nullptr };
+	_bool* m_pShotStart = { nullptr };
 	_uint* m_pWeaponState = { nullptr };
-
+	_uint* m_iUpperMotion = {nullptr};
 
 	XMMATRIX RotationMatrix{};
 	XMMATRIX matWorld{};
 
-
-
-	_bool m_bOnce = false;
-	_bool m_bOnce2 = false;
 	_float m_fStore_RandomValue{};
 public:
 	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "Player.h"
+#include <Bullet.h>
 
 CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
@@ -24,10 +25,15 @@ HRESULT CWeapon::Initialize_Prototype()
 HRESULT CWeapon::Initialize(void* pArg)
 {
 	WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
-
+	m_bShotStart = pDesc->bShotStart;
 	m_pParentState = pDesc->pParentState;
 	m_pSocketMatrix = pDesc->pSocketMatrix;
+	m_vecCameraAt = pDesc->vCameraAt;
+	m_vecCameraPos = pDesc->vCameraPos;
 
+	m_bReloading = pDesc->bReload;
+	m_pReloading_Time = pDesc->fReloadingTime;
+	
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -49,19 +55,31 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
 	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
-
-
-
+	m_bBulletIn = false;
+	m_iCurrent_Bullet = m_iRifle_Bullet;
+	
 	return S_OK;
 }
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
 
+	if (m_bBulletIn == true) // 장전 완료
+	{
+		m_iCurrent_Bullet = m_iRifle_Bullet; // 나중에 총에 따라 나누기
+		m_bBulletIn = false;
+	}
+
+	if (m_iCurrent_Bullet <= 0 && *m_bReloading == false)
+	{
+		*m_bReloading = true;
+		*m_pReloading_Time = 0.f;
+	}
+
+
 	if (*m_pParentState & CPlayer::MELEE || *m_pParentState & CPlayer::RELOADING)
 	{
 		m_pTransformCom->Rotation(XMConvertToRadians(8.87969f), XMConvertToRadians(-115.2f), XMConvertToRadians(6.4f));
-
 	}
 	else
 	{
@@ -101,7 +119,7 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 
 void CWeapon::Update(_float fTimeDelta)
 {
-
+	
 
 }
 
@@ -115,9 +133,26 @@ void CWeapon::Late_Update(_float fTimeDelta)
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
 	 m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1.f);
 	 m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31, m_WorldMatrix._32, m_WorldMatrix._33, 0.f);
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
 
+
+
+	// 총알 발사
+	if (*m_bShotStart == true && *m_bReloading == false)
+	{
+		--m_iCurrent_Bullet;
+		CBullet::BULLET_DESC Desc{};
+		Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
+		Desc.m_vecWeaponDir = (*m_vecCameraAt - Desc.m_vecWeaponPos);	// At까지의 방향, 총구 방향과 다름 주의
+		Desc.m_vecCameraPos = *m_vecCameraPos;
+		
+		Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
+		Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		Desc.eID = LEVEL_GAMEPLAY;
+		static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+	}
+
+	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+		return;
 }
 
 HRESULT CWeapon::Render()

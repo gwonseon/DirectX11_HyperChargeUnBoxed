@@ -56,7 +56,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	Load_Map();
 
 
-
+	m_pReloading = m_pPlayer->Get_Reloading();
 	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Player"));
 	pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"));
 	pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
@@ -91,7 +91,8 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	if (!XMVector3IsInfinite(RayPos) && !XMVector3IsNaN(RayPos) &&
 		!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
 	{
-		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos);
+		_bool* bShot = m_pPlayer->Get_ShotStart();
+		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());
 	}
 
 }
@@ -118,50 +119,49 @@ void CLevel_GamePlay::Interaction_Weapon()
 	XMStoreFloat3(&fPlayerPos, vPlayerPos);
 	for (int i = 0; i < 2; i++)
 	{
-	_vector vWeaponPos = m_pWeaponItem[i]->Get_Position();
-	XMStoreFloat3(&fWeaponPos, vWeaponPos);
-	if (((fPlayerPos.x - fWeaponPos.x) * (fPlayerPos.x - fWeaponPos.x) + (fPlayerPos.y - fWeaponPos.y) * (fPlayerPos.y - fWeaponPos.y) + (fPlayerPos.z - fWeaponPos.z) * (fPlayerPos.z - fWeaponPos.z)) <= 80.f)
-	{
-
-		m_pWeaponItem[i]->Set_Interation(true);
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+		_vector vWeaponPos = m_pWeaponItem[i]->Get_Position();
+		XMStoreFloat3(&fWeaponPos, vWeaponPos);
+		if (((fPlayerPos.x - fWeaponPos.x) * (fPlayerPos.x - fWeaponPos.x) + (fPlayerPos.y - fWeaponPos.y) * (fPlayerPos.y - fWeaponPos.y) + (fPlayerPos.z - fWeaponPos.z) * (fPlayerPos.z - fWeaponPos.z)) <= 80.f)
 		{
-			m_pWeaponItem[i]->Set_Charging(true); // 아이템에서 차징중임을 알려줌
-			
+			m_pWeaponItem[i]->Set_Interation(true);
+			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+				m_pWeaponItem[i]->Set_Charging(true); // 아이템에서 차징중임을 알려줌
+			else
+				m_pWeaponItem[i]->Set_Charging(false);
+
+			// 플레이어에게 장착된 장비가 무엇인지 알려줌
+			_bool bEquip{};
+			_uint iEuquipNum{};
+			m_pWeaponItem[i]->Set_WeaponItem_Equip(bEquip, iEuquipNum);
+			if (bEquip == true)
+				m_pPlayer->Set_EquipNumber(iEuquipNum);
 		}
 		else
 		{
 			m_pWeaponItem[i]->Set_Charging(false);
-		
-		}
-
-
-		// 플레이어에게 장착된 장비가 무엇인지 알려줌
-		_bool bEquip{};
-		_uint iEuquipNum{};
-		m_pWeaponItem[i]->Set_WeaponItem_Equip(bEquip, iEuquipNum);
-		if (bEquip == true)
-		{
-			m_pPlayer->Set_EquipNumber(iEuquipNum);
+			m_pWeaponItem[i]->Set_Interation(false);
 		}
 	}
-	else
+
+	if ( *m_pReloading == true)
 	{
-		
-		m_pWeaponItem[i]->Set_Charging(false);
-		m_pWeaponItem[i]->Set_Interation(false);
-	}
-}
-	_int iCheck = 0;
-	for(int i = 0; i< 2; i++)
-	{
-		if (m_pWeaponItem[i]->Get_Charging() == true)
-			iCheck++;
-	}
-	if(iCheck > 0)
 		m_pGuage->Set_Charging(true);
+	}
 	else
-		m_pGuage->Set_Charging(false);
+	{
+		_int iCheck = 0;
+		for (int i = 0; i < 2; i++)
+		{
+			if (m_pWeaponItem[i]->Get_Charging() == true)
+				iCheck++;
+		}
+		if (iCheck > 0)
+			m_pGuage->Set_Charging(true);
+		else
+			m_pGuage->Set_Charging(false);
+	}
+
+
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag)
@@ -189,12 +189,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	pDesc.eID = LEVEL_GAMEPLAY;
 	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"),&pDesc)))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
+		TEXT("Prototype_GameObject_Sky"))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar* pLayerTag)
 {
-	CContainerObject::CONTAINEROBJECT_DESC Desc{};
+	CPlayer::PLAYER_DESC Desc{};
+	Desc.vCameraAt = m_pCamera->Get_Camera_At();
+	Desc.vCameraPos = m_pCamera->Get_Camera_Pos();
 	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
 	m_pPlayer = static_cast<CPlayer*>(pPlayer);
 
@@ -256,9 +264,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.m_vecWeaponPos = m_pPlayer->Get_WeaponPos();
 	Desc.m_vecWeaponDir = m_pPlayer->Get_WeaponDir();
 	Desc.bShotNow = m_pPlayer->Get_ShotNow();
+	Desc.bShotStart = m_pPlayer->Get_ShotStart();
 	Desc.iWeaponState = m_pPlayer->Get_WeaponState();
+	Desc.iUpperMotion = m_pPlayer->Get_UpperMotion();
 	m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &Desc));
 	m_pPlayer->Set_CameraAt(m_pCamera->Get_Camera_At());
+	m_pPlayer->Set_CameraPos(m_pCamera->Get_Camera_Pos());
 	return S_OK;
 
 }
@@ -467,6 +478,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pCircleDesc.fDepth = 0.f;
 	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
+
 
 	CCrossLine::UIOBJECT_DESC			Desc{};
 	Desc.fX = g_iWinSizeX * 0.5f;

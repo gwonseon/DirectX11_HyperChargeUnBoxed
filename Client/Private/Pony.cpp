@@ -41,6 +41,8 @@ HRESULT CPony::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(0, true);
 	//pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
 
+	m_fHp = 100.f;
+	m_fEnergy = 0.f;
 
 	current = CPonyIdle::GetInstance();
 	return S_OK;
@@ -48,6 +50,7 @@ HRESULT CPony::Initialize(void* pArg)
 
 void CPony::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 }
