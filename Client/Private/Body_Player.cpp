@@ -49,6 +49,7 @@ HRESULT CBody_Player::Initialize(void* pArg)
 
 void CBody_Player::Priority_Update(_float fTimeDelta)
 {
+	//  6번 부턴 총쏘는 모션이기 때문에 사격 딜레이 넣어줌
 	if (m_iUpperMotion >= 6)
 	{
 		m_fCurrentDelay += fTimeDelta;
@@ -61,7 +62,6 @@ void CBody_Player::Update(_float fTimeDelta)
 {
 		
 	// 상체
-	
 		if(m_iUpperMotion < 6)
 		{
 			_long   MouseMove = { 0 };
@@ -84,6 +84,7 @@ void CBody_Player::Update(_float fTimeDelta)
 		else
 		{
 			// 총 쏘는 것은 딜레이 시간이 끝났을 때만 쏠 수 있게 별로도 나눠줌
+			// m_bShotNow 가 애니메이션의 시작과 끝을 알려주는데 총쏘는건 딱 한 번만 돌아야한다. 그래서 이걸 위한 구분이 필요함
 			if (m_bShotNow == true)
 			{
 				m_fCurrentDelay = 0.f;
@@ -180,35 +181,50 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_RIFLE:
 			{
 				if (m_fCurrentDelay >= m_fRiflrDelay)
+				{
 					m_bShotNow = true;
+					m_bShotStart = true;
+				}
 				m_iUpperMotion = RIFLE_FIRE_MOTION;
 				break;
 			}
 			case Client::CBody_Player::WEAPON_SHOTGUN:
 			{
 				if (m_fCurrentDelay >= m_fShotGunDelay)
+				{
 					m_bShotNow = true;
+					m_bShotStart = true;
+				}
 				m_iUpperMotion = SHOTGUN_FIRE_MOTION;
 				break;
 			}
 			case Client::CBody_Player::WEAPON_PULSECANNON:
 			{
 				if (m_fCurrentDelay >= m_fPulseCannonDelay)
+				{
 					m_bShotNow = true;
+					m_bShotStart = true;
+				}
 				m_iUpperMotion = PULSECANNON_FIRE_MOTION;
 				break;
 			}
 			case Client::CBody_Player::WEAPON_TELEPORT:
 			{
 				if (m_fCurrentDelay >= m_fTeleportDelay)
+				{
 					m_bShotNow = true;
+					m_bShotStart = true;
+				}
 				m_iUpperMotion = TELEPORTGUN_FIRE_MOTION;
 				break;
 			}
 			case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
 			{
 				if (m_fCurrentDelay >= m_fLocketLauncherDelay)
+				{
 					m_bShotNow = true;
+					m_bShotStart = true;
+				}
 				m_iUpperMotion = LOCKETLAUNCHER_FIRE_MOTION;
 				break;
 			}
@@ -235,7 +251,7 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 	if (*m_pParentState_Upper & CPlayer::RELOADING)
 	{
 		m_iUpperMotion = RELOAD_MOTION;
-		 m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_WeaponReload);
+		m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_WeaponReload);
 	}
 
 

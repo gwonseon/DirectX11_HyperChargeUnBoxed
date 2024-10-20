@@ -34,12 +34,14 @@ HRESULT CHelicopter::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(1, true);
 //	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
-
+	m_fHp = 100.f;
+	m_fEnergy = 0.f;
 	return S_OK;
 }
 
 void CHelicopter::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 }
 

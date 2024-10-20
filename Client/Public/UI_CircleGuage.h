@@ -48,6 +48,8 @@ private:
 
 public:
 	void	Set_Charging(_bool bCharging) { m_bCharging = bCharging; }
+	_bool	Get_Charging() { return m_bCharging; }
+
 private:
 	float	m_fGuaging_Time{};
 	_bool	m_bCharging{};

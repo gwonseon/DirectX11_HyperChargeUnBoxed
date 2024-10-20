@@ -28,7 +28,9 @@ HRESULT CPlayer::Initialize(void* pArg)
 	Desc.fRotationPerSec = XMConvertToRadians(90.f);
 	Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
 	m_fMouseSensor = 0.1f;
-
+	PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
+	m_vecCameraAt = pDesc->vCameraAt;
+	m_vecCameraPos = pDesc->vCameraPos;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
@@ -42,7 +44,6 @@ HRESULT CPlayer::Initialize(void* pArg)
 //	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Desc.fPosition.x, Desc.fPosition.y, Desc.fPosition.z, 1.f));
 	m_pTransformCom->Set_Scaling(2.f, 2.f, 2.f);
 	m_iWeaponState = WEAPON_RIFLE;
-	m_pBody = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY]);
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
 	m_pKatana = static_cast<CWeapon_Katana*>(m_PartObjects[TPS_PART_KATANA]);
 	m_pHead = static_cast<CHead_Player*>(m_PartObjects[TPS_PART_HEAD]);
@@ -57,9 +58,14 @@ HRESULT CPlayer::Initialize(void* pArg)
 	
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
-	m_fAttack = 20.f;
+	m_fAttack = 10.f;
 	m_bDontDestroy = true;
 	m_bKnockdown = false;
+
+	m_fRun_FourDirection = 1.5f;
+	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
+
+
 	return S_OK;
 }
 
@@ -91,33 +97,38 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	
 	if(m_iViewState == PLAYER_FPS_VIEW)
 	{
+		
 		// FPS
-		m_pHead->Set_PlayerViewState(false);
+		m_pHead->Set_PlayerViewState(false); 
 		m_pBody->Set_PlayerViewState(false);
-	//	const _float4x4* FPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
-	//	m_pWaepon->Set_SocketMatrix(FPSMatrix);
 		m_pWaepon->Set_TPSState(false);
-
 	}
 	else if(m_iViewState == PLAYER_TPS_VIEW)
 	{
 		 // TPS
 		m_pHead->Set_PlayerViewState(true);
 		m_pBody->Set_PlayerViewState(true);
-	//	const _float4x4* TPSMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
-		//m_pWaepon->Set_SocketMatrix(TPSMatrix);
 		m_pWaepon->Set_TPSState(true);
 	}
-	// 카메라 At 보내주기
-	m_pWaepon->Set_CameraAt(m_vecCameraAt);
-	// 몸에게 무기 상태 보내주기   TPS
-	m_pBody->Set_WeaponState(m_iWeaponState);		
-	// 무기에게 무기 상태 보내주기
-	m_pWaepon->Set_WeaponState(m_iWeaponState);	
-	// 칼에게 무기 상태 보내주기
-	if (m_iWeaponState == WEAPON_KATANA)			
+
+	if (m_bReloading == true) // 장전이 참일 때 
 	{
-		m_iViewState = PLAYER_TPS_VIEW;	// 카타나는 무조건 3인칭 
+		m_fReload_Charging += fTimeDelta; // 장전 시간
+	}
+	if (m_fReload_Charging >= 1.f)  // 장전 시간이 다 끝났을 때
+	{
+		m_fReload_Charging = 0.f;
+		m_bReloading = false;			// 장전 false
+		m_pWaepon->Set_BulletIn(true);	// 총한테 장전되었다고 알려주기
+	}
+	m_pWaepon->Set_CameraPos(m_vecCameraPos);			// 카메라 At 보내주기
+	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// 카메라 At 보내주기
+	m_pBody->Set_WeaponState(m_iWeaponState);		// 몸에게 무기 상태 보내주기   TPS	
+	m_pWaepon->Set_WeaponState(m_iWeaponState);		// 무기에게 무기 상태 보내주기
+
+	if (m_iWeaponState == WEAPON_KATANA)			// 칼에게 무기 상태 보내주기	
+	{
+		m_iViewState = PLAYER_TPS_VIEW;				// 카타나는 무조건 3인칭 
 		m_pKatana->Set_KatanaState(true);
 	}
 	else
@@ -125,8 +136,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 
 	Player_Movement(fTimeDelta);					// 플레이어 동작
 
-	m_fRun_FourDirection = 1.5f;
-	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
+
 
 	__super::Priority_Update(fTimeDelta);
 }
@@ -142,17 +152,6 @@ void CPlayer::Late_Update(_float fTimeDelta)
 {
 	
 	__super::Late_Update(fTimeDelta);
-	//CCollider* pTargetCollider{};
-	//_bool bCol = false;
-	//_uint i = 0;
-	//while(bCol == false)
-	//{
-	//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), TEXT("Com_Collider_Sphere"), i));
-	//	bCol = m_pColliderCom->Intersect(pTargetCollider);
-	//	i++;
-	//	if (i > 3)
-	//		break;
-	//}
 
 	if(m_bDead == false)
 	{
@@ -197,6 +196,7 @@ HRESULT CPlayer::Add_PartObjects()
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"), TPS_PART_BODY, &BodyDesc)))
 		return E_FAIL;
 
+	m_pBody = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY]);
 
 	/* For.Body */
 	CHead_Player::HEADPLAYER_DESC HeadDesc{};
@@ -218,6 +218,11 @@ HRESULT CPlayer::Add_PartObjects()
 	WeaponDesc.pParentState = &m_iState_Upper;
 	WeaponDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	WeaponDesc.m_iViewState = &m_iViewState;
+	WeaponDesc.vCameraAt = m_vecCameraAt;
+	WeaponDesc.vCameraPos = m_vecCameraPos;
+	WeaponDesc.bShotStart =  Get_ShotStart();
+	WeaponDesc.bReload = &m_bReloading;
+	WeaponDesc.fReloadingTime = &m_fReload_Charging;
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Weapon"), TPS_PART_WEAPON, &WeaponDesc)))
 		return E_FAIL;
 
@@ -276,11 +281,21 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	{
 		if(m_iWeaponState != WEAPON_KATANA)
 		{
-			if (!(m_iState_Upper & RELOADING))
+			m_fReload_Charging = 0.f;
+			m_bReloading = true;
+			if (m_iViewState == PLAYER_FPS_VIEW)
 			{
-				if (m_iState_Upper & STATE_IDLE)
-					m_iState_Upper ^= STATE_IDLE;
-				m_iState_Upper |= RELOADING;
+				// 아무것도 하지마 ( 1인칭 모션이 없음 ) 
+			}
+			else
+			{
+				// 장전 동작해라  
+				if (!(m_iState_Upper & RELOADING))
+				{
+					if (m_iState_Upper & STATE_IDLE)
+						m_iState_Upper ^= STATE_IDLE;
+					m_iState_Upper |= RELOADING;
+				}
 			}
 		}
 		else
@@ -290,11 +305,14 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB))
 	{
-		if (!(m_iState_Upper & FIRE))
+		if(m_bReloading == false) // 장전 중엔 총 못쏨
 		{
-			if (m_iState_Upper & STATE_IDLE)
-				m_iState_Upper ^= STATE_IDLE;
-			m_iState_Upper |= FIRE;
+			if (!(m_iState_Upper & FIRE))
+			{
+				if (m_iState_Upper & STATE_IDLE)
+					m_iState_Upper ^= STATE_IDLE;
+				m_iState_Upper |= FIRE;
+			}
 		}
 	}
 	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB))

@@ -20,6 +20,15 @@ BEGIN(Client)
 class CPlayer final : public CContainerObject
 {
 public:
+	typedef struct : public CGameObject::GAMEOBJ_DESC
+	{
+		_vector* vCameraAt = {};
+		_vector* vCameraPos = {};
+
+	}PLAYER_DESC;
+
+
+public:
 	enum TPS_PARTOBJID { TPS_PART_BODY, TPS_PART_WEAPON, TPS_PART_EFFECT, TPS_PART_HEAD, TPS_PART_PIVOT , TPS_PART_KATANA, FPS_PART_BODY, FPS_PART_PIVOT, PART_END };
 	enum TPSSTATE {
 		STATE_IDLE					= 0x00000001,
@@ -91,6 +100,7 @@ public:
 	}
 	_uint* Get_ViewState() { return &m_iViewState; }
 	void   Set_CameraAt(_vector* pAt) {	m_vecCameraAt = pAt;}
+	void   Set_CameraPos(_vector* pPos) { m_vecCameraPos = pPos; }
 
 	void		Set_Rotaion(_vector	vRight, _vector	vUp, _vector	vLook) {
 		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vRight);
@@ -102,20 +112,27 @@ public:
 	
 
 
+
 	CTransform* Get_Transform() {	return m_pTransformCom; }
 	_vector* Get_TPSPosptr()	{	return m_vecTPS_CamPos;	}
 	_vector* Get_FPSPosptr()	{	return m_vecFPS_CamPos; }
 	_vector* Get_WeaponPos()	{	return m_vecWeaponPos; }
 	_vector* Get_WeaponDir()	{	return m_vecWeaponDir; }
 	_bool*	 Get_ShotNow()		{	return m_pBody->Get_ShotNow(); }
+	_bool* Get_ShotStart()		{ return m_pBody->Get_ShotStart(); }
 	_uint* Get_WeaponState()	{ return &m_iWeaponState; }
+	_uint* Get_UpperMotion()	{ return m_pBody->Get_UpperMotion(); }
+	_bool* Get_Reloading()		{ return &m_bReloading; }
+
+
 private:
 	_vector* m_vecTPS_CamPos{};
 	_vector* m_vecFPS_CamPos{};
 	_vector* m_vecCameraAt{};
+	_vector* m_vecCameraPos{};
+
 	_vector* m_vecWeaponPos{};
 	_vector* m_vecWeaponDir{};
-
 	_uint	m_iViewState{};
 
 private:
@@ -130,9 +147,10 @@ private:
 	_bool					m_bKey_S = false;
 	_bool					m_bKey_Shift = false;
 	_bool					m_bKey_R = false;
-
+	_bool					m_bReloading = false;
 	float					m_fRun_FourDirection{};
 	float					m_fRun_EightDirection{};
+	_float					m_fReload_Charging = 0.f;
 
 public:
 	_float m_fRotation_Value{};

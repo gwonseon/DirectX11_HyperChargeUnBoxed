@@ -110,7 +110,13 @@ public:  // 피킹 매니저
 public: // 콜리전 매니저
 	void Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID = 0, _uint iDstPartObjID = 0);
 	void Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _uint iTargetPartObjID = 0);
+	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos,  _bool* bShot, _float fDamage,_uint iTargetPartObjID = 0);
+
+public: /* For.Font_Manager */
+	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePaht);
+	HRESULT Render_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, FXMVECTOR vColor, _float fScale = 1.f, _float fRotation = 0.f, const _float2& vPivot = _float2(0.f, 0.f));
+
+
 
 private:
 	class CGraphic_Device* m_pGraphic_Device = { nullptr };
@@ -124,6 +130,10 @@ private:
 	class CLight_Manager* m_pLight_Manager = { nullptr };
 	class CPicking_Manager* m_pPicking_Manager = { nullptr };
 	class CCollisionMgr* m_pCollision_Manager = { nullptr };
+	class CFont_Manager* m_pFont_Manager = { nullptr };
+
+
+
 public:
 	static void Release_Engine();
 	virtual void Free() override;

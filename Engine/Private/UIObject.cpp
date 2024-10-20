@@ -35,7 +35,7 @@ HRESULT CUIObject::Initialize(void* pArg)
 
     _uint   iNumViewports = { 1 };
     D3D11_VIEWPORT ViewportDesc{};
-
+    
     m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
     m_pTransformCom->Set_Scaling(m_fSizeX, m_fSizeY, 1.f);
@@ -43,11 +43,8 @@ HRESULT CUIObject::Initialize(void* pArg)
 
     XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
- 
-
     /* 뷰스페이스 상의 화면에 보여줄 영역(뷰볼륨)을 설정한다. */
     XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
-
 
     return S_OK;
 

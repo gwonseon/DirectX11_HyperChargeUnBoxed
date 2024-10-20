@@ -17,8 +17,11 @@ public:
 	{
 		const _uint* pParentState = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr };
-
-
+		_vector* vCameraAt = { nullptr };
+		_vector* vCameraPos = { nullptr };
+		_bool* bShotStart{}; // 사격 시작 타이밍
+		_bool* bReload{}; // 장전
+		_float* fReloadingTime{};
 	}WEAPON_DESC;
 
 
@@ -71,13 +74,14 @@ public:
 
 public:
 	void	Set_TPSState(_bool State) { m_bTPSState = State; }
-
+	void	Set_BulletIn(_bool bIn) { m_bBulletIn = bIn; }
 	void Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
 	HRESULT Weapon_Exchange();
 
 	void	Set_SocketMatrix(const _float4x4* matSocket) { m_pSocketMatrix = matSocket; }
 
 	void   Set_CameraAt(_vector* pAt) { m_vecCameraAt = pAt; }
+	void   Set_CameraPos(_vector* pPos) { m_vecCameraPos = pPos; }
 
 	_vector*	Get_WeaponPos() { return &m_vecWeaponPos; }
 	_vector*	Get_WeaponDir() { return &m_vecWeaponDir; }
@@ -89,13 +93,17 @@ private:
 
 	const _float4x4* m_pSocketMatrix = { nullptr };
 	const _uint* m_pParentState = { nullptr };
+
 	_float Scale{};
+	_float fPos{};
+
 	_float3 Position{};
 	_float3	Rotation{};
 
 	_vector	m_vecWeaponPos{};
 	_vector	m_vecWeaponDir{};
 	
+
 	_uint m_iWeaponState{};
 	WEAPONSTATE m_eWeaponState = WEAPON_END;
 private:
@@ -105,15 +113,23 @@ private:
 private:
 	_uint* m_iViewState{};
 	_vector* m_vecCameraAt{};
+	_vector* m_vecCameraPos{};
+	
+	_bool* m_bShotStart = {nullptr};
+	_bool* m_bReloading = { nullptr };
 
-
+	_float* m_pReloading_Time = { nullptr };
+	// 총알
+private:
+	_uint m_iRifle_Bullet = 30;
+	_uint m_iCurrent_Bullet = 30;
 
 private:
-	_uint		m_iCurrent_Bullet = 0;
-	_uint		m_iEntire_Bullet  = 0;
+
+
 
 	_bool		m_bTPSState{};
-
+	_bool		m_bBulletIn = false;
 
 	_float		m_fAngle_Y{};
 public:

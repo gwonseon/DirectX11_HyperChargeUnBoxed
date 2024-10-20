@@ -8,6 +8,7 @@
 #include "PipeLine.h"
 #include "Renderer.h"
 #include "Light_Manager.h"
+#include "font_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -64,6 +65,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pPicking_Manager = CPicking_Manager::Create();
 	if (nullptr == m_pPicking_Manager)
 		return E_FAIL;
+
+	m_pFont_Manager = CFont_Manager::Create(*ppDevice, *ppContext);
+	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -418,11 +424,20 @@ void CGameInstance::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, c
 	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
 }
 
-_bool CGameInstance::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _uint iTargetPartObjID)
+_bool CGameInstance::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _bool* bShot, _float fDamage, _uint iTargetPartObjID)
 {
-	return m_pCollision_Manager->Collision_Bullet(Target, strTargetComponentTag, vRayDior, vRayPos, iTargetPartObjID);
+	return m_pCollision_Manager->Collision_Bullet(Target, strTargetComponentTag, vRayDior, vRayPos, bShot, fDamage, iTargetPartObjID);
 }
 
+HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
+{
+	return m_pFont_Manager->Add_Font(strFontTag, pFontFilePath);
+}
+
+HRESULT CGameInstance::Render_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, FXMVECTOR vColor, _float fScale, _float fRotation, const _float2& vPivot)
+{
+	return m_pFont_Manager->Render_Text(strFontTag, pText, vPosition, vColor, fScale, fRotation, vPivot);
+}
 
 
 void CGameInstance::Release_Engine()
@@ -435,7 +450,7 @@ void CGameInstance::Release_Engine()
 void CGameInstance::Free()
 {
 	__super::Free();
-
+	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pRenderer);

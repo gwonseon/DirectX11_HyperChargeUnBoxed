@@ -44,7 +44,8 @@ HRESULT CRenderer::Draw()
 		return E_FAIL;
 	if (FAILED(Render_UI()))
 		return E_FAIL;
-
+	if (FAILED(Render_Last()))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -150,6 +151,22 @@ HRESULT CRenderer::Render_UI()
 	}
 
 	m_RenderGameObjects[RG_UI].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_Last()
+{
+	for (auto& pRenderGameObject : m_RenderGameObjects[RG_LAST])
+	{
+		if (nullptr != pRenderGameObject)
+			pRenderGameObject->Render();
+
+
+		Safe_Release(pRenderGameObject);
+	}
+
+	m_RenderGameObjects[RG_LAST].clear();
 
 	return S_OK;
 }

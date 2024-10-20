@@ -1,4 +1,4 @@
-
+#include "Engine_Shader_Defines.hlsli"
 //      전역변수들 : 컨스턴트 테이블
 //      같은 파일 내에 존재하는 모든 함수에서 전역변수를 사용할 수 있다. 대입은 불가하다.
 //      외부프로젝트에서 쉐이더 전역으로 특정 데이터를 던지고 받기 위한 메모리 공간을 의미한다.
@@ -99,20 +99,7 @@ PS_OUT PS_MAIN(PS_IN In)
  //   Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
     // 색으로 채우는 것이 이미지를 가져와서 색을 채워줌
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
- //   Out.vColor.gb = Out.vColor.r; // 같으면 회색, 죽었을 때를 표현하면 좋을듯
-    
-    // 알파테스트 : 알파값을 기준으로 그린다 안그린다를 고려한다. Dx11 에선 알파테스트가 사라지고 셰이파파일에서 비교하는 방식으로 바뀜
-    // 깊이 테스트를 통과하여 레스터라이즈를 거쳤으나 알파 테스트 통과 못한 값은 파괴한다. 따라서 깊이 값 기록 안한다!
-    //if(Out.vColor.a == 0.f) 
-    //    discard;// 파괴한다. 
 
-    //// 투영변환은 x,y를 변환전의 z값인 w로 나눔으로써 완성된다.
-    //float2 vProjPos = In.vProjPos.xy / In.vProjPos.w;
-    
-    // 데미지를 입었을 때 이기능을 통해 빨간색으로 바꿔서 피격효과를 줄 수 있다.
-    //if(vProjPos.x <= 1.f)
-    //    Out.vColor.r = 0.1;
-    
     return Out;
 
 }
@@ -244,46 +231,54 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
 {
     pass DefaultPass
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
 
     }
     pass DefaultPass1
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN2();
 
     }
     pass DefaultPass2
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN3();
 
     }
     pass DefaultPass3
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN4();
     }
     pass DefaultPass4
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN5();
     }
     pass DefaultPass5
     {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN6();
     }
-	//pass DefaultPass1
-	//{
-	//	VertexShader = compile vs_5_0 VS_MAIN();
-	//	PixelShader = compile ps_5_0 PS_MAIN_BLEND();
-	//}
 
-	//pass DefaultPass2
-	//{
-	//	VertexShader = compile vs_5_0 VS_MAIN_DIS();
-	//	PixelShader = compile ps_5_0 PS_MAIN_DIS();
-	//}
 }

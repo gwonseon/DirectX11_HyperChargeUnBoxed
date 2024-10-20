@@ -11,6 +11,16 @@
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
+	D3D11_RASTERIZER_DESC		RSDesc{};
+	D3D11_BLEND_DESC			BSDesc{};
+	D3D11_DEPTH_STENCIL_DESC	DSSDesc{};
+
+
+	/*m_pDevice->CreateRasterizerState(&RSDesc, &pRSState);
+	m_pContext->RSSetState(pRSState);
+	m_pContext->OMSetDepthStencilState();
+	m_pContext->OMSetBlendState();*/
+
 	Safe_AddRef(m_pGameInstance);
 }
 
@@ -32,15 +42,16 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
-
 	if (FAILED(Ready_Prototype_Component_For_Static()))
 		return E_FAIL;
-
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
-	
+
+	// 임시
+	if (FAILED(m_pGameInstance->Add_Font(TEXT("Font_146"), TEXT("../Bin/Resources/Fonts/146ex.spritefont"))))
+		return E_FAIL;
 	ImGui::CreateContext(); // 무조건 먼저 호출 되어야 함, 그렇지 않을 경우 다른 코드들이 정상적으로 호출되지 않음.
 	ImGui::StyleColorsDark(); // Gui Style : StyleColorsClassic, StyleColorsDark, StyleColorsLight
 
@@ -60,14 +71,12 @@ void CMainApp::Render()
 	if (FAILED(m_pGameInstance->Render_Begin(_float4(0.f, 0.f, 1.f, 1.f)))) // 색 11은 255 255 아니라 이거임
 		return;
 
-
-
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-
 	m_pGameInstance->Draw();
+	m_pGameInstance->Render_Text(TEXT("Font_146"), TEXT("나는야 응가쟁이"), _float2(0.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 1);
 
 
 	ImGui::Render();
@@ -118,9 +127,16 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile0.dds"), 1))))
+
+	/* For.Prototype_Component_Texture_Terrain_Mask */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain_Mask"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Mask.bmp"), 1))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 2))))
+		return E_FAIL;
+
 
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxBoxColor"),
