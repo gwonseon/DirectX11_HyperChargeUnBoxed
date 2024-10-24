@@ -19,11 +19,10 @@
 #include "DirectXTK\SpriteBatch.h"
 #include "DirectXTK\SpriteFont.h"
 #include "DirectXTK\Effects.h"
-
 #include "Effects11\d3dx11effect.h"
 
 
-
+using namespace std;
 using namespace DirectX;
 
 
@@ -38,11 +37,6 @@ using namespace DirectX;
 
 #include <DirectXMath.h>
 
-
-
-
-using namespace DirectX;
-using namespace std;
 
 #include "Engine_Typedef.h"
 #include "Engine_Macro.h"

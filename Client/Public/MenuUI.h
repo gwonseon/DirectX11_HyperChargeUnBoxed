@@ -15,7 +15,7 @@ BEGIN(Client)
 class CMenuUI final : public CUIObject
 {
 public:
-	enum UITAG {  LOGO_GAMENAME,LOGO_BACKGOUND, LOGO_END };
+	enum UITAG {  LOGO_GAMENAME, LOGO_BACKGOUND, LOGO_END };
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
 		enum UITAG eTag {};

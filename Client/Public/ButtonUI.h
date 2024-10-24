@@ -14,7 +14,7 @@ BEGIN(Client)
 class CButtonUI : public CUIObject
 {
 public:
-	enum BUTTONTAG { BUTTON_PLAY, BUTTON_MENU, BUTTON_PAUSE, BUTTON_END };
+	enum BUTTONTAG { BUTTON_PLAY, BUTTON_CREATE, BUTTON_MINI, BUTTON_END };
 
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{

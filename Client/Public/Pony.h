@@ -59,7 +59,7 @@ private:
 private:
 	_bool		m_bAnimState{};
 	_vector vPlayerPos{};
-
+	_vector vPos{};
 	_float m_fRunSpeed = 0.f;
 	_bool	m_bWalkState = true;;
 public:

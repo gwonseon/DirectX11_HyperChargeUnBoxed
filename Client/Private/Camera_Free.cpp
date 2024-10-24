@@ -70,8 +70,8 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 
         }
     }
-
-    *m_pShotStart = false;                  // ªÁ∞› ≥°≥µ¿Ω¿ª æÀ∑¡¡‹
+    if(m_eLevelID == LEVEL_GAMEPLAY)
+        *m_pShotStart = false;                  // ªÁ∞› ≥°≥µ¿Ω¿ª æÀ∑¡¡‹
     __super::Priority_Update(fTimeDelta);
 }
 

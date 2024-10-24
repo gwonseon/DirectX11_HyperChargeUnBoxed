@@ -116,9 +116,9 @@ HRESULT CLevel_Logo::Ready_Layer_Menu_UI(const _tchar* pLayerTag)
 {
 	CButtonUI::BUTTONUI_DESC			Desc{};
 
-	Desc.fX = 200;
+	Desc.fX = 250;
 	Desc.fY = 300;
-	Desc.fSizeX = 200;
+	Desc.fSizeX = 300;
 	Desc.fSizeY = 50;
 	Desc.iData = 10;
 	Desc.fDepth = 0.0f;
@@ -126,23 +126,23 @@ HRESULT CLevel_Logo::Ready_Layer_Menu_UI(const _tchar* pLayerTag)
 	(m_pButton_GamePlay = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_ButtonUI_Menu"), &Desc));
 	// GmaePlay
 
-	Desc.fX = 200;
+	Desc.fX = 250;
 	Desc.fY = 400;
-	Desc.fSizeX = 200;
+	Desc.fSizeX = 300;
 	Desc.fSizeY = 50;
 	Desc.iData = 10;
 	Desc.fDepth = 0.0f;
-	Desc.eTag = CButtonUI::BUTTON_PLAY;
+	Desc.eTag = CButtonUI::BUTTON_CREATE;
 	(m_pButton_ImGui = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_ButtonUI_Menu"), &Desc));
 	// ImGui
 
-	Desc.fX = 200;
+	Desc.fX = 250;
 	Desc.fY = 500;
-	Desc.fSizeX = 200;
+	Desc.fSizeX = 300;
 	Desc.fSizeY = 50;
 	Desc.iData = 10;
 	Desc.fDepth = 0.0f;
-	Desc.eTag = CButtonUI::BUTTON_PLAY;
+	Desc.eTag = CButtonUI::BUTTON_MINI;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_ButtonUI_Menu"), &Desc)))
 		return E_FAIL;
 

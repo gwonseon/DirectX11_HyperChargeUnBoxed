@@ -81,7 +81,7 @@ public:
 	void Rotation(_float fX, _float fY, _float fZ);
 	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount);
 	void Set_Min_Height();
-
+	_bool KnockBack(_float fTimeDelta, _vector vKnockBackDir, _float& fPower, _float StartHeight);
 
 	void Go_Left_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Right_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
@@ -105,6 +105,7 @@ private:
 	_float3						m_fScale = {};
 
 	_uint						m_iCurrent_JumpState{};
+	_float						m_fStart_Height{};
 	_float						m_fJumpSpeed{};
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pTransformDesc);

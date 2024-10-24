@@ -3,8 +3,11 @@
 #include "Level_Loading.h"
 #include "GameInstance.h"
 
+
 #include "CrossLine.h"
+#include "NumberUI.h"
 #include "InGameUI.h"
+
 #include "Terrain.h"
 #include "Monster.h"
 #include "Environment.h"
@@ -48,11 +51,23 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI_MACHINE_HP(TEXT("Layer_UIHp"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_UI_Button(TEXT("Layer_UI"))))
+
+	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
+
+	if (FAILED(Ready_Layer_Icon(TEXT("Layer_UI_Icon"))))
+		return E_FAIL;
+
+
 
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;
+
+	// 가장 마지막에 그려야한다.
+	if (FAILED(Ready_Layer_Damaged(TEXT("Layer_UI_Damaged"))))
+		return E_FAIL;
+
+
 	Load_Map();
 
 
@@ -60,7 +75,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Player"));
 	pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"));
 	pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
-
+	
 	return S_OK;
 }
 
@@ -68,15 +83,12 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 	Interaction_Weapon();
-	// m_pGameInstance
-	// 플레이어 몸에서 몬스터와 충돌
-	
-	 
-	
+
+	// 앞이 당하는 애
 	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
 	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
 	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
-	
+
 	
 
 	
@@ -92,7 +104,9 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
 	{
 		_bool* bShot = m_pPlayer->Get_ShotStart();
-		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());
+		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // 총과 근거리 몬스터
+		m_pGameInstance->Collision_Bullet(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());  // 총과 장거리 몬스터
+
 	}
 
 }
@@ -100,6 +114,13 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 HRESULT CLevel_GamePlay::Render()
 {
 	__super::Render();
+
+	// 코인 숫자 (문자열 ) 출력, 이미지로 하자 
+	//_uint m_iCoin = m_pPlayer->Get_Coin();
+//wstring strCoin = to_wstring(794);
+//m_pGameInstance->Render_Text(TEXT("GumiFont"), strCoin.c_str(), _float2(g_iWinSizeX - 140.f, g_iWinSizeY - 27.f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.4);
+
+
 
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
@@ -109,7 +130,7 @@ HRESULT CLevel_GamePlay::Render()
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
 			return E_FAIL;
 	}
-	return S_OK;
+	return S_OK; 
 }
 
 void CLevel_GamePlay::Interaction_Weapon()
@@ -166,16 +187,7 @@ void CLevel_GamePlay::Interaction_Weapon()
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag)
 {
-	//CInGameUI::UIOBJECT_DESC			Desc{};
 
-	//Desc.fX = 1200;
-	//Desc.fY = 640;
-	//Desc.fSizeX = 80.f;
-	//Desc.fSizeY = 80.f;
-	//Desc.iData = 0;
-
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &Desc)))
-	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -238,6 +250,172 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	pDesc.iModelComponentIndex = 205;
 	
 	m_pBrain = static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Icon(const _tchar* pLayerTag)
+{
+	CInGameUI::INGAMEUI_DESC	pDesc{};
+	pDesc.eLevel = LEVEL_GAMEPLAY;
+	pDesc.eUITag = CInGameUI::UI_F;
+	pDesc.fSizeX = 30.f;
+	pDesc.fSizeY = 30.f;
+	pDesc.iData = 0;
+	pDesc.fX = g_iWinSizeX - 75.f;
+	pDesc.fY = 490.f;
+	pDesc.fDepth = 0.1f;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc1{};
+	pDesc1.eLevel = LEVEL_GAMEPLAY;
+	pDesc1.eUITag = CInGameUI::UI_V;
+	pDesc1.fSizeX = 30.f;
+	pDesc1.fSizeY = 30.f;
+	pDesc1.iData = 0;
+	pDesc1.fX = g_iWinSizeX - 75.f;
+	pDesc1.fY = 530.f;
+	pDesc1.fDepth = 0.1f;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc1)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc2{};
+	pDesc2.eLevel = LEVEL_GAMEPLAY;
+	pDesc2.eUITag = CInGameUI::UI_SPACE;
+	pDesc2.fSizeX = 70.f;
+	pDesc2.fSizeY = 30.f;
+	pDesc2.iData = 0;
+	pDesc2.fX = g_iWinSizeX - 55.f;
+	pDesc2.fY = 450.f;
+	pDesc2.fDepth = 0.1f;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc2)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc19{};
+	pDesc19.eLevel = LEVEL_GAMEPLAY;
+	pDesc19.eUITag = CInGameUI::UI_JUMP_ICON;
+	pDesc19.fSizeX = 28.f;
+	pDesc19.fSizeY = 32.f;
+	pDesc19.iData = 0;
+	pDesc19.fX = g_iWinSizeX - 110.f;
+	pDesc19.fY = 450.f;
+	pDesc19.fDepth = 0.1f;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc19)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc3{};
+	pDesc3.eLevel = LEVEL_GAMEPLAY;
+	pDesc3.eUITag = CInGameUI::UI_SHIFT;
+	pDesc3.fSizeX = 70.f;
+	pDesc3.fSizeY = 30.f;
+	pDesc3.iData = 0;
+	pDesc3.fX = g_iWinSizeX - 55.f;
+	pDesc3.fY = 410.f;
+	pDesc3.fDepth = 0.1f;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc3)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc18{};
+	pDesc18.eLevel = LEVEL_GAMEPLAY;
+	pDesc18.eUITag = CInGameUI::UI_RUN_ICON;
+	pDesc18.fSizeX = 30.f;
+	pDesc18.fSizeY = 30.f;
+	pDesc18.iData = 0;
+	pDesc18.fX = g_iWinSizeX - 110.f;
+	pDesc18.fY = 410.f;
+	pDesc18.fDepth = 0.1f;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc18)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc20{};
+	pDesc20.eLevel = LEVEL_GAMEPLAY;
+	pDesc20.eUITag = CInGameUI::UI_MODECHANGE_ICON;
+	pDesc20.fSizeX = 30.f;
+	pDesc20.fSizeY = 30.f;
+	pDesc20.iData = 0;
+	pDesc20.fX = g_iWinSizeX - 110.f;
+	pDesc20.fY = 490.f;
+	pDesc20.fDepth = 0.1f;
+	pDesc20.iIndex = 0;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc20)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc21{};
+	pDesc21.eLevel = LEVEL_GAMEPLAY;
+	pDesc21.eUITag = CInGameUI::UI_PUNCH_ICON;
+	pDesc21.fSizeX = 30.f;
+	pDesc21.fSizeY = 30.f;
+	pDesc21.iData = 0;
+	pDesc21.fX = g_iWinSizeX - 110.f;
+	pDesc21.fY = 530.f;
+	pDesc21.fDepth = 0.1f;
+	pDesc21.iIndex = 0;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc21)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc23{};
+	pDesc23.eLevel = LEVEL_GAMEPLAY;
+	pDesc23.eUITag = CInGameUI::UI_C;
+	pDesc23.fSizeX = 30.f;
+	pDesc23.fSizeY = 30.f;
+	pDesc23.iData = 0;
+	pDesc23.fX = g_iWinSizeX - 75.f;
+	pDesc23.fY = 570.f;
+	pDesc23.fDepth = 0.1f;
+	pDesc23.iIndex = 0;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc23)))
+		return E_FAIL;
+
+
+	CInGameUI::INGAMEUI_DESC	pDesc24{};
+	pDesc24.eLevel = LEVEL_GAMEPLAY;
+	pDesc24.eUITag = CInGameUI::UI_VIEWCHANGE_ICON;
+	pDesc24.fSizeX = 30.f;
+	pDesc24.fSizeY = 30.f;
+	pDesc24.iData = 0;
+	pDesc24.fX = g_iWinSizeX - 110.f;
+	pDesc24.fY = 570.f;
+	pDesc24.fDepth = 0.1f;
+	pDesc24.iIndex = 0;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc24)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Damaged(const _tchar* pLayerTag)
+{
+	CInGameUI::INGAMEUI_DESC	pDesc12{};
+	pDesc12.eLevel = LEVEL_GAMEPLAY;
+	pDesc12.eUITag = CInGameUI::UI_DAMAGED;
+	pDesc12.fSizeX = g_iWinSizeX;
+	pDesc12.fSizeY = g_iWinSizeY;
+	pDesc12.iData = 0;
+	pDesc12.fX = g_iWinSizeX * 0.5f;
+	pDesc12.fY = g_iWinSizeY * 0.5f;
+	pDesc12.fDepth = 0.f;
+	pDesc12.iIndex = 0;
+	pDesc12.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc12)))
+		return E_FAIL;
+
+	CInGameUI::INGAMEUI_DESC	pDesc4{};
+	pDesc4.eLevel = LEVEL_GAMEPLAY;
+	pDesc4.eUITag = CInGameUI::UI_DEAD;
+	pDesc4.fSizeX = 100.f;
+	pDesc4.fSizeY = 100.f;
+	pDesc4.iData = 0;
+	pDesc4.fX = g_iWinSizeX * 0.5f;
+	pDesc4.fY = g_iWinSizeY * 0.3f;
+	pDesc4.fDepth = 0.1f;
+	pDesc4.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc4)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -335,6 +513,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag)
 	Tank_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
 	Tank_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
 	Tank_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
+	Tank_Desc.m_pBuild = m_pBrain;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
 		TEXT("Prototype_GameObject_Tank"), &Tank_Desc)))
 		return E_FAIL;
@@ -466,8 +645,22 @@ void CLevel_GamePlay::Free()
 
 
 
-HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
+HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 {
+
+	CInGameUI::INGAMEUI_DESC	DescCenterIcon{};
+	DescCenterIcon.eLevel = LEVEL_GAMEPLAY;
+	DescCenterIcon.eUITag = CInGameUI::UI_CENTERICON;
+	DescCenterIcon.fSizeX = 26.f;
+	DescCenterIcon.fSizeY = 26.f;
+	DescCenterIcon.iData = 0;
+	DescCenterIcon.fX = g_iWinSizeX * 0.5f;
+	DescCenterIcon.fY = g_iWinSizeY * 0.5f;
+	DescCenterIcon.fDepth = 0.1f;
+	DescCenterIcon.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescCenterIcon)))
+		return E_FAIL;
+
 	CUI_CircleGuage::CIRCLEGAUGE_DESC pCircleDesc{};
 	pCircleDesc.eLevel = LEVEL_GAMEPLAY;
 	pCircleDesc.fSizeX = 200.f;
@@ -475,11 +668,72 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pCircleDesc.iData = 0;
 	pCircleDesc.fX = g_iWinSizeX * 0.5f;
 	pCircleDesc.fY = g_iWinSizeY * 0.5f;
-	pCircleDesc.fDepth = 0.f;
+	pCircleDesc.fDepth = 0.1f;
 	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
 
+	// 총알 아이콘
+	CInGameUI::INGAMEUI_DESC	DescBulletIcon{};
+	DescBulletIcon.eLevel = LEVEL_GAMEPLAY;
+	DescBulletIcon.eUITag = CInGameUI::UI_BULLET;
+	DescBulletIcon.fSizeX = 30.f;
+	DescBulletIcon.fSizeY = 30.f;
+	DescBulletIcon.iData = 0;
+	DescBulletIcon.fX = g_iWinSizeX - 140.f;
+	DescBulletIcon.fY = 610.f;
+	DescBulletIcon.fDepth = 0.1f;
+	DescBulletIcon.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescBulletIcon)))
+		return E_FAIL;
 
+	// 현재 총알 개수
+	CNumberUI::NUMBERUI_DESC pBullet{};
+	pBullet.fDepth = 0.1f;
+	pBullet.eLevel = LEVEL_GAMEPLAY;
+	pBullet.fX = g_iWinSizeX - 100.f;
+	pBullet.fY = 610.f;
+	pBullet.fSizeX = 26.f;
+	pBullet.fSizeY = 26.f;
+	pBullet.eTypeUsage = CNumberUI::TYPE_BULLET;
+	pBullet.eDigit = CNumberUI::ONE_DIGIT; // 일의 자리수
+	pBullet.iData = 0;
+	pBullet.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+		return E_FAIL;
+
+	pBullet.eDigit = CNumberUI::TEN_DIGIT; // 십의 자리수
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+		return E_FAIL;
+
+	// 총 탄알 수
+	pBullet.fSizeX = 15.f;
+	pBullet.fSizeY = 15.f;
+	pBullet.fX = g_iWinSizeX - 40.f;
+	pBullet.fY = 620.f;
+	pBullet.eTypeUsage = CNumberUI::TYPE_FULLBULLET;
+	pBullet.eDigit = CNumberUI::ONE_DIGIT; // 일의 자리수
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+		return E_FAIL;
+
+	pBullet.eDigit = CNumberUI::TEN_DIGIT; // 십의 자리수
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+		return E_FAIL;
+
+
+	CInGameUI::INGAMEUI_DESC	DescSlice{};
+	DescSlice.eLevel = LEVEL_GAMEPLAY;
+	DescSlice.eUITag = CInGameUI::UI_SLICE;
+	DescSlice.fSizeX = 20.f;
+	DescSlice.fSizeY = 20.f;
+	DescSlice.iData = 0;
+	DescSlice.fX = g_iWinSizeX - 60.f;
+	DescSlice.fY = 615.f;
+	DescSlice.fDepth = 0.1f;
+	DescSlice.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescSlice)))
+		return E_FAIL;
+
+	// 크로스라인
 	CCrossLine::UIOBJECT_DESC			Desc{};
 	Desc.fX = g_iWinSizeX * 0.5f;
 	Desc.fY = g_iWinSizeY * 0.5f;
@@ -490,134 +744,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CrossLine"), &Desc)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc{};
-	pDesc.eLevel = LEVEL_GAMEPLAY;
-	pDesc.eUITag = CInGameUI::UI_F;
-	pDesc.fSizeX = 30.f;
-	pDesc.fSizeY = 30.f;
-	pDesc.iData = 0;
-	pDesc.fX = g_iWinSizeX - 75.f;
-	pDesc.fY = 500.f;
-	pDesc.fDepth = 0.1f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc1{};
-	pDesc1.eLevel = LEVEL_GAMEPLAY;
-	pDesc1.eUITag = CInGameUI::UI_V;
-	pDesc1.fSizeX = 30.f;
-	pDesc1.fSizeY = 30.f;
-	pDesc1.iData = 0;
-	pDesc1.fX = g_iWinSizeX - 75.f;
-	pDesc1.fY = 540.f;
-	pDesc1.fDepth = 0.1f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc1)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc2{};
-	pDesc2.eLevel = LEVEL_GAMEPLAY;
-	pDesc2.eUITag = CInGameUI::UI_SPACE;
-	pDesc2.fSizeX = 70.f;
-	pDesc2.fSizeY = 30.f;
-	pDesc2.iData = 0;
-	pDesc2.fX = g_iWinSizeX - 55.f;
-	pDesc2.fY = 460.f;
-	pDesc2.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc2)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc19{};
-	pDesc19.eLevel = LEVEL_GAMEPLAY;
-	pDesc19.eUITag = CInGameUI::UI_JUMP_ICON;
-	pDesc19.fSizeX = 28.f;
-	pDesc19.fSizeY = 32.f;
-	pDesc19.iData = 0;
-	pDesc19.fX = g_iWinSizeX - 110.f;
-	pDesc19.fY = 460.f;
-	pDesc19.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc19)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc3{};
-	pDesc3.eLevel = LEVEL_GAMEPLAY;
-	pDesc3.eUITag = CInGameUI::UI_SHIFT;
-	pDesc3.fSizeX = 70.f;
-	pDesc3.fSizeY = 30.f;
-	pDesc3.iData = 0;
-	pDesc3.fX = g_iWinSizeX - 55.f;
-	pDesc3.fY = 420.f;
-	pDesc3.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc3)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc18{};
-	pDesc18.eLevel = LEVEL_GAMEPLAY;
-	pDesc18.eUITag = CInGameUI::UI_RUN_ICON;
-	pDesc18.fSizeX = 30.f;
-	pDesc18.fSizeY = 30.f;
-	pDesc18.iData = 0;
-	pDesc18.fX = g_iWinSizeX - 110.f;
-	pDesc18.fY = 420.f;
-	pDesc18.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc18)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc20{};
-	pDesc20.eLevel = LEVEL_GAMEPLAY;
-	pDesc20.eUITag = CInGameUI::UI_MODECHANGE_ICON;
-	pDesc20.fSizeX = 30.f;
-	pDesc20.fSizeY = 30.f;
-	pDesc20.iData = 0;
-	pDesc20.fX = g_iWinSizeX - 110.f;
-	pDesc20.fY = 500.f;
-	pDesc20.fDepth = 0.1f;
-	pDesc20.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc20)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc21{};
-	pDesc21.eLevel = LEVEL_GAMEPLAY;
-	pDesc21.eUITag = CInGameUI::UI_PUNCH_ICON;
-	pDesc21.fSizeX = 30.f;
-	pDesc21.fSizeY = 30.f;
-	pDesc21.iData = 0;
-	pDesc21.fX = g_iWinSizeX - 110.f;
-	pDesc21.fY = 540.f;
-	pDesc21.fDepth = 0.1f;
-	pDesc21.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc21)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc23{};
-	pDesc23.eLevel = LEVEL_GAMEPLAY;
-	pDesc23.eUITag = CInGameUI::UI_C;
-	pDesc23.fSizeX = 30.f;
-	pDesc23.fSizeY = 30.f;
-	pDesc23.iData = 0;
-	pDesc23.fX = g_iWinSizeX - 75.f;
-	pDesc23.fY = 580.f;
-	pDesc23.fDepth = 0.1f;
-	pDesc23.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc23)))
-		return E_FAIL;
-
-
-	CInGameUI::INGAMEUI_DESC	pDesc24{};
-	pDesc24.eLevel = LEVEL_GAMEPLAY;
-	pDesc24.eUITag = CInGameUI::UI_VIEWCHANGE_ICON;
-	pDesc24.fSizeX = 30.f;
-	pDesc24.fSizeY = 30.f;
-	pDesc24.iData = 0;
-	pDesc24.fX = g_iWinSizeX - 110.f;
-	pDesc24.fY = 580.f;
-	pDesc24.fDepth = 0.1f;
-	pDesc24.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc24)))
-		return E_FAIL;
+	
 
 
 	CInGameUI::INGAMEUI_DESC	pDesc9{};
@@ -793,66 +920,78 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI_Button(const _tchar* pLayerTag)
 	pDesc17.fX = g_iWinSizeX - 160.f;
 	pDesc17.fY = g_iWinSizeY - 22.f;
 	pDesc17.fDepth = 0.2f;
+	pDesc17.pPlayer = m_pPlayer;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc17)))
 		return E_FAIL;
 
 
-			
-			/*
-#ifdef _DEBUG
-	CInGameUI::INGAMEUI_DESC	pDesc4{};
-	pDesc4.eLevel = LEVEL_GAMEPLAY;
-	pDesc4.eUITag = CInGameUI::UI_DEAD;
-	pDesc4.fSizeX = 100.f;
-	pDesc4.fSizeY = 100.f;
-	pDesc4.iData = 0;
-	pDesc4.fX = g_iWinSizeX * 0.5f;
-	pDesc4.fY = g_iWinSizeY * 0.3f;
-	pDesc4.fDepth = 0.1f;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc4)))
+	//CInGameUI::INGAMEUI_DESC	pDesc7{};
+	//pDesc7.eLevel = LEVEL_GAMEPLAY;
+	//pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	//pDesc7.fSizeX = 170.f;
+	//pDesc7.fSizeY = 60.f;
+	//pDesc7.iData = 0;
+	//pDesc7.fX = g_iWinSizeX * 0.55f;
+	//pDesc7.fY = 65.f;
+	//pDesc7.fDepth = 0.2f;
+	//pDesc7.iIndex = 0;	
+	//pDesc7.pPlayer = m_pPlayer;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
+	//	return E_FAIL;
+
+	//CInGameUI::INGAMEUI_DESC	pDesc6{};
+	//pDesc6.eLevel = LEVEL_GAMEPLAY;
+	//pDesc6.eUITag = CInGameUI::UI_CHARACTER;
+	//pDesc6.fSizeX = 100.f;
+	//pDesc6.fSizeY = 100.f;
+	//pDesc6.iData = 0;
+	//pDesc6.fX = g_iWinSizeX * 0.6f;
+	//pDesc6.fY = 65.f;
+	//pDesc6.fDepth = 0.1f;
+	//pDesc6.pPlayer = m_pPlayer;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc6)))
+	//	return E_FAIL;
+
+
+
+
+
+	// 코인 UI( 숫자 )
+	CNumberUI::NUMBERUI_DESC pCoin{};
+	pCoin.fDepth = 0.1f;
+	pCoin.eLevel = LEVEL_GAMEPLAY;
+	pCoin.fX = g_iWinSizeX - 140.f;
+	pCoin.fY = g_iWinSizeY - 22.f;
+	pCoin.fSizeX = 13.f;
+	pCoin.fSizeY = 13.f;
+	pCoin.eTypeUsage = CNumberUI::TYPE_COIN;
+	pCoin.eDigit = CNumberUI::ONE_DIGIT; // 첫 번째 자리수
+	pCoin.iData = 0;
+	pCoin.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc7{};
-	pDesc7.eLevel = LEVEL_GAMEPLAY;
-	pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
-	pDesc7.fSizeX = 170.f;
-	pDesc7.fSizeY = 60.f;
-	pDesc7.iData = 0;
-	pDesc7.fX = g_iWinSizeX * 0.55f;
-	pDesc7.fY = 65.f;
-	pDesc7.fDepth = 0.2f;
-	pDesc7.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
+	pCoin.eDigit = CNumberUI::TEN_DIGIT; // 십의 자리
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc6{};
-	pDesc6.eLevel = LEVEL_GAMEPLAY;
-	pDesc6.eUITag = CInGameUI::UI_CHARACTER;
-	pDesc6.fSizeX = 100.f;
-	pDesc6.fSizeY = 100.f;
-	pDesc6.iData = 0;
-	pDesc6.fX = g_iWinSizeX * 0.6f;
-	pDesc6.fY = 65.f;
-	pDesc6.fDepth = 0.1f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc6)))
+	pCoin.eDigit = CNumberUI::HUNDREDS_DIGIT; // 백의 자리
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
 		return E_FAIL;
 
-
-	CInGameUI::INGAMEUI_DESC	pDesc12{};
-	pDesc12.eLevel = LEVEL_GAMEPLAY;
-	pDesc12.eUITag = CInGameUI::UI_DAMAGED;
-	pDesc12.fSizeX = g_iWinSizeX;
-	pDesc12.fSizeY = g_iWinSizeY;
-	pDesc12.iData = 0;
-	pDesc12.fX = g_iWinSizeX * 0.5f;
-	pDesc12.fY = g_iWinSizeY * 0.5f;
-	pDesc12.fDepth = 0.f;
-	pDesc12.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc12)))
+	pCoin.eDigit = CNumberUI::THOUSANDS_DIGIT; // 천의 자리
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
 		return E_FAIL;
-#endif
-*/
+
+	pCoin.eDigit = CNumberUI::TENS_OF_THOUSANDS_DIGIT; // 만의 자리
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+		return E_FAIL;
+
+	pCoin.eDigit = CNumberUI::HUNDREDS_OF_THOUSANDS_DIGIT; // 십만의 자리
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

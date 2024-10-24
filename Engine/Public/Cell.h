@@ -27,7 +27,7 @@ public:
 
 public:
 	HRESULT Initialize(const _float3* pPoints, _uint iIndex);
-	_bool isIn(_fvector vLocalPos, _int* pNeighborIndex);
+	_bool isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosition, const _bool& bCalcSlide);
 	_bool Compare_Points(_fvector vSour, _fvector vDest);
 
 	_uint	Get_CellIndex() { return m_iIndex; }
@@ -46,7 +46,7 @@ private:
 	_uint					m_iIndex = {};
 	_int					m_iNeighbors[LINE_END] = { -1, -1, -1 }; // 이웃셀의 인덱스 넘버 3개를 보관한다. 이웃이 없으면 -1로 두고 나중에 처리한다.
 
-
+    
 #ifdef _DEBUG
 private:
 	class CVIBuffer_Cell* m_pVIBuffer = { nullptr };

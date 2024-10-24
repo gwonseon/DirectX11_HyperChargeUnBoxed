@@ -33,40 +33,35 @@ HRESULT CWeapon::Initialize(void* pArg)
 
 	m_bReloading = pDesc->bReload;
 	m_pReloading_Time = pDesc->fReloadingTime;
-	
-	/* 추가적으로 초기화가 필요하다면 수행해준다. */
-
+	m_iViewState = pDesc->m_iViewState;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
-	/*Position = { -7.8, 0.6, -0.925292 };
-	Rotation = { 2.22,0.2,0.f };*/
-	m_iViewState = pDesc->m_iViewState;
-
-
-
-
+	
 	Position = {-0.86f, 0.12f, -0.39f };
 	Scale = { 2.3f };
 	Rotation = { 8.87969f, -115.2f, 6.4f };
+
 	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
 	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
-	m_bBulletIn = false;
-	m_iCurrent_Bullet = m_iRifle_Bullet;
+	
+	// 총알
+	m_bBulletIn = false; 
+	m_iFull_Bullet = m_iRifle_Bullet; 
+	m_iCurrent_Bullet = m_iFull_Bullet;
 	
 	return S_OK;
 }
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
-
+	m_iFull_Bullet = m_iRifle_Bullet;
 	if (m_bBulletIn == true) // 장전 완료
 	{
-		m_iCurrent_Bullet = m_iRifle_Bullet; // 나중에 총에 따라 나누기
+		m_iCurrent_Bullet = m_iFull_Bullet; // 나중에 총에 따라 나누기
 		m_bBulletIn = false;
 	}
 
@@ -119,8 +114,12 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 
 void CWeapon::Update(_float fTimeDelta)
 {
-	
-
+	if (*m_iViewState == PLAYER_FPS_VIEW)
+	{
+		m_iShaderPassNum = 1;
+	}
+	else
+		m_iShaderPassNum = 0;
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
@@ -266,7 +265,7 @@ HRESULT CWeapon::Weapon_Exchange()
 		{
 			if (FAILED(m_pModelCom[m_iWeaponState]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 
 			m_pModelCom[0]->Render(i);
@@ -281,7 +280,7 @@ HRESULT CWeapon::Weapon_Exchange()
 		{
 			if (FAILED(m_pModelCom[WEAPONPARTS_SHOTGUN]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 
 			m_pModelCom[0]->Render(i);
@@ -295,7 +294,7 @@ HRESULT CWeapon::Weapon_Exchange()
 		{
 			if (FAILED(m_pModelCom[WEAPONPARTS_PULSE]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 
 			m_pModelCom[0]->Render(i);
@@ -309,7 +308,7 @@ HRESULT CWeapon::Weapon_Exchange()
 		{
 			if (FAILED(m_pModelCom[WEAPONPARTS_TELEPORT]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 
 			m_pModelCom[0]->Render(i);
@@ -323,7 +322,7 @@ HRESULT CWeapon::Weapon_Exchange()
 		{
 			if (FAILED(m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 
 			m_pModelCom[0]->Render(i);

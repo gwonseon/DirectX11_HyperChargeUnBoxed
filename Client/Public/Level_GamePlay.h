@@ -27,7 +27,7 @@ public:
 private:
 	HRESULT Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag);
 
-	HRESULT Ready_Layer_UI_Button(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Camera(const _tchar* pLayerTag);
 	HRESULT Ready_Lights();
@@ -36,6 +36,8 @@ private:
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WeaponITem(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Icon(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Damaged(const _tchar* pLayerTag);
 
 	
 private:
@@ -57,6 +59,8 @@ private:
 	CLayer* pNearMonsterLayer = { nullptr };
 	CLayer* pFarMonsterLayer = { nullptr };
 
+
+	
 	_bool* m_pReloading = { nullptr };
 	_float XPos{}, ZPos{};
 public:

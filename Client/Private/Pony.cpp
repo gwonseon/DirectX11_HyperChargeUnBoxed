@@ -39,54 +39,92 @@ HRESULT CPony::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true);
-	//pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
 
 	m_fHp = 100.f;
 	m_fEnergy = 0.f;
-
-	current = CPonyIdle::GetInstance();
+	m_fAttack = 10.f;
+	current = CPonyIdle::GetInstance(); // 상태 패턴
 	return S_OK;
 }
 
 void CPony::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
+	vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
-	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 }
 
 void CPony::Update(_float fTimeDelta)
 {
-
+	__super::Update(fTimeDelta);
+	// 콜라이더 업데이트
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	// 상태 패턴 업데이트
 	current->Update(this, fTimeDelta);
 
-	// Handle distance-based behavior (e.g., switch to GallopFast if far from player)
-	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	// 넉백이 True일 때 넉백 모션하게 하기
+	if (m_bAttacked == true)
+	{
+		m_fKnockBack_Height = XMVectorGetY(vPos);
+		m_fKnockBack_Power = 8.f;
+		m_bKnockBacking = true;
+		m_bAttacked = false;
+	}
+
+	// 플레이어에게 다가가기
 	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
+	if (fDistance > 4.f)
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	// 대각선 거리에 따라 행동 다르게 하기
 	if(fDistance < 5000.f)
 	{
+		// 플레이어 쫒아가는 상태
 		m_pTransformCom->LookAt(vPlayerPos);
-		if (fDistance > 6.f) {
+		if (fDistance > 10.f) {
+			m_pModelCom->Play_Animation(fTimeDelta, false);
 			// 처음에 걷다가 몇 초 뒤 뛰는 모션으로 변경
 			if (m_bWalkState == true)
 				Walk();
 			m_pTransformCom->Go_Straight(fTimeDelta + m_fRunSpeed);
+			m_bAttackState = false;
 		}
 		else {
+			// 공격 상태
+			m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 			AttackRepeat();
+			m_bAttackState = true;
 			m_bWalkState = true;
 		}
 	}
-	
+	else
+	{
+		// Idle 상태
+		Idle();
+		m_pModelCom->Play_Animation(fTimeDelta, false);
+	}
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-
-	
 }
 
 void CPony::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 
+	// 넉백이 true일 때 넉백 모션
+	if (m_bKnockBacking == true)
+	{
+		_vector vKnockBack_DIr = vPos - vPlayerPos; // 플레이어 방향으로부터 반대방향으로 날아가기
+		vKnockBack_DIr = XMVector3Normalize(vKnockBack_DIr);
+
+		if (m_pTransformCom->KnockBack(fTimeDelta, vKnockBack_DIr, m_fKnockBack_Power, m_fKnockBack_Height) == true)
+		{
+			// 모션 끝남
+			m_bCanAttacked = true;
+			m_bKnockBacking = false;
+		}
+
+	}
 }
 
 HRESULT CPony::Render()
@@ -247,5 +285,5 @@ void CPony::GallopFast()
 void CPony::AttackRepeat()
 {
 	current->AttackRepeat(this);
-	m_pModelCom->Set_Animation(PONY_AttackRepeat, false);
+	m_pModelCom->Set_Animation(PONY_AttackRepeat, true);
 }

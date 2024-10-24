@@ -2,6 +2,7 @@
 #include "..\Public\Tank.h"
 
 #include "GameInstance.h"
+#include <Monster_Bullet.h>
 
 
 CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -27,6 +28,7 @@ HRESULT CTank::Initialize(void* pArg)
 	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
 	m_iModelIndex = pDesc->iModelComponentIndex;
 	m_eLevel = pDesc->eID;
+	m_pBuild = pDesc->m_pBuild;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -35,9 +37,10 @@ HRESULT CTank::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(1, true);
-//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
+	
 	m_fHp = 100.f;
 	m_fEnergy = 0.f;
+	m_fAttack = 0.f; //  탱크 자체의 공격력은 0, 미사일이 공격력 갖게 하자
 	return S_OK;
 }
 
@@ -45,23 +48,54 @@ void CTank::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 	m_pTransformCom->LookAt(*m_vecTargetPos);
+	if (m_bCanAttacked == false)
+		m_fCurrentTime += fTimeDelta;
 }
 
 void CTank::Update(_float fTimeDelta)
 {	
+	// 데미지 입는 타이밍 딜레이로 맞춤
+	if(m_fCurrentTime >= m_fDamaged_DelayTime)
+	{
+		m_bCanAttacked = true;
+		m_fCurrentTime = 0.f;
+	}
+
+
 	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, vPos);
 
-	if (fDistance > 30.f)
+	if (fDistance > 2000.f)
 	{
 		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 		m_pModelCom->Set_Animation(MONSTER_Tank_Drive, true);
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		m_pTransformCom->Go_Straight(fTimeDelta * 3.f);
+		m_bFirstShot = false;
 	}
 	else
 	{
+		
+		if (m_bAnimState == true && m_bShotOnce == false || m_bFirstShot == false)
+		{
+			m_bShotOnce = true;	m_bFirstShot = true;
+			// 포탄 발사
+			_float3 fPos{};
+			XMStoreFloat3(&fPos,vPos);
+			CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
+			Desc.eID = m_eLevel;
+			Desc.fPosition = fPos;
+			Desc.m_iModelNumber = 3;
+			Desc.eType = CMonster_Bullet::TANK_BULLET;
+			Desc.vTargetPos = *m_vecTargetPos;
+			Desc.m_pBuild =  m_pBuild;
+			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+		}
 		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * 0.7f, false);
-		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire, true);
+		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire, false);
+		// 한 번만 쏘게 만들기 위함
+		if (m_bAnimState == false) 
+			m_bShotOnce = false;
+	
 	}
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
@@ -117,7 +151,7 @@ HRESULT CTank::Add_Components()
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
-	/* For.Com_Collider_OBB */
+	/* For.Com_Collider_Sphere*/
 	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
 	SphereDesc.fRadius = 1.7f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);

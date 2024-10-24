@@ -74,6 +74,12 @@ protected:
 	const _float4x4* m_matBrainCoreWorld = { nullptr };
 
 
+	_float		m_fCurrentTime = 0.f;
+	_float		m_fDamaged_DelayTime = 1.f;
+	// ³Ë¹é¿ë
+	_bool		m_bKnockBacking = false;
+	_float		m_fKnockBack_Power = 0.f;
+	_float		m_fKnockBack_Height = 0.f;
 protected:
 	_vector* m_vecTargetPos;
 

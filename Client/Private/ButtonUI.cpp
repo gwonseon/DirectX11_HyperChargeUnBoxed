@@ -83,6 +83,7 @@ void CButtonUI::Late_Update(_float fTimeDelta)
 HRESULT CButtonUI::Render()
 {
     m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
+
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Begin(0)))
@@ -93,8 +94,14 @@ HRESULT CButtonUI::Render()
     if (FAILED(m_pVIBufferCom->Render()))
         return E_FAIL;
 
+    if (m_eTag == BUTTON_PLAY)
+        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("플레이"), _float2(m_vObjectPos.x - 40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
+    if (m_eTag == BUTTON_CREATE)
+        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("Tool"), _float2(m_vObjectPos.x -40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
+    if (m_eTag == BUTTON_MINI)
+        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("환경설정"), _float2(m_vObjectPos.x - 40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
 
-
+    
     return S_OK;
 }
 

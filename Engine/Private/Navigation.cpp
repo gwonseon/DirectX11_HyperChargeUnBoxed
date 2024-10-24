@@ -40,51 +40,56 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 	_ulong				dwByte = {};
 	HANDLE				hFile = CreateFile(pNavigationFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
-		return E_FAIL;
-
-	while (true)
 	{
-		_float3		vPoints[3];
-		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
 
-		if (0 == dwByte)
-			break;
-		_vector vA = XMVectorSet(vPoints[0].x, vPoints[0].y, vPoints[0].z, 1.f);
-		_vector vB = XMVectorSet(vPoints[1].x, vPoints[1].y, vPoints[1].z, 1.f);
-		_vector vC = XMVectorSet(vPoints[2].x, vPoints[2].y, vPoints[2].z, 1.f);
-		_vector vCross = XMVector3Cross(vB - vA, vC - vB);
-		_float fDot{};
-		_vector vUp = { 0.f,1.f,0.f,0.f };
-
-		XMVECTOR vDot = XMVector3Dot(vCross, vUp);
-		XMStoreFloat(&fDot, vDot);
-		if (fDot < 0)
-		{
-			_float3 fNewB{}, fNewC{};
-			XMStoreFloat3(&fNewB, vC);
-			XMStoreFloat3(&fNewC, vB);
-			vPoints[1] = fNewB;
-			vPoints[2] = fNewC;
-		}
-		if (vPoints[0].y == 0)
-		{
-			vPoints[0].y = 0.1f;
-		}
-		if (vPoints[1].y == 0)
-		{
-			vPoints[1].y = 0.1f;
-		}
-		if (vPoints[2].y == 0)
-		{
-			vPoints[2].y = 0.1f;
-		}
-		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
-		if (nullptr == pCell)
-			return E_FAIL;
-
-		m_Cells.push_back(pCell);
 	}
-	CloseHandle(hFile);
+	else
+	{
+
+		while (true)
+		{
+			_float3		vPoints[3];
+			ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
+
+			if (0 == dwByte)
+				break;
+			_vector vA = XMVectorSet(vPoints[0].x, vPoints[0].y, vPoints[0].z, 1.f);
+			_vector vB = XMVectorSet(vPoints[1].x, vPoints[1].y, vPoints[1].z, 1.f);
+			_vector vC = XMVectorSet(vPoints[2].x, vPoints[2].y, vPoints[2].z, 1.f);
+			_vector vCross = XMVector3Cross(vB - vA, vC - vB);
+			_float fDot{};
+			_vector vUp = { 0.f,1.f,0.f,0.f };
+
+			XMVECTOR vDot = XMVector3Dot(vCross, vUp);
+			XMStoreFloat(&fDot, vDot);
+			if (fDot < 0)
+			{
+				_float3 fNewB{}, fNewC{};
+				XMStoreFloat3(&fNewB, vC);
+				XMStoreFloat3(&fNewC, vB);
+				vPoints[1] = fNewB;
+				vPoints[2] = fNewC;
+			}
+			if (vPoints[0].y == 0)
+			{
+				vPoints[0].y = 0.1f;
+			}
+			if (vPoints[1].y == 0)
+			{
+				vPoints[1].y = 0.1f;
+			}
+			if (vPoints[2].y == 0)
+			{
+				vPoints[2].y = 0.1f;
+			}
+			CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+			if (nullptr == pCell)
+				return E_FAIL;
+
+			m_Cells.push_back(pCell);
+		}
+		CloseHandle(hFile);
+	}
 
 
 #ifdef _DEBUG
@@ -167,41 +172,110 @@ void CNavigation::SetUp_Neighbor()
 	}
 }
 
-_bool CNavigation::isMove(_fvector vWorldPos)
+//_bool CNavigation::isMove_Slide(const _vector& vTargetPos, _fvector* vSlidePos)
+//{
+//	_fvector vLocal_TargetPos = XMVector3TransformCoord(vTargetPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+//	
+//	_int iNeighborIndex = { -1 };
+//
+//	/* 현재 이동하고 난 결과위치가 원래 존재하고 있던 쎌 바깥으로 나갔다. */
+//	_bool bNextJump{};
+//	if (false == m_Cells[m_iCurrentCellIndex]->isIn(vLocal_TargetPos, &iNeighborIndex, vSlidePos, true, &bNextJump))
+//	{
+//		// 이웃이 없는 경우
+//		if (-1 == iNeighborIndex) 
+//			return false;
+//		
+//	}
+//	// 다음 블럭이 점프 블럭이 아닌 경우
+//	else
+//	{
+//		if(iNeighborIndex != -1)
+//		{
+//			while (true)
+//			{
+//				if (m_Cells[iNeighborIndex]->isIn(vLocal_TargetPos, &iNeighborIndex, vSlidePos, false, &bNextJump))
+//				{
+//
+//					// 이미 슬라이드가 확정 된 상황에서, 오버한 지점에 대해 검사했더니 true인 경우
+//					if (XMVectorGetX(XMVector3Length(*vSlidePos)))
+//					{
+//						vSlidePos = &vLocal_TargetPos;
+//						m_iCurrentCellIndex = iNeighborIndex;
+//						return false;
+//					}
+//
+//					// 한번도 슬라이드 상황을 겪지 않고 isin한 경우,
+//					break;
+//				}
+//
+//				// 그냥 삼각형 내부에서 슬라이드한 경우.
+//				if (-1 == iNeighborIndex) { return false; }
+//			}
+//		}
+//	}
+//
+//	m_iCurrentCellIndex = iNeighborIndex;
+//	return true;
+//}
+
+
+_bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSlidingPos)
 {
-	_vector		vLocalPos = XMVector3TransformCoord(vWorldPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vLocalPos = XMVector3Transform(vWorldPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_int iNeighborIndex = { -1 };
 
-	_int		iNeighborIndex = { -1 };
-
-	if (false == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex))
+	// 현재 셀 내에 위치 확인, 현재 셀 안에 있음
+	if (false == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex, vSlidingPos, true))
 	{
-
-		if (-1 != iNeighborIndex)
-		{
-			while (true)
-			{
-				if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
-					break;
-
-				if (-1 == iNeighborIndex)
-					return false;
-			}
-			// cout <<"지금셀 : " << m_iCurrentCellIndex << endl;
-			m_iCurrentCellIndex = iNeighborIndex;
-			return true;
-		}
-		else 
-		{
+		// 나간 쪽 선분의 이웃을 살펴보자 
+		// 근데 그쪽 이웃이 없는데?
+		if (-1 == iNeighborIndex)
 			return false;
-		}
-	}
 
-	return true;
+		_uint iInfinite_Check{};
+		while (true)
+		{
+			
+			if (m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex, vSlidingPos, false))
+			{
+				// 이미 슬라이드가 확정 된 상황에서, 오버한 지점에 대해 검사했더니 true인 경우
+				if (XMVectorGetX(XMVector3Length(vSlidingPos)))
+				{
+					vSlidingPos = vLocalPos;
+					m_iCurrentCellIndex = iNeighborIndex;
+					return false;
+				}
+
+				// 한번도 슬라이드 상황을 겪지 않고 isin한 경우,
+				break;
+			}
+
+			// 그냥 삼각형 내부에서 슬라이드한 경우.
+			if (-1 == iNeighborIndex) { return false; }
+
+			iInfinite_Check++;
+			if (iInfinite_Check > 100) // 무한루프시 제자리
+			{
+				vSlidingPos = vCurrentPos;
+				return false;
+			}
+		}
+		// 현재 셀을 이웃 셀로 업데이트
+		m_iCurrentCellIndex = iNeighborIndex;
+		
+		
+		return true;
+	}
+	
+	return true;  // 현재 셀 내에 있을 경우
 }
+
+
 #ifdef _DEBUG
 HRESULT CNavigation::Render()
 {
-
+	
 	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))

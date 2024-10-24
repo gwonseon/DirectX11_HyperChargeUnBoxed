@@ -18,7 +18,7 @@ public:
 	{
 		const _uint* pParentState_Upper = { nullptr };
 		const _uint* pParentState_Lower = { nullptr };
-
+		_bool* m_bAttackState = { nullptr };
 		
 	}BODY_PLAYER_DESC;
 
@@ -204,7 +204,7 @@ private:
 	_uint	m_iUpperMotion = 0;			// 상체 모션, 애니메이션 마다 본 위치나 currentPosition이 달라짐
 
 
-
+	_uint	m_iShaderPassNum = 0;		// 1인칭일 때 벽을 뚫어도 몸이 보이게 
 	_uint	m_iWeaponState = 0;			// 어떤 무기를 들고 있는지, 0이 Idle, 1이 공격, 2가 Katana 공격
 
 	_float	m_fArmAngle{};
@@ -237,7 +237,7 @@ public:
 
 	// 총 딜레이용
 private:
-	_float					m_fRiflrDelay = 0.03f;
+	_float					m_fRiflrDelay = 0.1f;
 	_float					m_fShotGunDelay = 1.f;
 	_float					m_fPulseCannonDelay = 2.f;
 	_float					m_fTeleportDelay = 2.f;
@@ -247,8 +247,9 @@ private:
 	_bool					m_bShotStart = false;  // 쏘는 시작을 알려줌 (이때 총알 발사와 반동)
 	_bool					m_bShotNow = false;		// 애니메이션 작동의 시작과 끝을 알려줌 ( 딜레이 계산)
 	_bool					m_bTemp = false;
-
+	_bool*					m_bAttackState = { nullptr }; // 공격 상태인지 아닌지 체크
 public:
+
 	_bool*					Get_ShotNow()	{ return &m_bShotNow; }
 	_bool*					Get_ShotStart() { return &m_bShotStart; }
 private:

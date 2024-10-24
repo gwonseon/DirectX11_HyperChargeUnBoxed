@@ -13,7 +13,7 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex)
 {
 	m_iIndex = iIndex;
-	
+
 	for (size_t i = 0; i < POINT_END; i++)
 		m_vPoints[i] = pPoints[i];
 
@@ -27,8 +27,8 @@ HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex)
 	return S_OK;
 }
 
-// 
-_bool CCell::isIn(_fvector vLocalPos, _int* pNeighborIndex)
+  
+_bool CCell::isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosition,  const _bool& bCalcSlide)
 {
 	for (size_t i = 0; i < LINE_END; i++)
 	{
@@ -36,16 +36,76 @@ _bool CCell::isIn(_fvector vLocalPos, _int* pNeighborIndex)
 		_vector		vNormal = XMVectorSet(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine), 0.f);
 		// _vector vNormal = XMVector3Cross(vLine, XMVectorSet(0.f, 1.f, 0.f, 0.f)); // Y축 포함한 법선 계산
 		_vector		vDir = vLocalPos - XMLoadFloat3(&m_vPoints[i]);
-
-		if (0 < XMVectorGetX(XMVector3Dot(XMVector3Normalize(vNormal), XMVector3Normalize(vDir))))
+		_vector		vDot = XMVector3Dot(XMVector3Normalize(vNormal), (vDir));
+		if (0 < XMVectorGetX(vDot))
 		{
-			*pNeighborIndex = m_iNeighbors[i];
+			if(pNeighborIndex)
+				*pNeighborIndex = m_iNeighbors[i];
+			if (m_iNeighbors[i] == -1)
+			{
+				_vector vSlidePos = XMLoadFloat3(&m_vPoints[i]) + vDir + -1.f * XMVectorGetX(vDot) * XMVector3Normalize(vNormal);
+				_vector vSlideDir = vSlidePos - XMLoadFloat3(&m_vPoints[i]);
+				if (XMVectorGetX(XMVector3Length(vLine)) < XMVectorGetX(XMVector3Length(vSlideDir)))
+				{
+					// 이웃셀이 없으면 이웃셀을 끝점으로 
+					if (m_iNeighbors[i] == -1)
+						*pNeighborIndex = m_iNeighbors[(i + 1) % 3];
+					vLocalPos = XMVectorSet(XMVectorGetX(vSlidePos), XMVectorGetY(vSlidePos), XMVectorGetZ(vSlidePos), 1.f);
+					vSlidePos = XMLoadFloat3(&m_vPoints[(i + 1) % 3]);
+				}
+				else if (XMVectorGetX(XMVector3Dot(vSlideDir, vLine)) < 0.f)
+				{
+					if (m_iNeighbors[i] == -1)
+						*pNeighborIndex = m_iNeighbors[(i - 1 + 3) % 3];
+					vLocalPos = XMVectorSet(XMVectorGetX(vSlidePos), XMVectorGetY(vSlidePos), XMVectorGetZ(vSlidePos), 1.f);
+					vSlidePos = XMLoadFloat3(&m_vPoints[(i)]);
+				}
+				fSlidePosition = XMVectorSet(XMVectorGetX(vSlidePos), XMVectorGetY(vSlidePos), XMVectorGetZ(vSlidePos), 1.f);
+			}
 			return false;
 		}
 	}
-	// 여기서 각도 계산해서 각도에 따라 이동 가능 여부 판단하면 좋을 듯
 	return true;
 }
+
+
+//_bool CCell::Sliding(_fvector& vLocalPos, _int* pNeighborIndex, _vector vEntervector, _vector& vSlidingPos, _vector vCurrentPos, _bool& bSliding, _float fDistanc)
+//{
+//	for (size_t i = 0; i < LINE_END; i++)
+//	{
+//		// 현재 점과 다음 점을 연결하는 벡터 계산
+//		_vector vLine = XMLoadFloat3(&m_vPoints[(i + 1) % POINT_END]) - XMLoadFloat3(&m_vPoints[i]);
+//		// 법선 벡터 계산
+//		_vector vNormal = XMVector3Cross(vLine, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+//
+//		// 슬라이딩 벡터 계산
+//		_vector SlidingVector = vEntervector - XMVectorGetX(XMVector3Dot(vEntervector, vNormal)) * vNormal;
+//		SlidingVector = XMVector3Normalize(SlidingVector);
+//
+//		// 슬라이딩 적용 후 새로운 위치 계산
+//		_vector SlidingPos = vCurrentPos + SlidingVector * -1.f; // 슬라이딩 적용 후 위치
+//
+//		// 슬라이딩 방향 검사
+//		_vector Sliding_Dir = SlidingPos - XMLoadFloat3(&m_vPoints[i]);
+//
+//		// 슬라이딩 방향이 법선 방향과의 내적이 양수인지 검사
+//		if (XMVectorGetX(XMVector3Dot(XMVector3Normalize(vNormal), XMVector3Normalize(Sliding_Dir))) > 0)
+//		{
+//			cout << i << "번 째 위치 선에선 밖으로 나갔네 " << endl;
+//			
+//			*pNeighborIndex = m_iNeighbors[i]; // 이웃 셀로 이동
+//			return false; // 슬라이딩 중단
+//		}
+//		cout  << "슬라이딩 위치다 : "  << XMVectorGetX(vSlidingPos) << "  " << XMVectorGetY(vSlidingPos) << "  " << XMVectorGetZ(vSlidingPos) << "  " << endl;
+//		if (m_iNeighbors[i] != -1)
+//		{
+//			// 슬라이딩 위치 업데이트
+//			vSlidingPos = SlidingPos;
+//		}
+//	}
+//	return true; // 슬라이딩 성공
+//}
+
 
 _bool CCell::Compare_Points(_fvector vSour, _fvector vDest)
 {

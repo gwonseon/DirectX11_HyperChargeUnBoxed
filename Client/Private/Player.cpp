@@ -59,6 +59,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
 	m_fAttack = 10.f;
+	m_iCoin = 74;
 	m_bDontDestroy = true;
 	m_bKnockdown = false;
 
@@ -145,6 +146,14 @@ void CPlayer::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 
+	// 공격 당했을 때 무적상태 1초간 
+	if (m_bCanAttacked == false)
+		m_fInvincibleTime += fTimeDelta;
+	if (m_fInvincibleTime >= 1.f)
+	{
+		m_bCanAttacked = true;
+		m_fInvincibleTime = 0.f;
+	}
 
 }
 
@@ -193,6 +202,7 @@ HRESULT CPlayer::Add_PartObjects()
 	BodyDesc.pParentState_Upper = &m_iState_Upper;
 	BodyDesc.pParentState_Lower = &m_iState_Lower;
 	BodyDesc.m_iViewState = &m_iViewState;
+	BodyDesc.m_bAttackState = &m_bAttackState;
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"), TPS_PART_BODY, &BodyDesc)))
 		return E_FAIL;
 
@@ -307,6 +317,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	{
 		if(m_bReloading == false) // 장전 중엔 총 못쏨
 		{
+			if (m_iWeaponState == WEAPON_KATANA)
+				m_bAttackState = true;
 			if (!(m_iState_Upper & FIRE))
 			{
 				if (m_iState_Upper & STATE_IDLE)
@@ -315,7 +327,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 		}
 	}
-	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB))
+	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB)) 
 	{
 		if (m_iWeaponState != WEAPON_KATANA)
 		{
@@ -324,6 +336,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_RB))
 	{
+		m_bAttackState = true;
 		if (!(m_iState_Upper & FIRE_RB))
 		{
 			if (m_iState_Upper & STATE_IDLE)
@@ -331,7 +344,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			m_iState_Upper |= FIRE_RB;
 		}
 	}
-	
+
+
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V))
 	{
 		if (!(m_iState_Upper & MELEE))
@@ -352,8 +366,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			
 			if (iJumpState == LANDING_STATE)
 			{
-				m_pTransformCom->Go_Left_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
-				m_pTransformCom->Go_Backward_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
+				m_pTransformCom->Go_Left_Nav(fTimeDelta , m_pNavigationCom);
+				m_pTransformCom->Go_Backward_Nav(fTimeDelta , m_pNavigationCom);
 				if (!(m_iState_Lower & WALKSTATE_SOUTHWEST))
 				{
 					if (m_iState_Lower & STATE_IDLE)
@@ -366,8 +380,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		// 뒤 오른쪽 으로 걷기
 		else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
-			m_pTransformCom->Go_Right_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
-			m_pTransformCom->Go_Backward_Nav(fTimeDelta * m_fRun_EightDirection, m_pNavigationCom);
+			m_pTransformCom->Go_Right_Nav(fTimeDelta , m_pNavigationCom);
+			m_pTransformCom->Go_Backward_Nav(fTimeDelta , m_pNavigationCom);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_SOUTHEAST))

@@ -49,9 +49,14 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 
-	// 임시
-	if (FAILED(m_pGameInstance->Add_Font(TEXT("Font_146"), TEXT("../Bin/Resources/Fonts/146ex.spritefont"))))
+	// 구미시 폰트
+	if (FAILED(m_pGameInstance->Add_Font(TEXT("GumiFont"), TEXT("../Bin/Resources/Fonts/GumiFont.spritefont"))))
 		return E_FAIL;
+	// 던파 폰트
+	if (FAILED(m_pGameInstance->Add_Font(TEXT("DunFont"), TEXT("../Bin/Resources/Fonts/Dunfight.spritefont"))))
+		return E_FAIL;
+
+	
 	ImGui::CreateContext(); // 무조건 먼저 호출 되어야 함, 그렇지 않을 경우 다른 코드들이 정상적으로 호출되지 않음.
 	ImGui::StyleColorsDark(); // Gui Style : StyleColorsClassic, StyleColorsDark, StyleColorsLight
 
@@ -76,7 +81,7 @@ void CMainApp::Render()
 	ImGui::NewFrame();
 
 	m_pGameInstance->Draw();
-	m_pGameInstance->Render_Text(TEXT("Font_146"), TEXT("나는야 응가쟁이"), _float2(0.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 1);
+	
 
 
 	ImGui::Render();
