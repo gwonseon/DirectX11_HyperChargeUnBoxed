@@ -39,36 +39,59 @@ HRESULT CAlien::Initialize(void* pArg)
 	m_fEnergy = 0.f;
 	m_fHp = 60.f;
 	
-	
+	m_bAttackState = true;
 	return S_OK;
 }
 
 void CAlien::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
+	vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	m_pModelCom->Set_Animation(0, true);
-	cout << m_fHp << endl;
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
-	m_pTransformCom->LookAt(vPlayerPos);
+	if (XMVectorGetY(vPlayerPos) <= (XMVectorGetY(vPos) + 2.f))
+		m_pTransformCom->LookAt(vPlayerPos);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 }
 
 void CAlien::Update(_float fTimeDelta)
 {
-	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	
 	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
 	if (fDistance > 4.f)
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	// 넉백이 True일 때 넉백 모션하게 하기
+	if (m_bAttacked == true)
+	{
+		m_fKnockBack_Height = XMVectorGetY(vPos);
+		m_fKnockBack_Power = 8.f;
+		m_bKnockBacking = true;
+		m_bAttacked = false;
+	}
+
 }
 
 void CAlien::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
-//	m_pColliderCom->Intersect(pTargetCollider);
 
+	// 넉백이 true일 때 넉백 모션
+	if (m_bKnockBacking == true)
+	{
+		_vector vKnockBack_DIr = vPos - vPlayerPos; // 플레이어 방향으로부터 반대방향으로 날아가기
+		vKnockBack_DIr = XMVector3Normalize(vKnockBack_DIr);
+
+		if (m_pTransformCom->KnockBack(fTimeDelta, vKnockBack_DIr, m_fKnockBack_Power, m_fKnockBack_Height) == true)
+		{
+			// 넉백 끝남
+			m_bCanAttacked = true;
+			m_bKnockBacking = false;
+		}
+
+	}
 }
 
 HRESULT CAlien::Render()

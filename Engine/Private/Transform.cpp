@@ -39,7 +39,6 @@ void CTransform::Set_Scaling(_float fScaleX, _float fScaleY, _float fScaleZ)
 	Set_State(STATE_UP, XMVector3Normalize(vUp) * fScaleY);
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * fScaleZ);
 }
-
 void CTransform::LookAt(_fvector vAt)
 {
 	_float3	vScaled = Get_Scaled();
@@ -53,7 +52,6 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 
 }
-
 void CTransform::Go_Straight(_float fTimeDelta)
 {
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -63,7 +61,6 @@ void CTransform::Go_Straight(_float fTimeDelta)
 	Set_State(CTransform::STATE_POSITION, vPosition);
 
 }
-
 void CTransform::Go_Straight(_float fTimeDelta, _float AddfSpeed)
 {
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -73,6 +70,48 @@ void CTransform::Go_Straight(_float fTimeDelta, _float AddfSpeed)
 	Set_State(CTransform::STATE_POSITION, vPosition);
 
 }
+
+//void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
+//{
+//	_vector vLook = Get_State(CTransform::STATE_LOOK);
+//	_vector vPosition = Get_State(CTransform::STATE_POSITION);
+//
+//	if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
+//	{
+//		if (m_fJumpSpeed < 1.0f)
+//		{
+//			m_fJumpSpeed += fTimeDelta;
+//		}
+//	}
+//	else
+//	{
+//		if (m_fJumpSpeed > 0.1f)
+//			m_fJumpSpeed -= (fTimeDelta * 0.2f);
+//	}
+//
+//	// 이동할 목표 위치 계산
+//	_vector vTargetPosition = vPosition + XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
+//	_vector vSlidePos;  // 슬라이딩 위치를 저장할 변수
+//
+//	// 슬라이드 이동 처리
+//	if (nullptr != pNavigation)
+//	{
+//		if (!pNavigation->isMove_Slide(vTargetPosition, &vSlidePos))
+//		{
+//			// 슬라이드가 실패할 경우, 슬라이드 위치로 업데이트
+//			vPosition = vSlidePos;
+//		}
+//		else
+//		{
+//			// 슬라이드가 성공하면 목표 위치로 업데이트
+//			vPosition = vTargetPosition;
+//		}
+//	}
+//
+//	// 상태 업데이트
+//	Set_State(CTransform::STATE_POSITION, vPosition);
+//}
+
 void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -89,11 +128,14 @@ void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
 		if (m_fJumpSpeed > 0.1f)
 			m_fJumpSpeed -= (fTimeDelta * 0.2f);
 	}
+
+	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
-
-	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
-		return;
-
+	_vector vecSlidingPos{};
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
+	{
+		vPosition = vecSlidingPos;
+	}
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
@@ -117,11 +159,13 @@ void CTransform::Go_Backward_Nav(_float fTimeDelta, CNavigation* pNavigation)
 		}
 	}
 	
+	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
-
-	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
-		return;
-
+	_vector vecSlidingPos{};
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
+	{
+		vPosition = vecSlidingPos;
+	}
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
@@ -145,12 +189,15 @@ void CTransform::Go_Right_Nav(_float fTimeDelta, CNavigation* pNavigation)
 		}
 	}
 
+	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
-
-	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
-		return;
-
+	_vector vecSlidingPos{};
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
+	{
+		vPosition = vecSlidingPos;
+	}
 	Set_State(CTransform::STATE_POSITION, vPosition);
+
 }
 void CTransform::Go_Left_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
@@ -172,12 +219,15 @@ void CTransform::Go_Left_Nav(_float fTimeDelta, CNavigation* pNavigation)
 				m_fJumpSpeed -= (fTimeDelta * 0.2f);
 		}
 	}
+	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
-
-	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition))
-		return;
-
+	_vector vecSlidingPos{};
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
+	{
+		vPosition = vecSlidingPos;
+	}
 	Set_State(CTransform::STATE_POSITION, vPosition);
+
 }
 
 void CTransform::Go_Left(_float fTimeDelta)
@@ -296,6 +346,28 @@ void CTransform::Set_Min_Height()
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	vPosition = XMVectorSetY(vPosition, 0.f);
 	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+_bool CTransform::KnockBack(_float fTimeDelta, _vector vKnockBackDir, _float& fPower, _float StartHeight)
+{
+	_vector		vLook = Get_State(CTransform::STATE_UP);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	float fHeight = XMVectorGetY(vPosition);
+	if (fHeight <= StartHeight && fPower< 0)
+	{
+		fPower = 0.f;
+		XMVectorSetY(vPosition, StartHeight); // 항상 높이가 일정한 경우의 넉백임
+		return true;
+	}
+	else
+	{
+		vPosition += XMVector3Normalize(vLook) * fPower* 2.f * fTimeDelta;	// 위로 날아가기 
+		
+		vPosition += XMVector3Normalize(vKnockBackDir) *  0.6f; // 피격의 반대 방향으로 날아가기
+		fPower -= 0.5f;
+	}
+	Set_State(CTransform::STATE_POSITION, vPosition);
+	return false;
 }
 
 _float CTransform::Cal_Distance(_float3 fObj, _float3 fTarget)

@@ -35,8 +35,7 @@ public:
 
 public:
 	void SetUp_Neighbor();
-	_bool isMove(_fvector vWorldPos);
-
+	_bool isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSlidingPos);
 
 #ifdef _DEBUG
 public:
@@ -60,5 +59,5 @@ public:
 
 };
 
-
+ 
 END

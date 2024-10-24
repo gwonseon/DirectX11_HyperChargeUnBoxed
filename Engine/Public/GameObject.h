@@ -73,14 +73,17 @@ public:
 	void	Set_UseCoin(_uint Price)		{ m_iCoin -= Price; }
 	void	Set_PickUp_Coin(_uint Price)	{ m_iCoin += Price; }
 
+	void	Set_CanAttacked(_bool bCanAttacked) { m_bCanAttacked = bCanAttacked; }  // 공격 당해도 되는지 알림
 	void	Set_Attacked(_bool bAttacked)	{ m_bAttacked = bAttacked; }  // 공격 당했음을 알려줌
 	void	Set_knockdown(_bool bknockdown) { m_bKnockdown = bknockdown; }
 
+	
 	_float	Get_Hp()						{ return m_fHp; }		// 체력 얼마나 있는지
 	_float	Get_Energy()					{ return m_fEnergy; }	// 쉴드량 얼마나 있는지
 	_float	Get_Attack()					{ return m_fAttack; }	// 공격력 얼마인지 
 	_uint	Get_Coin()						{ return m_iCoin; }		// 돈 얼마나 있는지
-		
+
+	_bool	Get_CanAttacked()				{ return m_bCanAttacked; }    // 공격을 당해도 되는지 알려줌
 	_bool	Get_Attacked()					{ return m_bAttacked; }    // 공격을 당했는지 알려줌
 	_bool	Get_DontDestroyAble()			{ return m_bDontDestroy; } // 객체 삭제하면 안되는 애인지 아닌지 알려줌
 	_bool	Get_knockdown()					{ return m_bKnockdown; }   // 객체 삭제하면 안되는 애들 죽었다고 알리기 위함
@@ -116,7 +119,7 @@ protected:
 	_bool							m_bDontDestroy	= false;
 	_bool							m_bKnockdown	= false; // 삭제되면 안되는 애들 죽음 상태를 얘로 대체
 	_bool							m_bAttackState	= false;
-
+	_bool							m_bCanAttacked	= true; // 맞을 수 있는 상태인지 확인
 	_bool							m_bCollision_Check = false;
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);

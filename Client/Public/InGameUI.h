@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "UIObject.h"
+#include <Player.h>
 
 BEGIN(Engine)
 class CShader;
@@ -19,8 +20,7 @@ public:
 		UI_MACHINE_HP,UI_BULLET,UI_CHARACTER,UI_CONVERSATIONBOX,
 		UI_MACHINE_ENERGY,UI_DAMAGED,UI_PLAYER_HP, UI_PLAYER_ENERGY,
 		UI_ENERGY_ICON, UI_HP_ICON, UI_CREDIT_ICON,UI_RUN_ICON, UI_JUMP_ICON, UI_MODECHANGE_ICON, UI_VIEWCHANGE_ICON,
-		UI_PUNCH_ICON, UI_V, UI_F, UI_C, 
-		
+		UI_PUNCH_ICON, UI_V, UI_F, UI_C, UI_CENTERICON, UI_SLICE,
 		UI_END};
 
 	typedef struct : public CUIObject::UIOBJECT_DESC
@@ -31,6 +31,7 @@ public:
 		_float* fBrainEnergy;
 		GAMEUI eUITag{};
 		_uint	iIndex{};
+		CPlayer* pPlayer{};
 	
 	}INGAMEUI_DESC;
 
@@ -88,6 +89,18 @@ private:
 	float*						m_fPlayerHp;
 	// 플레이어 Energy
 	float*						m_fPlayerEnergy;
+
+	// 글자 출력 위치를 위해서 같이 띄우는 위치 저장
+	_float3						m_fUIPosition{};
+
+	// 내가 가진 코인이 얼마나 있는지 알림
+	_uint						m_iCoin{};
+
+	// 그릴지 안그릴지 결정
+	_bool						m_bDraw = true;
+
+	//  플레이어에게서 가져와야 하는 값이 많아서 플레이어 포인터를 들고옴 ( 아차피 삭제 안됨 ㄱㅊ)
+	CPlayer*					m_pPlayer = { nullptr };
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };

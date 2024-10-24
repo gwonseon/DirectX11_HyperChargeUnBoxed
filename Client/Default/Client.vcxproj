@@ -184,10 +184,12 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MenuUI.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\Monster_Bullet.h" />
     <ClInclude Include="..\Public\Monster_Path.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Navigation_Leve.h" />
+    <ClInclude Include="..\Public\NumberUI.h" />
     <ClInclude Include="..\Public\Pivot.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\Player_Build.h" />
@@ -230,10 +232,12 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MenuUI.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\Monster_Bullet.cpp" />
     <ClCompile Include="..\Private\Monster_Path.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Navigation_Leve.cpp" />
+    <ClCompile Include="..\Private\NumberUI.cpp" />
     <ClCompile Include="..\Private\Pivot.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\Player_Build.cpp" />

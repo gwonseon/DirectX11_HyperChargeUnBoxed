@@ -75,7 +75,7 @@ public:
 public:
 	void	Set_TPSState(_bool State) { m_bTPSState = State; }
 	void	Set_BulletIn(_bool bIn) { m_bBulletIn = bIn; }
-	void Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
+	void	Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
 	HRESULT Weapon_Exchange();
 
 	void	Set_SocketMatrix(const _float4x4* matSocket) { m_pSocketMatrix = matSocket; }
@@ -85,6 +85,11 @@ public:
 
 	_vector*	Get_WeaponPos() { return &m_vecWeaponPos; }
 	_vector*	Get_WeaponDir() { return &m_vecWeaponDir; }
+
+
+public:
+	_uint*		Get_FullBullet() { return &m_iFull_Bullet; }
+	_uint*		Get_CurrentBullet() { return &m_iCurrent_Bullet; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };
@@ -103,7 +108,7 @@ private:
 	_vector	m_vecWeaponPos{};
 	_vector	m_vecWeaponDir{};
 	
-
+	_uint m_iShaderPassNum{};  // 무기가 벽에 겹쳐도 보이게
 	_uint m_iWeaponState{};
 	WEAPONSTATE m_eWeaponState = WEAPON_END;
 private:
@@ -122,6 +127,7 @@ private:
 	// 총알
 private:
 	_uint m_iRifle_Bullet = 30;
+	_uint m_iFull_Bullet{};
 	_uint m_iCurrent_Bullet = 30;
 
 private:

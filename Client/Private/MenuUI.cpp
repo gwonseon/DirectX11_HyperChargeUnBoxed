@@ -31,6 +31,8 @@ HRESULT CMenuUI::Initialize(void* pArg)
     Desc.fDepth = pDesc->fDepth;
     Desc.eTag = pDesc->eTag;
     m_eTag = Desc.eTag;
+
+
     if (FAILED(__super::Initialize(&Desc)))
         return E_FAIL;
 
@@ -56,7 +58,7 @@ void CMenuUI::Late_Update(_float fTimeDelta)
 
 HRESULT CMenuUI::Render()
 {
-   
+
     m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;

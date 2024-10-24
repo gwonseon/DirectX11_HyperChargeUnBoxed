@@ -133,11 +133,17 @@
     <Filter Include="02. GameObjects\Monster\Pony\PonyState">
       <UniqueIdentifier>{6789da16-12d8-452b-9edb-f89660d4faa1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Bullet">
-      <UniqueIdentifier>{393b5cff-3b49-41b0-942c-4a6c843ed3b2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\SkyBox">
       <UniqueIdentifier>{74b89f2b-2c46-4e83-a151-ccdf8a1b30eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Weapon\Player_Bullet">
+      <UniqueIdentifier>{393b5cff-3b49-41b0-942c-4a6c843ed3b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Monster_Bullet">
+      <UniqueIdentifier>{292609d5-f940-46cf-93b7-6d9cb5612a5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\NumberUI">
+      <UniqueIdentifier>{8d1a15f3-2bc0-49f4-9a22-05c1cf059963}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -265,10 +271,16 @@
       <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Bullet.h">
-      <Filter>02. GameObjects\Bullet</Filter>
+      <Filter>02. GameObjects\Player\Weapon\Player_Bullet</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02. GameObjects\SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_Bullet.h">
+      <Filter>02. GameObjects\Monster\Monster_Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NumberUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\NumberUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -387,10 +399,16 @@
       <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Bullet.cpp">
-      <Filter>02. GameObjects\Bullet</Filter>
+      <Filter>02. GameObjects\Player\Weapon\Player_Bullet</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02. GameObjects\SkyBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_Bullet.cpp">
+      <Filter>02. GameObjects\Monster\Monster_Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NumberUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\NumberUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

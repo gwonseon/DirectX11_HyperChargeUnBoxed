@@ -111,10 +111,12 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		else
 		{
 			eNaviMode = CREATE_NAVIPOINT;
-
-			fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
-			fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
-			fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
+			if(m_vecCollision.size() > 0)
+			{
+				fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
+				fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
+				fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
+			}
 		}
 	}
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
@@ -244,7 +246,7 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 			for (int i = 0; i < 3; i++)
 			{
 				if (vPoints[i].y == 0.f)
-					vPoints[i].y = 0.1f;
+					vPoints[i].y = 0.2f;
 			}
 			// 셀 생성 해줌
 			m_pTerrain->Get_NaviCom()->Create_Cell(vPoints);
@@ -265,12 +267,15 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 	// 선택모드일 때
 	if (eNaviMode == SELECT_NAVIPOINT)
 	{
-		if (m_iSelected_index != -1)
+		if (m_iSelected_index != -1 && m_vecCollision.size() > 0)
 		{
-			
+			if (m_iSelected_index > m_iSelected_index)
+			{
+				--m_iSelected_index;
+				return;
+			}
 			auto pSelected = m_vecCollision[m_iSelected_index];
 			// 위치 변경이 되도록
-
 
 			// 삭제
 			if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)))
@@ -344,17 +349,20 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 							if(iIndex >= m_iSelected_index)
 								pCol->Set_IndexNumber(iIndex - 3);
 						}
-						fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
-						fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
-						fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
-						m_iSelected_index = -1;
+						if (m_vecCollision.size() > 2)
+						{
+							fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
+							fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
+							fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
+							m_iSelected_index = -1;
+						}
+						else
+							m_iSelected_index = 0;
 					}
 				}
 			}
 		}
 	}
-
-
 
 	// 나가기
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
@@ -362,7 +370,6 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_NAVIGATION, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
 			return;
 	}
-
 
 }
 

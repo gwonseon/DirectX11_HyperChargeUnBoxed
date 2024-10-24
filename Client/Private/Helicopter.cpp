@@ -33,6 +33,7 @@ HRESULT CHelicopter::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(1, true);
+	m_bAttackState = true;
 //	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
 	m_fHp = 100.f;
 	m_fEnergy = 0.f;
@@ -43,10 +44,19 @@ void CHelicopter::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
+	if (m_bCanAttacked == false)
+		m_fCurrentTime += fTimeDelta;
 }
 
 void CHelicopter::Update(_float fTimeDelta)
 {
+	// 데미지 입는 타이밍 딜레이로 맞춤
+	if (m_fCurrentTime >= m_fDamaged_DelayTime)
+	{
+		m_bCanAttacked = true;
+		m_fCurrentTime = 0.f;
+	}
+
 	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, vPos);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(XMVectorGetX(vPos), 10.f, XMVectorGetZ(vPos),1.f));

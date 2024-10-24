@@ -32,6 +32,7 @@ HRESULT CBody_Player::Initialize(void* pArg)
 
 	m_pParentState_Upper = pDesc->pParentState_Upper;
 	m_pParentState_Lower = pDesc->pParentState_Lower;
+	m_bAttackState = pDesc->m_bAttackState;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -80,6 +81,7 @@ void CBody_Player::Update(_float fTimeDelta)
 			{
 				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bTemp);
 			}
+			
 		}
 		else
 		{
@@ -107,7 +109,10 @@ void CBody_Player::Update(_float fTimeDelta)
 			}
 			
 		}
-
+		if (*m_bAttackState == true && m_bUpperAnimState == true)
+		{
+			*m_bAttackState = false;
+		}
 
 		// 하체
 		if(m_bRunState == false)
@@ -118,6 +123,14 @@ void CBody_Player::Update(_float fTimeDelta)
 		UpperBody_Anim(fTimeDelta);
 		LowerBody_Anim(fTimeDelta);
 		
+
+
+		if (*m_iViewState == PLAYER_FPS_VIEW)
+		{
+			m_iShaderPassNum = 1;
+		}
+		else
+			m_iShaderPassNum = 0;
 		
 }
 
@@ -152,7 +165,7 @@ HRESULT CBody_Player::Render()
 			if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
 				return E_FAIL;
 
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 
 			m_pModelCom->Render(i);

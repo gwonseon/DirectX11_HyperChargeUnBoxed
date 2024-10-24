@@ -7,6 +7,7 @@
 #include "InGameUI.h"
 #include "MenuUI.h"
 #include "ButtonUI.h"
+#include "NumberUI.h"
 
 
 #include "Terrain.h"
@@ -22,6 +23,7 @@
 #include "Environment.h"
 #include "BrainCore.h"
 #include "Bullet.h"
+#include "Monster_Bullet.h"
 
 #include "Head_Player.h"
 #include "Body_Player.h"
@@ -300,6 +302,20 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CircleGuage.png")))))
 		return E_FAIL;	
 	
+	//CenterUI 
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CenterUI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CenterUI%d.png"),2))))
+		return E_FAIL;
+
+	//Slice
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Slice"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Slice.dds")))))
+		return E_FAIL;
+
+	// Number 
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Number"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/%d.dds"), 10))))
+		return E_FAIL;
 #pragma endregion UI텍스처 생성
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
@@ -358,7 +374,13 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CUI_CircleGuage::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	//UINumber
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UINumber")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UINumber"),
+			CNumberUI::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 	// 터레인
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
 	{
@@ -492,7 +514,13 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CBullet::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	//MonsterBullet
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 	// 네비게이션
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation")) == nullptr)
 	{
@@ -640,18 +668,13 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
-
 	Loading_DataFile_For_NavigationLevel();
-
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("셰이더 로딩중입니다.");
 
-
-
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
-
 
 	// 터레인
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
@@ -681,7 +704,13 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 			CBullet::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-	
+	//MonsterBullet
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 	// BrainCore
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
@@ -705,15 +734,12 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 			return E_FAIL;
 	}
 
-
-
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("로딩 완료되었습니다.");
 	m_fPersent += 20.f;
 	m_isFinished = true;
 
 	return S_OK;
-
 }
 
 HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
@@ -916,7 +942,7 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	cout << "----------------------------------------------------------------------------------------" << endl;
 	const _wstring Model_Bullet_Component = TEXT("Prototype_Component_Model_Bullet");
 	PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
-	for(int i = 0; i <3;i++)
+	for(int i = 0; i <4;i++)
 	{
 		const _wstring Model_Component_Bullet_Result = Model_Bullet_Component + to_wstring(i);
 		const _wstring Model_Path_Bullet_Result = Model_Bullet_Path + to_wstring(i) + Ext;
@@ -925,7 +951,6 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 			return E_FAIL;
 	}
 	cout << "Bullet Read 완료" << endl;
-
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------		

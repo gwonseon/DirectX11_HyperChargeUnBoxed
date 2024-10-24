@@ -125,7 +125,7 @@ public:
 	_bool* Get_Reloading()		{ return &m_bReloading; }
 
 
-private:
+private: // Camera
 	_vector* m_vecTPS_CamPos{};
 	_vector* m_vecFPS_CamPos{};
 	_vector* m_vecCameraAt{};
@@ -152,6 +152,13 @@ private:
 	float					m_fRun_EightDirection{};
 	_float					m_fReload_Charging = 0.f;
 
+
+
+
+public:  // 총알
+	_uint* Get_CurrentBullet() { return m_pWaepon->Get_CurrentBullet(); }
+	_uint* Get_FullBullet() { return m_pWaepon->Get_FullBullet(); }
+
 public:
 	_float m_fRotation_Value{};
 
@@ -167,7 +174,7 @@ private:
 private:
 	_float	m_fHeight{};		// 점프 높이
 	_float m_fPower{};			// 점프 힘
-
+	_float	m_fInvincibleTime{}; // 무적시간
 
 	_vector	m_vecPos{}, m_vecDir{}, m_vecDir2{};
 

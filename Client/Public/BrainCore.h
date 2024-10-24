@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CShader;
 class CModel;
+class CCollider; 
 END
 
 BEGIN(Client)
@@ -47,6 +48,7 @@ private:
 	HRESULT Bind_ShaderResources();
 
 private:
+	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 

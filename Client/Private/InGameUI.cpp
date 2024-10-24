@@ -26,8 +26,8 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_iCount = pDesc->m_iCount; // ArmCannon Count
     m_eUIType = pDesc->eUITag;
     m_iIndex = pDesc->iIndex;
-    
-
+    m_fUIPosition = { pDesc->fX, pDesc->fY, 0.f};
+    m_pPlayer = pDesc->pPlayer;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -72,6 +72,10 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_C:
         break;
     case Client::CInGameUI::UI_DEAD:
+        if (m_pPlayer->Get_knockdown() == true)
+            m_bDraw = true;
+        else
+            m_bDraw = false;
         break;
     case Client::CInGameUI::UI_BATTERY:
         Battery_UI(fTimeDelta);
@@ -88,6 +92,11 @@ void CInGameUI::Update(_float fTimeDelta)
         Machine_UI_Energy(fTimeDelta);
         break;
     case Client::CInGameUI::UI_BULLET:
+        // 칼일 때 안그리기
+        if (*m_pPlayer->Get_WeaponState() == CPlayer::WEAPON_KATANA)
+            m_bDraw = false;
+        else
+            m_bDraw = true;
         break;
     case Client::CInGameUI::UI_CONVERSATIONBOX:
         UI_Conversation(fTimeDelta);
@@ -114,7 +123,7 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_MODECHANGE_ICON:
         if (m_pGameInstance->Get_DIKeyState_Down(DIK_F))
         {
-            if (m_iIndex == 0)
+            if (m_iIndex == 0) 
                 m_iIndex = 1;
             else
                 m_iIndex = 0;
@@ -123,6 +132,30 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_VIEWCHANGE_ICON:
         break;      
     case Client::CInGameUI::UI_PUNCH_ICON:
+        break;
+    case Client::CInGameUI::UI_CENTERICON:
+        if (*m_pPlayer->Get_Reloading() == true)
+        {
+            m_bDraw = true;
+            m_iIndex = 0;
+        }
+        else
+            m_bDraw = false;
+        
+        m_iIndex;// 장전이냐 건축이냐에 따라서 모양이 바뀜
+        break;
+    case Client::CInGameUI::UI_DAMAGED:
+        if (m_pPlayer->Get_CanAttacked() == false)
+            m_bDraw = true;
+        else
+            m_bDraw = false;
+        break;
+    case Client::CInGameUI::UI_SLICE:
+        // 칼일 때 안그리기
+        if (*m_pPlayer->Get_WeaponState() == CPlayer::WEAPON_KATANA)
+            m_bDraw = false;
+        else
+            m_bDraw = true;
         break;
 
         
@@ -137,51 +170,69 @@ void CInGameUI::Update(_float fTimeDelta)
 
 void CInGameUI::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
-        return;
+    if(m_eUIType == UI_DAMAGED)
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI_LAST, this)))
+            return;
+    }
+    else
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
+            return;
+    }
 
    
 }
 
 HRESULT CInGameUI::Render()
 {
+    //if (*m_pPlayer->Get_Reloading() == true)
+    /*m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);*/
 
-    m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
+    
 
-    if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
 
-    if (UI_CONVERSATIONBOX == m_eUIType && m_iIndex == 0)
+    if(m_bDraw== true)
     {
-        // 점점 투명해짐
-        if (FAILED(m_pShaderCom->Begin(3)))
+        if (FAILED(Bind_ShaderResources()))
+            return E_FAIL;
+
+        if (UI_CONVERSATIONBOX == m_eUIType && m_iIndex == 0)
+        {
+            // 점점 투명해짐
+            if (FAILED(m_pShaderCom->Begin(3)))
+                return E_FAIL;
+        }
+        else if (UI_BATTERY_GAGE == m_eUIType)
+        {
+
+            if (FAILED(m_pShaderCom->Begin(4)))
+                return E_FAIL;
+        }
+        else if (UI_CREDIT_ICON == m_eUIType)
+        {
+            if (FAILED(m_pShaderCom->Begin(0)))
+                return E_FAIL;
+        }
+        else if (UI_MACHINE_ENERGY == m_eUIType || UI_MACHINE_HP == m_eUIType || UI_PLAYER_ENERGY == m_eUIType || UI_PLAYER_HP == m_eUIType)
+        {
+            if (FAILED(m_pShaderCom->Begin(5)))
+                return E_FAIL;
+        }
+        else
+        {
+            // 그냥 그림
+            if (FAILED(m_pShaderCom->Begin(0)))
+                return E_FAIL;
+        }
+
+        if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+            return E_FAIL;
+
+        if (FAILED(m_pVIBufferCom->Render()))
             return E_FAIL;
     }
-    else if (UI_BATTERY_GAGE == m_eUIType)
-    {
-  
-        if (FAILED(m_pShaderCom->Begin(4)))
-            return E_FAIL;
-    }
-    else if (UI_MACHINE_ENERGY == m_eUIType || UI_MACHINE_HP == m_eUIType || UI_PLAYER_ENERGY == m_eUIType || UI_PLAYER_HP == m_eUIType)
-    {
-        if (FAILED(m_pShaderCom->Begin(5)))
-            return E_FAIL;
-    }
-    else
-    {
-        // 그냥 그림
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
-    }
-
-    if (FAILED(m_pVIBufferCom->Bind_Buffers()))
-        return E_FAIL;
-
-    if (FAILED(m_pVIBufferCom->Render()))
-        return E_FAIL;
-
-    return S_OK;
+     return S_OK;
 }
 
 
@@ -293,6 +344,7 @@ HRESULT CInGameUI::Add_Components(_int iNum)
         if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CreditIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
+
         break;
     case Client::CInGameUI::UI_RUN_ICON:
         if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RunIcon"),
@@ -319,6 +371,23 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
+    case Client::CInGameUI::UI_CENTERICON:
+        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CenterUI"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+    case Client::CInGameUI::UI_BULLET:
+        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CenterUI"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+    case Client::CInGameUI::UI_SLICE:
+        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Slice"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+
+        
     case Client::CInGameUI::UI_END:
         break;
     default:
@@ -393,6 +462,12 @@ HRESULT CInGameUI::Bind_ShaderResources()
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fPlayerEnergy, sizeof(float))))
+            return E_FAIL;
+
+    }
+    else if (m_eUIType == UI_CENTERICON)
+    {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
     }
     else

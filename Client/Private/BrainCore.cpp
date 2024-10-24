@@ -41,6 +41,8 @@ void CBrainCore::Priority_Update(_float fTimeDelta)
 
 void CBrainCore::Update(_float fTimeDelta)
 {
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
 }
 
 void CBrainCore::Late_Update(_float fTimeDelta)
@@ -67,7 +69,9 @@ HRESULT CBrainCore::Render()
 		m_pModelCom->Render(i);
 	}
 
-
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
 	return S_OK;
 }
 
@@ -83,6 +87,15 @@ HRESULT CBrainCore::Add_Components()
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
+
+	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
+
+	AABBDesc.vExtents = _float3(1.f, 2.5f, 1.f);
+	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y , 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -144,4 +157,5 @@ void CBrainCore::Free()
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pColliderCom);
 }

@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "Monster.h"
+#include "Player_Build.h"
 
 BEGIN(Engine)
 class CShader;
@@ -16,7 +17,7 @@ class CTank final : public CMonster
 public:
 	typedef struct : CMonster::MONSTER_DESC
 	{
-
+		CPlayer_Build* m_pBuild = { nullptr };
 
 	}TANK_DESC;
 
@@ -57,13 +58,12 @@ private:
 	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	CCollider* pTargetCollider = { nullptr };
+	CPlayer_Build* m_pBuild = { nullptr };
 
 private:
 	_bool		m_bAnimState{};
-
-
-
+	_bool		m_bFirstShot = false; // 첫 발은 애니메이션으로 안돼서 따로 쏴줌
+	_bool		m_bShotOnce = false;	// 애니메이션 끝났을 때의 조건문이 두 번 돌아서 한 번만 쏘게 만들어줌
 public:
 	static CTank* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
