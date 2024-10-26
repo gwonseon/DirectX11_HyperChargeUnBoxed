@@ -18,7 +18,7 @@ public:
 	typedef struct : CMonster::MONSTER_DESC
 	{
 		CPlayer_Build* m_pBuild = { nullptr };
-
+		_uint		iCell_Idx{};
 	}TANK_DESC;
 
 	enum TANK_ANIM
@@ -59,8 +59,12 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
-
+	CNavigation* m_pNavigationCom = nullptr;
+	vector<_float3> Path{};
 private:
+	_vector vPos{};
+	_uint		m_iCell_Idx{};
+
 	_bool		m_bAnimState{};
 	_bool		m_bFirstShot = false; // 첫 발은 애니메이션으로 안돼서 따로 쏴줌
 	_bool		m_bShotOnce = false;	// 애니메이션 끝났을 때의 조건문이 두 번 돌아서 한 번만 쏘게 만들어줌

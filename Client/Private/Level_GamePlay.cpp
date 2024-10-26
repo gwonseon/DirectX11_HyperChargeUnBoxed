@@ -506,7 +506,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag)
 {
 	CTank::TANK_DESC Tank_Desc{};
 	Tank_Desc.eID = LEVEL_GAMEPLAY;
-	Tank_Desc.fPosition = _float3(400.755f, 0.f, 255.710f);
 	Tank_Desc.fSpeedPerSec = 5.f;
 	Tank_Desc.fScale = _float3(3.f, 3.f, 3.f);
 	Tank_Desc.iModelComponentIndex = ANIM_TANK;
@@ -514,6 +513,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag)
 	Tank_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
 	Tank_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
 	Tank_Desc.m_pBuild = m_pBrain;
+	Tank_Desc.fPosition = _float3(511.736f, 0.f, 305.298f);
+	Tank_Desc.iCell_Idx = 333;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
 		TEXT("Prototype_GameObject_Tank"), &Tank_Desc)))
 		return E_FAIL;

@@ -89,6 +89,9 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	}
 
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 pos{};
+	XMStoreFloat3(&pos, m_vecPos);
+	cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_0))
 	{
 		m_iWeaponState++;
@@ -159,7 +162,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
-	
+
 	__super::Late_Update(fTimeDelta);
 
 	if(m_bDead == false)

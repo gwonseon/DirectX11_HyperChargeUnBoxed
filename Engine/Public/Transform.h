@@ -94,6 +94,12 @@ public:
 	_float Cal_Distance_No_Height(_float3 fObj, _float3 fTarget);
 	_float Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget);
 
+
+	// A스타 이동
+public:
+	vector<_float3> PathFind(_float fTimeDelta, CNavigation* pNavigation,_int CurrentCell_Idx, _int TargetCell_Idx);
+
+
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
 

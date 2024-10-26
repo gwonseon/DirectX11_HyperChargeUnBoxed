@@ -12,11 +12,18 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex)
 {
-	m_iIndex = iIndex;
-
+	m_iIndex = iIndex; // ¼¿ÀÇ ÀÎµ¦½º
+	_float fCenterX{}, fCenterY{}, fCenterZ{};
 	for (size_t i = 0; i < POINT_END; i++)
+	{
 		m_vPoints[i] = pPoints[i];
-
+		fCenterX = fCenterX + m_vPoints[i].x;
+		fCenterY = fCenterY + m_vPoints[i].y;
+		fCenterZ = fCenterZ + m_vPoints[i].z;
+	
+	}
+	m_vCenterPoints = {fCenterX/3, fCenterY/3, fCenterZ/3}; // ÁßÁ¡ ÁÂÇ¥ , 3Á¡À» ´õÇØ¼­ 3À¸·Î ³ª´²ÁÜ
+	// m_iNeighbors ÀÌ ÀÌ¿ô¼¿
 
 #ifdef _DEBUG
 	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
