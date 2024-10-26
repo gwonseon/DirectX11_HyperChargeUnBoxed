@@ -145,6 +145,9 @@
     <Filter Include="02. GameObjects\UI\GamePlay_UI\NumberUI">
       <UniqueIdentifier>{8d1a15f3-2bc0-49f4-9a22-05c1cf059963}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Environment\Coin">
+      <UniqueIdentifier>{696d48e3-9320-4cda-ae79-14321b952575}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -282,6 +285,9 @@
     <ClInclude Include="..\Public\NumberUI.h">
       <Filter>02. GameObjects\UI\GamePlay_UI\NumberUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Coin.h">
+      <Filter>02. GameObjects\Environment\Coin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -409,6 +415,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\NumberUI.cpp">
       <Filter>02. GameObjects\UI\GamePlay_UI\NumberUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Coin.cpp">
+      <Filter>02. GameObjects\Environment\Coin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

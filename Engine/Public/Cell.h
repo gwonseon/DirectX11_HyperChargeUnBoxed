@@ -47,6 +47,36 @@ private:
 	_int					m_iNeighbors[LINE_END] = { -1, -1, -1 }; // 이웃셀의 인덱스 넘버 3개를 보관한다. 이웃이 없으면 -1로 두고 나중에 처리한다.
 
     
+
+	// 길찾기
+private:
+	_float3					m_vCenterPoints{};  // 셀의 중점
+	_float					G;
+	_float					H;
+	_float					F;
+	CCell*					m_pParent= {nullptr};
+
+
+public:
+	void					Astar_Reset()
+	{
+		G = 0;  // 현재 노드까지 이동하는 데 소요된 실제 비용
+		H = 0;	// 현재 노드에서 목표 노드까지의 예상 비용
+		F = 0;	// 현재 노드가 목표에 도달하는데 필요한 전체 비용
+		m_pParent = nullptr; // 현재 노드로 오기 직전에 방문한 이전 노드
+	}
+
+	void					Set_G(_float fG) { G = fG; }
+	void					Set_H(_float fH) { H = fH; }
+	void					Set_F(_float fF) { F = fF; }
+	void					Set_Parent(CCell* pCell) { m_pParent = pCell; }
+
+	_float					Get_G()							{ return G; }
+	_float					Get_H()							{ return H; }
+	_float					Get_F()							{ return F; }
+	CCell*					Get_Parent()					{ return m_pParent;	}
+	_uint					Get_NeighborCell(_uint index)	{ return m_iNeighbors[index]; }
+	_float3					Get_CenterPoints()				{ return m_vCenterPoints; }
 #ifdef _DEBUG
 private:
 	class CVIBuffer_Cell* m_pVIBuffer = { nullptr };

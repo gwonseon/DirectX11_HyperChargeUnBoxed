@@ -29,7 +29,7 @@ HRESULT CTank::Initialize(void* pArg)
 	m_iModelIndex = pDesc->iModelComponentIndex;
 	m_eLevel = pDesc->eID;
 	m_pBuild = pDesc->m_pBuild;
-
+	m_iCell_Idx = pDesc->iCell_Idx;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -41,13 +41,15 @@ HRESULT CTank::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fEnergy = 0.f;
 	m_fAttack = 0.f; //  탱크 자체의 공격력은 0, 미사일이 공격력 갖게 하자
+
+	Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_iCell_Idx, 99);
 	return S_OK;
 }
 
 void CTank::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
-	m_pTransformCom->LookAt(*m_vecTargetPos);
+
 	if (m_bCanAttacked == false)
 		m_fCurrentTime += fTimeDelta;
 }
@@ -62,14 +64,25 @@ void CTank::Update(_float fTimeDelta)
 	}
 
 
-	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, vPos);
+		_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, vPos);
 
 	if (fDistance > 2000.f)
 	{
+		vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float3 fPos{};
+		XMStoreFloat3(&fPos, vPos);
+		// 목표 Path와 현재 내 위치 사이의 거리를 파악해서 Path 바꾸기 
+		if (m_pTransformCom->Cal_Distance(Path.front(), fPos) <= 200.f)
+		{
+			if(Path.size() > 1)
+				Path.erase(Path.begin());
+		}
+		// Path 따라 갈 때는 Path 목표 바라보기
+		m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
+		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f);
+
 		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 		m_pModelCom->Set_Animation(MONSTER_Tank_Drive, true);
-		m_pTransformCom->Go_Straight(fTimeDelta * 3.f);
 		m_bFirstShot = false;
 	}
 	else
@@ -90,6 +103,8 @@ void CTank::Update(_float fTimeDelta)
 			Desc.m_pBuild =  m_pBuild;
 			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
 		}
+		m_pTransformCom->LookAt(*m_vecTargetPos);
+
 		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * 0.7f, false);
 		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire, false);
 		// 한 번만 쏘게 만들기 위함
@@ -160,6 +175,16 @@ HRESULT CTank::Add_Components()
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 
+
+	// For.Com_Navigation
+	CNavigation::NAVIGATION_DESC		Desc{};
+	Desc.iCurrentCellIndex = m_iCell_Idx;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
+		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		return E_FAIL;
+
+
+
 	return S_OK;
 }
 
@@ -222,4 +247,5 @@ void CTank::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pNavigationCom);
 }

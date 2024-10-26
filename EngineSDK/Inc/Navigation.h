@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "Cell.h"
 
 BEGIN(Engine)
 
@@ -11,6 +12,7 @@ public:
 	{
 		_int			iCurrentCellIndex = { -1 };
 	}NAVIGATION_DESC;
+
 
 private:
 	CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -27,7 +29,7 @@ public:
 	}
 
 
-	//임시
+
 public:
 	void Create_Cell(_float3 vPoints[3]);
 	void Delete_Cell(_uint iIndex);
@@ -36,6 +38,23 @@ public:
 public:
 	void SetUp_Neighbor();
 	_bool isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSlidingPos);
+
+
+	// 길 찾기
+public:
+	vector<_float3>  Find_Path_AStar(_int iStartIndex, _int iTargetIndex);
+	vector<_float3>  PathFind_Reuturn_Result(CCell* pStart, CCell* pTarget);
+	_float Get_Heuristic_Cal(_int iStartIndex, _int iTargetIndex);
+	CCell* Find_LowerCell(vector<CCell*>& OpneList);
+	vector<CCell*> ReFindPath(CCell* pStart, CCell* pTarget);
+	vector<CCell*> Get_NeighborCell(CCell* pCell);
+
+
+	_int		Get_CurrentCell_Index() { return m_iCurrentCellIndex;	}
+
+private:
+	vector<CCell*> vecResultCell{};
+
 
 #ifdef _DEBUG
 public:

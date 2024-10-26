@@ -409,6 +409,12 @@ _float CTransform::Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget)
 }
 
 
+vector<_float3> CTransform::PathFind(_float fTimeDelta, CNavigation* pNavigation,_int StartCell_Idx, _int TargetCell_Idx)
+{
+	vector<_float3> vecPath = pNavigation->Find_Path_AStar(StartCell_Idx, TargetCell_Idx);
+
+	return vecPath;
+}
 
 HRESULT CTransform::Bind_ShaderResource(CShader* pShader, const _char* pConstantName)
 {

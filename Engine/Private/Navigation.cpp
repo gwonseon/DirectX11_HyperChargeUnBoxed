@@ -85,7 +85,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 			CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
 			if (nullptr == pCell)
 				return E_FAIL;
-
+			pCell->Set_G(INFINITY); // G 값 무한대로 초기화( Astar 알고리즘에서 이웃셀의 비교를 위함)
 			m_Cells.push_back(pCell);
 		}
 		CloseHandle(hFile);
@@ -128,30 +128,30 @@ void CNavigation::Delete_Cell(_uint iIndex)
 {
 	bool bDel = false;
 
-	for (auto it = m_Cells.begin(); it != m_Cells.end();)
+	for (auto iter = m_Cells.begin(); iter != m_Cells.end();)
 	{
-		_uint iCellIndex = (*it)->Get_CellIndex();
+		_uint iCellIndex = (*iter)->Get_CellIndex();
 
 		if (bDel)
 		{
-			(*it)->Set_CellIndex(iCellIndex - 1); // 하나 삭제됐으니까 그 뒤에 애들은 인덱스 1씩 줄어야 함
-			++it; // 다음 요소로 이동
+			(*iter)->Set_CellIndex(iCellIndex - 1); // 하나 삭제됐으니까 그 뒤에 애들은 인덱스 1씩 줄어야 함
+			++iter; // 다음 요소로 이동
 		}
 		else if (iCellIndex == iIndex)
 		{
-			Safe_Release(*it); // 삭제할 셀을 안전하게 해제
-			it = m_Cells.erase(it); // 삭제 후 반복자를 재설정
+			Safe_Release(*iter); // 삭제할 셀을 안전하게 해제
+			iter = m_Cells.erase(iter); // 삭제 후 반복자를 재설정
 			bDel = true; // 삭제가 완료되었음을 표시
 		}
 		else
 		{
-			++it; // 조건이 맞지 않으면 다음 요소로 이동
+			++iter; // 조건이 맞지 않으면 다음 요소로 이동
 		}
 	}
 }
 
 
-void CNavigation::SetUp_Neighbor()
+void CNavigation::SetUp_Neighbor() // 이웃셀 설정
 {
 	for (auto& pSourCell : m_Cells)
 	{
@@ -244,6 +244,7 @@ _bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSli
 				{
 					vSlidingPos = vLocalPos;
 					m_iCurrentCellIndex = iNeighborIndex;
+					
 					return false;
 				}
 
@@ -263,12 +264,137 @@ _bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSli
 		}
 		// 현재 셀을 이웃 셀로 업데이트
 		m_iCurrentCellIndex = iNeighborIndex;
-		
+		cout << m_iCurrentCellIndex << endl;
 		
 		return true;
 	}
 	
 	return true;  // 현재 셀 내에 있을 경우
+}
+vector<_float3> CNavigation::Find_Path_AStar(_int iStartIndex, _int iTargetIndex)
+{
+	vector<CCell*> m_vecOpenList{}; // 탐색이 필요한 셀을 저장
+	vector<CCell*> m_vecClosedList{}; // 탐색이 끝난 셀을 저장
+
+	// 시작 셀 초기화
+	m_Cells[iStartIndex]->Astar_Reset();
+	m_Cells[iStartIndex]->Set_H(Get_Heuristic_Cal(iStartIndex, iTargetIndex));
+	m_Cells[iStartIndex]->Set_F(m_Cells[iStartIndex]->Get_G() + m_Cells[iStartIndex]->Get_H());
+	m_vecOpenList.push_back(m_Cells[iStartIndex]);
+
+	while (m_vecOpenList.size() > 0) 
+	{
+		auto CurrentCell = Find_LowerCell(m_vecOpenList);
+		if (CurrentCell == m_Cells[iTargetIndex]) {
+		
+			vecResultCell = m_vecClosedList;
+			return PathFind_Reuturn_Result(m_Cells[iStartIndex], m_Cells[iTargetIndex]);
+		}
+
+		// 오픈 리스트에서 빼서 클로즈드 리스트에 현재 셀 넣어줌
+		m_vecOpenList.erase(remove(m_vecOpenList.begin(), m_vecOpenList.end(), CurrentCell), m_vecOpenList.end());
+		m_vecClosedList.push_back(CurrentCell);
+
+		for (auto pNeighbor : Get_NeighborCell(CurrentCell)) {
+			if (find(m_vecClosedList.begin(), m_vecClosedList.end(), pNeighbor) != m_vecClosedList.end())
+				continue;
+
+			// 현재 셀에서 이웃 셀까지의 비용
+			float CurrentCell_GCost = CurrentCell->Get_G() + Get_Heuristic_Cal(CurrentCell->Get_CellIndex(), pNeighbor->Get_CellIndex());
+			// 이웃까지의 비용과 비교해서 이웃의 비용보다 현재 셀에서의 비용이 작으면 바꿈
+			if (CurrentCell_GCost < pNeighbor->Get_G())
+			{
+				pNeighbor->Set_G(CurrentCell_GCost);
+				pNeighbor->Set_H(Get_Heuristic_Cal(pNeighbor->Get_CellIndex(), m_Cells[iTargetIndex]->Get_CellIndex()));
+				pNeighbor->Set_F(pNeighbor->Get_G() + pNeighbor->Get_H());
+				pNeighbor->Set_Parent(CurrentCell);
+				// 오픈 리스트에 이웃셀이 없으면 이웃셀에 집어 넣겠다
+				if (find(m_vecOpenList.begin(), m_vecOpenList.end(), pNeighbor) == m_vecOpenList.end()) 
+				{
+					m_vecOpenList.push_back(pNeighbor);
+				}
+			}
+		}
+	}
+	// 경로가 없으면 빈 벡터 반환
+	return {};
+}
+
+vector<_float3> CNavigation::PathFind_Reuturn_Result(CCell* pStart, CCell* pTarget)
+{
+	std::vector<_float3> vecCenterPos{};
+	CCell* CurrentCell = pTarget;
+
+	while (CurrentCell != pStart) {
+		vecCenterPos.push_back(CurrentCell->Get_CenterPoints());
+		CurrentCell = CurrentCell->Get_Parent();
+	}
+	vecCenterPos.push_back(pStart->Get_CenterPoints());
+	reverse(vecCenterPos.begin(), vecCenterPos.end());
+
+	return vecCenterPos;
+}
+
+
+_float CNavigation::Get_Heuristic_Cal(_int iStartIndex, _int iTargetIndex)
+{
+	_float3 fStartIndex = m_Cells[iStartIndex]->Get_CenterPoints();
+	_float3 fTargetIndex = m_Cells[iTargetIndex]->Get_CenterPoints();
+
+	_float distance = sqrtf((fStartIndex.x - fTargetIndex.x) * (fStartIndex.x - fTargetIndex.x)) +
+		((fStartIndex.y - fTargetIndex.y) * (fStartIndex.y - fTargetIndex.y)) +
+		((fStartIndex.z - fTargetIndex.z) * (fStartIndex.z - fTargetIndex.z));
+	return distance;
+}
+
+CCell* CNavigation::Find_LowerCell(vector<CCell*>& OpneList)
+{
+	CCell* LowestCell = *OpneList.begin();
+	for (auto pCell : OpneList)
+	{
+		if (pCell->Get_F() < LowestCell->Get_F())
+		{
+			LowestCell = pCell;
+		}
+	}
+
+	return LowestCell;
+}
+
+vector<CCell*> CNavigation::ReFindPath(CCell* pStart, CCell* pTarget)
+{
+	vector<CCell*> vecPath{};
+	CCell* CurrentCell = pTarget;
+
+	while (CurrentCell != pStart)
+	{
+		vecPath.push_back(CurrentCell);
+		CurrentCell = CurrentCell->Get_Parent();
+	}
+	vecPath.push_back(pStart);
+	reverse(vecPath.begin(), vecPath.end());
+
+	return vecPath;
+}
+
+vector<CCell*> CNavigation::Get_NeighborCell(CCell* pCell)
+{
+	vector<CCell*> vecNeighbor{};
+	for (int i = 0; i < CCell::LINE_END; ++i) {
+		
+			int neighborIndex = pCell->Get_NeighborCell(i);
+		
+			if (neighborIndex != -1)
+			{
+				CCell* pNeighbor = m_Cells[neighborIndex];
+				if (pNeighbor) {
+					vecNeighbor.push_back(pNeighbor);
+				}
+
+			}
+	}
+
+	return vecNeighbor;
 }
 
 

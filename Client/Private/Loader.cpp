@@ -22,6 +22,7 @@
 
 #include "Environment.h"
 #include "BrainCore.h"
+#include "Coin.h"
 #include "Bullet.h"
 #include "Monster_Bullet.h"
 
@@ -507,6 +508,15 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CBrainCore::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+
+	// Coin
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CBrainCore::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
 	//Bullet
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
 	{

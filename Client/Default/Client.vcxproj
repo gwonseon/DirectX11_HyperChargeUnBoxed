@@ -168,6 +168,7 @@
     <ClInclude Include="..\Public\ButtonUI.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionBox.h" />
     <ClInclude Include="..\Public\CrossLine.h" />
     <ClInclude Include="..\Public\Environment.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="..\Private\Bullet.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionBox.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
     <ClCompile Include="..\Private\Environment.cpp" />
