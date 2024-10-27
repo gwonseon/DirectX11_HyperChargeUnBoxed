@@ -31,7 +31,7 @@ public:
 public:
 	list<class CGameObject*> Get_GameObject_List() { return m_GameObjects; }
 
-
+	_int	Get_GameObjectList_Size() { return m_GameObjects.size(); }
 
 private:
 	list<class CGameObject*> m_GameObjects;

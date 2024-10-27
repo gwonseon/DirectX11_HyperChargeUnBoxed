@@ -275,7 +275,10 @@ vector<_float3> CNavigation::Find_Path_AStar(_int iStartIndex, _int iTargetIndex
 {
 	vector<CCell*> m_vecOpenList{}; // 탐색이 필요한 셀을 저장
 	vector<CCell*> m_vecClosedList{}; // 탐색이 끝난 셀을 저장
-
+	for (auto pCell : m_Cells)
+	{
+		pCell->Set_G(INFINITY);
+	}
 	// 시작 셀 초기화
 	m_Cells[iStartIndex]->Astar_Reset();
 	m_Cells[iStartIndex]->Set_H(Get_Heuristic_Cal(iStartIndex, iTargetIndex));

@@ -24,7 +24,7 @@ public:
 	{
 		_vector* vCameraAt = {};
 		_vector* vCameraPos = {};
-
+		_uint* iRound		= {};
 	}PLAYER_DESC;
 
 
@@ -110,7 +110,7 @@ public:
 	_float	Get_Rotation_Value() {return m_fRotation_Value;	}
 	void Set_Rotation(_float fAngleY) { m_pTransformCom->Rotation(0.f, fAngleY, 0.f); }
 	
-
+	void Set_RoundStart(_bool* bStart) { m_bRoundStart = bStart; }
 
 
 	CTransform* Get_Transform() {	return m_pTransformCom; }
@@ -152,8 +152,13 @@ private:
 	float					m_fRun_EightDirection{};
 	_float					m_fReload_Charging = 0.f;
 
+private: // ºôµå ¸ðµå
+	_bool					m_bBuildMode = false;
+	_bool*					m_bRoundStart = { nullptr };
+	_uint*					m_iRound{};
 
-
+public:
+	_bool* Get_BuildMode() { return &m_bBuildMode; }
 
 public:  // ÃÑ¾Ë
 	_uint* Get_CurrentBullet() { return m_pWaepon->Get_CurrentBullet(); }

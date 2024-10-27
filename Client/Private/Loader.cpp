@@ -317,6 +317,8 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Number"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/%d.dds"), 10))))
 		return E_FAIL;
+
+
 #pragma endregion UI텍스처 생성
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
@@ -460,6 +462,14 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			return E_FAIL;
 	}
 
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
 	/* Tank */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
 	{
@@ -531,13 +541,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CMonster_Bullet::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-	// 네비게이션
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation")) == nullptr)
-	{
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
-			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
-			return E_FAIL;
-	}
+
 
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
@@ -603,6 +607,13 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 			CCamera_Free::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 	///* 몬스터 */
 	//if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Monster_ImGui")) == nullptr)
 	//{
@@ -655,14 +666,30 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 			CCollisionBox::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-	// 네비게이션
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation")) == nullptr)
+	
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Navigation"),
-			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
+		/* For.Prototype_Component_Collider_AABB */
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_AABB"),
+			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+			return E_FAIL;
+	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
+	{
+		/* For.Prototype_Component_Collider_OBB */
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_OBB"),
+			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
 			return E_FAIL;
 	}
 
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
+	{
+		/* For.Prototype_Component_Collider_Sphere */
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_Sphere"),
+			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+			return E_FAIL;
+	}
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("로딩 완료되었습니다.");
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
@@ -736,13 +763,7 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 			return E_FAIL;
 
 	}
-	// 네비게이션
-	if (m_pGameInstance->Find_Prototype_Component(LEVEL_NAVIGATION, TEXT("Prototype_Component_Navigation")) == nullptr)
-	{
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_NAVIGATION, TEXT("Prototype_Component_Navigation"),
-			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
-			return E_FAIL;
-	}
+
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("로딩 완료되었습니다.");
@@ -939,12 +960,19 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	}
 	CloseHandle(hBuildFile);
 	cout << "Build Read 완료" << endl;
-	const _wstring Model_Component_Result = Model_Component + to_wstring(40 + ENVIRONMENT_EA);
-	const _wstring Model_Path_Result = Model_Build_Path + to_wstring(40) + Ext;
+	// 브레인 코어
+	_wstring Model_Component_Result = Model_Component + to_wstring(40 + ENVIRONMENT_EA);
+	_wstring Model_Path_Result = Model_Build_Path + to_wstring(40) + Ext;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
 		return E_FAIL;
-
+	// 코인
+	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	Model_Component_Result = Model_Component + to_wstring(41 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(41) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
+		return E_FAIL;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	const _wstring Model_Bullet_Path = TEXT("../Bin/Resources/Model/ModelData_Bullet");

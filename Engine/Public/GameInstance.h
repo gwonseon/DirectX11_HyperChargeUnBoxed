@@ -7,6 +7,7 @@
 #include "Component_Manager.h"
 #include "Picking_Manager.h"
 #include "CollisionMgr.h"
+#include "Round_Manager.h"
 
 
 
@@ -116,6 +117,9 @@ public: /* For.Font_Manager */
 	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePaht);
 	HRESULT Render_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, FXMVECTOR vColor, _float fScale = 1.f, _float fRotation = 0.f, const _float2& vPivot = _float2(0.f, 0.f));
 
+public: // Round Manager
+	void Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer);
+
 
 
 private:
@@ -131,7 +135,7 @@ private:
 	class CPicking_Manager* m_pPicking_Manager = { nullptr };
 	class CCollisionMgr* m_pCollision_Manager = { nullptr };
 	class CFont_Manager* m_pFont_Manager = { nullptr };
-
+	class CRound_Manager* m_pRound_Manager = { nullptr };
 
 
 public:

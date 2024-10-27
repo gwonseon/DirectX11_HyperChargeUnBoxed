@@ -29,10 +29,12 @@ HRESULT CPony::Initialize(void* pArg)
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_matPlayerWorld = pDesc->matPlayerWorld;
 	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
-	m_iModelIndex = pDesc->iModelComponentIndex;
+	m_iModelIndex = ANIM_PONY;
 	m_eLevel = pDesc->eID;
-	
-	if (FAILED(__super::Initialize(pArg)))
+	pDesc->fScale = _float3(2.f, 2.f, 2.f);
+	pDesc->fSpeedPerSec = 8.f;
+
+	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))

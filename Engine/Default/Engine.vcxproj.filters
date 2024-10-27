@@ -172,6 +172,9 @@
     <Filter Include="01. Utility\08. Manager\03. FontMgr">
       <UniqueIdentifier>{40719d10-ee86-4bca-b7b2-92d46607a3ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\08. Manager\04. RoundMgr">
+      <UniqueIdentifier>{b1226719-9b98-499b-b205-0a6b1847ccbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -326,6 +329,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Font_Manager.cpp">
       <Filter>01. Utility\08. Manager\03. FontMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Round_Manager.cpp">
+      <Filter>01. Utility\08. Manager\04. RoundMgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -493,6 +499,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Font_Manager.h">
       <Filter>01. Utility\08. Manager\03. FontMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Round_Manager.h">
+      <Filter>01. Utility\08. Manager\04. RoundMgr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

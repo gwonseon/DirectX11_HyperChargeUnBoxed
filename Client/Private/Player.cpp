@@ -31,6 +31,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 	PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
 	m_vecCameraAt = pDesc->vCameraAt;
 	m_vecCameraPos = pDesc->vCameraPos;
+	m_iRound = pDesc->iRound;
+ 
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
@@ -55,18 +57,19 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_vecFPS_CamPos = m_pFPSPivot->Get_FPS_CameraPos();
 	m_vecWeaponPos = m_pWaepon->Get_WeaponPos();
 	m_vecWeaponDir = m_pWaepon->Get_WeaponDir();
-	
+
+
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
 	m_fAttack = 10.f;
-	m_iCoin = 74;
+	m_iCoin = 0;
 	m_bDontDestroy = true;
 	m_bKnockdown = false;
 
 	m_fRun_FourDirection = 1.5f;
 	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
 
-
+	m_bBuildMode = true; 
 	return S_OK;
 }
 
@@ -80,7 +83,13 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		else
 			m_iViewState = PLAYER_TPS_VIEW;
 	}
-
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_F) && *m_bRoundStart == false)
+	{
+		if (m_bBuildMode == false)
+			m_bBuildMode = true;
+		else
+			m_bBuildMode = false;
+	}
 	// 회전
 	_long   MouseMove = { 0 };
 	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
@@ -91,7 +100,8 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float3 pos{};
 	XMStoreFloat3(&pos, m_vecPos);
-	cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
+	//cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
+	//cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_0))
 	{
 		m_iWeaponState++;
@@ -187,7 +197,7 @@ HRESULT CPlayer::Add_Components()
 
 	Desc.iCurrentCellIndex = 7;
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
 		return E_FAIL;
 
@@ -316,19 +326,20 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			m_iState_Upper |= STATE_IDLE;
 		}
 	}
-	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB))
+	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
 	{
-		if(m_bReloading == false) // 장전 중엔 총 못쏨
+		if (m_iWeaponState == WEAPON_KATANA)
+			m_bAttackState = true;
+		if (!(m_iState_Upper & FIRE))
 		{
-			if (m_iWeaponState == WEAPON_KATANA)
-				m_bAttackState = true;
-			if (!(m_iState_Upper & FIRE))
-			{
-				if (m_iState_Upper & STATE_IDLE)
-					m_iState_Upper ^= STATE_IDLE;
-				m_iState_Upper |= FIRE;
-			}
+			if (m_iState_Upper & STATE_IDLE)
+				m_iState_Upper ^= STATE_IDLE;
+			m_iState_Upper |= FIRE;
 		}
+	}
+	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == true && m_iViewState == PLAYER_FPS_VIEW)
+	{
+		m_iState_Upper = STATE_IDLE;
 	}
 	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB)) 
 	{
@@ -349,7 +360,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 
 
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V))
+	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V) && m_iViewState == PLAYER_TPS_VIEW)
 	{
 		if (!(m_iState_Upper & MELEE))
 		{

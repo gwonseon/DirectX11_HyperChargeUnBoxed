@@ -219,6 +219,18 @@ PS_OUT PS_MAIN6(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN7(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor.r = 0.f;
+    Out.vColor.g = 0.f;
+    Out.vColor.b = 0.f;
+    Out.vColor.a = 0.4f;
+    return Out;
+
+}
 // Pass 는 그래픽 파이프라인 상태를 설정한다
 // Pass는 여러개 할 수 있음 , 지금은 1개뿐, 그래서 Begin 함수 매개변수가 0이었음
 // VertexShader 와 PixelShader 는 각각의 패스에서 사용할 셰이더의 프로그램을 지정한다.  위의 VS_MAIN 을 지정함
@@ -279,6 +291,14 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN6();
+    }
+    pass DefaultPass6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN7();
     }
 
 }

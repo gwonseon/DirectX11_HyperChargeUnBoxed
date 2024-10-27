@@ -15,24 +15,27 @@ HRESULT CCollisionMgr::Initialize()
 _bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos,  _bool* bShot, _float fDamage, _uint iTargetPartObjID)
 {
 	_bool Collision{};
-	for (auto& pTarget : Target->Get_GameObject_List())
+	if(Target != nullptr)
 	{
-		CCollider* pTargetCollider = static_cast<CCollider*>(pTarget->Find_Component(strTargetComponentTag, iTargetPartObjID));
-		_float3 fCenter =  pTargetCollider->Get_Center();
-		float fRadius = pTargetCollider->Get_Radius();
-		_float fDistance{};
-		Collision = pTargetCollider->Intersect_Mouse(vRayPos, vRayDir, fDistance);
-		if (Collision == true)
+		for (auto& pTarget : Target->Get_GameObject_List())
 		{
-			pTarget->Set_CollisionChecking(true);
-			if (*bShot == true)
+			CCollider* pTargetCollider = static_cast<CCollider*>(pTarget->Find_Component(strTargetComponentTag, iTargetPartObjID));
+			_float3 fCenter = pTargetCollider->Get_Center();
+			float fRadius = pTargetCollider->Get_Radius();
+			_float fDistance{};
+			Collision = pTargetCollider->Intersect_Mouse(vRayPos, vRayDir, fDistance);
+			if (Collision == true)
 			{
-				pTarget->Set_Damaged(fDamage);
+				pTarget->Set_CollisionChecking(true);
+				if (*bShot == true)
+				{
+					pTarget->Set_Damaged(fDamage);
+				}
 			}
-		}
-		else
-		{
-			pTarget->Set_CollisionChecking(false);
+			else
+			{
+				pTarget->Set_CollisionChecking(false);
+			}
 		}
 	}
 	return Collision;
@@ -40,6 +43,7 @@ _bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetC
 
 void CCollisionMgr::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
 {
+
 	if(pSrcLayer != nullptr && pDstLayer != nullptr)
 	{
 		for (auto& pSrc : pSrcLayer->Get_GameObject_List())
@@ -112,7 +116,7 @@ void CCollisionMgr::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, c
 			XMStoreFloat3(&fTargetPos, vTargetPos);
 
 			// 위치 비교해서 안에 들어온 애들만 검사학기 && 공격 상태일 때만 확인하기 
-			if (m_pTrans->Cal_Distance(fPos, fTargetPos) < 500.f && pDst->Get_AttackState() == true)
+			if (m_pTrans->Cal_Distance(fPos, fTargetPos) < 500.f)
 			{
 				// 가하는 오브젝트 Collider 컴포넌트 가져오기
 				CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag, iDstPartObjID));

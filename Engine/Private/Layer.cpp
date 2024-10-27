@@ -21,6 +21,7 @@ HRESULT CLayer::Add_GameObject(CGameObject* pGameObject)
     m_GameObjects.push_back(pGameObject);
     return S_OK;
 
+
 }
 
 CGameObject* CLayer::Get_Object(_uint iIndex)

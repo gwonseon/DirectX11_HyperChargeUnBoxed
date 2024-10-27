@@ -21,19 +21,35 @@ HRESULT CCoin::Initialize_Prototype()
 HRESULT CCoin::Initialize(void* pArg)
 {
     COIN_DESC* pDesc = static_cast<COIN_DESC*>(pArg);
-
+    m_fPickingPos = pDesc->fPosition;
+    m_fScale = pDesc->fScale;
+    m_eLevel = pDesc->eID;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
     if (FAILED(Add_Components()))
         return E_FAIL;
 
+    m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPickingPos.x, m_fPickingPos.y, m_fPickingPos.z, 1.f));
+    m_iCoin = 10;
 
     return S_OK;
 }
 
 void CCoin::Priority_Update(_float fTimeDelta)
 {
+    if (m_bDead)
+    {
+        return;
+    }
+    m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPickingPos.x, m_fPickingPos.y, m_fPickingPos.z, 1.f));
+    
+    // È¸Àü
+    _vector Axis = { 0.f, 1.f, 0.f };
+    m_pTransformCom->Turn(Axis, fTimeDelta * 0.3f);
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CCoin::Update(_float fTimeDelta)
@@ -42,13 +58,19 @@ void CCoin::Update(_float fTimeDelta)
     {
         return;
     }
+    m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
+    __super::Update(fTimeDelta);
 }
 
 void CCoin::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-        return;
+    if(m_bDead == false)
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+            return;
+    }
+ 
 }
 
 HRESULT CCoin::Render()
@@ -69,26 +91,32 @@ HRESULT CCoin::Render()
         m_pModelCom->Render(i);
     }
 
-
-    return S_OK;;
+#ifdef _DEBUG
+    if (m_bDead == false)
+        m_pColliderCom->Render();
+#endif
+    return S_OK;
 }
 
 HRESULT CCoin::Add_Components()
 {
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCoin"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
 
-    if (FAILED(__super::Add_Component(m_eLevel, TEXT(""),
+    const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
+    const _wstring Model_Component_Result = Model_Component + to_wstring(206);
+    /* For.Com_Model */
+    if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
         return E_FAIL;
 
     /* For.Com_Collider_Sphere*/
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-    SphereDesc.fRadius = 1.7f;
-    SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+    SphereDesc.fRadius = 0.15f;
+    SphereDesc.vCenter = _float3(0.f, 0.f , 0.f);
 
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
         TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
         return E_FAIL;
 

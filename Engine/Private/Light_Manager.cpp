@@ -17,9 +17,6 @@ const LIGHT_DESC* CLight_Manager::Get_LightDesc(_uint iIndex)
         ++iter;
 
     return (*iter)->Get_LightDesc();
-
-
-
 }
 
 HRESULT CLight_Manager::Initialize()

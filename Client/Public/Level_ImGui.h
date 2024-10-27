@@ -7,6 +7,7 @@
 #include "GameInstance.h"
 #include "Environment.h"
 #include "Player.h"
+#include "Coin.h"
 
 BEGIN(Client)
 
@@ -14,7 +15,7 @@ BEGIN(Client)
 class CLevel_ImGui final : public CLevel
 {
 public:
-	enum IMGUI_TYPE{ IMGUI_OBJECT_NONANIM, IMGUI_OBJECT_ANIM, IMGUI_BUILD, IMGUI_MAPTOOL, IMGUI_END};
+	enum IMGUI_TYPE{ IMGUI_OBJECT_NONANIM, IMGUI_OBJECT_ANIM, IMGUI_BUILD, IMGUI_ITEM, IMGUI_END};
 	enum IMGUI_MODE{ IMGUI_CREATE, IMGUI_SELECT, MODE_END};
 private:
 	CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -54,13 +55,13 @@ public:
 	void Object_NonAnim_Update(_float fTimeDelta);
 	void Object_Anim_Update(_float fTimeDelta);
 	void Build_Update(_float fTimeDelta);
-	void MapTool_Update(_float fTimeDelta);
+	void Item_Update(_float fTimeDelta);
 
 
 	void Object_NonAnim();
 	void Object_Anim();
 	void Object_Build();
-	void MapTool();
+	void Object_Item();
 
 public:
 	HRESULT Picking_Create();
@@ -77,14 +78,23 @@ public:
 	void	Build_Load();
 	HRESULT Build_Select();
 
+	HRESULT Item_Add();
+	HRESULT Item_DataChange(_float fTimeDelta);
+	void	Item_Save();
+	void	Item_Load();
+	HRESULT Item_Select();
+
 
 private:
 	vector<CEnvironment*> m_vecEnvironment;
 	vector<CEnvironment*> m_vecBuild;
+	vector<CCoin*> m_vecCoin;
+
 	CGameObject* pGameObj = { nullptr };
 private:
 	_uint		m_iEnvironment_Count = 0; // 생성한 개수
 	_uint		m_iBuild_Count = 0;			// 생성한 개수
+	_uint		m_iCoin_Count = 0;			// 생성한 코인개수
 
 
 

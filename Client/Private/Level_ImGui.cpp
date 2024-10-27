@@ -51,6 +51,7 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 		{
 			pEnviron->Set_ImGuiMode(IMGUI_OBJECT_NONANIM);
 		}
+		
 		m_eImGui_Type = IMGUI_OBJECT_NONANIM;
 		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
@@ -78,10 +79,19 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
 	}
-	// 맵툴
-	if (GetAsyncKeyState(VK_F4) & 0x0001) // 맵툴
+	// 코인
+	if (GetAsyncKeyState(VK_F4) & 0x0001) // 코인
 	{
-		m_eImGui_Type = IMGUI_MAPTOOL;
+		for (auto& pEnviron : m_vecEnvironment)
+		{
+			pEnviron->Set_PickingCheck(false);
+			pEnviron->Set_ImGuiMode(IMGUI_ITEM);
+		}
+		for (auto& pBuild : m_vecBuild)
+		{
+			pBuild->Set_ImGuiMode(IMGUI_ITEM);
+		}
+		m_eImGui_Type = IMGUI_ITEM;
 		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
 	}
@@ -115,7 +125,6 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 			case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
 				break;
 			case Client::CLevel_ImGui::IMGUI_BUILD:
-				
 				if(m_iBuild_Count > 0)
 				{
 					for (auto& pBuild : m_vecBuild)
@@ -131,7 +140,10 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 					XMStoreFloat3(&fCollisionPos, vCollisionPos);
 				}
 				break;
-			case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+			case Client::CLevel_ImGui::IMGUI_ITEM:
+				vPos = m_vecCoin.back()->Get_Pos();
+				fScale = m_vecCoin.back()->Get_Scale();
+
 				break;
 			case Client::CLevel_ImGui::IMGUI_END:
 				break;
@@ -140,8 +152,12 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 			}
 			Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
 			Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
-			CollisionBox_Pos[0] = fCollisionPos.x;					CollisionBox_Pos[1] = fCollisionPos.y;					CollisionBox_Pos[2] = fCollisionPos.z;
-			CollisionBox_Scale[0] = fCollisionScale.x;				CollisionBox_Scale[1] = fCollisionScale.y;				CollisionBox_Scale[2] = fCollisionScale.z;
+			if(m_eImGui_Type != IMGUI_ITEM)
+			{
+				// Coin일 때 충돌박스 안씀
+				CollisionBox_Pos[0] = fCollisionPos.x;					CollisionBox_Pos[1] = fCollisionPos.y;					CollisionBox_Pos[2] = fCollisionPos.z;
+				CollisionBox_Scale[0] = fCollisionScale.x;				CollisionBox_Scale[1] = fCollisionScale.y;				CollisionBox_Scale[2] = fCollisionScale.z;
+			}
 			m_iModeSelect = IMGUI_CREATE;
 		}
 		else if (m_iModeSelect == IMGUI_CREATE)
@@ -166,7 +182,8 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 		break;
 	case Client::CLevel_ImGui::IMGUI_BUILD:
 		Build_Update(fTimeDelta);
-	case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+	case Client::CLevel_ImGui::IMGUI_ITEM:
+		Item_Update(fTimeDelta);
 		break;
 	case Client::CLevel_ImGui::IMGUI_END:
 		break;
@@ -203,8 +220,8 @@ HRESULT CLevel_ImGui::Render()
 	case Client::CLevel_ImGui::IMGUI_BUILD:
 		Object_Build();
 		break;
-	case Client::CLevel_ImGui::IMGUI_MAPTOOL:
-		MapTool();
+	case Client::CLevel_ImGui::IMGUI_ITEM:
+		Object_Item();
 		break;
 	case Client::CLevel_ImGui::IMGUI_END:
 		break;
@@ -239,7 +256,8 @@ HRESULT CLevel_ImGui::Render()
 		case Client::CLevel_ImGui::IMGUI_BUILD:
 			Build_Load();
 			break;
-		case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+		case Client::CLevel_ImGui::IMGUI_ITEM:
+			Item_Load();
 			break;
 		case Client::CLevel_ImGui::IMGUI_END:
 			break;
@@ -295,7 +313,8 @@ HRESULT CLevel_ImGui::Picking_Create()
 			case Client::CLevel_ImGui::IMGUI_BUILD:
 				Build_Add();
 				break;
-			case Client::CLevel_ImGui::IMGUI_MAPTOOL:
+			case Client::CLevel_ImGui::IMGUI_ITEM:
+				Item_Add();
 				break;
 			case Client::CLevel_ImGui::IMGUI_END:
 				break;
@@ -345,9 +364,20 @@ void CLevel_ImGui::Build_Update(_float fTimeDelta)
 	}
 }
 
-void CLevel_ImGui::MapTool_Update(_float fTimeDelta)
+void CLevel_ImGui::Item_Update(_float fTimeDelta)
 {
+	if (m_iCoin_Count > 0)
+		Item_DataChange(fTimeDelta);
+	Picking_Create();
+	Item_Select();
+
+	if (Save == true)
+	{
+		Item_Save();
+		Save = false;
+	}
 }
+
 
 void CLevel_ImGui::Object_NonAnim()
 {
@@ -458,14 +488,39 @@ void CLevel_ImGui::Object_Build()
 	ImGui::EndChild();
 }
 
-void CLevel_ImGui::MapTool()
+void CLevel_ImGui::Object_Item()
 {
-	const char* pText = "MapTool";
+	const char* pText = "Coin Tool";
 	ImGui::Text(pText);
 	ImGui::Text(" ");
+	if (m_iModeSelect == IMGUI_CREATE)
+	{
+		const char* pModeText = "Create Mode";
+		ImGui::Text(pModeText);
+	}
+	if (m_iModeSelect == IMGUI_SELECT)
+	{
+		const char* pModeText = "Select Mode";
+		ImGui::Text(pModeText);
+	}
+	// 위치 크기 방향 수정창
+	ImGui::Text("Build Data");
+	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
+	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
 
+	// 모델 선택창
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+
+	ImGui::Text("Build List ");
+	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
+	ButtonImage_List(); // ImGui 선택 리스트 ( Environment 리스트 )
+	ImGui::EndChild();
 
 }
+
 
 void CLevel_ImGui::ButtonImage_List()
 {
@@ -510,8 +565,23 @@ void CLevel_ImGui::ButtonImage_List()
 		ImGui::EndChild();
 	}
 		break;
-	case Client::CLevel_ImGui::IMGUI_MAPTOOL:
-		break;
+	case Client::CLevel_ImGui::IMGUI_ITEM:
+	{
+		auto& SRVs = m_pBuild->Get_SRV();
+		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		{
+			if (iButton % 4 != 0)
+				ImGui::SameLine();
+			string tag = "Build" + to_string(iButton);
+			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			{
+				m_iModelIndex = iButton;
+			}
+			iButton++;
+		}
+		ImGui::EndChild();
+	}
+	break;
 	case Client::CLevel_ImGui::IMGUI_END:
 		break;
 	default:
@@ -1319,6 +1389,153 @@ HRESULT CLevel_ImGui::Build_Select()
 		}
 	}
 
+	return S_OK;
+}
+
+HRESULT CLevel_ImGui::Item_Add()
+{
+	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+		return S_OK;
+
+	CCoin::COIN_DESC			Desc{};
+	Desc.eID = LEVEL_IMGUI;
+	m_fPickingPos.y = 3.f;
+	Desc.fPosition = m_fPickingPos;
+	Desc.fScale = { 15.f,15.f ,15.f };
+	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
+	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
+
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Coin"),
+		TEXT("Prototype_GameObject_Coin"), &Desc));
+	if (pGameObj != nullptr)
+	{
+		m_vecCoin.push_back(dynamic_cast<CCoin*>(pGameObj));
+
+		m_iCoin_Count++;
+		bAble_Select = false;
+	}
+	return S_OK;
+}
+
+HRESULT CLevel_ImGui::Item_DataChange(_float fTimeDelta)
+{
+	if (m_iModeSelect == IMGUI_CREATE)   // Create 모드 일 때 가장 최근 설치 항목에 대한 수정 가능 기능
+	{
+		// 가장 최근 설치한 Environment 삭제하기
+		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iCoin_Count > 0)
+		{
+			m_vecCoin.back()->Set_Dead();
+			m_vecCoin.erase(m_vecCoin.end() - 1);
+			--m_iCoin_Count;
+			cout << "남은 Coin 개수 : " << m_iCoin_Count << endl;
+
+			if (m_iCoin_Count > 0)
+			{
+				_float3 fPos, fScale;
+				_vector vPos = m_vecCoin.back()->Get_Pos();
+				fScale = m_vecCoin.back()->Get_Scale();
+				_float3 fEnvironPos{};
+
+				XMStoreFloat3(&fPos, vPos);
+				Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
+				Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
+
+			}
+			else
+			{
+				Position[0] = 0.f;				Position[1] = 0.f;				Position[2] = 0.f;
+				Scale[0] = 0.f;					Scale[1] = 0.f;					Scale[2] = 0.f;
+			}
+			return S_OK;
+		}
+
+
+		m_vecCoin.back()->MovePos( Position[0], Position[1], Position[2]);
+		m_vecCoin.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
+
+	}
+	return S_OK;
+}
+
+void CLevel_ImGui::Item_Save()
+{
+	HANDLE hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Save Coin File Creation Failed", L"Error", MB_OK);
+		return;
+	}
+	DWORD dwByte = 0;
+	_float3 fPos;
+	for (auto& pCoin : m_vecCoin)
+	{
+		if (pCoin)
+		{
+			LEVELID iLevel = pCoin->Get_Level();
+			_vector vPos = pCoin->Get_Pos();
+			XMStoreFloat3(&fPos, vPos);
+			_float3 fScale = pCoin->Get_Scale();
+
+			WriteFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr);
+			WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		}
+	}
+	CloseHandle(hFile);
+	MessageBox(NULL, L"Coin Saved Successfully", L"Success", MB_OK);
+
+}
+
+void CLevel_ImGui::Item_Load()
+{
+	for (auto& pCoin : m_vecCoin)
+	{
+		pCoin->Set_Dead();
+	}
+	m_vecCoin.clear();
+
+
+	m_iCoin_Count = 0;
+	HANDLE hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
+		return;
+	}
+	DWORD dwByte = 0;
+	LEVELID iLevel;
+	_float3 fPos{}, fScale{};
+	
+	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	{
+		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		CCoin::COIN_DESC			Desc{};
+		Desc.eID = iLevel;
+		Desc.fPosition = fPos;
+		Desc.fScale = fScale;
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Coin"),
+			TEXT("Prototype_GameObject_Coin"), &Desc));
+		if (pGameObj != nullptr)
+		{
+
+			Position[0] = fPos.x;			Position[1] = fPos.y;			Position[2] = fPos.z;
+			dynamic_cast<CCoin*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
+			dynamic_cast<CCoin*>(pGameObj)->MovePos(fPos.x, fPos.y, fPos.z);
+			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
+	
+			m_vecCoin.push_back(dynamic_cast<CCoin*>(pGameObj));
+			m_iCoin_Count++;
+		}
+	}
+
+	CloseHandle(hFile);
+	MessageBox(NULL, L"Coin Loaded Successfully", L"Success", MB_OK);
+}
+
+HRESULT CLevel_ImGui::Item_Select()
+{
 	return S_OK;
 }
 

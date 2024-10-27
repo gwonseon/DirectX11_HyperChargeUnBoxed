@@ -67,8 +67,14 @@ void CInGameUI::Update(_float fTimeDelta)
         break;
     case Client::CInGameUI::UI_V:
         break;
-    case Client::CInGameUI::UI_F:
+    case Client::CInGameUI::UI_BUILDMODE_F:
+    {
+        if(*m_pPlayer->Get_BuildMode() == true)
+            m_bDraw = true;
+        else
+            m_bDraw = false;
         break;
+    }
     case Client::CInGameUI::UI_C:
         break;
     case Client::CInGameUI::UI_DEAD:
@@ -98,6 +104,14 @@ void CInGameUI::Update(_float fTimeDelta)
         else
             m_bDraw = true;
         break;
+    case Client::CInGameUI::UI_BUILDMODE_CONVERSATIONBOX:
+    {
+        if (*m_pPlayer->Get_BuildMode() == true)
+            m_bDraw = true;
+        else
+            m_bDraw = false;
+        break;
+    }
     case Client::CInGameUI::UI_CONVERSATIONBOX:
         UI_Conversation(fTimeDelta);
         break;
@@ -121,13 +135,11 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_JUMP_ICON:
         break;
     case Client::CInGameUI::UI_MODECHANGE_ICON:
-        if (m_pGameInstance->Get_DIKeyState_Down(DIK_F))
-        {
-            if (m_iIndex == 0) 
-                m_iIndex = 1;
-            else
-                m_iIndex = 0;
-        }
+        if (*m_pPlayer->Get_BuildMode() == true)
+            m_iIndex = 1;
+        else
+            m_iIndex = 0;
+        
         break;
     case Client::CInGameUI::UI_VIEWCHANGE_ICON:
         break;      
@@ -203,6 +215,12 @@ HRESULT CInGameUI::Render()
             if (FAILED(m_pShaderCom->Begin(3)))
                 return E_FAIL;
         }
+        else if (UI_BUILDMODE_CONVERSATIONBOX == m_eUIType)
+        {
+            if (FAILED(m_pShaderCom->Begin(6)))
+                return E_FAIL;
+
+        }
         else if (UI_BATTERY_GAGE == m_eUIType)
         {
 
@@ -231,6 +249,9 @@ HRESULT CInGameUI::Render()
 
         if (FAILED(m_pVIBufferCom->Render()))
             return E_FAIL;
+   
+        
+
     }
      return S_OK;
 }
@@ -273,6 +294,12 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
+    case Client::CInGameUI::UI_BUILDMODE_F:
+        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FIcon"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+        
     case Client::CInGameUI::UI_C:
         if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -305,6 +332,12 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
+    case Client::CInGameUI::UI_BUILDMODE_CONVERSATIONBOX:
+        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBackGround"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+        
     case Client::CInGameUI::UI_MACHINE_HP:
         if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -423,7 +456,7 @@ HRESULT CInGameUI::Bind_ShaderResources()
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iBattery)))
             return E_FAIL;
     }
-    else if (m_eUIType == UI_CHARACTER || m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_MODECHANGE_ICON)
+    else if (m_eUIType == UI_CHARACTER || m_eUIType == UI_BUILDMODE_CONVERSATIONBOX || m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_MODECHANGE_ICON)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
