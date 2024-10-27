@@ -70,6 +70,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
 
+	m_pRound_Manager = CRound_Manager::Create();
+	if (nullptr == m_pRound_Manager)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -416,16 +419,19 @@ bool CGameInstance::Picking_Box(const _vector& rayOrigin, const _vector& rayDire
 
 void CGameInstance::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID, _uint iDstPartObjID)
 {
+	
 	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iPartObjID, iDstPartObjID);
 }
 
 void CGameInstance::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
 {
-	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
+	
+	m_pCollision_Manager->Collision_Layer_Coin(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
 }
 
 _bool CGameInstance::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _bool* bShot, _float fDamage, _uint iTargetPartObjID)
 {
+	
 	return m_pCollision_Manager->Collision_Bullet(Target, strTargetComponentTag, vRayDior, vRayPos, bShot, fDamage, iTargetPartObjID);
 }
 
@@ -437,6 +443,12 @@ HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontF
 HRESULT CGameInstance::Render_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, FXMVECTOR vColor, _float fScale, _float fRotation, const _float2& vPivot)
 {
 	return m_pFont_Manager->Render_Text(strFontTag, pText, vPosition, vColor, fScale, fRotation, vPivot);
+}
+
+void CGameInstance::Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far, _bool& bRoundStart,_float& SkipTimer)
+{
+	
+	return m_pRound_Manager->Update(fTimeDelta, iCurrentRound, bBuildMode, Monster_Near, Monster_Far, bRoundStart, SkipTimer);
 }
 
 
@@ -460,4 +472,5 @@ void CGameInstance::Free()
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);
+	Safe_Release(m_pRound_Manager);
 }

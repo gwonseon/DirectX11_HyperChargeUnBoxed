@@ -23,14 +23,16 @@ HRESULT CTank::Initialize_Prototype()
 HRESULT CTank::Initialize(void* pArg)
 {
 	TANK_DESC* pDesc = static_cast<TANK_DESC*>(pArg);
+
+	pDesc->fSpeedPerSec = 5.f;
+	pDesc->fScale = _float3(3.f, 3.f, 3.f);
 	m_vecTargetPos = pDesc->vecTargetPos;
-	m_matPlayerWorld = pDesc->matPlayerWorld;
-	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
-	m_iModelIndex = pDesc->iModelComponentIndex;
+
+	m_iModelIndex = ANIM_TANK;
 	m_eLevel = pDesc->eID;
 	m_pBuild = pDesc->m_pBuild;
 	m_iCell_Idx = pDesc->iCell_Idx;
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
@@ -46,6 +48,7 @@ HRESULT CTank::Initialize(void* pArg)
 	return S_OK;
 }
 
+
 void CTank::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
@@ -56,6 +59,8 @@ void CTank::Priority_Update(_float fTimeDelta)
 
 void CTank::Update(_float fTimeDelta)
 {	
+	if (m_bDead == true)
+		return;
 	// 데미지 입는 타이밍 딜레이로 맞춤
 	if(m_fCurrentTime >= m_fDamaged_DelayTime)
 	{
@@ -179,7 +184,7 @@ HRESULT CTank::Add_Components()
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
 	Desc.iCurrentCellIndex = m_iCell_Idx;
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
 		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
 		return E_FAIL;
 

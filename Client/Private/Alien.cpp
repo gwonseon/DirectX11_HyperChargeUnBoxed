@@ -24,17 +24,20 @@ HRESULT CAlien::Initialize(void* pArg)
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_matPlayerWorld = pDesc->matPlayerWorld;
 	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
-	m_iModelIndex = pDesc->iModelComponentIndex;
+
+	pDesc->fScale = _float3(2.f, 2.f, 2.f);
+	pDesc->fSpeedPerSec = 10.f;
+
+	m_iModelIndex = ANIM_ALIEN;
 	m_eLevel = pDesc->eID;
 
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true);
-//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
 	m_fAttack = 10.f;
 	m_fEnergy = 0.f;
 	m_fHp = 60.f;

@@ -6,12 +6,14 @@
 #include "Player.h"
 #include <UI_CircleGuage.h>
 #include "BrainCore.h"
-BEGIN(Client)
 
-class CLevel_GamePlay final : public CLevel
+
+BEGIN(Client)
+class CGamePlay_Round;
+class CLevel_GamePlay  : public CLevel
 {
 
-private:
+protected:
 	CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLevel_GamePlay() = default;
 
@@ -23,7 +25,7 @@ public:
 
 public:
 	void	Interaction_Weapon();
-
+	void    Texture_Render();
 private:
 	HRESULT Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag);
 
@@ -31,6 +33,7 @@ private:
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Camera(const _tchar* pLayerTag);
 	HRESULT Ready_Lights();
+	HRESULT Ready_Layer_Coin(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
@@ -52,17 +55,22 @@ private:
 	CBrainCore* m_pBrain;
 
 	_float	m_fDelay{};
-
+	_bool m_bOnce = false;
 	// Ãæµ¹¿ë
 private:
-	CLayer* pPlayerLayer = { nullptr };
-	CLayer* pNearMonsterLayer = { nullptr };
-	CLayer* pFarMonsterLayer = { nullptr };
+	CLayer* pPlayerLayer		= { nullptr };
+	CLayer* pNearMonsterLayer	= { nullptr };
+	CLayer* pFarMonsterLayer	= { nullptr };
+	CLayer* pCoin				= { nullptr };
 
-
-	
+	_uint	m_iCurrentRound = 0;
 	_bool* m_pReloading = { nullptr };
 	_float XPos{}, ZPos{};
+
+private:
+	_float	m_fSkipTimer{};
+	CGamePlay_Round* m_pRound[3] = {nullptr};
+	_bool		m_bRoundStart = false;
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

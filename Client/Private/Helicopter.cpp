@@ -20,13 +20,15 @@ HRESULT CHelicopter::Initialize_Prototype()
 HRESULT CHelicopter::Initialize(void* pArg)
 {
 	HELICOPTER_DESC* pDesc = static_cast<HELICOPTER_DESC*>(pArg);
+
+	pDesc->fSpeedPerSec = 10.f;
+	pDesc->fScale = _float3(3.f, 3.f, 3.f);
+
 	m_vecTargetPos = pDesc->vecTargetPos;
-	m_matPlayerWorld = pDesc->matPlayerWorld;
-	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
-	m_iModelIndex = pDesc->iModelComponentIndex;
+	m_iModelIndex = ANIM_HELICOPTER;
 	m_eLevel = pDesc->eID;
 
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))

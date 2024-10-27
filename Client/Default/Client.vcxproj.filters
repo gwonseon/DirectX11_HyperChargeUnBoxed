@@ -148,6 +148,9 @@
     <Filter Include="02. GameObjects\Environment\Coin">
       <UniqueIdentifier>{696d48e3-9320-4cda-ae79-14321b952575}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\01. Gameplay\Round">
+      <UniqueIdentifier>{7379d2e9-2108-4189-9f56-d69f5e5674ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -288,6 +291,9 @@
     <ClInclude Include="..\Public\Coin.h">
       <Filter>02. GameObjects\Environment\Coin</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\GamePlay_Round.h">
+      <Filter>01. Levels\01. Gameplay\Round</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -419,6 +425,9 @@
     <ClCompile Include="..\Private\Coin.cpp">
       <Filter>02. GameObjects\Environment\Coin</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\GamePlay_Round.cpp">
+      <Filter>01. Levels\01. Gameplay\Round</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -456,6 +465,9 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCoin.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
