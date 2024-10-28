@@ -40,7 +40,15 @@ HRESULT CCollisionBox::Initialize(void* pArg)
 		XMStoreFloat3(&m_fPickingPos, m_vecPosition);
 		m_iIndexNumber = pDesc->iIndexNumber; // ÀüÃ¼ ÀÎµ¦½º
 	}
-
+	if (m_eLevel == LEVEL_MONSTERSPAWN)
+	{
+		m_fScale = { 0.3f, 0.3f, 0.3f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
+		m_pTransformCom->Set_Scaling(0.3f, 0.3f, 0.3f);
+		m_vecPosition = { pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f };
+		XMStoreFloat3(&m_fPickingPos, m_vecPosition);
+		m_iCellIdx = pDesc->iCell_Idx;
+	}
 	return S_OK;
 }
 
@@ -105,7 +113,28 @@ void CCollisionBox::Update(_float fTimeDelta)
 		m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 	}
-
+	if (m_eLevel == LEVEL_MONSTERSPAWN)
+	{
+		if (m_bChecking == true)
+		{
+			m_fClolor = { 255.f,0.f,0.f };
+			if (m_fScale.y > 0.7f)
+				m_bBouncing = true;
+			if (m_fScale.y < 0.3f)
+				m_bBouncing = false;
+			if (m_bBouncing == false)
+				m_fScale.y += fTimeDelta;
+			else
+				m_fScale.y -= fTimeDelta;
+		}
+		else
+		{
+			m_fClolor = { 0.f,0.f,0.f };
+			m_fScale.y = 0.3f;
+		}
+		m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+	}
 }
 
 void CCollisionBox::Late_Update(_float fTimeDelta)
@@ -133,7 +162,7 @@ HRESULT CCollisionBox::Render()
 				return E_FAIL;
 		}
 	}
-	if(m_eLevel == LEVEL_NAVIGATION)
+	if(m_eLevel == LEVEL_NAVIGATION || m_eLevel == LEVEL_MONSTERSPAWN )
 	{
 		if (FAILED(Bind_ShaderResources()))
 			return E_FAIL;

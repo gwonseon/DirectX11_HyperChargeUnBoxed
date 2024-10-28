@@ -21,6 +21,7 @@ public:
 		_uint iPoint_Number{};
 		_uint iImGuiMode{};
 		_uint iIndexNumber{};
+		_uint iCell_Idx{};
 	}COLLISIONBOX_DESC;
 
 
@@ -63,8 +64,11 @@ public:
 
 public:
 	void Set_BoundingBos(DirectX::BoundingBox Box) { BoundingBox = Box; }
+	
+	
+	
 	DirectX::BoundingBox Get_BoundingBox() { return BoundingBox; }
-
+	_uint	Get_CellIdx() { return m_iCellIdx; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };
@@ -83,6 +87,8 @@ private:
 	_uint m_iImGuiMode = 0;
 	_uint m_iCurrentImGuiMode{};
 
+
+	_uint m_iCellIdx{};
 	// navigation
 private:
 	_uint m_iPointNumber{};  // 배열에 들어가는 인덱스 넘버

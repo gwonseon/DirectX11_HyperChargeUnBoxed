@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "CollisionBox.h"
 
 BEGIN(Engine)
 class CShader;
@@ -40,6 +41,7 @@ public:
 public:
 	CNavigation* Get_NaviCom() { return m_pNavigationCom; }
 
+	vector<CCollisionBox*> Get_Collision_Center() { return m_vecCollisionBox; }
 public:
 	void	Picking();
 
@@ -54,6 +56,7 @@ private:
 
 private:
 	LEVELID		m_eLevel = {};
+	vector<CCollisionBox*> m_vecCollisionBox;
 
 private:
 	HRESULT Add_Components();

@@ -52,7 +52,7 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
     m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     // 편집툴에서 카메라 조정
-    if (m_eLevelID == LEVEL_IMGUI || m_eLevelID == LEVEL_NAVIGATION)
+    if (m_eLevelID == LEVEL_IMGUI || m_eLevelID == LEVEL_NAVIGATION || m_eLevelID == LEVEL_MONSTERSPAWN)
     {
         if (m_bMouseLock == false)
         {
@@ -150,6 +150,36 @@ void CCamera_Free::Update(_float fTimeDelta)
         }
         ShowCursor(TRUE);
         break;
+
+    case Client::LEVEL_MONSTERSPAWN:
+        if (GetKeyState('S') & 0x8000)
+        {
+            m_pTransformCom->Go_Backward(fTimeDelta);
+        }
+        if (GetKeyState('W') & 0x8000)
+        {
+            m_pTransformCom->Go_Straight(fTimeDelta);
+        }
+        if (GetKeyState('A') & 0x8000)
+        {
+            m_pTransformCom->Go_Left(fTimeDelta);
+        }
+        if (GetKeyState('D') & 0x8000)
+        {
+            m_pTransformCom->Go_Right(fTimeDelta);
+        }
+        // 마우스 고정
+        if (GetAsyncKeyState(VK_MBUTTON) & 0x0001)
+        {
+            if (m_bMouseLock == true)
+                m_bMouseLock = false;
+            else
+                m_bMouseLock = true;
+
+        }
+        ShowCursor(TRUE);
+        break;
+
     default:
         break;
     }

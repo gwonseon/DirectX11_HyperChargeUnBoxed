@@ -34,6 +34,22 @@ HRESULT CTerrain::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+
+#ifdef _DEBUG
+	if (m_eLevel == LEVEL_MONSTERSPAWN)
+	{
+		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
+		for (auto pCell : m_pNavigationCom->Get_Cells())
+		{
+			CollisionDesc.iCell_Idx = pCell->Get_CellIndex();
+			CollisionDesc.eLevel = LEVEL_MONSTERSPAWN;
+			CollisionDesc.fPosition = pCell->Get_Cell_CenterPos();
+			m_vecCollisionBox.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		}
+	}
+#endif
+
+
 	return S_OK;
 }
 
@@ -49,8 +65,6 @@ void CTerrain::Update(_float fTimeDelta)
 		// 맵 그리드로 바꾸기
 		m_pVIBufferCom->Chang_Topology();
 	}
-
-
 
 	m_pVIBufferCom->Update(fTimeDelta);
 }

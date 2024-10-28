@@ -6,12 +6,14 @@
 #include "Level_Logo.h"
 #include "Level_gamePlay.h"
 #include "Level_ImGui.h"
+#include "Monster_Path.h"
 #include "Navigation_Leve.h"
 #include "BackGround.h"
 
 
 
 #include "GameInstance.h"
+
 
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -89,6 +91,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 			break;
 		case LEVEL_NAVIGATION:
 			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CNavigation_Leve::Create(m_pDevice, m_pContext));
+			break;
+		case LEVEL_MONSTERSPAWN:
+			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CMonster_Path::Create(m_pDevice, m_pContext));
 			break;
 		}
 

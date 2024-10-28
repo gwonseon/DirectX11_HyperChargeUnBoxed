@@ -97,7 +97,6 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 	if (nullptr == m_pShader)
 		return E_FAIL;
 #endif
-
 	SetUp_Neighbor();
 
 	return S_OK;
@@ -264,7 +263,7 @@ _bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSli
 		}
 		// ÇöÀç ¼¿À» ÀÌ¿ô ¼¿·Î ¾÷µ¥ÀÌÆ®
 		m_iCurrentCellIndex = iNeighborIndex;
-		cout << m_iCurrentCellIndex << endl;
+		//cout << m_iCurrentCellIndex << endl;
 		
 		return true;
 	}

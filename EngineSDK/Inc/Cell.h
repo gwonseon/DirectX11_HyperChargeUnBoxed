@@ -32,6 +32,7 @@ public:
 
 	_uint	Get_CellIndex() { return m_iIndex; }
 	void	Set_CellIndex(_uint iIndex) { m_iIndex = iIndex; }
+	_float3 Get_Cell_CenterPos() { return m_vCenterPoints; }
 #ifdef _DEBUG
 public:
 	virtual HRESULT Render();

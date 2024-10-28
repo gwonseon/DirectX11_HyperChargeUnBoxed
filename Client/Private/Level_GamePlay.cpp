@@ -51,7 +51,6 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI_MACHINE_HP(TEXT("Layer_UIHp"))))
 		return E_FAIL;
 
-
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
@@ -69,9 +68,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	Load_Map();
 
 	// 라운드( 각 라운드 마다 데이터가 다르기 때문에 각각 따로 라운드를 생성해서 관리해줌)
-	m_pRound[0] = CGamePlay_Round::Create(m_pDevice, m_pContext);
-	m_pRound[1] = CGamePlay_Round::Create(m_pDevice, m_pContext);
-	m_pRound[2] = CGamePlay_Round::Create(m_pDevice, m_pContext);
+	m_pRound[0] = CGamePlay_Round::Create(m_pDevice, m_pContext,1);
+	m_pRound[1] = CGamePlay_Round::Create(m_pDevice, m_pContext,2);
+	m_pRound[2] = CGamePlay_Round::Create(m_pDevice, m_pContext,3);
 	for (int i = 0; i < 3; i++)
 	{
 		m_pRound[i]->Set_BrainPos(m_pBrain->Get_BrainPos());
@@ -92,18 +91,14 @@ HRESULT CLevel_GamePlay::Initialize()
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
-
 	
 
 	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
 	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart,m_fSkipTimer);
 	if(m_bRoundStart == true && m_iCurrentRound < 4)
-	{
-		
-		// 배열은 0부터 시작이라 1 빼줌 
-		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound - 1);
+	{		// 배열은 0부터 시작이라 1 빼줌 
+		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
 		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
-
 		if(m_bOnce == false) // 한 번만 찾으면 된다
 		{
 			// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
@@ -111,12 +106,21 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
 			m_bOnce = true;
 		}
+		if (pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
+		{
+			// 남은 몬스터 수를 보내줌
+			m_pRound[m_iCurrentRound - 1]->Set_RemainMonster_Count(pNearMonsterLayer->Get_GameObjectList_Size() + pFarMonsterLayer->Get_GameObjectList_Size());
+		}
+		else
+			m_bOnce = false;
+
 
 	}
 	
 	if (*m_pPlayer->Get_BuildMode() == false)
 	{
-		cout << m_fSkipTimer << endl;
+		// 빌드 모드 스킵 시간 
+		//cout << m_fSkipTimer << endl;
 	}
 	// Round 클래스는 Initailize에서 생성해서 담고, 생성할 때 dat파일 읽어서 위치 값 저장해두고 
 	// 업데이트에서 해당 조건을 만족했을 때 작동하는 식으로 하면 어떨까
@@ -511,7 +515,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
