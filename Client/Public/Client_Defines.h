@@ -5,6 +5,7 @@
 #define BUILD_EA	42
 #define ENVIRONMENT_EA 165
 #define WEAPON_EA		11
+#define MONSTER_EA		4
 #define OBJ_DEAD 1
 namespace Client
 {

@@ -7,15 +7,25 @@
 #include "GameInstance.h"
 #include "Environment.h"
 #include "Player.h"
+#include "Terrain.h"
 
 BEGIN(Client)
 
 class CMonster_Path final : public CLevel
 {
 public:
-	enum PATHFIND_TYPE{NORMAL_PATHFIND, ASTAR_PATHFIND, PATHFIND_END };
-	enum PLAY_ROUND{PLAY_FIRST_ROUND, PLAY_SECOND_ROUND, PLAY_THIRD_ROUND, PLAY_ROUND_END};
+	enum PATHFIND_TYPE { NORMAL_PATHFIND, ASTAR_PATHFIND, PATHFIND_END };
+	enum PLAY_ROUND { PLAY_FIRST_ROUND, PLAY_SECOND_ROUND, PLAY_THIRD_ROUND, PLAY_ROUND_END };
 
+public:
+	typedef struct
+	{
+		_float3 fPos{ };
+		_uint	iLevel{};
+		_uint	iRound{};
+		_uint	iModel_Idx{};
+		_uint	iCellIdx{};
+	}MONSTER_SPAWN_DESC;
 private:
 	CMonster_Path(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CMonster_Path() = default;
@@ -33,16 +43,34 @@ public:
 
 
 private:
-
-
-
-
+	void	Save_FirstRound();
+	void	Save_SecondRound();
+	void	Save_ThirdRound();
+	void	Load();
+	void	Add_Data();
+	void	Picking_Create();
+	void	Load_Map();
 private:
 	PATHFIND_TYPE			m_ePathFind_Type{};
 
+	int					m_iRound{};
+	int					m_iLevel{};
+	int					m_iCellIndex{};
+	float				Position[3];
+	_float3				m_fPickingPos{};
 
+	
+	_bool				m_bAdd = false;
+	_bool				m_bSave = false;
+	_bool				m_bLoad = false;
+	
+	vector< MONSTER_SPAWN_DESC> m_vecMonsterSpawn[LEVEL_END][3];
+
+	_bool				m_bOnce = false;
+	vector<CCollisionBox*> m_vecCollisionCenter;
 private:
 	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // 터레인 피킹
+	CTerrain* m_pTerrain = { nullptr };
 
 
 private:// 이미지 버튼
@@ -56,7 +84,7 @@ private:// 이미지 버튼
 	ID3D11ShaderResourceView* my_Savetexture = nullptr;
 	ID3D11ShaderResourceView* my_Loadtexture = nullptr;
 
-	_int  m_iModelIndex = 0;
+	int  m_iModelIndex = 0;
 
 
 public:

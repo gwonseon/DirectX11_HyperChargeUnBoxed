@@ -7,6 +7,7 @@ BEGIN(Client)
 
 class CGamePlay_Round : public CLevel_GamePlay
 {
+
 public:
 	typedef struct
 	{
@@ -20,7 +21,7 @@ private:
 	virtual ~CGamePlay_Round() = default;
 
 public:
-	virtual HRESULT Initialize() ;
+	virtual HRESULT Initialize(_uint iRound) ;
 	virtual void Update(_float fTimeDelta) override;
 
 public:
@@ -31,11 +32,19 @@ public:
 	void Set_PlayerPos(_vector* vPos) { vecPlayerPos = vPos; }
 	const void Set_PlayerWorld_matrix(const _float4x4* vMatrix) { matPlayerWorld = vMatrix; }
 	const void Set_BrainCoreWorld_matrix(const _float4x4* vMatrix) { matBrainCoreWorld = vMatrix; }
+	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
+
+
+	_uint	Get_MonsterCount() { return m_iMonsterCount; }
+	void	MonsterCreate(_float fTimeDelta);
 
 
 private:
 	_uint m_iCurrentRound{};
-	_float fRound_Time;
+	_uint m_iMyRound{}; //  이 객체가 갖고 있는 라운드
+	_uint m_iMonsterCount{};
+	_uint m_iCurrent_RemainMonster{};
+	_float fRound_Time{}, fCreate_Time{};
 	vector< MONSTER_CREATE_DESC> m_vecMonsterCreate;
 
 	ANIMMODEL_INDEX eModel_Index{};
@@ -54,7 +63,7 @@ private:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
 public:
-	static CGamePlay_Round* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext );
+	static CGamePlay_Round* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,_uint iRound );
 	virtual void Free() override;
 };
 

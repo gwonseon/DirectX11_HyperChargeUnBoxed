@@ -98,7 +98,11 @@ HRESULT CLoader::Loading()
 	case LEVEL_NAVIGATION:
 		hr = Loading_For_NavigationLevel();
 		break;
+	case LEVEL_MONSTERSPAWN:
+		hr = Loading_For_MonsterSpawnLevel();
+		break;
 
+		
 	}
 
 	if (FAILED(hr))
@@ -124,7 +128,7 @@ HRESULT CLoader::Loading_For_LogoLevel()
 	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
 	/* For.Prototype_Component_Texture_Logo */
 
-		// 뒷배경
+	// 뒷배경
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Menu_Back"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_BackgroundStats_Background.png")))))
 		return E_FAIL;
@@ -773,6 +777,82 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_MonsterSpawnLevel()
+{
+	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
+
+	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
+	m_strLoadingText = TEXT("모델 로딩중입니다.");
+
+	Loading_DataFile_For_MonsterSpawnLevel();
+
+	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
+	m_strLoadingText = TEXT("셰이더 로딩중입니다.");
+
+	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
+	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
+
+	// 터레인
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
+			CTerrain::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	/* Prototype_GameObject_Camera_Free */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
+			CCamera_Free::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// Environment
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	//Bullet
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	//MonsterBullet
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	// BrainCore
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
+			CCollisionBox::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+
+	}
+
+
+	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
+	m_strLoadingText = TEXT("로딩 완료되었습니다.");
+	m_fPersent += 20.f;
+	m_isFinished = true;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 {
 	_int iEnvironmentIndex = 0;
@@ -1227,6 +1307,155 @@ HRESULT CLoader::Loading_DataFile_For_NavigationLevel()
 		iAnimModelIndex++;
 	}
 
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel()
+{
+	_int iPathIndex{}, iModelIndex{}, iEnvironmentIndex = 0;
+	DWORD dwByte = 0;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+
+	_matrix			PreTransformMatrix = XMMatrixIdentity();
+	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
+	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
+	const _wstring Ext = TEXT(".dat");
+	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	cout << "Environment ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+
+	HANDLE hFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Load GamePlayLevel_Env_Index File Failed", L"Error", MB_OK);
+		return E_FAIL;
+	}
+
+	while (ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr) && dwByte > 0)
+	{
+		const _wstring Model_Component_Result = Model_Component + to_wstring(iModelIndex);
+		const _wstring Model_Path_Result = Model_Path + to_wstring(iModelIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MONSTERSPAWN, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iModelIndex))))
+			return E_FAIL;
+
+	}
+	CloseHandle(hFile);
+	cout << "Environment Read 완료" << endl;
+
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	const _wstring Model_Build_Path = TEXT("../Bin/Resources/Model/ModelData_Build");
+
+	cout << "BUILD ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+
+	HANDLE hBuildFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hBuildFile)
+	{
+		MessageBox(NULL, L"Load GamePlayLevel_Build_Index File Failed", L"Error", MB_OK);
+		return E_FAIL;
+	}
+
+	while (ReadFile(hBuildFile, &iModelIndex, sizeof(_int), &dwByte, nullptr) && dwByte > 0)
+	{
+		const _wstring Model_Component_Result = Model_Component + to_wstring(iModelIndex + ENVIRONMENT_EA);
+		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iModelIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MONSTERSPAWN, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iModelIndex))))
+			return E_FAIL;
+
+	}
+	CloseHandle(hBuildFile);
+	cout << "Build Read 완료" << endl;
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------------------------------------------------------------------
+
+	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
+	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
+	iPathIndex = 0;
+	_uint iCharacterIndex = 0;
+	cout << "Character ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+	while (iPathIndex < 2)
+	{
+		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
+		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MONSTERSPAWN, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+			return E_FAIL;
+		iCharacterIndex++;
+		iPathIndex++;
+	}
+
+
+	const _wstring Model_Component_Weapon = TEXT("Prototype_Component_Model_Weapon");
+	const _wstring Model_Weapon_Path = TEXT("../Bin/Resources/Model/ModelData_Weapon");
+	iPathIndex = 0;
+	_uint iWeaponIndex = 0;
+	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+
+	while (iPathIndex < WEAPON_EA)
+	{
+
+		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
+		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MONSTERSPAWN, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+			return E_FAIL;
+		iWeaponIndex++;
+		iPathIndex++;
+	}
+
+
+	// 애니메이션
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	_int iAnimModelIndex = 0;
+	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
+	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
+
+	cout << "애니메이션 ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+
+	while (iAnimModelIndex < 12)
+	{
+		if (iAnimModelIndex == 0)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		}
+		else if (iAnimModelIndex == 2) // Tank
+		{
+			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		}
+		else if (iAnimModelIndex == 7)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
+		}
+		else if (iAnimModelIndex == 6)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
+		}
+		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10)
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		}
+		else
+		{
+			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+		}
+		//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
+		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
+		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
+		cout << iAnimModelIndex << "번 애님모델" << endl;
+		cout << "--------------------------------------------------" << endl;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MONSTERSPAWN, ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+			return E_FAIL;
+		iAnimModelIndex++;
+	}
 	return S_OK;
 }
 

@@ -60,7 +60,12 @@ void CLevel_Logo::Update(_float fTimeDelta)
 			return;
 		return;
 	}
-
+	if (GetKeyState(VK_NUMPAD4) & 0x8000)
+	{
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_MONSTERSPAWN))))
+			return;
+		return;
+	}
 	if(m_pButton_GamePlay != nullptr)
 	{
 		if (true == dynamic_cast<CButtonUI*> (m_pButton_GamePlay)->Get_bClick())
