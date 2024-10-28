@@ -1090,14 +1090,12 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 		iPathIndex++;
 	}
 
-
 	const _wstring Model_Component_Weapon = TEXT("Prototype_Component_Model_Weapon");
 	const _wstring Model_Weapon_Path = TEXT("../Bin/Resources/Model/ModelData_Weapon");
 	iPathIndex = 0;
 	_uint iWeaponIndex = 0;
 	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-
 	while (iPathIndex < WEAPON_EA)
 	{
 
@@ -1109,6 +1107,24 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 		iWeaponIndex++;
 		iPathIndex++;
 	}
+
+	const _wstring Model_Component_Trap = TEXT("Prototype_Component_Model_Trap");
+	const _wstring Model_Trap_Path = TEXT("../Bin/Resources/Model/ModelData_Trap");
+	iPathIndex = 0;
+	_uint iTrapIndex = 0;
+	cout << "Trap ---------------------------------------------------------------------------" << endl;
+	cout << "----------------------------------------------------------------------------------------" << endl;
+	while (iPathIndex < TRAP_EA)
+	{
+		const _wstring Model_Component_Result = Model_Component_Trap + to_wstring(iTrapIndex);
+		const _wstring Model_Path_Result = Model_Trap_Path + to_wstring(iPathIndex) + Ext;
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iTrapIndex))))
+			return E_FAIL;
+		iTrapIndex++;
+		iPathIndex++;
+	}
+
 
 
 	// 애니메이션

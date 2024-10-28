@@ -7,6 +7,7 @@
 #define WEAPON_EA		11
 #define MONSTER_EA		4
 #define OBJ_DEAD 1
+#define TRAP_EA 12
 namespace Client
 {
 	const unsigned int		g_iWinSizeX = 1280;
