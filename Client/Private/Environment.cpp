@@ -176,20 +176,17 @@ HRESULT CEnvironment::Bind_ShaderResources()
 CEnvironment* CEnvironment::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CEnvironment* pInstance = new CEnvironment(pDevice, pContext);
-
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CEnvironment");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 
 CGameObject* CEnvironment::Clone(void* pArg)
 {
 	CEnvironment* pInstance = new CEnvironment(*this);
-
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
  		MSG_BOX("Failed to Created : CEnvironment");

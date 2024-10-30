@@ -15,6 +15,7 @@ public:
 		const _float4x4* matPlayerWorld = { nullptr };
 		const _float4x4* matBrainCoreWorld = { nullptr };
 		_vector* vecTargetPos{};
+		CLayer* pTrapLayer = { nullptr };
 	}MONSTER_DESC;
 
 	
@@ -66,6 +67,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta) ;
 	virtual HRESULT Render();
 
+	void Set_TargetPos(_vector* pPos) { m_vecTargetPos = pPos; }
 
 protected:
 	LEVELID	m_eLevel = {};
@@ -81,8 +83,11 @@ protected:
 	_float		m_fKnockBack_Power = 0.f;
 	_float		m_fKnockBack_Height = 0.f;
 protected:
-	_vector* m_vecTargetPos;
+	_vector*	m_vecTargetPos;
+	_vector		m_vecNewTargetPos{};
+	_vector		m_vecStoreTargetPos{};
 
+	CLayer* m_pTrapLayer = { nullptr };
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

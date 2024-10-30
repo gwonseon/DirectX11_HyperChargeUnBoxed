@@ -1,23 +1,31 @@
 #include "stdafx.h"
 #include "..\Public\Level_GamePlay.h"
-#include "Level_Loading.h"
 #include "GameInstance.h"
 
+#include "Level_Loading.h"
+#include "GamePlay_Round.h"
 
 #include "CrossLine.h"
 #include "NumberUI.h"
 #include "InGameUI.h"
 
-#include "Terrain.h"
-#include "Monster.h"
 #include "Environment.h"
 #include "Weapon.h"
-#include <Tank.h>
+#include "Coin.h"
+
+
+#include "Trap_Bricks.h"
+#include "Terrain.h"
+
+#include "Monster.h"
+#include "Tank.h"
 #include "Helicopter.h"
-#include <Alien.h>
-#include <Pony.h>
-#include <Coin.h>
-#include "GamePlay_Round.h"
+#include "Alien.h"
+#include "Pony.h"
+#include <Energy_Cap.h>
+#include <Battery.h>
+
+
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -26,7 +34,6 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
-
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 
@@ -36,22 +43,16 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_PlayerBuild"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster_Attack_Near"))))
-		return E_FAIL;
-
-	if (FAILED(Ready_Layer_Monster_Attack_Far(TEXT("Layer_Monster_Attack_Far"))))
-		return E_FAIL;
-
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_WeaponITem(TEXT("Layer_WeaponItem"))))
-		return E_FAIL;
-	
-	if (FAILED(Ready_Layer_UI_MACHINE_HP(TEXT("Layer_UIHp"))))
+	if (FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_WeaponITem(TEXT("Layer_WeaponItem"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Icon(TEXT("Layer_UI_Icon"))))
@@ -59,27 +60,27 @@ HRESULT CLevel_GamePlay::Initialize()
 
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;
-
+	
 	// 가장 마지막에 그려야한다.
 	if (FAILED(Ready_Layer_Damaged(TEXT("Layer_UI_Damaged"))))
 		return E_FAIL;
 
-
 	Load_Map();
-
+	pTrap = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Trap"));
+#pragma region 라운드
 	// 라운드( 각 라운드 마다 데이터가 다르기 때문에 각각 따로 라운드를 생성해서 관리해줌)
 	m_pRound[0] = CGamePlay_Round::Create(m_pDevice, m_pContext,1);
 	m_pRound[1] = CGamePlay_Round::Create(m_pDevice, m_pContext,2);
 	m_pRound[2] = CGamePlay_Round::Create(m_pDevice, m_pContext,3);
 	for (int i = 0; i < 3; i++)
 	{
+		m_pRound[i]->Set_TrapLayer(pTrap);
 		m_pRound[i]->Set_BrainPos(m_pBrain->Get_BrainPos());
 		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
 		m_pRound[i]->Set_BrainCoreWorld_matrix(m_pBrain->Get_Transform()->Get_WorldMatrixPtr());
 		m_pRound[i]->Set_PlayerWorld_matrix(m_pPlayer->Get_Transform()->Get_WorldMatrixPtr());
-
 	}
-
+#pragma endregion 라운드
 
 	m_pPlayer->Set_RoundStart(&m_bRoundStart);
 	m_pReloading = m_pPlayer->Get_Reloading();
@@ -91,31 +92,9 @@ HRESULT CLevel_GamePlay::Initialize()
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
+	Build_Check(); // 트랩 설치관련 
+	RoundMgr_And_MonsterSpawn(fTimeDelta); // 라운드관리 및 몬스터 스폰 
 	
-
-	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
-	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart,m_fSkipTimer);
-	if(m_bRoundStart == true && m_iCurrentRound < 4)
-	{		// 배열은 0부터 시작이라 1 빼줌 
-		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
-		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
-		if(m_bOnce == false) // 한 번만 찾으면 된다
-		{
-			// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
-			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"));
-			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
-			m_bOnce = true;
-		}
-		if (pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
-		{
-			// 남은 몬스터 수를 보내줌
-			m_pRound[m_iCurrentRound - 1]->Set_RemainMonster_Count(pNearMonsterLayer->Get_GameObjectList_Size() + pFarMonsterLayer->Get_GameObjectList_Size());
-		}
-		else
-			m_bOnce = false;
-
-
-	}
 	
 	if (*m_pPlayer->Get_BuildMode() == false)
 	{
@@ -129,14 +108,18 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	// 무기와 상호작용
 	Interaction_Weapon();
 
+#pragma region Collision
+	if(pTrap_Shield == nullptr)
+		pTrap_Shield = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Trap_Shield"));
 	// 앞이 당하는 애
 	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
 	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
 	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
 	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
-	
+	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
 
 
+#pragma endregion Collision	
 #pragma region 총알충돌검사
 	_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
 	XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
@@ -162,12 +145,6 @@ HRESULT CLevel_GamePlay::Render()
 	Texture_Render();
 	__super::Render();
 	
-	// 코인 숫자 (문자열 ) 출력, 이미지로 하자 
-	//_uint m_iCoin = m_pPlayer->Get_Coin();
-//wstring strCoin = to_wstring(794);
-//m_pGameInstance->Render_Text(TEXT("GumiFont"), strCoin.c_str(), _float2(g_iWinSizeX - 140.f, g_iWinSizeY - 27.f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.4);
-
-
 
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
@@ -238,16 +215,6 @@ void CLevel_GamePlay::Texture_Render()
 		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("건설 모드 건너뛰기"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag)
-{
-
-
-	return S_OK;
-}
-
-
-
-
 HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
@@ -258,7 +225,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
 		TEXT("Prototype_GameObject_Sky"))))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -274,7 +240,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar* pLayerTag)
 
 	return S_OK;
 }
- 
 
 HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 {
@@ -283,7 +248,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	Desc.iModelIndex = 5;
 	Desc.fScale = { 30.f,30.f,30.f };
 	Desc.fPosition = { 469.82f, 3.f, 442.094f };
-	CGameObject*  pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
+	CGameObject* pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
 	m_pWeaponItem[0] = static_cast<CWeapon_Item*>(pItem);
 
 	Desc.fScale = { 10.f,10.f,10.f };
@@ -292,18 +257,49 @@ HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
 	m_pWeaponItem[1] = static_cast<CWeapon_Item*>(pItem);
 
+
+	CBattery::BATTERY_DESC pBattery;
+	pBattery.eID = LEVEL_GAMEPLAY;
+	pBattery.fScale = { 7.f, 7.f, 7.f };
+	pBattery.fPosition = { 400.f,2.f, 450.f };
+	pBattery.pGauge = m_pGuage;
+	pBattery.pPlayer = m_pPlayer;
+	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Battery"), &pBattery);
+
+
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 {
+	// 브레인 코어
 	CBrainCore::BRAIN_CORE_DESC pDesc{};
 	pDesc.eID = LEVEL_GAMEPLAY;
-	pDesc.fPosition = _float3(490.f, 0.1f, 505.066f);
+	pDesc.fPosition = _float3(490.f, 0.1f, 505.f);
 	pDesc.fScale = { 4.f,4.f,4.f };
 	pDesc.iModelComponentIndex = 205;
-	
 	m_pBrain = static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
+
+	// 에너지 머신
+	CEnergy_Machine::ENERGYMACHINE_DESC pEnergyMachine{};
+	pEnergyMachine.eID = LEVEL_GAMEPLAY;
+	pEnergyMachine.fScale = { 5.f,5.f,5.f };
+	pEnergyMachine.fPosition = _float3{ 477.267f, 0.1f,532.115f };
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
+
+	// 에너지 머신 레이더
+	CEnergy_Lader::ENERGYLADER_DESC pEnergyLader{};
+	pEnergyLader.eID = LEVEL_GAMEPLAY;
+	pEnergyLader.fScale = { 5.f,5.f,5.f };
+	pEnergyLader.fPosition = _float3{ 477.267f, 0.1f,532.115f };
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyLader"), &pEnergyLader));
+
+	// 에너지 머신 캡
+	CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
+	pEnergyCap.eID = LEVEL_GAMEPLAY;
+	pEnergyCap.fScale = { 5.f,5.f,5.f };
+	pEnergyCap.fPosition = _float3{ 476.075f, 5.82203f,532.203f };
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
 
 	return S_OK;
 }
@@ -443,6 +439,56 @@ HRESULT CLevel_GamePlay::Ready_Layer_Icon(const _tchar* pLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Ready_Layer_Trap(const _tchar* pLayerTag)
+{
+	CTrap_Marks::TRAP_MARKS_DESC Mark_Desc{};
+	Mark_Desc.eID = LEVEL_GAMEPLAY;
+	Mark_Desc.fScale = { 4.f,4.f,4.f };
+	Mark_Desc.pPlayer = m_pPlayer;
+
+
+#pragma region 레고트랩
+	Mark_Desc.eType = CTrap_Marks::BRICKS_TRAP;
+
+	Mark_Desc.fPosition = _float3(502.f, 0.11f, 505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(478.f, 0.11f, 505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(490.f, 0.11f, 493.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	
+	Mark_Desc.fPosition = _float3(490.f, 0.11f, 517.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+#pragma endregion 레고트랩
+
+#pragma region 탱크트랩
+	Mark_Desc.eType = CTrap_Marks::TANK_TRAP;
+
+	Mark_Desc.fPosition = _float3(485.692f, 0.11f, 437.152f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(440.698f, 0.11f, 428.292f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(440.114f, 0.11f, 520.027f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+
+#pragma endregion 탱크트랩
+	/*
+	Cell : 143
+485.692     0     437.152
+Cell : 74
+440.698     0     428.292
+Cell : 33
+440.114     0     520.027
+	*/
+	return S_OK;
+}
+
 HRESULT CLevel_GamePlay::Ready_Layer_Damaged(const _tchar* pLayerTag)
 {
 	CInGameUI::INGAMEUI_DESC	pDesc12{};
@@ -520,76 +566,6 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Coin(const _tchar* pLayerTag)
-{
-
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar* pLayerTag)
-{
-
-	
-
-	//CAlien::ALIEN_DESC Alien_Desc{};
-	//Alien_Desc.eID = LEVEL_GAMEPLAY;
-	//Alien_Desc.fPosition = _float3(400.f, 3.f, 300.710f);
-
-	//Alien_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
-	//Alien_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
-	//Alien_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-	//	TEXT("Prototype_GameObject_Alien"), &Alien_Desc)))
-	//	return E_FAIL;
-
-	//CPony::PONY_DESC Pony_Desc{};
-	//Pony_Desc.eID = LEVEL_GAMEPLAY;
-	//Pony_Desc.fPosition = _float3(410.f, 1.f, 310.710f);
-
-	//Pony_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
-	//Pony_Desc.matBrainCoreWorld = m_pBrain->Get_Transform()->Get_WorldMatrixPtr();
-	//Pony_Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-	//	TEXT("Prototype_GameObject_Pony"), &Pony_Desc)))
-	//	return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag)
-{
-	//CTank::TANK_DESC Tank_Desc{};
-
-	//Tank_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
-	//Tank_Desc.m_pBuild = m_pBrain;
-
-	//Tank_Desc.eID = LEVEL_GAMEPLAY;
-	//Tank_Desc.fPosition = _float3(519.786f, 0.f, 329.124f);
-	//Tank_Desc.iCell_Idx = 323;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-	//	TEXT("Prototype_GameObject_Tank"), &Tank_Desc)))
-	//	return E_FAIL;
-
-	//Tank_Desc.fPosition = _float3(378.412f, 0.f, 552.151f);
-	//Tank_Desc.iCell_Idx = 335;
-
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-	//	TEXT("Prototype_GameObject_Tank"), &Tank_Desc)))
-	//	return E_FAIL;
-
-	//CHelicopter::HELICOPTER_DESC Helicopter_Desc{};
-	//Helicopter_Desc.vecTargetPos = m_pBrain->Get_BrainPos();
-
-	//Helicopter_Desc.eID = LEVEL_GAMEPLAY;
-	//Helicopter_Desc.fPosition = _float3(380.755f, 5.f, 300.710f);
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-	//	TEXT("Prototype_GameObject_Helicopter"), &Helicopter_Desc)))
-	//	return E_FAIL;
 	return S_OK;
 }
 
@@ -711,6 +687,66 @@ void CLevel_GamePlay::Load_Map()
 	CloseHandle(hFile);
 }
 
+void CLevel_GamePlay::Build_Check()
+{
+	_bool bBuildCheck = false;
+	for (auto& pBuild : m_vecTrapMark)
+	{
+		if (pBuild->Get_BuildAble() == true)
+		{
+			m_pPlayer->Set_Build_Able(true);
+			bBuildCheck = true;
+		}
+		if (bBuildCheck == false)
+		{
+			m_pPlayer->Set_Build_Able(false);
+		}
+	}
+}
+
+void CLevel_GamePlay::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
+{
+	m_iPreviousRound = m_iCurrentRound;
+	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
+	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart, m_fSkipTimer);
+	if (m_iPreviousRound != m_iCurrentRound && m_iCurrentRound == 0)
+	{
+		// 빌드 모드 시작 (쉬는 시간 시작)
+		for (auto pMark : m_vecTrapMark)
+		{
+			// 만든 레고 브릭이 부숴졌을 때 다시 만들 수 있게 값 초기화
+			if (pMark->Get_Bricks_KnockDown() == true)
+			{
+				pMark->Set_ReBuild();
+			}
+		}
+	}
+	if (m_bRoundStart == true && m_iCurrentRound < 4)
+	{		// 배열은 0부터 시작이라 1 빼줌 
+		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
+		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
+		if (m_bOnce == false) // 한 번만 찾으면 된다
+		{
+			// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
+			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"));
+			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
+			m_bOnce = true;
+		}
+		if(pMonsterBullet == nullptr)
+			pMonsterBullet = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"));
+
+		if (pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
+		{
+			// 남은 몬스터 수를 보내줌
+			m_pRound[m_iCurrentRound - 1]->Set_RemainMonster_Count(pNearMonsterLayer->Get_GameObjectList_Size() + pFarMonsterLayer->Get_GameObjectList_Size());
+		}
+		else
+			m_bOnce = false;
+	}
+
+	
+}
+
 CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_GamePlay* pInstance = new CLevel_GamePlay(pDevice, pContext);
@@ -761,6 +797,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.fX = g_iWinSizeX * 0.5f;
 	pCircleDesc.fY = g_iWinSizeY * 0.5f;
 	pCircleDesc.fDepth = 0.1f;
+	pCircleDesc.pPlayer = m_pPlayer;
+	pCircleDesc.vecMarks = &m_vecTrapMark;
 	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
 

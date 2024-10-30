@@ -22,7 +22,8 @@ HRESULT CUI_CircleGuage::Initialize_Prototype()
 HRESULT CUI_CircleGuage::Initialize(void* pArg)
 {
 	CIRCLEGAUGE_DESC* pDesc = (CIRCLEGAUGE_DESC*)pArg;
-
+	m_pPlayer = pDesc->pPlayer;
+	m_pvecTrap_Marks = pDesc->vecMarks;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -30,23 +31,65 @@ HRESULT CUI_CircleGuage::Initialize(void* pArg)
 		return E_FAIL;
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
 
+	m_bBuildMode = m_pPlayer->Get_BuildMode();
 	return S_OK;
 }
 
 void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 {
+	// 빌드모드에서 건물 만들 때
+	if(*m_bBuildMode == true && m_bItemCharging == false)
+	{
+		if (m_pPlayer->Get_Build_Gauging() == true)
+			m_bBuild_Draw = true;
+		else
+			m_bBuild_Draw = false;
+
+		if (m_fReal_Gauging_Time >= 1.f)
+		{
+			m_fReal_Gauging_Time = 0.f;
+			m_bBuild_Draw = false;
+			for (auto& pMark : *m_pvecTrap_Marks)
+			{
+				// 만들 수 있고, 살 수 있을 때
+				if (pMark->Get_BuildAble() == true && pMark->Get_CanBuy() == true)
+				{
+					m_pPlayer->UseCoin(pMark->Get_Privce());
+					pMark->Set_Build_Done(true);
+					break;
+				}
+			}
+		}
+	}
+
+
+	// 아이템과의 상호 작용
+	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false)
+	{
+		cout << "sas" << endl;
+		m_bItemCharging = true;
+		if (m_fReal_Gauging_Time >= 1.f)
+		{
+			cout << "차징 끝 " << endl;
+			m_bItem_Interaction_End = true;
+			m_bItemCharging = false;
+			m_fGuaging_Time = 0.f;
+			m_fReal_Gauging_Time = 0.f;
+		}
+	}
 }
 
 void CUI_CircleGuage::Update(_float fTimeDelta)
 {
-	if (m_bCharging == true)
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true)
 	{
-		m_fGuaging_Time += fTimeDelta * 10;
+			m_fReal_Gauging_Time += fTimeDelta;
+			m_fGuaging_Time += fTimeDelta * 10;
 	}
 	else
 	{
-		m_fGuaging_Time = 0.f;
-		m_bCharging = false;
+			m_fReal_Gauging_Time = 0.f;
+			m_fGuaging_Time = 0.f;
 	}
 }
 
@@ -58,7 +101,7 @@ void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 
 HRESULT CUI_CircleGuage::Render()
 {
-	if (m_bCharging == true)
+	if (m_bCharging == true || m_bBuild_Draw == true)
 	{
 		m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
 

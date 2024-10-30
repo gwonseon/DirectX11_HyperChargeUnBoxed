@@ -63,8 +63,10 @@ private:
 	vector<_float3> Path{};
 private:
 	_vector vPos{};
+	
 	_uint		m_iCell_Idx{};
 
+	_float		m_fTime_For_Target{};
 	_bool		m_bAnimState{};
 	_bool		m_bFirstShot = false; // 첫 발은 애니메이션으로 안돼서 따로 쏴줌
 	_bool		m_bShotOnce = false;	// 애니메이션 끝났을 때의 조건문이 두 번 돌아서 한 번만 쏘게 만들어줌

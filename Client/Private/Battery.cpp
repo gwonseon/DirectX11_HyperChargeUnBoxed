@@ -1,0 +1,185 @@
+#include "stdafx.h"
+#include "..\Public\Battery.h"
+
+#include "GameInstance.h"
+
+
+CBattery::CBattery(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: CGameObject{ pDevice, pContext }
+{
+}
+
+CBattery::CBattery(const CBattery& Prototype)
+	: CGameObject{ Prototype }
+{
+}
+
+HRESULT CBattery::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT CBattery::Initialize(void* pArg)
+{
+	BATTERY_DESC* pDesc = static_cast<BATTERY_DESC*>(pArg);
+	m_eLevel = pDesc->eID;
+	m_pPlayer = pDesc->pPlayer;
+	m_pGauge = pDesc->pGauge;
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	if (FAILED(Add_Components()))
+		return E_FAIL;
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
+	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
+	return S_OK;
+}
+
+void CBattery::Priority_Update(_float fTimeDelta)
+{
+	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	if (m_pTransformCom->Cal_Distance_vec(m_pPlayer->Get_Position(), m_vecPos) <= 80.f) // 플레이어와의 거리 계산
+	{
+		// 근처에 있을 때 상호작용이 되어야 하는데
+		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E) && m_pGauge->Get_ItemInteraction_End() == false)
+		{
+			// Circle Gauge한테 충전하라고 보내주기
+			m_pGauge->Set_Item_Interaction(true);
+		}
+		else
+		{
+			// Circle Gauge 값 초기화
+			m_pGauge->Set_Item_Interaction(false);
+		
+		}
+
+		// 아이템 상호작용이 끝났을 때 안보이게 만들기, 나중에 위치 업데이트되면 그자리로 보낸 후 업데이트 할 것
+		if (m_pGauge->Get_ItemInteraction_End() == true)
+		{
+
+			cout << "이게 왜" << endl;
+			m_bVisible = false;
+			m_pGauge->Set_Item_InteractionEnd(false); // 상호작용 끝났는지 알려주는 값 초기화 해주기
+			// 플레이어한테 배터리 들라고 알려주기
+			m_pPlayer->Set_EquipNumber(CPlayer::BATTERY); //8번 
+		}
+	}
+	
+}
+
+void CBattery::Update(_float fTimeDelta)
+{
+}
+
+void CBattery::Late_Update(_float fTimeDelta)
+{
+	if(m_bVisible == true)
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+			return;
+	}
+}
+
+HRESULT CBattery::Render()
+{
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CBattery::Add_Components()
+{
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
+		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+
+	const _wstring Model_Component = TEXT("Prototype_Component_Model_Weapon");
+	const _wstring Model_Component_Result = Model_Component + to_wstring(11);
+	/* For.Com_Model */
+	;
+	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
+		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CBattery::Bind_ShaderResources()
+{
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+	if (nullptr == pLightDesc)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+		return E_FAIL;
+
+	return S_OK;
+
+
+}
+
+CBattery* CBattery::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CBattery* pInstance = new CBattery(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CBattery");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CBattery::Clone(void* pArg)
+{
+	CBattery* pInstance = new CBattery(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Created : CBattery");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CBattery::Free()
+{
+	__super::Free();
+
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
+}

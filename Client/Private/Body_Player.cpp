@@ -132,18 +132,20 @@ void CBody_Player::Update(_float fTimeDelta)
 		else
 			m_iShaderPassNum = 0;
 		
+		XMStoreFloat4x4(&m_WorldMatrix, XMLoadFloat4x4(m_pParentMatrix) * m_pTransformCom->Get_WorldMatrix());
+		m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+		m_pColliderCom->Update(XMLoadFloat4x4(&m_WorldMatrix));
+
 }
 
 void CBody_Player::Late_Update(_float fTimeDelta)
 {
-	XMStoreFloat4x4(&m_WorldMatrix, XMLoadFloat4x4(m_pParentMatrix) * m_pTransformCom->Get_WorldMatrix());
-	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	m_pColliderCom->Update(XMLoadFloat4x4(&m_WorldMatrix));
 
 	if(m_bDead == false)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
 			return;
 	}
 }
@@ -317,6 +319,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Katana, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -350,6 +355,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_W_Katana, true);
+				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_W_Rifle, true);
 				break;
 			default:
 				break;
@@ -385,6 +393,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_S_Katana, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_S_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -419,6 +430,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_E_Katana, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_E_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -451,6 +465,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
+				break;
+			case Client::CBody_Player::BATTERY:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
 				break;
 			default:
@@ -487,6 +504,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -519,6 +539,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_SW_Rifle, true);
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_SW_Rifle, true);
+				break;
+			case Client::CBody_Player::BATTERY:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_SW_Rifle, true);
 				break;
 			default:
@@ -555,6 +578,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_SE_Rifle, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_SE_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -585,6 +611,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed, true);
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed, true);
+				break;
+			case Client::CBody_Player::BATTERY:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed, true);
 				break;
 			default:
@@ -622,6 +651,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Katana, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_N_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -658,6 +690,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Katana, true);
 				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NW_Rifle, true);
+				break;
 			default:
 				break;
 			}
@@ -692,6 +727,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 				break;
 			case Client::CBody_Player::WEAPON_KATANA:
 				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Katana, true);
+				break;
+			case Client::CBody_Player::BATTERY:
+				m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Walk_NE_Rifle, true);
 				break;
 			default:
 				break;

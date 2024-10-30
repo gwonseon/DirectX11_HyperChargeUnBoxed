@@ -51,6 +51,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
 	CCollider* m_pTargetCollider = { nullptr };
+	CCollider* m_pTrapCollider = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
 	
 private:

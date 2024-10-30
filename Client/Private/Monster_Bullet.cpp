@@ -44,7 +44,8 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
 
     m_fAttack = 20.f;
     m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
-   
+    m_pTrapCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_Trap"), TEXT("Com_Collider_AABB")));
+
     return S_OK;
 }
 
@@ -68,6 +69,8 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
         m_pBuild->Set_Damaged(m_fAttack);
         m_bDead = true;
     }
+    
+    
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
         return;
 }

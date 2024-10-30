@@ -70,7 +70,7 @@ public:
 
 	void	Set_GetEnergy(_float Energy)	{ m_fEnergy += Energy; }
 	void	Set_Heal(_float Heal)			{ m_fHp += Heal; }
-	void	Set_UseCoin(_uint Price)		{ m_iCoin -= Price; }
+	void	UseCoin(_uint Price)		{ m_iCoin -= Price; }
 	void	Set_PickUp_Coin(_uint Price)	{ m_iCoin += Price; }
 
 	void	Set_CanAttacked(_bool bCanAttacked) { m_bCanAttacked = bCanAttacked; }  // 공격 당해도 되는지 알림

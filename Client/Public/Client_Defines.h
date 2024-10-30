@@ -2,12 +2,12 @@
 
 #include <process.h>
 
-#define BUILD_EA	42
+#define BUILD_EA	51
 #define ENVIRONMENT_EA 165
-#define WEAPON_EA		11
+#define WEAPON_EA		12
 #define MONSTER_EA		4
 #define OBJ_DEAD 1
-#define TRAP_EA 12
+#define TRAP_EA 14
 namespace Client
 {
 	const unsigned int		g_iWinSizeX = 1280;

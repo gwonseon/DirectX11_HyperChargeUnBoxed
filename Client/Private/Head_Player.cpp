@@ -46,6 +46,13 @@ HRESULT CHead_Player::Initialize(void* pArg)
 
 void CHead_Player::Priority_Update(_float fTimeDelta)
 {
+	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
+
+	for (size_t i = 0; i < 3; i++)
+		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
+
+	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
+
 
 
 }
@@ -85,13 +92,6 @@ void CHead_Player::Update(_float fTimeDelta)
 
 void CHead_Player::Late_Update(_float fTimeDelta)
 {
-	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
-
-	for (size_t i = 0; i < 3; i++)
-		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
-
-	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
 }

@@ -20,11 +20,9 @@ HRESULT CPlayer_Build::Initialize_Prototype()
 
 HRESULT CPlayer_Build::Initialize(void* pArg)
 {
-	PLAYER_BUILD_DESC* pDesc = static_cast<PLAYER_BUILD_DESC*>(pArg);
-	
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+	PLAYER_BUILD_DESC* pDesc = static_cast<PLAYER_BUILD_DESC*>(pArg);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
 	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
 	return S_OK;

@@ -88,9 +88,6 @@
     <Filter Include="02. GameObjects\Map">
       <UniqueIdentifier>{14490b87-dea2-476a-9acb-77a8f9d70db3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Environment\CollisionBox">
-      <UniqueIdentifier>{662bfdc2-493f-4ce2-b2ca-bc0e80252a78}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Player\Weapon\Weapon_Katana">
       <UniqueIdentifier>{287e9917-dce8-4422-820f-2abe31bb590e}</UniqueIdentifier>
     </Filter>
@@ -150,6 +147,33 @@
     </Filter>
     <Filter Include="01. Levels\01. Gameplay\Round">
       <UniqueIdentifier>{7379d2e9-2108-4189-9f56-d69f5e5674ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\CollisionBox">
+      <UniqueIdentifier>{662bfdc2-493f-4ce2-b2ca-bc0e80252a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Trap">
+      <UniqueIdentifier>{411ab8d6-9e7f-40ec-8462-273b4c8ed234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Trap\Trap_Marks">
+      <UniqueIdentifier>{fe668ea9-31f5-4a1c-bd63-4803ed8a9fbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Trap\Trap_Bricks">
+      <UniqueIdentifier>{6ccd7afc-f0ed-412c-8a5e-6f824dfb0882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Trap\Trap_Bricks\Broken_Bricks">
+      <UniqueIdentifier>{ec074762-d2bc-4b28-82f7-5cd0e7688685}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine">
+      <UniqueIdentifier>{d6b47026-cd40-4ed7-a930-60cafb4d676f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Lader">
+      <UniqueIdentifier>{348452e4-8081-435c-b4a5-0db2a71ebe4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Cap">
+      <UniqueIdentifier>{2cbf4936-949e-4887-bdef-976114fd388d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Environment\Battery">
+      <UniqueIdentifier>{fdde6bc9-c926-4c03-8b3f-b0b3250e37e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -232,7 +256,7 @@
       <Filter>02. GameObjects\Player\Pivot</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CollisionBox.h">
-      <Filter>02. GameObjects\Environment\CollisionBox</Filter>
+      <Filter>02. GameObjects\CollisionBox</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Weapon_Katana.h">
       <Filter>02. GameObjects\Player\Weapon\Weapon_Katana</Filter>
@@ -293,6 +317,27 @@
     </ClInclude>
     <ClInclude Include="..\Public\GamePlay_Round.h">
       <Filter>01. Levels\01. Gameplay\Round</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trap_Marks.h">
+      <Filter>02. GameObjects\Player_Build\Trap\Trap_Marks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trap_Bricks.h">
+      <Filter>02. GameObjects\Player_Build\Trap\Trap_Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Broken_Bricks.h">
+      <Filter>02. GameObjects\Player_Build\Trap\Trap_Bricks\Broken_Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Energy_Machine.h">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Energy_Lader.h">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine\Energy_Lader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Energy_Cap.h">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine\Energy_Cap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Battery.h">
+      <Filter>02. GameObjects\Environment\Battery</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -366,7 +411,7 @@
       <Filter>02. GameObjects\Player\Pivot</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CollisionBox.cpp">
-      <Filter>02. GameObjects\Environment\CollisionBox</Filter>
+      <Filter>02. GameObjects\CollisionBox</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Weapon_Katana.cpp">
       <Filter>02. GameObjects\Player\Weapon\Weapon_Katana</Filter>
@@ -428,6 +473,27 @@
     <ClCompile Include="..\Private\GamePlay_Round.cpp">
       <Filter>01. Levels\01. Gameplay\Round</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Trap_Marks.cpp">
+      <Filter>02. GameObjects\Player_Build\Trap\Trap_Marks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trap_Bricks.cpp">
+      <Filter>02. GameObjects\Player_Build\Trap\Trap_Bricks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Broken_Bricks.cpp">
+      <Filter>02. GameObjects\Player_Build\Trap\Trap_Bricks\Broken_Bricks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Energy_Machine.cpp">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Energy_Lader.cpp">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine\Energy_Lader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Energy_Cap.cpp">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine\Energy_Cap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Battery.cpp">
+      <Filter>02. GameObjects\Environment\Battery</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -468,6 +534,9 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCoin.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrap.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

@@ -22,7 +22,18 @@
 
 #include "Environment.h"
 #include "BrainCore.h"
+#include "Energy_Machine.h"
+#include "Energy_Lader.h"
+#include "Energy_Cap.h"
+
+
+#include "Trap_Marks.h"
+#include "Trap_Bricks.h"
+#include "Broken_Bricks.h"
+
 #include "Coin.h"
+#include "Battery.h"
+
 #include "Bullet.h"
 #include "Monster_Bullet.h"
 
@@ -403,6 +414,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			return E_FAIL;
 	}
 
+	// 플레이어
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
@@ -411,6 +423,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			return E_FAIL;
 	}
 
+	// 플레이어 몸
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
@@ -418,7 +431,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CBody_Player::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// 플레이어 머리
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
 	{
 
@@ -426,7 +439,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CHead_Player::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// 플레이어 TPS 피봇
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
 	{
 
@@ -434,6 +447,8 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CPivot::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+
+	// 플레이어 FPS vlqht
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
 	{
 
@@ -441,7 +456,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CFPS_Pivot::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// 플레이어 무기
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
@@ -449,7 +464,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CWeapon::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// 플레이어 칼
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
@@ -457,7 +472,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CWeapon_Katana::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// 무기 아이템
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
@@ -465,7 +480,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CWeapon_Item::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// 코인
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
@@ -473,7 +488,16 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CCoin::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
+	// Battery 
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
+	{
+		/* Prototype_GameObject_Weapon */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
+			CBattery::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 
+	
 	/* Tank */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
 	{
@@ -522,15 +546,48 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			CBrainCore::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
-	// Coin
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	// EnergyMachine
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
-			CBrainCore::Create(m_pDevice, m_pContext))))
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
+			CEnergy_Machine::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
-
+	// EnergyMachine Lader
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
+			CEnergy_Lader::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	// EnergyMachine Lader
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
+			CEnergy_Cap::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	// 트랩 마크
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
+			CTrap_Marks::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	// 트랩 레고 벽돌
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
+			CTrap_Bricks::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	// 레고 부서짐
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
+			CBroken_Bricks::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 	//Bullet
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
 	{
@@ -1046,6 +1103,25 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
 		return E_FAIL;
+	// 에너지 머신
+	 Model_Component_Result = Model_Component + to_wstring(44 + ENVIRONMENT_EA);
+	 Model_Path_Result = Model_Build_Path + to_wstring(44) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 44))))
+		return E_FAIL;
+	// 에너지 머신 레이더
+	Model_Component_Result = Model_Component + to_wstring(45 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(45) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 45))))
+		return E_FAIL;
+	// 에너지 Cap
+	Model_Component_Result = Model_Component + to_wstring(43 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(43) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 45))))
+		return E_FAIL;
+
 	// 코인
 	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
 	Model_Component_Result = Model_Component + to_wstring(41 + ENVIRONMENT_EA);
