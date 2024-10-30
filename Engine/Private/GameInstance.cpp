@@ -91,7 +91,6 @@ void CGameInstance::Update(_float fTimeDelta)
 	m_pPipeLine->Update();
 
 	m_pLevel_Manager->Update(fTimeDelta);
-
 }
 
 void CGameInstance::Draw()

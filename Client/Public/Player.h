@@ -10,6 +10,7 @@
 #include "Weapon_Katana.h"
 #include "Weapon_Item.h"
 
+
 BEGIN(Engine)
 
 class CNavigation;
@@ -156,19 +157,25 @@ private:
 private: // 빌드 모드
 	_bool					m_bBuildMode = false;		// 빌드 모드
 	_bool					m_bBuild_Gauging = false;  // E 눌러서 빌드 중임을 알려주는 변수
-	_bool*					m_bRoundStart = { nullptr }; // 빌드 모드가 끝나고 라운드가 시작했음을 알리는  포인터
-	_uint*					m_iRound{};
+	_bool					m_bCharging = false;
+	_bool					m_bBuild_Able = false;
 
+	_bool* m_bRoundStart = { nullptr }; // 빌드 모드가 끝나고 라운드가 시작했음을 알리는  포인터
+	_uint* m_iRound = { nullptr };
 public:
-	_bool* Get_BuildMode() { return &m_bBuildMode; }
-	_bool Get_Build_Gauging() { return m_bBuild_Gauging; }
+	void	Set_Build_Able(_bool bAble) { m_bBuild_Able = bAble; }
+
+	_bool*	Get_BuildMode() { return &m_bBuildMode; }
+	_bool	Get_Build_Gauging() { return m_bBuild_Gauging; }
+
+
+
 public:  // 총알
 	_uint* Get_CurrentBullet() { return m_pWaepon->Get_CurrentBullet(); }
 	_uint* Get_FullBullet() { return m_pWaepon->Get_FullBullet(); }
 
+	
 
-public:
-	void	Set_Build_Able(_bool bAble) { m_bBuild_Able = bAble; }
 
 public:
 	_float m_fRotation_Value{};
@@ -177,7 +184,6 @@ private:
 	CWeapon* m_pWaepon = nullptr;
 	CBody_Player* m_pBody = nullptr;
 	CWeapon_Katana* m_pKatana = nullptr;
-
 	CHead_Player* m_pHead = nullptr;
 	CNavigation* m_pNavigationCom = nullptr;
 
@@ -193,16 +199,7 @@ private:
 	_float					m_fMouseSensor = { 0.f };
 	_vector					m_vecPivotPos{};
 
-	_bool					m_bCharging = false;
-	_bool					m_bBuild_Able = false;
-
 	_uint					m_iWeaponState = WEAPON_RIFLE;
-	_uint					m_iPrev_WeaponState = WEAPON_RIFLE;
-public:
-	_float*					Get_PlayerHP() { return &m_fHp; }
-	_float*					Get_PlayerEnergy() { return &m_fEnergy; }
-
-private:
 
 
 private:
@@ -216,18 +213,31 @@ private:
 
 public:
 	_vector Get_Position() { return m_vecPos; }
-
 	_vector Get_PivotPostion() { return m_vecPivotPos; }
 
 	void	Set_EquipNumber(_uint iEquipNum) { m_iWeaponState = iEquipNum; }
-	void	PickUp_Battery(_uint iEquipNum) 
+
+
+	_bool	Set_Charging(_bool bCharge) { m_bCharging = bCharge; }
+
+	// 배터리
+public:
+	void	PickUp_Battery(_uint iEquipNum)
 	{
 		m_iPrev_WeaponState = m_iWeaponState; // 지금 들고 있는 무기를 저장해둠, 나중에 건전지 내려놓았을 때 이거 다시 들어야함
 		m_iWeaponState = iEquipNum; // 무기 배터리로 변경
-		
 	}
+	
+	_vector* Get_BatteryPos() { return &m_vecBatteryPos; }
+	_bool* Get_Visible_Battery() { return &m_bVisible_Battery; }
+private:
+	_uint					m_iPrev_WeaponState = WEAPON_RIFLE;
+	_vector					m_vecBatteryPos{};
+	_bool					m_bVisible_Battery = true;
+public:
 
-	_bool	Set_Charging(_bool bCharge) { m_bCharging = bCharge; }
+	_float* Get_PlayerHP() { return &m_fHp; }
+	_float* Get_PlayerEnergy() { return &m_fEnergy; }
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

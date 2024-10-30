@@ -54,7 +54,13 @@ private:
 
 public:
 	void	Set_Charging(_bool bCharging) { m_bCharging = bCharging; }
-	void	Set_Item_Interaction(_bool bItemInteraction) { m_bItem_Interaction = bItemInteraction; }
+	void	Set_Item_Interaction(_bool bItemInteraction) { 
+		m_bItem_Interaction = bItemInteraction;
+		if(m_bItem_Interaction == true)
+			m_bItemCharging = true;
+		else
+			m_bItemCharging = false;
+	}
 	void	Set_Item_InteractionEnd(_bool bEnd) { m_bItem_Interaction_End = bEnd; }
 
 	_bool	Get_Charging() { return m_bCharging; }
