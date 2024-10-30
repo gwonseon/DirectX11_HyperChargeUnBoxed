@@ -161,9 +161,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Alien.h" />
+    <ClInclude Include="..\Public\Battery.h" />
     <ClInclude Include="..\Public\BrainCore.h" />
     <ClInclude Include="..\Public\BackGround.h" />
     <ClInclude Include="..\Public\Body_Player.h" />
+    <ClInclude Include="..\Public\Broken_Bricks.h" />
     <ClInclude Include="..\Public\Bullet.h" />
     <ClInclude Include="..\Public\ButtonUI.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -171,6 +173,9 @@
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\CollisionBox.h" />
     <ClInclude Include="..\Public\CrossLine.h" />
+    <ClInclude Include="..\Public\Energy_Cap.h" />
+    <ClInclude Include="..\Public\Energy_Lader.h" />
+    <ClInclude Include="..\Public\Energy_Machine.h" />
     <ClInclude Include="..\Public\Environment.h" />
     <ClInclude Include="..\Public\FPS_Pivot.h" />
     <ClInclude Include="..\Public\GamePlay_Round.h">
@@ -203,6 +208,8 @@
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Tank.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\Trap_Bricks.h" />
+    <ClInclude Include="..\Public\Trap_Marks.h" />
     <ClInclude Include="..\Public\UI_CircleGuage.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Weapon_Item.h" />
@@ -215,14 +222,19 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Alien.cpp" />
     <ClCompile Include="..\Private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Battery.cpp" />
     <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\BrainCore.cpp" />
+    <ClCompile Include="..\Private\Broken_Bricks.cpp" />
     <ClCompile Include="..\Private\Bullet.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\CollisionBox.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
+    <ClCompile Include="..\Private\Energy_Cap.cpp" />
+    <ClCompile Include="..\Private\Energy_Lader.cpp" />
+    <ClCompile Include="..\Private\Energy_Machine.cpp" />
     <ClCompile Include="..\Private\Environment.cpp" />
     <ClCompile Include="..\Private\FPS_Pivot.cpp" />
     <ClCompile Include="..\Private\GamePlay_Round.cpp">
@@ -255,6 +267,8 @@
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\Trap_Bricks.cpp" />
+    <ClCompile Include="..\Private\Trap_Marks.cpp" />
     <ClCompile Include="..\Private\UI_CircleGuage.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon_Item.cpp" />
@@ -285,6 +299,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrap.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

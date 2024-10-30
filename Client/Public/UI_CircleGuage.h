@@ -2,6 +2,8 @@
 
 #include "Client_Defines.h"
 #include "UIObject.h"
+#include "Player.h"
+#include "Trap_Marks.h"
 
 BEGIN(Engine)
 class CShader;
@@ -17,7 +19,8 @@ public:
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
 		_uint	iIndex{};
-
+		CPlayer* pPlayer = { nullptr };
+		vector<CTrap_Marks*>* vecMarks = { nullptr };
 	}CIRCLEGAUGE_DESC;
 private:
 	CUI_CircleGuage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -45,14 +48,26 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CPlayer* m_pPlayer = { nullptr };
+	vector<CTrap_Marks*>* m_pvecTrap_Marks = { nullptr };
+	_bool* m_bBuild_Gauging = { nullptr };
 
 public:
 	void	Set_Charging(_bool bCharging) { m_bCharging = bCharging; }
-	_bool	Get_Charging() { return m_bCharging; }
+	void	Set_Item_Interaction(_bool bItemInteraction) { m_bItem_Interaction = bItemInteraction; }
+	void	Set_Item_InteractionEnd(_bool bEnd) { m_bItem_Interaction_End = bEnd; }
 
+	_bool	Get_Charging() { return m_bCharging; }
+	_bool   Get_ItemInteraction_End() { return m_bItem_Interaction_End; }
 private:
 	float	m_fGuaging_Time{};
-	_bool	m_bCharging{};
+	_float	m_fReal_Gauging_Time{};
+	_bool	m_bCharging{}, m_bItemCharging{};
+	_bool	m_bBuild_Draw = false;
+	_bool   m_bItem_Interaction = false;
+	_bool   m_bItem_Interaction_End = false;
+	_bool*  m_bBuildMode = { nullptr };
+	
 public:
 	static CUI_CircleGuage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

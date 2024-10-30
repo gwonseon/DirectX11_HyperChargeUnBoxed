@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include <Monster_Bullet.h>
+#include <Trap_Marks.h>
 
 
 CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -27,7 +28,8 @@ HRESULT CTank::Initialize(void* pArg)
 	pDesc->fSpeedPerSec = 5.f;
 	pDesc->fScale = _float3(3.f, 3.f, 3.f);
 	m_vecTargetPos = pDesc->vecTargetPos;
-
+	m_vecStoreTargetPos = *m_vecTargetPos;
+	m_pTrapLayer = pDesc->pTrapLayer;
 	m_iModelIndex = ANIM_TANK;
 	m_eLevel = pDesc->eID;
 	m_pBuild = pDesc->m_pBuild;
@@ -55,6 +57,7 @@ void CTank::Priority_Update(_float fTimeDelta)
 
 	if (m_bCanAttacked == false)
 		m_fCurrentTime += fTimeDelta;
+	m_fTime_For_Target += fTimeDelta;
 }
 
 void CTank::Update(_float fTimeDelta)
@@ -68,14 +71,37 @@ void CTank::Update(_float fTimeDelta)
 		m_fCurrentTime = 0.f;
 	}
 
-
-		_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, vPos);
+	// 트랩이 있을 경우에 해당 트랩을 공격하도록 타겟을 변경해줌
+	if (m_fTime_For_Target >= 3.f) // 항상 검사하기엔 검사량이 많아서 검사 빈도수를 줄여줌
+	{
+		m_fTime_For_Target = 0.f;
+		_int iCheck_Count = 0;
+		for (auto pTrap : m_pTrapLayer->Get_GameObject_List())
+		{
+			
+			if (static_cast<CTrap_Marks*>(pTrap)->Get_Build_Done() == true)
+			{
+				m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
+				// 공격 사거리보다 먼거리까지 검사해야함
+				if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, vPos) <= 2500.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
+				{
+					m_vecTargetPos = &m_vecNewTargetPos;
+					break;
+				}
+			}
+			++iCheck_Count;
+		}
+		if (iCheck_Count == m_pTrapLayer->Get_GameObjectList_Size())
+		{
+			m_vecTargetPos = &m_vecStoreTargetPos;
+		}
+	}
+	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, vPos);
 
 	if (fDistance > 2000.f)
 	{
 		vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_float3 fPos{};
-		XMStoreFloat3(&fPos, vPos);
+		_float3 fPos{};		XMStoreFloat3(&fPos, vPos);
 		// 목표 Path와 현재 내 위치 사이의 거리를 파악해서 Path 바꾸기 
 		if (m_pTransformCom->Cal_Distance(Path.front(), fPos) <= 200.f)
 		{
@@ -92,7 +118,6 @@ void CTank::Update(_float fTimeDelta)
 	}
 	else
 	{
-		
 		if (m_bAnimState == true && m_bShotOnce == false || m_bFirstShot == false)
 		{
 			m_bShotOnce = true;	m_bFirstShot = true;
@@ -115,21 +140,15 @@ void CTank::Update(_float fTimeDelta)
 		// 한 번만 쏘게 만들기 위함
 		if (m_bAnimState == false) 
 			m_bShotOnce = false;
-	
 	}
-
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
-
-//	m_pColliderCom->Intersect(pTargetCollider);
 	__super::Update(fTimeDelta);
-
 }
 
 void CTank::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
-
 }
 
 HRESULT CTank::Render()
@@ -138,18 +157,14 @@ HRESULT CTank::Render()
 		return E_FAIL;
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
-
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 			return E_FAIL;
-
 		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
 			return E_FAIL;
-
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
-
 		m_pModelCom->Render(i);
 	}
 #ifdef _DEBUG
@@ -163,19 +178,16 @@ HRESULT CTank::Add_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-
 	/* For.Com_Model */
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
-
 	/* For.Com_Collider_Sphere*/
 	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
 	SphereDesc.fRadius = 1.7f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
-
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;

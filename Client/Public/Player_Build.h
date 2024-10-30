@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include "Player.h"
 
 BEGIN(Client)
 
@@ -12,7 +12,8 @@ public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID eID = {};
-
+		CPlayer* pPlayer = { nullptr };
+		_uint iModel_Idx{};
 
 	}PLAYER_BUILD_DESC;
 
@@ -41,7 +42,7 @@ protected:
 	LEVELID	m_eLevel = {};
 	_int	m_iModelIndex = {};
 
-
+	_bool	m_bDraw = false;
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

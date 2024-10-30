@@ -135,12 +135,13 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_JUMP_ICON:
         break;
     case Client::CInGameUI::UI_MODECHANGE_ICON:
+    {
         if (*m_pPlayer->Get_BuildMode() == true)
             m_iIndex = 1;
         else
             m_iIndex = 0;
-        
         break;
+    }
     case Client::CInGameUI::UI_VIEWCHANGE_ICON:
         break;      
     case Client::CInGameUI::UI_PUNCH_ICON:
@@ -150,6 +151,11 @@ void CInGameUI::Update(_float fTimeDelta)
         {
             m_bDraw = true;
             m_iIndex = 0;
+        }
+        else if (m_pPlayer->Get_Build_Gauging() == true)
+        {
+            m_bDraw = true;
+            m_iIndex = 1;
         }
         else
             m_bDraw = false;

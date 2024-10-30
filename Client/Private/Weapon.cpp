@@ -110,6 +110,8 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 	//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
 	}
 	}
+
+
 }
 
 void CWeapon::Update(_float fTimeDelta)
@@ -120,18 +122,29 @@ void CWeapon::Update(_float fTimeDelta)
 	}
 	else
 		m_iShaderPassNum = 0;
-}
 
-void CWeapon::Late_Update(_float fTimeDelta)
-{
+
+	if (m_iWeaponState == BATTERY)
+		Scale = 2.3f;
+	else
+		Scale = 2.3f;
+
+	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
+
 	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
 	for (size_t i = 0; i < 3; i++)
 		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
 
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-	 m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1.f);
-	 m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31, m_WorldMatrix._32, m_WorldMatrix._33, 0.f);
+	m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1.f);
+	m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31, m_WorldMatrix._32, m_WorldMatrix._33, 0.f);
+
+}
+
+void CWeapon::Late_Update(_float fTimeDelta)
+{
+
 
 
 
@@ -333,6 +346,17 @@ HRESULT CWeapon::Weapon_Exchange()
 	case Client::CWeapon::WEAPON_RIFLE_SECOND:
 		break;
 	case Client::CWeapon::WEAPON_KATANA:
+		break;
+	case Client::CWeapon::BATTERY:
+		iNumMeshes = m_pModelCom[BATTERY]->Get_NumMeshes();
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom[BATTERY]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+				return E_FAIL;
+			m_pModelCom[BATTERY]->Render(i);
+		}
 		break;
 	default:
 		break;

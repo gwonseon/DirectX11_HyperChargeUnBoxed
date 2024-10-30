@@ -105,6 +105,7 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Tank_Desc.eID = LEVEL_GAMEPLAY;
 		Tank_Desc.fPosition = m_vecMonsterCreate.front().fPos;
 		Tank_Desc.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
+		Tank_Desc.pTrapLayer = m_pTrapLeyer;
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Tank"), &Tank_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 		break;

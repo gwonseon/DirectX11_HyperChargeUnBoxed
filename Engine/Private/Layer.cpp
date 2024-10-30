@@ -1,7 +1,6 @@
 #include "..\Public/Layer.h"
 #include "GameObject.h"
 
-
 CLayer::CLayer()
 {
 }

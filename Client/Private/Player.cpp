@@ -74,8 +74,20 @@ HRESULT CPlayer::Initialize(void* pArg)
 }
 
 void CPlayer::Priority_Update(_float fTimeDelta)
-{	
-	
+{
+	if (m_bBuildMode == true && m_bBuild_Able == true)
+	{
+		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+		{
+			m_bBuild_Gauging = true;
+		}
+		else
+			m_bBuild_Gauging = false;
+	}
+	else
+	{
+		m_bBuild_Gauging = false;
+	}
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_C))
 	{
 		if (m_iViewState == PLAYER_TPS_VIEW)
@@ -100,15 +112,19 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float3 pos{};
 	XMStoreFloat3(&pos, m_vecPos);
-	//cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
-	//cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
+#pragma region 지우ㅡㅓ
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_P))
+	{
+		cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
+		cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
+	}
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_0))
 	{
 		m_iWeaponState++;
 		if (m_iWeaponState > 7)
 			m_iWeaponState = 0;
 	}
-	
+#pragma endregion 지우ㅡㅓ	
 	if(m_iViewState == PLAYER_FPS_VIEW)
 	{
 		

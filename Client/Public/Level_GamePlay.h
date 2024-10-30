@@ -6,11 +6,13 @@
 #include "Player.h"
 #include <UI_CircleGuage.h>
 #include "BrainCore.h"
-
+#include "Trap_Marks.h"
+#include "Energy_Machine.h"
+#include "Energy_Lader.h"
 
 BEGIN(Client)
 class CGamePlay_Round;
-class CLevel_GamePlay  : public CLevel
+class CLevel_GamePlay : public CLevel
 {
 
 protected:
@@ -27,26 +29,22 @@ public:
 	void	Interaction_Weapon();
 	void    Texture_Render();
 private:
-	HRESULT Ready_Layer_UI_MACHINE_HP(const _tchar* pLayerTag);
-
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Camera(const _tchar* pLayerTag);
 	HRESULT Ready_Lights();
-	HRESULT Ready_Layer_Coin(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Monster_Attack_Far(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WeaponITem(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Icon(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Damaged(const _tchar* pLayerTag);
 
-	
+
 private:
 	void Load_Map();
-
-
+	void Build_Check();
+	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
 private:
 	CCamera_Free* m_pCamera;
 	CPlayer* m_pPlayer;
@@ -62,11 +60,17 @@ private:
 	CLayer* pNearMonsterLayer	= { nullptr };
 	CLayer* pFarMonsterLayer	= { nullptr };
 	CLayer* pCoin				= { nullptr };
-
-	_uint	m_iCurrentRound = 0;
-	_bool* m_pReloading = { nullptr };
+	CLayer* pTrap				= { nullptr };
+	CLayer* pTrap_Shield		= { nullptr };
+	CLayer* pMonsterBullet		= { nullptr };
+	_bool* m_pReloading			= { nullptr };
+	_uint	m_iCurrentRound		= 0;
+	_uint	m_iPreviousRound	= 0;
 	_float XPos{}, ZPos{};
+private:
+	vector<CTrap_Marks*> m_vecTrapMark;
 
+	// ¶ó¿îµå
 private:
 	_float	m_fSkipTimer{};
 	CGamePlay_Round* m_pRound[3] = {nullptr};

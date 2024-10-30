@@ -33,7 +33,7 @@ public:
 	const void Set_PlayerWorld_matrix(const _float4x4* vMatrix) { matPlayerWorld = vMatrix; }
 	const void Set_BrainCoreWorld_matrix(const _float4x4* vMatrix) { matBrainCoreWorld = vMatrix; }
 	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
-
+	void Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
 
 	_uint	Get_MonsterCount() { return m_iMonsterCount; }
 	void	MonsterCreate(_float fTimeDelta);
@@ -50,9 +50,9 @@ private:
 	ANIMMODEL_INDEX eModel_Index{};
 
 
-
-	_vector* vecBrainPos{};
-	_vector* vecPlayerPos{};
+	CLayer* m_pTrapLeyer = { nullptr };
+	_vector* vecBrainPos = { nullptr };
+	_vector* vecPlayerPos = { nullptr };
 	const _float4x4* matPlayerWorld = { nullptr };
 	const _float4x4* matBrainCoreWorld = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };

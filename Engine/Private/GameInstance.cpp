@@ -81,14 +81,14 @@ void CGameInstance::Update(_float fTimeDelta)
 {
 	/* 엔진에있는 객체들 중 반복적인 갱신이 필요한 녀석이라면 여기서 다 호출. */
 	m_pInput_Device->Update_InputDev();
-	
-	m_pPipeLine->Update();
 
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
 	m_pObject_Manager->Update(fTimeDelta);
 
 	m_pObject_Manager->Late_Update(fTimeDelta);
+
+	m_pPipeLine->Update();
 
 	m_pLevel_Manager->Update(fTimeDelta);
 
@@ -433,6 +433,11 @@ _bool CGameInstance::Collision_Bullet(CLayer* Target, const _wstring& strTargetC
 {
 	
 	return m_pCollision_Manager->Collision_Bullet(Target, strTargetComponentTag, vRayDior, vRayPos, bShot, fDamage, iTargetPartObjID);
+}
+
+void CGameInstance::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+{
+	m_pCollision_Manager->Collision_Trap(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
 }
 
 HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
