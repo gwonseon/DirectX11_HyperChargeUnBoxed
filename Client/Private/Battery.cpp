@@ -33,36 +33,71 @@ HRESULT CBattery::Initialize(void* pArg)
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
 	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
+	m_bVisible = m_pPlayer->Get_Visible_Battery();
 	return S_OK;
 }
 
 void CBattery::Priority_Update(_float fTimeDelta)
 {
-	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	if (m_pTransformCom->Cal_Distance_vec(m_pPlayer->Get_Position(), m_vecPos) <= 80.f) // 플레이어와의 거리 계산
+	
+	if(m_vecPos != nullptr)
+	{
+		
+		XMStoreFloat3(&fPrevPos, m_vecPrevPos);
+		XMStoreFloat3(&fPos, *m_vecPos);
+
+		if (fPrevPos.x != fPos.x &&  fPrevPos.z != fPos.z)
+		{
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(fPos.x, fPos.y + 4.f , fPos.z,1.f));
+		}
+		m_vecPrevPos = *m_vecPos;
+
+	}
+	if (m_bFirst_PickUp == false && (fPos.x != 0.f && fPos.z != 0.f))
+	{
+		m_pTransformCom->Rotation(0.f, 0.f, XMConvertToRadians(90.f));
+		
+		_vector vCurrentPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		if(XMVectorGetY(vCurrentPos) > 0.5f)
+		{
+			vCurrentPos = XMVectorSetY(vCurrentPos, XMVectorGetY(vCurrentPos) - (fTimeDelta * 10.f));
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurrentPos);
+		}
+		else
+		{
+			vCurrentPos = XMVectorSetY(vCurrentPos, 0.5f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurrentPos);
+		}
+	}
+
+	if (m_pTransformCom->Cal_Distance_vec(m_pPlayer->Get_Position(), m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 80.f) // 플레이어와의 거리 계산
 	{
 		// 근처에 있을 때 상호작용이 되어야 하는데
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E) && m_pGauge->Get_ItemInteraction_End() == false)
+		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E) )
 		{
-			// Circle Gauge한테 충전하라고 보내주기
-			m_pGauge->Set_Item_Interaction(true);
+			if(m_pGauge->Get_ItemInteraction_End() == false)
+			{
+				// Circle Gauge한테 충전하라고 보내주기
+				m_pGauge->Set_Item_Interaction(true);
+			}
 		}
 		else
 		{
 			// Circle Gauge 값 초기화
 			m_pGauge->Set_Item_Interaction(false);
-		
+			
 		}
-
 		// 아이템 상호작용이 끝났을 때 안보이게 만들기, 나중에 위치 업데이트되면 그자리로 보낸 후 업데이트 할 것
 		if (m_pGauge->Get_ItemInteraction_End() == true)
 		{
-
-			cout << "이게 왜" << endl;
-			m_bVisible = false;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+			*m_bVisible = false;
+			m_bFirst_PickUp = false;
+			m_pGauge->Set_Item_Interaction(false);
 			m_pGauge->Set_Item_InteractionEnd(false); // 상호작용 끝났는지 알려주는 값 초기화 해주기
 			// 플레이어한테 배터리 들라고 알려주기
-			m_pPlayer->Set_EquipNumber(CPlayer::BATTERY); //8번 
+			m_pPlayer->PickUp_Battery(CPlayer::BATTERY); //8번 
+			m_vecPos = m_pPlayer->Get_BatteryPos();
 		}
 	}
 	
@@ -74,7 +109,7 @@ void CBattery::Update(_float fTimeDelta)
 
 void CBattery::Late_Update(_float fTimeDelta)
 {
-	if(m_bVisible == true)
+	if(*m_bVisible == true)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;

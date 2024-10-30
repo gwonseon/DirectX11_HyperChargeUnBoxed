@@ -37,6 +37,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
@@ -48,8 +50,11 @@ private:
 	CUI_CircleGuage* m_pGauge = { nullptr };
 private:
 	LEVELID	m_eLevel = {};
-	_vector m_vecPos{};
-	_bool   m_bVisible = true;
+	_vector* m_vecPos = {nullptr};
+	_vector m_vecPrevPos{};
+	_bool*   m_bVisible = { nullptr };
+	_bool	m_bFirst_PickUp = true;
+	_float3 fPrevPos{}, fPos{};
 public:
 	static CBattery* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

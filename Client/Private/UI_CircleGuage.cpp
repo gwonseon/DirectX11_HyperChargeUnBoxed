@@ -63,25 +63,12 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 	}
 
 
-	// 아이템과의 상호 작용
-	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false)
-	{
-		cout << "sas" << endl;
-		m_bItemCharging = true;
-		if (m_fReal_Gauging_Time >= 1.f)
-		{
-			cout << "차징 끝 " << endl;
-			m_bItem_Interaction_End = true;
-			m_bItemCharging = false;
-			m_fGuaging_Time = 0.f;
-			m_fReal_Gauging_Time = 0.f;
-		}
-	}
+
 }
 
 void CUI_CircleGuage::Update(_float fTimeDelta)
 {
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true)
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true )
 	{
 			m_fReal_Gauging_Time += fTimeDelta;
 			m_fGuaging_Time += fTimeDelta * 10;
@@ -95,14 +82,28 @@ void CUI_CircleGuage::Update(_float fTimeDelta)
 
 void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
-		return;
+	// 아이템과의 상호 작용
+	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false)
+	{
+		if (m_fReal_Gauging_Time >= 1.f)
+		{
+			m_bItem_Interaction = false;
+			m_bItem_Interaction_End = true;
+			m_bItemCharging = false;
+			m_fGuaging_Time = 0.f;
+			m_fReal_Gauging_Time = 0.f;
+		}
+	}
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true)
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
+			return;
+	}
 }
 
 HRESULT CUI_CircleGuage::Render()
 {
-	if (m_bCharging == true || m_bBuild_Draw == true)
-	{
+	
 		m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
 
 		if (FAILED(Bind_ShaderResources()))
@@ -113,7 +114,7 @@ HRESULT CUI_CircleGuage::Render()
 			return E_FAIL;
 		if (FAILED(m_pVIBufferCom->Render()))
 			return E_FAIL;
-	}
+	
 
 	return S_OK;
 }

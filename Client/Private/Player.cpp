@@ -75,6 +75,9 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
+
+
+	// 빌드 모드 ( 건축)
 	if (m_bBuildMode == true && m_bBuild_Able == true)
 	{
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
@@ -88,13 +91,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	{
 		m_bBuild_Gauging = false;
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_C))
-	{
-		if (m_iViewState == PLAYER_TPS_VIEW)
-			m_iViewState = PLAYER_FPS_VIEW;
-		else
-			m_iViewState = PLAYER_TPS_VIEW;
-	}
+	// 빌드모드 건너뛰기
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_F) && *m_bRoundStart == false)
 	{
 		if (m_bBuildMode == false)
@@ -102,18 +99,28 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		else
 			m_bBuildMode = false;
 	}
-	// 회전
-	_long   MouseMove = { 0 };
-	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
+
+	// 뷰 변경 
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_C))
 	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+		if (m_iViewState == PLAYER_TPS_VIEW)
+			m_iViewState = PLAYER_FPS_VIEW;
+		else
+			m_iViewState = PLAYER_TPS_VIEW;
 	}
 
+	
+#pragma region 카메라회전
+	_long   MouseMove = { 0 };
+	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float3 pos{};
-	XMStoreFloat3(&pos, m_vecPos);
-#pragma region 지우ㅡㅓ
-	if(m_pGameInstance->Get_DIKeyState_Down(DIK_P))
+	_float3 pos{};	XMStoreFloat3(&pos, m_vecPos);
+#pragma endregion 카메라회전
+
+#pragma region 지워
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_P))
 	{
 		cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
 		cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
@@ -124,10 +131,12 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		if (m_iWeaponState > 7)
 			m_iWeaponState = 0;
 	}
-#pragma endregion 지우ㅡㅓ	
+
+#pragma endregion 지워	
+
+
 	if(m_iViewState == PLAYER_FPS_VIEW)
 	{
-		
 		// FPS
 		m_pHead->Set_PlayerViewState(false); 
 		m_pBody->Set_PlayerViewState(false);
@@ -155,6 +164,8 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// 카메라 At 보내주기
 	m_pBody->Set_WeaponState(m_iWeaponState);		// 몸에게 무기 상태 보내주기   TPS	
 	m_pWaepon->Set_WeaponState(m_iWeaponState);		// 무기에게 무기 상태 보내주기
+	
+	if (m_iWeaponState == BATTERY)		m_iViewState = PLAYER_FPS_VIEW; // 배터리는 무조건 1인칭
 
 	if (m_iWeaponState == WEAPON_KATANA)			// 칼에게 무기 상태 보내주기	
 	{
@@ -342,7 +353,13 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			m_iState_Upper |= STATE_IDLE;
 		}
 	}
-	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
+	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_iWeaponState == BATTERY)
+	{
+		m_iWeaponState = m_iPrev_WeaponState; // 건전지 내리고 이전 무기로 돌아가기
+		m_vecBatteryPos = m_vecPos;
+		m_bVisible_Battery = true;
+	}
+	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
 	{
 		if (m_iWeaponState == WEAPON_KATANA)
 			m_bAttackState = true;
@@ -352,6 +369,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 				m_iState_Upper ^= STATE_IDLE;
 			m_iState_Upper |= FIRE;
 		}
+
+		// 여기서 건전지 떨구자 
 	}
 	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == true && m_iViewState == PLAYER_FPS_VIEW)
 	{

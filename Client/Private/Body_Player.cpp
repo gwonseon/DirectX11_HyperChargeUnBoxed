@@ -141,8 +141,6 @@ void CBody_Player::Update(_float fTimeDelta)
 
 void CBody_Player::Late_Update(_float fTimeDelta)
 {
-
-
 	if(m_bDead == false)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
@@ -188,6 +186,12 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 		{
 			m_iUpperMotion = ATTACK_KATANA_MOTION;
 			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_NinjaSweepAttack, false);
+		}
+		else if (m_iWeaponState == BATTERY)
+		{
+			m_iUpperMotion = PLAYER_ANIM_FiringAnimation8_Base; // °ÇÀüÁö ¶³±¼ ¶§
+			m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
+
 		}
 		else
 		{
@@ -243,7 +247,7 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 				m_iUpperMotion = LOCKETLAUNCHER_FIRE_MOTION;
 				break;
 			}
-		
+			
 			default:
 				break;
 			}
