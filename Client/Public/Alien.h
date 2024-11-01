@@ -7,6 +7,8 @@ BEGIN(Engine)
 class CShader;
 class CModel;
 class CCollider;
+class CNavigation;
+
 END
 
 BEGIN(Client)
@@ -46,6 +48,8 @@ private:
 	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CNavigation* m_pNavigationCom = { nullptr };
+
 	_vector* m_vecTargetPos;
 
 

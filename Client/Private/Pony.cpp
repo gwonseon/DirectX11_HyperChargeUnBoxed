@@ -2,6 +2,7 @@
 #include "..\Public\Pony.h"
 
 #include "GameInstance.h"
+#include "Pony_Defines.h"
 
 
 CPony::CPony(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -11,7 +12,7 @@ CPony::CPony(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CPony::CPony(const CPony& Prototype)
 	: CMonster{ Prototype }
-	, m_pCurrentState()
+	, m_pCurrentState(new CTrotState_Pony())
 {
 
 }
@@ -126,13 +127,15 @@ void CPony::Update(_float fTimeDelta)
 			m_pTransformCom->LookAt(*m_vecTargetPos);
 			if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 30.f)
 			{
+				m_ePonyState = ATTACK_STATE;
 				m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * 0.1f, true);
 				m_bAttackState = true;
 				m_bWalkState = true;
 			}
 			else
 			{
-				m_pCurrentState->Trot(this);
+				m_ePonyState = TROT_STATE;
+			/*	m_pCurrentState->Trot(this);*/
 				m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
 			}
 		}
@@ -144,7 +147,8 @@ void CPony::Update(_float fTimeDelta)
 				if (Path.size() > 1)
 					Path.erase(Path.begin());
 			}
-			m_pCurrentState->Walk(this);
+			m_ePonyState = TROT_STATE;
+			/*m_pCurrentState->Walk(this);*/
 			m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
 			m_pTransformCom->Go_Straight_Nav(fTimeDelta * 1.5f, m_pNavigationCom);
 		}
@@ -172,7 +176,10 @@ void CPony::Update(_float fTimeDelta)
 			//		Path.erase(Path.begin());
 			//}
 			if (m_bWalkState == true)
-				m_pCurrentState->Walk(this);
+			{
+				m_ePonyState = TROT_STATE;
+			/*	m_pCurrentState->Walk(this);*/
+			}
 			
 			m_pTransformCom->LookAt(vPlayerPos);
 			m_pModelCom->Play_Animation(fTimeDelta, false);
@@ -182,7 +189,8 @@ void CPony::Update(_float fTimeDelta)
 		else
 		{
 			// 공격 상태
-			m_pCurrentState->Attack(this);
+			m_ePonyState = ATTACK_STATE;
+			/*m_pCurrentState->Attack(this);*/
 			m_pTransformCom->LookAt(vPlayerPos);
 			m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 			m_bAttackState = true;
@@ -363,6 +371,5 @@ void CPony::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pNavigationCom);
 
-	Safe_Delete(m_pCurrentState);
 }
 
