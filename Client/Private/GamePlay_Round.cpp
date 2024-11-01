@@ -128,6 +128,9 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Pony_Desc.vecTargetPos = vecBrainPos;
 		Pony_Desc.matBrainCoreWorld = matBrainCoreWorld;
 		Pony_Desc.matPlayerWorld = matPlayerWorld;
+		Pony_Desc.pPlayer = m_pPlayer;
+		Pony_Desc.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
+		Pony_Desc.pTrapLayer = m_pTrapLeyer;
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"), TEXT("Prototype_GameObject_Pony"), &Pony_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 		break;

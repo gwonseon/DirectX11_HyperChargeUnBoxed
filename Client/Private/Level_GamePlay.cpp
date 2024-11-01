@@ -7,7 +7,7 @@
 
 #include "CrossLine.h"
 #include "NumberUI.h"
-#include "InGameUI.h"
+
 
 #include "Environment.h"
 #include "Weapon.h"
@@ -22,8 +22,7 @@
 #include "Helicopter.h"
 #include "Alien.h"
 #include "Pony.h"
-#include <Energy_Cap.h>
-#include <Battery.h>
+
 
 
 
@@ -74,6 +73,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	m_pRound[2] = CGamePlay_Round::Create(m_pDevice, m_pContext,3);
 	for (int i = 0; i < 3; i++)
 	{
+		m_pRound[i]->Set_Player(m_pPlayer);
 		m_pRound[i]->Set_TrapLayer(pTrap);
 		m_pRound[i]->Set_BrainPos(m_pBrain->Get_BrainPos());
 		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
@@ -264,9 +264,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	pBattery.fPosition = { 400.f,2.f, 450.f };
 	pBattery.pGauge = m_pGuage;
 	pBattery.pPlayer = m_pPlayer;
-	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Battery"), &pBattery);
+	pBattery.pEnergy_Machine = m_pEnergyMachine;
+	pBattery.pBrain = m_pBrain;
+	pBattery.pInGameUI = m_pBatteryUI;
+	pBattery.pInGameUI_Gauge = m_pBatteryGaugeUI;
+	m_pBattery = static_cast<CBattery*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Battery"), &pBattery));
 
-
+	
 	return S_OK;
 }
 
@@ -285,7 +289,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	pEnergyMachine.eID = LEVEL_GAMEPLAY;
 	pEnergyMachine.fScale = { 5.f,5.f,5.f };
 	pEnergyMachine.fPosition = _float3{ 477.267f, 0.1f,532.115f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
+	pEnergyMachine.pPlayer = m_pPlayer;
+	
+	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
 
 	// 에너지 머신 레이더
 	CEnergy_Lader::ENERGYLADER_DESC pEnergyLader{};
@@ -299,7 +305,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	pEnergyCap.eID = LEVEL_GAMEPLAY;
 	pEnergyCap.fScale = { 5.f,5.f,5.f };
 	pEnergyCap.fPosition = _float3{ 476.075f, 5.82203f,532.203f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
+	m_pEnergyMachine_Cap = static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
 
 	return S_OK;
 }
@@ -799,6 +805,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.fDepth = 0.1f;
 	pCircleDesc.pPlayer = m_pPlayer;
 	pCircleDesc.vecMarks = &m_vecTrapMark;
+	pCircleDesc.pEnergy_Machine = m_pEnergyMachine;
+	pCircleDesc.pEnergyMachine_Cap = m_pEnergyMachine_Cap;
 	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
 
@@ -900,8 +908,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDesc5.fX = 95.f;
 	pDesc5.fY = 120.f;
 	pDesc5.fDepth = 0.1f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc5)))
-		return E_FAIL;
+	m_pBatteryUI = static_cast<CInGameUI*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc5));
+
 
 	CInGameUI::INGAMEUI_DESC	pDesc8{};
 	pDesc8.eLevel = LEVEL_GAMEPLAY;
@@ -911,11 +919,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDesc8.iData = 0;
 	pDesc8.fX = 150;
 	pDesc8.fY = 120;
-
 	pDesc8.fDepth = 0.2f;
-	pDesc8.iIndex = 4;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc8)))
-		return E_FAIL;
+	pDesc8.iIndex = 3;
+	m_pBatteryGaugeUI = static_cast<CInGameUI*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc8));
+		
 
 	pDesc8.fDepth = 0.1f;
 	pDesc8.iIndex = 3;

@@ -39,10 +39,13 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 
-
+public:
+	void	Set_BatteryIn() { m_bBattery_In = true; }
 private:
+	_bool	m_bBattery_In = false;
 	_vector vPos{};
 	_float3	fPos{};
+	_float	fRotation{};
 public:
 	static CEnergy_Cap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

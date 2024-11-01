@@ -161,6 +161,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Alien.h" />
+    <ClInclude Include="..\Public\AttackState_Pony.h" />
     <ClInclude Include="..\Public\Battery.h" />
     <ClInclude Include="..\Public\BrainCore.h" />
     <ClInclude Include="..\Public\BackGround.h" />
@@ -204,12 +205,14 @@
     <ClInclude Include="..\Public\Player_Build.h" />
     <ClInclude Include="..\Public\Player_FPS.h" />
     <ClInclude Include="..\Public\Pony.h" />
-    <ClInclude Include="..\Public\PonyState.h" />
+    <ClInclude Include="..\Public\Pony_State.h" />
+    <ClInclude Include="..\Public\RunState_Pony.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Tank.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Trap_Bricks.h" />
     <ClInclude Include="..\Public\Trap_Marks.h" />
+    <ClInclude Include="..\Public\TrotState_Pony.h" />
     <ClInclude Include="..\Public\UI_CircleGuage.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Weapon_Item.h" />
@@ -221,6 +224,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Alien.cpp" />
+    <ClCompile Include="..\Private\AttackState_Pony.cpp" />
     <ClCompile Include="..\Private\BackGround.cpp" />
     <ClCompile Include="..\Private\Battery.cpp" />
     <ClCompile Include="..\Private\Body_Player.cpp" />
@@ -263,12 +267,13 @@
     <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />
     <ClCompile Include="..\Private\Pony.cpp" />
-    <ClCompile Include="..\Private\PonyState.cpp" />
+    <ClCompile Include="..\Private\RunState_Pony.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Trap_Bricks.cpp" />
     <ClCompile Include="..\Private\Trap_Marks.cpp" />
+    <ClCompile Include="..\Private\TrotState_Pony.cpp" />
     <ClCompile Include="..\Private\UI_CircleGuage.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon_Item.cpp" />

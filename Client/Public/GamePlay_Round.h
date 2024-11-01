@@ -1,7 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Level_GamePlay.h"
-
+#include "Player.h"
 
 BEGIN(Client)
 
@@ -34,7 +34,7 @@ public:
 	const void Set_BrainCoreWorld_matrix(const _float4x4* vMatrix) { matBrainCoreWorld = vMatrix; }
 	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
 	void Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
-
+	void Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 	_uint	Get_MonsterCount() { return m_iMonsterCount; }
 	void	MonsterCreate(_float fTimeDelta);
 
@@ -57,7 +57,7 @@ private:
 	const _float4x4* matBrainCoreWorld = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
 	CBrainCore* m_pBrain = { nullptr };
-
+	CPlayer* m_pPlayer = { nullptr };
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };

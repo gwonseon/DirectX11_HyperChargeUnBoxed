@@ -3,7 +3,9 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "UI_CircleGuage.h"
-
+#include "InGameUI.h"
+#include "Energy_Machine.h"
+#include "BrainCore.h"
 BEGIN(Engine)
 class CShader;
 class CModel;
@@ -16,6 +18,10 @@ class CBattery final : public CGameObject
 public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
+		CInGameUI* pInGameUI_Gauge = { nullptr };
+		CInGameUI* pInGameUI = { nullptr };
+		CBrainCore* pBrain = { nullptr };
+		CEnergy_Machine* pEnergy_Machine = { nullptr };
 		CUI_CircleGuage* pGauge = { nullptr };
 		CPlayer* pPlayer = { nullptr };
 		LEVELID eID = {};
@@ -44,10 +50,15 @@ private:
 	HRESULT Bind_ShaderResources();
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CPlayer* m_pPlayer = { nullptr };
-	CUI_CircleGuage* m_pGauge = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	CModel*					m_pModelCom = { nullptr };
+	CPlayer*				m_pPlayer = { nullptr };
+	CBrainCore*				m_pBrain = { nullptr };
+	CUI_CircleGuage*		m_pGauge = { nullptr };
+	CEnergy_Machine*		m_pEnergy_Machine = { nullptr };
+	CInGameUI*				m_pInGameUI = { nullptr };
+	CInGameUI*				m_pInGameUI_Gauge = { nullptr };
+
 private:
 	LEVELID	m_eLevel = {};
 	_vector* m_vecPos = {nullptr};
@@ -55,6 +66,7 @@ private:
 	_bool*   m_bVisible = { nullptr };
 	_bool	m_bFirst_PickUp = true;
 	_float3 fPrevPos{}, fPos{};
+	_float	m_fCharging_Delay{};
 public:
 	static CBattery* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

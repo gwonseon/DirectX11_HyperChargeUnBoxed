@@ -112,8 +112,6 @@ HRESULT CLoader::Loading()
 	case LEVEL_MONSTERSPAWN:
 		hr = Loading_For_MonsterSpawnLevel();
 		break;
-
-		
 	}
 
 	if (FAILED(hr))

@@ -109,8 +109,8 @@ private:
 	KEYFRAME						PrevKeyFrame{};
 	KEYFRAME						PrevKeyFrame_UpperBody{};
 	KEYFRAME						PrevKeyFrame_LowerBody{};
-	_uint	m_iPrevNumChannels{};
-	_bool bAnimChange = false;
+	_uint							m_iPrevNumChannels{};
+	_bool							bAnimChange = false;
 
 public:
 	virtual CComponent* Clone(void* pArg) override;

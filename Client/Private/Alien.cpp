@@ -10,6 +10,7 @@ CAlien::CAlien(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CAlien::CAlien(const CAlien& Prototype)
 	: CMonster{ Prototype }
+
 {
 }
 

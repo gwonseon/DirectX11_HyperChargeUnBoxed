@@ -25,32 +25,32 @@ public:
 	{
 		_vector* vCameraAt = {};
 		_vector* vCameraPos = {};
-		_uint* iRound		= {};
+		_uint* iRound = {};
 	}PLAYER_DESC;
 
 
 public:
-	enum TPS_PARTOBJID { TPS_PART_BODY, TPS_PART_WEAPON, TPS_PART_EFFECT, TPS_PART_HEAD, TPS_PART_PIVOT , TPS_PART_KATANA, FPS_PART_BODY, FPS_PART_PIVOT, PART_END };
+	enum TPS_PARTOBJID { TPS_PART_BODY, TPS_PART_WEAPON, TPS_PART_EFFECT, TPS_PART_HEAD, TPS_PART_PIVOT, TPS_PART_KATANA, FPS_PART_BODY, FPS_PART_PIVOT, PART_END };
 	enum TPSSTATE {
-		STATE_IDLE					= 0x00000001,
-		WALKSTATE_NORTH				= 0x00000002,
-		WALKSTATE_SOUTH				= 0x00000004,
-		WALKSTATE_EAST				= 0x00000008,
-		WALKSTATE_WEST				= 0x00000010,
-		WALKSTATE_NORTHEAST			= 0x00000020,
-		WALKSTATE_NORTHWEST			= 0x00000040,
-		WALKSTATE_SOUTHEAST			= 0x00000080,
-		WALKSTATE_SOUTHWEST			= 0x00000100,
-		JUMP_START					= 0x00000200,
-		JUMP_LOOP					= 0x00000400,
-		JUMP_END					= 0x00000800,
-		RUNSTATE_NORTH				= 0x00001000,
-		RUNSTATE_NORTHWEST			= 0x00002000,
-		RUNSTATE_NORTHEAST			= 0x00004000,
-		RELOADING					= 0x00008000,
-		FIRE						= 0x00010000,
-		FIRE_RB						= 0x00020000,
-		MELEE						= 0x00040000,
+		STATE_IDLE = 0x00000001,
+		WALKSTATE_NORTH = 0x00000002,
+		WALKSTATE_SOUTH = 0x00000004,
+		WALKSTATE_EAST = 0x00000008,
+		WALKSTATE_WEST = 0x00000010,
+		WALKSTATE_NORTHEAST = 0x00000020,
+		WALKSTATE_NORTHWEST = 0x00000040,
+		WALKSTATE_SOUTHEAST = 0x00000080,
+		WALKSTATE_SOUTHWEST = 0x00000100,
+		JUMP_START = 0x00000200,
+		JUMP_LOOP = 0x00000400,
+		JUMP_END = 0x00000800,
+		RUNSTATE_NORTH = 0x00001000,
+		RUNSTATE_NORTHWEST = 0x00002000,
+		RUNSTATE_NORTHEAST = 0x00004000,
+		RELOADING = 0x00008000,
+		FIRE = 0x00010000,
+		FIRE_RB = 0x00020000,
+		MELEE = 0x00040000,
 	};
 
 	enum TPS_JUMPSTATE
@@ -93,7 +93,7 @@ public:
 
 
 public:
-	void Set_Dir(_vector vDir) { m_pTransformCom->Set_State(CTransform::STATE_LOOK,vDir); }
+	void Set_Dir(_vector vDir) { m_pTransformCom->Set_State(CTransform::STATE_LOOK, vDir); }
 	_vector Get_Dir() { return m_pTransformCom->Get_State(CTransform::STATE_LOOK); }
 	void		Get_Rotation(_vector& vRight, _vector& vUp, _vector& vLook) {
 		vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
@@ -101,33 +101,31 @@ public:
 		vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	}
 	_uint* Get_ViewState() { return &m_iViewState; }
-	void   Set_CameraAt(_vector* pAt) {	m_vecCameraAt = pAt;}
+	void   Set_CameraAt(_vector* pAt) { m_vecCameraAt = pAt; }
 	void   Set_CameraPos(_vector* pPos) { m_vecCameraPos = pPos; }
-
-	void		Set_Rotaion(_vector	vRight, _vector	vUp, _vector	vLook) {
+	void   Set_Rotaion(_vector	vRight, _vector	vUp, _vector	vLook) {
 		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vRight);
 		m_pTransformCom->Set_State(CTransform::STATE_UP, vUp);
 		m_pTransformCom->Set_State(CTransform::STATE_LOOK, vLook);
 	}
-	_float	Get_Rotation_Value() {return m_fRotation_Value;	}
+	_float	Get_Rotation_Value() { return m_fRotation_Value; }
 	void Set_Rotation(_float fAngleY) { m_pTransformCom->Rotation(0.f, fAngleY, 0.f); }
-	
 	void Set_RoundStart(_bool* bStart) { m_bRoundStart = bStart; }
 
 
-	CTransform* Get_Transform() {	return m_pTransformCom; }
-	_vector* Get_TPSPosptr()	{	return m_vecTPS_CamPos;	}
-	_vector* Get_FPSPosptr()	{	return m_vecFPS_CamPos; }
-	_vector* Get_WeaponPos()	{	return m_vecWeaponPos; }
-	_vector* Get_WeaponDir()	{	return m_vecWeaponDir; }
-	_bool*	 Get_ShotNow()		{	return m_pBody->Get_ShotNow(); }
-	_bool* Get_ShotStart()		{ return m_pBody->Get_ShotStart(); }
-	_uint* Get_WeaponState()	{ return &m_iWeaponState; }
-	_uint* Get_UpperMotion()	{ return m_pBody->Get_UpperMotion(); }
-	_bool* Get_Reloading()		{ return &m_bReloading; }
+	CTransform* Get_Transform() { return m_pTransformCom; }
+	_vector* Get_TPSPosptr() { return m_vecTPS_CamPos; }
+	_vector* Get_FPSPosptr() { return m_vecFPS_CamPos; }
+	_vector* Get_WeaponPos() { return m_vecWeaponPos; }
+	_vector* Get_WeaponDir() { return m_vecWeaponDir; }
+	_bool* Get_ShotNow() { return m_pBody->Get_ShotNow(); }
+	_bool* Get_ShotStart() { return m_pBody->Get_ShotStart(); }
+	_uint* Get_WeaponState() { return &m_iWeaponState; }
+	_uint* Get_UpperMotion() { return m_pBody->Get_UpperMotion(); }
+	_bool* Get_Reloading() { return &m_bReloading; }
 
 
-private: // Camera
+private: // Camera 
 	_vector* m_vecTPS_CamPos{};
 	_vector* m_vecFPS_CamPos{};
 	_vector* m_vecCameraAt{};
@@ -154,7 +152,8 @@ private:
 	float					m_fRun_EightDirection{};
 	_float					m_fReload_Charging = 0.f;
 
-private: // 빌드 모드
+#pragma region  빌드 모드 
+private:
 	_bool					m_bBuildMode = false;		// 빌드 모드
 	_bool					m_bBuild_Gauging = false;  // E 눌러서 빌드 중임을 알려주는 변수
 	_bool					m_bCharging = false;
@@ -165,17 +164,14 @@ private: // 빌드 모드
 public:
 	void	Set_Build_Able(_bool bAble) { m_bBuild_Able = bAble; }
 
-	_bool*	Get_BuildMode() { return &m_bBuildMode; }
+	_bool* Get_BuildMode() { return &m_bBuildMode; }
 	_bool	Get_Build_Gauging() { return m_bBuild_Gauging; }
 
-
+#pragma endregion  빌드 모드 
 
 public:  // 총알
 	_uint* Get_CurrentBullet() { return m_pWaepon->Get_CurrentBullet(); }
 	_uint* Get_FullBullet() { return m_pWaepon->Get_FullBullet(); }
-
-	
-
 
 public:
 	_float m_fRotation_Value{};
@@ -186,7 +182,6 @@ private:
 	CWeapon_Katana* m_pKatana = nullptr;
 	CHead_Player* m_pHead = nullptr;
 	CNavigation* m_pNavigationCom = nullptr;
-
 
 private:
 	_float	m_fHeight{};		// 점프 높이
@@ -214,28 +209,33 @@ private:
 public:
 	_vector Get_Position() { return m_vecPos; }
 	_vector Get_PivotPostion() { return m_vecPivotPos; }
-
+	_uint	Get_CurrentCellIdx() { return m_pNavigationCom->Get_CurrentCell_Index(); }
 	void	Set_EquipNumber(_uint iEquipNum) { m_iWeaponState = iEquipNum; }
 
 
 	_bool	Set_Charging(_bool bCharge) { m_bCharging = bCharge; }
 
-	// 배터리
+#pragma region 배터리
 public:
 	void	PickUp_Battery(_uint iEquipNum)
 	{
 		m_iPrev_WeaponState = m_iWeaponState; // 지금 들고 있는 무기를 저장해둠, 나중에 건전지 내려놓았을 때 이거 다시 들어야함
 		m_iWeaponState = iEquipNum; // 무기 배터리로 변경
 	}
-	
+	void	Insert_Battery()
+	{
+		m_iWeaponState = m_iPrev_WeaponState;
+	}
 	_vector* Get_BatteryPos() { return &m_vecBatteryPos; }
 	_bool* Get_Visible_Battery() { return &m_bVisible_Battery; }
 private:
 	_uint					m_iPrev_WeaponState = WEAPON_RIFLE;
 	_vector					m_vecBatteryPos{};
 	_bool					m_bVisible_Battery = true;
-public:
 
+#pragma endregion 배터리
+
+public:
 	_float* Get_PlayerHP() { return &m_fHp; }
 	_float* Get_PlayerEnergy() { return &m_fEnergy; }
 

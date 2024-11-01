@@ -24,12 +24,16 @@ HRESULT CUI_CircleGuage::Initialize(void* pArg)
 	CIRCLEGAUGE_DESC* pDesc = (CIRCLEGAUGE_DESC*)pArg;
 	m_pPlayer = pDesc->pPlayer;
 	m_pvecTrap_Marks = pDesc->vecMarks;
+	m_pEnergy_Machine = pDesc->pEnergy_Machine;
+	m_pEnergyMachine_Cap = pDesc->pEnergyMachine_Cap;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components(1)))
 		return E_FAIL;
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
+	
+	m_bBattery_Insert_End = false;
 
 	m_bBuildMode = m_pPlayer->Get_BuildMode();
 	return S_OK;
@@ -62,16 +66,36 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 		}
 	}
 
-
+	if (*m_pPlayer->Get_WeaponState() == CPlayer::BATTERY)
+	{
+		if (m_pTransformCom->Cal_Distance_vec(m_pEnergy_Machine->Get_EnergyMachinePos(), m_pPlayer->Get_Position()) <= 80.f)
+		{
+			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E) && m_bBattery_Insert_End == false)
+			{
+				m_bBattery_Insert = true;
+			}
+			else
+			{
+				m_bBattery_Insert = false;
+				m_fReal_Gauging_Time = 0.f;
+				m_fGuaging_Time = 0.f;
+			}
+		}
+	}
+	else
+	{
+		m_bBattery_Insert_End = false;
+	}
 
 }
 
 void CUI_CircleGuage::Update(_float fTimeDelta)
 {
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true )
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true)
 	{
 			m_fReal_Gauging_Time += fTimeDelta;
 			m_fGuaging_Time += fTimeDelta * 10;
+			
 	}
 	else
 	{
@@ -94,7 +118,28 @@ void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 			m_fReal_Gauging_Time = 0.f;
 		}
 	}
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true)
+	// 배터리 삽입
+	if (m_bBattery_Insert == true && m_bBattery_Insert_End == false)
+	{
+		// 배터리 삽입 완료 되었을 때
+		if (m_fReal_Gauging_Time >= 1.f)
+		{
+			m_bBattery_Insert_End = true;	// 삽입 완료
+			m_bBattery_Insert = false;		// 삽입 로딩 완료
+			m_fGuaging_Time = 0.f;			// 시간 초기화
+			m_fReal_Gauging_Time = 0.f;		// 시간 초기화
+			m_pEnergy_Machine->Set_BatteryInsert(true);   // 머신에 배터리 넣기
+			m_pPlayer->Insert_Battery();				  // 플레이어 들고 있는 무기 정상화
+			if (m_bBattery_Insert_First == false)
+			{
+				m_pEnergyMachine_Cap->Set_BatteryIn();
+				m_bBattery_Insert_First = true;
+			}
+		}
+	}
+	
+
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
 			return;

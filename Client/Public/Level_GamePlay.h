@@ -9,6 +9,9 @@
 #include "Trap_Marks.h"
 #include "Energy_Machine.h"
 #include "Energy_Lader.h"
+#include "Energy_Cap.h"
+#include "Battery.h"
+#include "InGameUI.h"
 
 BEGIN(Client)
 class CGamePlay_Round;
@@ -46,11 +49,17 @@ private:
 	void Build_Check();
 	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
 private:
-	CCamera_Free* m_pCamera;
-	CPlayer* m_pPlayer;
+	CCamera_Free*				m_pCamera				= { nullptr };
+	CPlayer*					m_pPlayer				= { nullptr };
+	CUI_CircleGuage*			m_pGuage				= { nullptr };
+	CBrainCore*					m_pBrain				= { nullptr };
+	CEnergy_Machine*			m_pEnergyMachine		= { nullptr };
+	CEnergy_Cap*				m_pEnergyMachine_Cap	= { nullptr };
+	CBattery*					m_pBattery				= { nullptr };
+	CInGameUI*					m_pBatteryUI			= { nullptr };
+	CInGameUI*					m_pBatteryGaugeUI		= { nullptr };
+
 	CWeapon_Item* m_pWeaponItem[2];
-	CUI_CircleGuage* m_pGuage;
-	CBrainCore* m_pBrain;
 
 	_float	m_fDelay{};
 	_bool m_bOnce = false;

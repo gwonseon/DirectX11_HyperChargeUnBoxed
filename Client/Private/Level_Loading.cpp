@@ -10,8 +10,6 @@
 #include "Navigation_Leve.h"
 #include "BackGround.h"
 
-
-
 #include "GameInstance.h"
 
 
@@ -152,7 +150,6 @@ HRESULT CLevel_Loading::Ready_Layer_UI_LOGO(const _tchar* pLayerTag)
 
 	return S_OK;
 }
-
 HRESULT CLevel_Loading::Ready_Layer_UI_GameTitle(const _tchar* pLayerTag)
 {
 	m_pLoadingUI_GameTitle = CLoading_UI::Create(m_pDevice, m_pContext);

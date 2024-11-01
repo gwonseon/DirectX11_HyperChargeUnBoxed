@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Player_Build.h"
+#include "Player.h"
 
 BEGIN(Engine)
 class CShader;
@@ -14,6 +15,7 @@ class CEnergy_Machine final : public CPlayer_Build
 public:
 	typedef struct : public CPlayer_Build::PLAYER_BUILD_DESC
 	{
+		CPlayer* pPlayer = { nullptr };
 		_int	iModelComponentIndex{};
 	}ENERGYMACHINE_DESC;
 
@@ -37,9 +39,18 @@ private:
 	HRESULT Bind_ShaderResources();
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
+	CShader*	m_pShaderCom = { nullptr };
+	CModel*		m_pModelCom = { nullptr };
+	CPlayer*	m_pPlayer = { nullptr };
 
+public:
+	void		Set_BatteryInsert(_bool bInsert) { m_bBattery_Insert = bInsert; }
+	_bool		Get_Battery_Is_In() { return m_bBattery_Insert; }
+	_vector		Get_EnergyMachinePos() { return m_vecPos; }
+private:
+	_bool		m_bBattery_Insert = false;
+
+	_vector m_vecPos{};
 public:
 	static CEnergy_Machine* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
