@@ -357,6 +357,9 @@
     <ClInclude Include="..\Public\RunState_Pony.h">
       <Filter>02. GameObjects\Monster\Pony\PonyState\Run</Filter>
     </ClInclude>
+    <ClInclude Include="Pony_Defines.h">
+      <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">

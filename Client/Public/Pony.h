@@ -8,6 +8,7 @@ BEGIN(Engine)
 class CShader;
 class CCollider;
 class CModel;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -29,7 +30,10 @@ public:
 		PONY_Neigh,		PONY_Trot,		PONY_Walk, 
 	};
 
-
+	enum PONY_STATE
+	{
+		TROT_STATE, RUN_STATE, ATTACK_STATE, PONY_STATE_END
+	};
 private:
 	CPony(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPony(const CPony& Prototype);
@@ -49,7 +53,10 @@ public: // 상태패턴
 	void ChangeState(CPony_State* pNewState)
 	{
 		if (m_pCurrentState)
+		{
 			m_pCurrentState->Exit(this);
+			delete m_pCurrentState;
+		}
 
 		m_pCurrentState = pNewState;
 
@@ -62,6 +69,7 @@ public: // 상태패턴
 
 public:
 	CModel* Get_ModelCom() { return m_pModelCom; }
+	PONY_STATE Get_State() { return m_ePonyState; }
 
 private:
 	HRESULT Add_Components();
@@ -85,7 +93,7 @@ private:
 	_bool		m_bAnimState{};
 	_bool	m_bFind_Path = false;
 
-
+	PONY_STATE m_ePonyState = TROT_STATE;
 public:
 	static CPony* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

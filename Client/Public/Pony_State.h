@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "Engine_Defines.h"
 
+
 BEGIN(Client)
 
 class CPony;

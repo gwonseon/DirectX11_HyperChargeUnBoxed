@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "Pony_State.h"
 #include "Engine_Defines.h"
+#include "Pony_Defines.h"
 
 BEGIN(Client)
 class CPony;

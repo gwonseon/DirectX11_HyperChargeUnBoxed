@@ -36,7 +36,6 @@ HRESULT CHelicopter::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(1, true);
 	m_bAttackState = true;
-//	pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA));
 	m_fHp = 100.f;
 	m_fEnergy = 0.f;
 	return S_OK;
@@ -61,20 +60,23 @@ void CHelicopter::Update(_float fTimeDelta)
 
 	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, vPos);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(XMVectorGetX(vPos), 10.f, XMVectorGetZ(vPos),1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(XMVectorGetX(vPos), 20.f, XMVectorGetZ(vPos),1.f));
 
-	if (fDistance >= 90.f)
+	if (fDistance >= 350.f)
 	{
-		m_pTransformCom->LookAt(*m_vecTargetPos);
+		_vector vLookPos = *m_vecTargetPos;
+		vLookPos = XMVectorSetY(vLookPos, 20.f);
+		m_pTransformCom->LookAt(vLookPos);
 		m_pModelCom->Set_Animation(HELICOPTER_DIORAMA, true);
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 	else
 	{
 		// Turn 함수로 하면 좋을듯, 이동 좌표는 직접 찍을 것이기 때문에 방향 신경쓰지 말자 
-		if (XMConvertToRadians(m_fRotation) <= 90.f)
+		if (XMConvertToRadians(m_fRotation) <= XMConvertToRadians(90.f))
 		{
-			m_fRotation += fTimeDelta * 10.f;
+			
+			m_fRotation += fTimeDelta * 20.f;
 		}
 			
 		m_pTransformCom->Rotation(0.f, XMConvertToRadians(m_fRotation), 0.f);

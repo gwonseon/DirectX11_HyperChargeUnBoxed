@@ -117,6 +117,7 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Alien_Desc.vecTargetPos = vecBrainPos;
 		Alien_Desc.matBrainCoreWorld = matBrainCoreWorld;
 		Alien_Desc.matPlayerWorld = matPlayerWorld;
+		Alien_Desc.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"), TEXT("Prototype_GameObject_Alien"), &Alien_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 		break;

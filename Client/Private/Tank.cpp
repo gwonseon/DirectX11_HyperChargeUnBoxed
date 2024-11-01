@@ -13,9 +13,7 @@ CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CTank::CTank(const CTank& Prototype)
 	: CMonster{ Prototype }
-	, m_pColliderCom{ Prototype.m_pColliderCom }
-	, m_pShaderCom{ Prototype.m_pShaderCom }
-	, m_pModelCom{ Prototype.m_pModelCom }
+
 {
 }
 

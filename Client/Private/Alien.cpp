@@ -29,6 +29,7 @@ HRESULT CAlien::Initialize(void* pArg)
 	pDesc->fScale = _float3(2.f, 2.f, 2.f);
 	pDesc->fSpeedPerSec = 10.f;
 
+	m_iCell_Idx = pDesc->iCell_Idx;
 	m_iModelIndex = ANIM_ALIEN;
 	m_eLevel = pDesc->eID;
 
@@ -64,7 +65,7 @@ void CAlien::Update(_float fTimeDelta)
 	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
 	if (fDistance > 4.f)
 	{
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		m_pTransformCom->Go_Straight_Nav(fTimeDelta,m_pNavigationCom);
 	}
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	// 넉백이 True일 때 넉백 모션하게 하기
@@ -147,6 +148,13 @@ HRESULT CAlien::Add_Components()
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 
+	// For.Com_Navigation
+	CNavigation::NAVIGATION_DESC		Desc{};
+	Desc.iCurrentCellIndex = m_iCell_Idx;
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -206,7 +214,10 @@ CGameObject* CAlien::Clone(void* pArg)
 void CAlien::Free()
 {
 	__super::Free();
+
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pNavigationCom);
+
 }
