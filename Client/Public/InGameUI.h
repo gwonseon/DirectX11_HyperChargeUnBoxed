@@ -25,10 +25,10 @@ public:
 
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
-		_float* fPlayerHP;
-		_float* fPlayerEnergy;
-		_float* fBrainHP;
-		_float* fBrainEnergy;
+		_float* fPlayerHP		= { nullptr };
+		_float* fPlayerEnergy	= { nullptr };
+		_float* fBrainHP		= { nullptr };
+		_float* fBrainEnergy	= { nullptr };
 		GAMEUI eUITag{};
 		_uint	iIndex{};
 		CPlayer* pPlayer{};
@@ -59,10 +59,12 @@ public:
 	void Machine_HP_UI(_float fTimeDelta);
 	void Charater_UI(_float fTimeDelta);
 	void UI_Conversation(_float fTimeDelta);
-	void UI_Bar(_float fTimeDelta);
 	void Machine_UI_Energy(_float fTimeDelta);
 	void Player_UI_Hp(_float fTimeDelta);
 	void Player_UI_Energy(_float fTimeDelta);
+
+public:
+	void Set_BatteryGauge(float fGauge) { m_fBatteryGauge = fGauge; }
 private:
 	//_float						m_fX{}, m_fY{}, m_fSizeX{}, m_fSizeY{};
 	//_float4x4					m_ViewMatrix, m_ProjMatrix;
@@ -70,7 +72,7 @@ private:
 
 	// 배터리
 	_uint						m_iBattery = 0;
-	float						m_fBatteryGage = 80.f;
+	float						m_fBatteryGauge = 0.f;
 
 
 	// 캐릭터 대화 상자

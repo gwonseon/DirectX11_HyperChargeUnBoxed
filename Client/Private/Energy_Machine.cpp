@@ -22,6 +22,7 @@ HRESULT CEnergy_Machine::Initialize(void* pArg)
 {
 	ENERGYMACHINE_DESC* pDesc = static_cast<ENERGYMACHINE_DESC*>(pArg);
 	m_eLevel = pDesc->eID;
+	m_pPlayer = pDesc->pPlayer;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -34,6 +35,14 @@ HRESULT CEnergy_Machine::Initialize(void* pArg)
 
 void CEnergy_Machine::Priority_Update(_float fTimeDelta)
 {
+	// 혹시 오버 충전될까봐
+	if (m_fEnergy > 100.f)
+		m_fEnergy = 100.f;
+
+
+	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	
+
 }
 
 void CEnergy_Machine::Update(_float fTimeDelta)

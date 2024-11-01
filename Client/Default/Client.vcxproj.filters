@@ -175,6 +175,15 @@
     <Filter Include="02. GameObjects\Environment\Battery">
       <UniqueIdentifier>{fdde6bc9-c926-4c03-8b3f-b0b3250e37e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Trot">
+      <UniqueIdentifier>{beb832c6-04c0-4e63-8864-74c1264a421b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Attack">
+      <UniqueIdentifier>{600d30e4-46ac-4565-9461-ee2a7313ea54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Run">
+      <UniqueIdentifier>{32a41391-cbed-427b-b65c-cd96d989808f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -297,9 +306,6 @@
     <ClInclude Include="..\Public\Navigation_Leve.h">
       <Filter>01. Levels\92. NavigationTool</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\PonyState.h">
-      <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Bullet.h">
       <Filter>02. GameObjects\Player\Weapon\Player_Bullet</Filter>
     </ClInclude>
@@ -338,6 +344,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Battery.h">
       <Filter>02. GameObjects\Environment\Battery</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Pony_State.h">
+      <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TrotState_Pony.h">
+      <Filter>02. GameObjects\Monster\Pony\PonyState\Trot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AttackState_Pony.h">
+      <Filter>02. GameObjects\Monster\Pony\PonyState\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RunState_Pony.h">
+      <Filter>02. GameObjects\Monster\Pony\PonyState\Run</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -452,9 +470,6 @@
     <ClCompile Include="..\Private\Navigation_Leve.cpp">
       <Filter>01. Levels\92. NavigationTool</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\PonyState.cpp">
-      <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Bullet.cpp">
       <Filter>02. GameObjects\Player\Weapon\Player_Bullet</Filter>
     </ClCompile>
@@ -493,6 +508,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Battery.cpp">
       <Filter>02. GameObjects\Environment\Battery</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TrotState_Pony.cpp">
+      <Filter>02. GameObjects\Monster\Pony\PonyState\Trot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AttackState_Pony.cpp">
+      <Filter>02. GameObjects\Monster\Pony\PonyState\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RunState_Pony.cpp">
+      <Filter>02. GameObjects\Monster\Pony\PonyState\Run</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

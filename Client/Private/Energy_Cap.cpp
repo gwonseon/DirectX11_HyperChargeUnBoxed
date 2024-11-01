@@ -30,40 +30,31 @@ HRESULT CEnergy_Cap::Initialize(void* pArg)
         return E_FAIL;
    
     fPos = { pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z};
+    m_bBattery_In = false;
     return S_OK;
 }
 
 void CEnergy_Cap::Priority_Update(_float fTimeDelta)
 {
+    if (m_bBattery_In == true && fPos.y > 0.5f)
+    {
+        fPos.x -= fTimeDelta;
+        fPos.y -= fTimeDelta * 5.f;
+    }
+    else if(m_bBattery_In == true)
+    {
+        fPos.y = 0.5f;
+        if (fRotation <= XMConvertToRadians(90.f))
+        {
+            fRotation += fTimeDelta;
+            m_pTransformCom->Rotation(0.f, 0.f, fRotation);
+        }
+    }
+
 }
 
 void CEnergy_Cap::Update(_float fTimeDelta)
 {
-    if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD1))
-    {
-        fPos.x += fTimeDelta;
-    }
-    if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD2))
-    {
-        fPos.y += fTimeDelta;
-    }
-    if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD3))
-    {
-        fPos.z += fTimeDelta;
-    }
-
-    if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD4))
-    {
-        fPos.x -= fTimeDelta;
-    }
-    if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD5))
-    {
-        fPos.y -= fTimeDelta;
-    }
-    if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_NUMPAD6))
-    {
-        fPos.z -= fTimeDelta;
-    }
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(fPos.x, fPos.y, fPos.z, 1.f));
 }
 

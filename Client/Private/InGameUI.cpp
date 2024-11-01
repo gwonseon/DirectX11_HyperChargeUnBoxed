@@ -28,7 +28,7 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_iIndex = pDesc->iIndex;
     m_fUIPosition = { pDesc->fX, pDesc->fY, 0.f};
     m_pPlayer = pDesc->pPlayer;
-
+   
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -85,11 +85,9 @@ void CInGameUI::Update(_float fTimeDelta)
         break;
     case Client::CInGameUI::UI_BATTERY:
         Battery_UI(fTimeDelta);
-        UI_Bar(fTimeDelta);
         break;
     case Client::CInGameUI::UI_BATTERY_GAGE:
         Battery_UI(fTimeDelta);
-        UI_Bar(fTimeDelta);
         break;
     case Client::CInGameUI::UI_MACHINE_HP:
         Machine_HP_UI(fTimeDelta);
@@ -471,7 +469,7 @@ HRESULT CInGameUI::Bind_ShaderResources()
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fBatteryGage,sizeof(float))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fBatteryGauge, sizeof(float))))
             return E_FAIL;
 
     }
@@ -551,29 +549,20 @@ void CInGameUI::Free()
 
 void CInGameUI::Battery_UI(_float fTimeDelta)
 {
-#ifdef _DEBUG
-    // 배터리 량 받아와서 UI번호 바꿔주기
-    
-    if (m_pGameInstance->Get_DIKeyState_Down(DIK_ADD))
-    {
-        m_fBatteryGage = 80.f;
-    }
 
-#endif
-
-    if (m_fBatteryGage >= 60.f)
+    if (m_fBatteryGauge >= 70.f)
     {
         m_iBattery = 0;
     }
-    else if (m_fBatteryGage >= 40.f)
+    else if (m_fBatteryGauge >= 50.f)
     {
         m_iBattery = 1;
     }
-    else if (m_fBatteryGage >= 20.f)
+    else if (m_fBatteryGauge >= 30.f)
     {
         m_iBattery = 2;
     }
-    else if (m_fBatteryGage > 0.f)
+    else if (m_fBatteryGauge > 0.f)
     {
         m_iBattery = 3;
     }
@@ -614,20 +603,7 @@ void CInGameUI::UI_Conversation(_float fTimeDelta)
 #endif
 }
 
-void CInGameUI::UI_Bar(_float fTimeDelta)
-{
 
-    if (m_eUIType == UI_BATTERY_GAGE || m_eUIType == UI_BATTERY)
-    {
-         m_fBatteryGage -= fTimeDelta * 10.f;
-       
-    }
-#ifdef _DEBUG
-
-
-
-#endif
-}
 
 void CInGameUI::Machine_UI_Energy(_float fTimeDelta)
 {

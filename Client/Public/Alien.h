@@ -47,7 +47,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	_vector* m_vecTargetPos;
-	CCollider* pTargetCollider = { nullptr };
+
 
 private:
 	_bool		m_bAnimState{};

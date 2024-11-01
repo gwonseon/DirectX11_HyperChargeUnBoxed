@@ -4,7 +4,8 @@
 #include "UIObject.h"
 #include "Player.h"
 #include "Trap_Marks.h"
-
+#include "Energy_Machine.h"
+#include "Energy_Cap.h"
 BEGIN(Engine)
 class CShader;
 class CTexture;
@@ -19,8 +20,10 @@ public:
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
 		_uint	iIndex{};
-		CPlayer* pPlayer = { nullptr };
-		vector<CTrap_Marks*>* vecMarks = { nullptr };
+		CEnergy_Machine* pEnergy_Machine	= { nullptr };
+		CEnergy_Cap* pEnergyMachine_Cap		= { nullptr };
+		CPlayer* pPlayer					= { nullptr };
+		vector<CTrap_Marks*>* vecMarks		= { nullptr };
 	}CIRCLEGAUGE_DESC;
 private:
 	CUI_CircleGuage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -45,12 +48,16 @@ private:
 
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
-	CPlayer* m_pPlayer = { nullptr };
-	vector<CTrap_Marks*>* m_pvecTrap_Marks = { nullptr };
-	_bool* m_bBuild_Gauging = { nullptr };
+	CShader*				m_pShaderCom			= { nullptr };
+	CTexture*				m_pTextureCom			= { nullptr };
+	CVIBuffer_Rect*			m_pVIBufferCom			= { nullptr };
+	CEnergy_Machine*		m_pEnergy_Machine		= { nullptr };
+	CEnergy_Cap*			m_pEnergyMachine_Cap = { nullptr };
+	CPlayer*				m_pPlayer				= { nullptr };
+
+	vector<CTrap_Marks*>*	m_pvecTrap_Marks		= { nullptr };	// Æ®·¦ ¸¶Å©¿¡ Æ®·¦ ¼³Ä¡
+	_bool*					m_bBuild_Gauging		= { nullptr };	// ºôµå¸ðµå
+	_bool*					m_bBuildMode			= { nullptr };  // ºôµå¸ðµå
 
 public:
 	void	Set_Charging(_bool bCharging) { m_bCharging = bCharging; }
@@ -65,15 +72,20 @@ public:
 
 	_bool	Get_Charging() { return m_bCharging; }
 	_bool   Get_ItemInteraction_End() { return m_bItem_Interaction_End; }
+	
 private:
 	float	m_fGuaging_Time{};
 	_float	m_fReal_Gauging_Time{};
 	_bool	m_bCharging{}, m_bItemCharging{};
+	
 	_bool	m_bBuild_Draw = false;
+	
 	_bool   m_bItem_Interaction = false;
 	_bool   m_bItem_Interaction_End = false;
-	_bool*  m_bBuildMode = { nullptr };
-	
+
+	_bool	m_bBattery_Insert = false;
+	_bool	m_bBattery_Insert_End = false;
+	_bool	m_bBattery_Insert_First = false;
 public:
 	static CUI_CircleGuage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

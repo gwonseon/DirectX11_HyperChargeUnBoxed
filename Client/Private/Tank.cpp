@@ -13,6 +13,9 @@ CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CTank::CTank(const CTank& Prototype)
 	: CMonster{ Prototype }
+	, m_pColliderCom{ Prototype.m_pColliderCom }
+	, m_pShaderCom{ Prototype.m_pShaderCom }
+	, m_pModelCom{ Prototype.m_pModelCom }
 {
 }
 
@@ -78,7 +81,6 @@ void CTank::Update(_float fTimeDelta)
 		_int iCheck_Count = 0;
 		for (auto pTrap : m_pTrapLayer->Get_GameObject_List())
 		{
-			
 			if (static_cast<CTrap_Marks*>(pTrap)->Get_Build_Done() == true)
 			{
 				m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
