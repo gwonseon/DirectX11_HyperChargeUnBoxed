@@ -46,7 +46,7 @@ private:
 private:
 	void Load_Map();
 	void Build_Check();
-	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
+	//void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
 private:
 	CCamera_Free* m_pCamera = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };

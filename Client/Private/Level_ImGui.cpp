@@ -142,8 +142,11 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 				}
 				break;
 			case Client::CLevel_ImGui::IMGUI_ITEM:
-				vPos = m_vecCoin.back()->Get_Pos();
-				fScale = m_vecCoin.back()->Get_Scale();
+				if(m_vecCoin.size() > 0)
+				{
+					vPos = m_vecCoin.back()->Get_Pos();
+					fScale = m_vecCoin.back()->Get_Scale();
+				}
 
 				break;
 			case Client::CLevel_ImGui::IMGUI_END:
@@ -1614,7 +1617,7 @@ HRESULT CLevel_ImGui::Item_Add()
 	if (pGameObj != nullptr)
 	{
 		m_vecCoin.push_back(dynamic_cast<CCoin*>(pGameObj));
-
+		cout << m_fPickingPos.x << "  " << m_fPickingPos.y << "  " << m_fPickingPos.z << "   추가" << endl;
 		m_iCoin_Count++;
 		bAble_Select = false;
 	}
@@ -1625,7 +1628,7 @@ HRESULT CLevel_ImGui::Item_DataChange(_float fTimeDelta)
 {
 	if (m_iModeSelect == IMGUI_CREATE)   // Create 모드 일 때 가장 최근 설치 항목에 대한 수정 가능 기능
 	{
-		// 가장 최근 설치한 Environment 삭제하기
+		// 가장 최근 설치한 Coin 삭제하기
 		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iCoin_Count > 0)
 		{
 			m_vecCoin.back()->Set_Dead();
@@ -1735,7 +1738,7 @@ void CLevel_ImGui::Item_Load()
 		pCoin->Set_Dead();
 	}
 	m_vecCoin.clear();
-
+	return;
 
 	m_iCoin_Count = 0;
 	HANDLE hFile{};

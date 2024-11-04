@@ -29,9 +29,9 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_fUIPosition = { pDesc->fX, pDesc->fY, 0.f};
     m_pPlayer = pDesc->pPlayer;
     m_eLevel = pDesc->eLevel;
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
-
     if (FAILED(Add_Components(pDesc->iData)))
         return E_FAIL;
     if(m_eUIType == UI_PLAYER_HP )
@@ -42,8 +42,6 @@ HRESULT CInGameUI::Initialize(void* pArg)
         m_fMachineHP = pDesc->fBrainHP;
     if (m_eUIType == UI_MACHINE_ENERGY)
         m_fMachineEnergy = pDesc->fBrainEnergy;
-       
-
 
     return S_OK;
 }
@@ -253,9 +251,6 @@ HRESULT CInGameUI::Render()
 
         if (FAILED(m_pVIBufferCom->Render()))
             return E_FAIL;
-   
-        
-
     }
      return S_OK;
 }
@@ -265,7 +260,6 @@ HRESULT CInGameUI::Render()
 
 HRESULT CInGameUI::Add_Components(_int iNum)
 {
-
     switch (m_eUIType)
     {
     case Client::CInGameUI::UI_SHIFT:
@@ -303,14 +297,11 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
-        
     case Client::CInGameUI::UI_C:
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
-        
-        
     case Client::CInGameUI::UI_DEAD:
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Death"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -341,7 +332,6 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
-        
     case Client::CInGameUI::UI_MACHINE_HP:
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -381,7 +371,6 @@ HRESULT CInGameUI::Add_Components(_int iNum)
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CreditIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
-
         break;
     case Client::CInGameUI::UI_RUN_ICON:
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_RunIcon"),

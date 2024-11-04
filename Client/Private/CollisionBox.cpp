@@ -39,6 +39,21 @@ HRESULT CCollisionBox::Initialize(void* pArg)
 		m_vecPosition = { pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f };
 		XMStoreFloat3(&m_fPickingPos, m_vecPosition);
 		m_iIndexNumber = pDesc->iIndexNumber; // ÀüÃ¼ ÀÎµ¦½º
+
+		if (m_iPointNumber == 0)
+		{
+			m_fClolor = { 255.f,0.f,0.f };
+		}
+		else if (m_iPointNumber == 1)
+		{
+			m_fClolor = { 0.f,255.f,0.f };
+		}
+		else if (m_iPointNumber == 2)
+		{
+			m_fClolor = { 0.f,0.f,255.f };
+		}
+	
+
 	}
 	if (m_eLevel == LEVEL_MONSTERSPAWN)
 	{
@@ -81,20 +96,6 @@ void CCollisionBox::Update(_float fTimeDelta)
 	}
 	if (m_eLevel == LEVEL_NAVIGATION)
 	{
-		if (m_iPointNumber == 0)
-		{
-			m_fClolor = { 255.f,0.f,0.f }; 
-		}
-		else if (m_iPointNumber == 1)
-		{
-			m_fClolor = { 0.f,255.f,0.f };
-		}
-		else if (m_iPointNumber == 2)
-		{
-			m_fClolor = { 0.f,0.f,255.f };
-
-		}
-
 		if (m_bChecking == true)
 		{
 			if (m_fScale.y > 0.7f)
@@ -202,8 +203,8 @@ HRESULT CCollisionBox::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_Color", &m_fClolor, sizeof(_float3))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_Color", &m_fClolor, sizeof(_float3))))
+	//	return E_FAIL;
 
 	return S_OK;
 

@@ -27,6 +27,7 @@ public:
 		_vector* vCameraAt = {};
 		_vector* vCameraPos = {};
 		_uint* iRound = {};
+		_uint iCellIdx{};
 	}PLAYER_DESC;
 
 
@@ -196,7 +197,7 @@ private:
 	_vector					m_vecPivotPos{};
 
 	_uint					m_iWeaponState = WEAPON_RIFLE;
-
+	_uint					m_iCellidx = 0;
 	LEVELID m_eLevelID{};
 private:
 	HRESULT Add_Components();

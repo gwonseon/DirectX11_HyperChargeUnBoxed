@@ -239,6 +239,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar* pLayerTag)
 	Desc.vCameraAt = m_pCamera->Get_Camera_At();
 	Desc.vCameraPos = m_pCamera->Get_Camera_Pos();
 	Desc.iRound = &m_iCurrentRound;
+	Desc.iCellIdx = 7;
+	Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
+	// 7; 인덱스번호   플레이어 이니셜라이즈에서 저장하고 , 여기서 보내주는 방식으로 다 바꿔 위치도
+	//Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(386.295f, 1.f, 450.425f, 1.f));
 	Desc.m_eLevelID = LEVEL_GAMEPLAY;
 	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
 	m_pPlayer = static_cast<CPlayer*>(pPlayer);
@@ -880,14 +885,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	Desc.fY = g_iWinSizeY * 0.5f;
 	Desc.fSizeX = 20.f;
 	Desc.fSizeY = 20.f;
-	Desc.iData = 10;
 	Desc.fDepth = 0.1f;
+	Desc.iData = 0;
 	Desc.eLevel = LEVEL_GAMEPLAY;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CrossLine"), &Desc)))
 		return E_FAIL;
-
-	
-
 
 	CInGameUI::INGAMEUI_DESC	pDesc9{};
 	pDesc9.eLevel = LEVEL_GAMEPLAY;
