@@ -26,6 +26,7 @@ HRESULT CUI_CircleGuage::Initialize(void* pArg)
 	m_pvecTrap_Marks = pDesc->vecMarks;
 	m_pEnergy_Machine = pDesc->pEnergy_Machine;
 	m_pEnergyMachine_Cap = pDesc->pEnergyMachine_Cap;
+	m_eLevel = pDesc->eLevel;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -166,7 +167,7 @@ HRESULT CUI_CircleGuage::Render()
 
 HRESULT CUI_CircleGuage::Add_Components(_int iNum)
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CircleGuage"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CircleGuage"),
 		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
 		return E_FAIL;
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCircleGuage"),

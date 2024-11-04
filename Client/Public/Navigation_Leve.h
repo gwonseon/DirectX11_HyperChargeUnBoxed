@@ -45,7 +45,7 @@ private:
 	CTerrain* m_pTerrain;
 	_bool bAble_Select = true;
 	_float3 m_fPickingPos{};
-
+	LEVELID m_eLevel = LEVEL_YARD;
 private:
 	XMFLOAT3		vPoints[3];
 	float			fPoints[3];

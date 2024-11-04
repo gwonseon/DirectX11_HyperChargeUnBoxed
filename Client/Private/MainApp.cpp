@@ -39,6 +39,7 @@ HRESULT CMainApp::Initialize()
 	EngineDesc.iWinSizeY = g_iWinSizeY;
 	EngineDesc.iNumLevels = LEVEL_END;
 
+
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
@@ -182,14 +183,20 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCircle_Gauge.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
-	// 네비게이션
+	// 네비게이션_ 튜토리얼맵 (LEVEL_GamePlay)
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation")) == nullptr)
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
 			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
 			return E_FAIL;
 	}
-
+	// 네비게이션_ 마당맵 (LEVEL_YARD)
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation_Yard")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation_Yard.dat")))))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 

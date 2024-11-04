@@ -86,6 +86,9 @@ private:
 	_bool	m_bBattery_Insert = false;
 	_bool	m_bBattery_Insert_End = false;
 	_bool	m_bBattery_Insert_First = false;
+
+	LEVELID m_eLevel{};
+
 public:
 	static CUI_CircleGuage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

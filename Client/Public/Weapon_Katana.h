@@ -16,6 +16,7 @@ class CWeapon_Katana final : public CPartObject
 public:
 	typedef struct : CPartObject::PARTOBJECT_DESC
 	{
+		LEVELID m_eLevelID{};
 		const _uint* pParentState = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr };
 	}KATANA_DESC;
@@ -59,6 +60,8 @@ private:
 	_bool m_bKatanaState{};
 
 	_uint* m_iViewState{};
+
+	LEVELID m_eLevelID{};
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

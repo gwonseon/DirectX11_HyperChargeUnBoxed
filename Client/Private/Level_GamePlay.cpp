@@ -23,7 +23,7 @@
 #include "Alien.h"
 #include "Pony.h"
 
-
+#include "Sky.h"
 
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -79,6 +79,7 @@ HRESULT CLevel_GamePlay::Initialize()
 		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
 		m_pRound[i]->Set_BrainCoreWorld_matrix(m_pBrain->Get_Transform()->Get_WorldMatrixPtr());
 		m_pRound[i]->Set_PlayerWorld_matrix(m_pPlayer->Get_Transform()->Get_WorldMatrixPtr());
+
 	}
 #pragma endregion ¶ó¿îµå
 
@@ -117,6 +118,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // Ä®ÀÌ¶û ¸ó½ºÅÍ
 	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
 	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
+	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
 
 
 #pragma endregion Collision	
@@ -222,8 +224,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"),&pDesc)))
 		return E_FAIL;
 
+	CSky::SKY_DESC pSky{};
+	pSky.m_eLevel = LEVEL_GAMEPLAY;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-		TEXT("Prototype_GameObject_Sky"))))
+		TEXT("Prototype_GameObject_Sky"),&pSky)))
 		return E_FAIL;
 
 	return S_OK;
@@ -235,6 +239,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar* pLayerTag)
 	Desc.vCameraAt = m_pCamera->Get_Camera_At();
 	Desc.vCameraPos = m_pCamera->Get_Camera_Pos();
 	Desc.iRound = &m_iCurrentRound;
+	Desc.m_eLevelID = LEVEL_GAMEPLAY;
 	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
 	m_pPlayer = static_cast<CPlayer*>(pPlayer);
 
@@ -484,14 +489,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Trap(const _tchar* pLayerTag)
 
 
 #pragma endregion ÅÊÅ©Æ®·¦
-	/*
-	Cell : 143
-485.692     0     437.152
-Cell : 74
-440.698     0     428.292
-Cell : 33
-440.114     0     520.027
-	*/
+
+
+
+
+
+
 	return S_OK;
 }
 
@@ -879,6 +882,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	Desc.fSizeY = 20.f;
 	Desc.iData = 10;
 	Desc.fDepth = 0.1f;
+	Desc.eLevel = LEVEL_GAMEPLAY;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CrossLine"), &Desc)))
 		return E_FAIL;
 

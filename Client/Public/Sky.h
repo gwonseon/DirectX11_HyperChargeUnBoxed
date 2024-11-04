@@ -13,6 +13,12 @@ BEGIN(Client)
 
 class CSky final : public CGameObject
 {
+public:
+	typedef struct : public CGameObject::GAMEOBJ_DESC
+	{
+		LEVELID m_eLevel{};
+
+	}SKY_DESC;
 private:
 	CSky(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CSky(const CSky& Prototype);
@@ -36,6 +42,9 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
+
+private:
+	LEVELID m_eLevel{};
 
 public:
 	static CSky* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

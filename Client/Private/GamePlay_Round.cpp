@@ -4,6 +4,8 @@
 #include "Helicopter.h"
 #include "Alien.h"
 #include "Pony.h"
+#include "Blimp.h"
+#include <RifleMan.h>
 
 CGamePlay_Round::CGamePlay_Round(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel_GamePlay{ pDevice, pContext }
@@ -44,8 +46,8 @@ void CGamePlay_Round::Update(_float fTimeDelta)
 	// 지금 라운드와 이 객체의 라운드가 일치할 때 생성이 된다.
 	if (m_iMyRound == m_iCurrentRound)
 	{
-		// 필드에 남은 몬스터가 2마리 밑이고 만들 수 있는 몬스터가 더 있을 때
-		if (m_iCurrent_RemainMonster < 3 && m_iMonsterCount > 0 && fRound_Time > 0.f)
+		// 필드에 남은 몬스터가 5마리 밑이고 만들 수 있는 몬스터가 더 있을 때
+		if (m_iCurrent_RemainMonster < 5 && m_iMonsterCount > 0 && fRound_Time > 0.f)
 		{
 			if (fCreate_Time >= 2.f) // 2초마다 1마리씩 생성
 			{
@@ -75,8 +77,7 @@ void CGamePlay_Round::Update(_float fTimeDelta)
 
 	// 현재 라운드의 시간만 증가됨
 	fRound_Time += fTimeDelta;
-	m_iCurrent_RemainMonster; // 지금 남은 몬스터
-	m_iMonsterCount; // 이번 라운드에서 생성할 몬스터 수
+
 }
 
 void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
@@ -85,6 +86,8 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 	CHelicopter::HELICOPTER_DESC Helicopter_Desc{};
 	CAlien::ALIEN_DESC Alien_Desc{};
 	CPony::PONY_DESC Pony_Desc{};
+	CRifleMan::RIFLEMAN_DESC pRifleMan{};
+	CBlimp::BLIMP_DESC pBlimp{};
 
 	ANIMMODEL_INDEX eModel = m_vecMonsterCreate.front().eModelIndex;
 	switch (eModel)
@@ -94,6 +97,8 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Helicopter_Desc.vecTargetPos = vecBrainPos;
 		Helicopter_Desc.eID = LEVEL_GAMEPLAY;
 		Helicopter_Desc.fPosition = m_vecMonsterCreate.front().fPos;
+		Helicopter_Desc.pBuild = m_pBrain;
+
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Helicopter"), &Helicopter_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 		break;
@@ -132,13 +137,53 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Pony_Desc.pPlayer = m_pPlayer;
 		Pony_Desc.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
 		Pony_Desc.pTrapLayer = m_pTrapLeyer;
+		Pony_Desc.m_pBuild = m_pBrain;
+
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"), TEXT("Prototype_GameObject_Pony"), &Pony_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
+		break;
+	}
+	case Client::ANIM_RIFLEMAN:
+	{
+		pRifleMan.fPosition = m_vecMonsterCreate.front().fPos;
+		pRifleMan.vecTargetPos = vecBrainPos;
+		pRifleMan.pTrapLayer = m_pTrapLeyer;
+		pRifleMan.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
+		pRifleMan.pPlayer = m_pPlayer;
+		pRifleMan.eID = LEVEL_GAMEPLAY;
+		pRifleMan.matPlayerWorld = matPlayerWorld;
+		pRifleMan.matBrainCoreWorld = matBrainCoreWorld;
+		pRifleMan.m_pBuild = m_pBrain;
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_RifleMan"), &pRifleMan);
+		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
+
+		break;
+	}
+
+	case Client::ANIM_BLIMP:
+	{
+		pBlimp.fPosition = m_vecMonsterCreate.front().fPos;
+		pBlimp.vecTargetPos = vecBrainPos;
+		pBlimp.pTrapLayer = m_pTrapLeyer;
+		pBlimp.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
+		pBlimp.pPlayer = m_pPlayer;
+		pBlimp.eID = LEVEL_GAMEPLAY;
+		pBlimp.matPlayerWorld = matPlayerWorld;
+		pBlimp.matBrainCoreWorld = matBrainCoreWorld;
+		pBlimp.pBuild = m_pBrain;
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Blimp"), &pBlimp);
+		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
+
 		break;
 	}
 	default:
 		break;
 	}
+
+
+	/*
+
+	*/
 }
 
 CGamePlay_Round* CGamePlay_Round::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iRound)

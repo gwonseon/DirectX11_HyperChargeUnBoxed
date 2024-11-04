@@ -92,7 +92,7 @@ HRESULT CBrainCore::Add_Components()
 
 	AABBDesc.vExtents = _float3(1.f, 2.5f, 1.f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y , 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
 		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 

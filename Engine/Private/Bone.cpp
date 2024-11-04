@@ -111,7 +111,7 @@ HRESULT CBone::Initialize(_uint iParentBoneIndex, HANDLE hFileRead)
 	char* szName = new char[iBoneNameLen + 1];
 	ReadFile(hFileRead, szName, iBoneNameLen * sizeof(_char), &dwByte, nullptr);
 	szName[iBoneNameLen] = '\0'; 
-	// cout << szName << endl;
+	cout << szName << endl;
 	strcpy_s(m_szName, szName);  
 	delete[] szName;
 

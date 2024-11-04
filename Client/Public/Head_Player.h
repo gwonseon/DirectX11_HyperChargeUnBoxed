@@ -15,6 +15,7 @@ class CHead_Player final : public CPartObject
 public:
 	typedef struct : CPartObject::PARTOBJECT_DESC
 	{
+		LEVELID m_eLevelID{};
 		const _uint* pParentState = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr };
 		_uint* m_iWeaponState{};
@@ -62,7 +63,7 @@ private:
 	_uint* m_iViewState{};
 	_float3 Position{}, Rotation{};
 	_float		m_fAngle_Y{};
-
+	LEVELID m_eLevelID{};
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };

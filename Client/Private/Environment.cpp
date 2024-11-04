@@ -98,9 +98,21 @@ HRESULT CEnvironment::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 			return E_FAIL;
-	
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
+		if (m_iModelIndex == 84 + ENVIRONMENT_EA ||
+			m_iModelIndex == 91 + ENVIRONMENT_EA ||
+			m_iModelIndex == 116 + ENVIRONMENT_EA||
+			m_iModelIndex == 142 + ENVIRONMENT_EA||
+			m_iModelIndex == 143 + ENVIRONMENT_EA||
+			m_iModelIndex == 152 + ENVIRONMENT_EA)
+		{
+			if (FAILED(m_pShaderCom->Begin(2)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pShaderCom->Begin(0)))
+				return E_FAIL;
+		}
 
 		m_pModelCom->Render(i);
 	}
@@ -124,14 +136,12 @@ void CEnvironment::Picking()
 
 HRESULT CEnvironment::Add_Components()
 {
+
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-	if (m_eLevel == LEVEL_IMGUI)
-	{
 	
-	}
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
 	/* For.Com_Model */

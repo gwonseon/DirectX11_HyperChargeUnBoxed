@@ -15,6 +15,7 @@ class CPlayer_FPS : public CPartObject
 public:
 	typedef struct : CPartObject::PARTOBJECT_DESC
 	{
+		LEVELID m_eLevelID{};
 		const _uint* pParentState = { nullptr };
 
 	}FPS_PLAYER_DESC;
@@ -113,7 +114,7 @@ private:
 
 	_uint	m_iWeaponState = 0;
 	WEAPONSTATE m_eWeapon{}; // 스위치문 편하게 만드려고
-
+	LEVELID m_eLevelID{};
 
 	// 점프
 public:

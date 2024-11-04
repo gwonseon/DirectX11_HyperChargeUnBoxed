@@ -31,7 +31,8 @@ HRESULT CBullet::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-
+    m_bCanAttacked = true;
+    m_bIsBullet = true;
     m_fBullet_Move = 0.f;
     iRand = 2;
     m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);

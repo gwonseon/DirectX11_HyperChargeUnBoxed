@@ -131,7 +131,7 @@ void CTank::Update(_float fTimeDelta)
 			Desc.eType = CMonster_Bullet::TANK_BULLET;
 			Desc.vTargetPos = *m_vecTargetPos;
 			Desc.m_pBuild =  m_pBuild;
-			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
 		}
 		m_pTransformCom->LookAt(*m_vecTargetPos);
 
@@ -188,7 +188,7 @@ HRESULT CTank::Add_Components()
 	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
 	SphereDesc.fRadius = 1.7f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 
@@ -196,10 +196,26 @@ HRESULT CTank::Add_Components()
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
 	Desc.iCurrentCellIndex = m_iCell_Idx;
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
-		return E_FAIL;
+	switch (m_eLevel)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			return E_FAIL;
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			return E_FAIL;
+		break;
+	}
 
+	default:
+		break;
+	}
 
 
 	return S_OK;

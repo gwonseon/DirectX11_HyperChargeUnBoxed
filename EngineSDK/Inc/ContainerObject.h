@@ -9,7 +9,7 @@ class ENGINE_DLL CContainerObject abstract : public CGameObject
 public:
 	typedef struct : CGameObject::GAMEOBJ_DESC
 	{
-	
+		
 		_uint	iNumPartObjects;
 	}CONTAINEROBJECT_DESC;
 

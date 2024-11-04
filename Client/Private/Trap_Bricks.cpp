@@ -80,6 +80,8 @@ void CTrap_Bricks::Priority_Update(_float fTimeDelta)
 
 void CTrap_Bricks::Update(_float fTimeDelta)
 {
+	if (m_bDead)
+		return;
 	// 건설되었을 때
 	if(*m_bBuild == true)
 	{
@@ -170,7 +172,7 @@ HRESULT CTrap_Bricks::Add_Components()
 		AABBDesc.vExtents = _float3(0.6f, 0.6f, 0.6f);
 
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
 		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 

@@ -20,19 +20,13 @@ HRESULT CCrossLine::Initialize_Prototype()
 
 HRESULT CCrossLine::Initialize(void* pArg)
 {
-	UIOBJECT_DESC			Desc{};
+
 	UIOBJECT_DESC* pDesc = (UIOBJECT_DESC*)pArg;
-	Desc.fX = pDesc->fX;
-	Desc.fY = pDesc->fY;
-	Desc.fSizeX = pDesc->fSizeX;
-	Desc.fSizeY = pDesc->fSizeY;
+	pDesc->fSpeedPerSec = 0.f;
+	pDesc->fRotationPerSec = 0.f;
+	m_eLevel = pDesc->eLevel;
 
-	Desc.iData = pDesc->iData;
-	Desc.fSpeedPerSec = 0.f;
-	Desc.fRotationPerSec = 0.f;
-
-
-	if (FAILED(__super::Initialize(&Desc)))
+	if (FAILED(__super::Initialize(&pDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
@@ -79,7 +73,7 @@ HRESULT CCrossLine::Render()
 
 HRESULT CCrossLine::Add_Components()
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Logo2"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Logo2"),
 		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
 		return E_FAIL;
 

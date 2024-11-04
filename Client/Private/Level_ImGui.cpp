@@ -16,6 +16,7 @@ CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_ImGui::Initialize()
 {
 	ShowCursor(true);
+	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;  // 플레이어 생성
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 카메라 생성
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))			return E_FAIL;	// 몬스터
@@ -241,7 +242,6 @@ HRESULT CLevel_ImGui::Render()
 	if (ImGui::ImageButton("Save", my_Savetexture, ImVec2(50, 50), ImVec2(0, 0)))
 	{
 		Save = true;
-		
 	}
 	ImGui::SameLine();
 	if (ImGui::ImageButton("Load", my_Loadtexture, ImVec2(50, 50), ImVec2(0, 0)))
@@ -278,6 +278,7 @@ HRESULT CLevel_ImGui::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID= LEVEL_IMGUI;
+	pDesc.eTargetID = m_eID;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_Terrain_ImGui"), &pDesc)))
 		return E_FAIL;
 	return S_OK;
@@ -475,6 +476,7 @@ void CLevel_ImGui::Object_Build()
 	ImGui::Text("CollisionBox");
 	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
 	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
+
 
 	// 모델 선택창
 	ImGui::Text(" ");
@@ -792,14 +794,35 @@ HRESULT CLevel_ImGui::Environment_DataChange(_float fTimeDelta)
 }
 void CLevel_ImGui::Environment_Save()
 {
-	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Save Environment File Creation Failed", L"Error", MB_OK);
-		return;
-	}
+		case Client::LEVEL_GAMEPLAY:
+		{
+			 hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
+			if (INVALID_HANDLE_VALUE == hFile)
+			{
+				MessageBox(NULL, L"Save Environment File Creation Failed", L"Error", MB_OK);
+				return;
+			}
+		}
+			break;
+		case Client::LEVEL_YARD:
+		{
+			 hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+			if (INVALID_HANDLE_VALUE == hFile)
+			{
+				MessageBox(NULL, L"Save Environment_Yard File Creation Failed", L"Error", MB_OK);
+				return;
+			}
+		}
+			break;
+		default:
+			break;
+	}
+	
 	DWORD dwByte = 0;
 	_float3 fPos;
 	for (auto& environment : m_vecEnvironment)
@@ -839,17 +862,50 @@ void CLevel_ImGui::Environment_Save()
 	}
 
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+		break;
+	case Client::LEVEL_YARD:
+		MessageBox(NULL, L"Environment_Yard Saved Successfully", L"Success", MB_OK);
+		break;
+	
+	default:
+		break;
+	}
 
 	sort(m_vecModelIndex.begin(), m_vecModelIndex.end());
 	vector<_int>::iterator iter = unique(m_vecModelIndex.begin(), m_vecModelIndex.end());
 	m_vecModelIndex.erase(iter, m_vecModelIndex.end());
 
-	HANDLE hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hIndexFile{}; 
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
+		break;
+	case Client::LEVEL_YARD:
+		hIndexFile = CreateFile(L"../Bin/Data/GameYardLevel_Env_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		break;
+	default:
+		break;
+	}
 	if (INVALID_HANDLE_VALUE == hIndexFile)
 	{
-		MessageBox(NULL, L"Save GamePlayLevel_Env_Index File Creation Failed", L"Error", MB_OK);
+		switch (m_eID)
+		{
+		case Client::LEVEL_GAMEPLAY:
+			MessageBox(NULL, L"Save GamePlayLevel_Env_Index File Creation Failed", L"Error", MB_OK);
+
+			break;
+		case Client::LEVEL_YARD:
+			MessageBox(NULL, L"Save GameYardLevel_Env_Index File Creation Failed", L"Error", MB_OK);
+			break;
+		default:
+			break;
+		}
 		return;
 	}
 
@@ -861,7 +917,19 @@ void CLevel_ImGui::Environment_Save()
 	}
 
 	CloseHandle(hIndexFile);
-	MessageBox(NULL, L"GamePlayLevel_Env_Index Saved Successfully", L"Success", MB_OK);
+
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		MessageBox(NULL, L"GamePlayLevel_Env_Index Saved Successfully", L"Success", MB_OK);
+
+		break;
+	case Client::LEVEL_YARD:
+		MessageBox(NULL, L"GameYardLevel_Env_Index Saved Successfully", L"Success", MB_OK);
+		break;
+	default:
+		break;
+	}
 
 
 
@@ -874,13 +942,33 @@ void CLevel_ImGui::Environment_Load()
 	}
 	m_vecEnvironment.clear();
 	m_iEnvironment_Count = 0;
-	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		 hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		 hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Environment_Yard File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_int  iModelIndex;
@@ -942,7 +1030,17 @@ void CLevel_ImGui::Environment_Load()
 	}
 
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Environment Loaded Successfully", L"Success", MB_OK);
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		MessageBox(NULL, L"Environment Loaded Successfully", L"Success", MB_OK);
+		break;
+	case Client::LEVEL_YARD:
+		MessageBox(NULL, L"Environment_Yard Loaded Successfully", L"Success", MB_OK);
+		break;
+	default:
+		break;
+	}
 }
 
 HRESULT CLevel_ImGui::Environment_Select()
@@ -1198,12 +1296,34 @@ HRESULT CLevel_ImGui::Build_DataChange(_float fTimeDelta)
 
 void CLevel_ImGui::Build_Save()
 {
-	HANDLE hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Save Build File Creation Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Save Build File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Save Build_Yard File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	
 	DWORD dwByte = 0;
 	_float3 fPos;
 	for (auto& pBuild : m_vecBuild)
@@ -1242,19 +1362,52 @@ void CLevel_ImGui::Build_Save()
 		}
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Build Saved Successfully", L"Success", MB_OK);
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"Build Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"Build_Yard Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
 
 	sort(m_vecBuildIndex.begin(), m_vecBuildIndex.end());
 	vector<_int>::iterator iter = unique(m_vecBuildIndex.begin(), m_vecBuildIndex.end());
 	m_vecBuildIndex.erase(iter, m_vecBuildIndex.end());
-
-	HANDLE hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (INVALID_HANDLE_VALUE == hIndexFile)
+	HANDLE hIndexFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Save GamePlayLevel_Build_Index File Creation Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hIndexFile)
+		{
+			MessageBox(NULL, L"Save GamePlayLevel_Build_Index File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		hIndexFile = CreateFile(L"../Bin/Data/GameYardLevel_Build_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hIndexFile)
+		{
+			MessageBox(NULL, L"Save GameYardLevel_Build_Index File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+	
 
 	dwByte = 0;
 
@@ -1266,7 +1419,21 @@ void CLevel_ImGui::Build_Save()
 	}
 
 	CloseHandle(hIndexFile);
-	MessageBox(NULL, L"GamePlayLevel_Build_Index Saved Successfully", L"Success", MB_OK);
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"GamePlayLevel_Build_Index Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"GameYardLevel_Build_Index Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
 
 
 }
@@ -1281,12 +1448,34 @@ void CLevel_ImGui::Build_Load()
 
 
 	m_iBuild_Count = 0;
-	HANDLE hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		 hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		 hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Build_Yard File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_int  iModelIndex;
@@ -1339,7 +1528,23 @@ void CLevel_ImGui::Build_Load()
 	}
 
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Build Loaded Successfully", L"Success", MB_OK);
+
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"Build Loaded Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"Build_Yard Loaded Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
+
 }
 
 HRESULT CLevel_ImGui::Build_Select()
@@ -1381,7 +1586,6 @@ HRESULT CLevel_ImGui::Build_Select()
 				CollisionBox_Scale[0] = fBoxSize.x;				CollisionBox_Scale[1] = fBoxSize.y;				CollisionBox_Scale[2] = fBoxSize.z;
 
 				bAble_Select = false;
-
 				
 			}
 			pBuild->Set_PickingCheck(bPickCheck);
@@ -1459,12 +1663,34 @@ HRESULT CLevel_ImGui::Item_DataChange(_float fTimeDelta)
 
 void CLevel_ImGui::Item_Save()
 {
-	HANDLE hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Save Coin File Creation Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Save Coin File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		hFile = CreateFile(L"../Bin/Data/Coin_Yard.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Save Coin_Yard File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+
 	DWORD dwByte = 0;
 	_float3 fPos;
 	for (auto& pCoin : m_vecCoin)
@@ -1482,7 +1708,23 @@ void CLevel_ImGui::Item_Save()
 		}
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Coin Saved Successfully", L"Success", MB_OK);
+
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"Coin Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"Coin_Yard Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
+
 
 }
 
@@ -1496,12 +1738,33 @@ void CLevel_ImGui::Item_Load()
 
 
 	m_iCoin_Count = 0;
-	HANDLE hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eID)
 	{
-		MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		 hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
+			return;
+		}		
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		 hFile = CreateFile(L"../Bin/Data/Coin_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Coin_Yard File Failed", L"Error", MB_OK);
+			return;
+		}		
+		break;
+	}
+	default:
+		break;
+	}
+	
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_float3 fPos{}, fScale{};
@@ -1531,7 +1794,23 @@ void CLevel_ImGui::Item_Load()
 	}
 
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Coin Loaded Successfully", L"Success", MB_OK);
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"Coin Loaded Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"Coin_Yard Loaded Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
+
+
 }
 
 HRESULT CLevel_ImGui::Item_Select()
@@ -1629,9 +1908,7 @@ HRESULT CLevel_ImGui::Ready_Layer_Monster(const _tchar* pLayerTag)
 
 HRESULT CLevel_ImGui::Ready_Layer_Player(const _tchar* pLayerTag)
 {
-	//CGameObject::GAMEOBJ_DESC Desc{};
-	//CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
-	//m_pPlayer = static_cast<CPlayer*>(pPlayer);
+
 	return S_OK;
 }
 

@@ -88,6 +88,7 @@ public:
 	void Go_Straight_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Backward_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 
+	void Go_Straight_Nav_Type2(_float fTimeDelta,_vector vPos, class CNavigation* pNavigation = nullptr);
 
 	_float Cal_Distance(_float3 fObj, _float3 fTarget);
 	_float Cal_Distance_vec(_vector vObj, _vector vTarget);

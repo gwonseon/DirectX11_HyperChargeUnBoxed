@@ -30,7 +30,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_pSocketMatrix = pDesc->pSocketMatrix;
 	m_vecCameraAt = pDesc->vCameraAt;
 	m_vecCameraPos = pDesc->vCameraPos;
-
+	m_eLevelID = pDesc->m_eLevelID;
 	m_bReloading = pDesc->bReload;
 	m_pReloading_Time = pDesc->fReloadingTime;
 	m_iViewState = pDesc->m_iViewState;
@@ -159,8 +159,8 @@ void CWeapon::Late_Update(_float fTimeDelta)
 		
 		Desc.m_vecCameraAt = *m_vecCameraAt;							// ÃÑ¾Ë ±ËÀûÀ» À§ÇÔ
 		Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-		Desc.eID = LEVEL_GAMEPLAY;
-		static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+		Desc.eID = m_eLevelID;
+		static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
 	}
 
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
@@ -196,7 +196,7 @@ HRESULT CWeapon::Add_Components()
 		const _wstring WeaponNumber = Weapon_Component + to_wstring(i);
 		const _wstring WeaponComponentTag_Result = WeaponComponentTag + to_wstring(i);
 
-		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, WeaponNumber,
+		if (FAILED(__super::Add_Component(m_eLevelID, WeaponNumber,
 			WeaponComponentTag_Result, reinterpret_cast<CComponent**>(&m_pModelCom[i]))))
 			return E_FAIL;
 	}

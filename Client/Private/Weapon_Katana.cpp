@@ -25,7 +25,7 @@ HRESULT CWeapon_Katana::Initialize(void* pArg)
 
 	m_pParentState = pDesc->pParentState;
 	m_pSocketMatrix = pDesc->pSocketMatrix;
-
+	m_eLevelID = pDesc->m_eLevelID;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -114,7 +114,7 @@ HRESULT CWeapon_Katana::Add_Components()
 		return E_FAIL;
 
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Model_Weapon8"), TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if (FAILED(__super::Add_Component(m_eLevelID ,TEXT("Prototype_Component_Model_Weapon8"), TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	/* For.Com_Collider_Sphere */
@@ -123,7 +123,7 @@ HRESULT CWeapon_Katana::Add_Components()
 	SphereDesc.fRadius = 0.7f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 

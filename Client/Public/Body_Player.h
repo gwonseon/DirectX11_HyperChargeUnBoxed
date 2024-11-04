@@ -16,6 +16,7 @@ class CBody_Player final : public CPartObject
 public:
 	typedef struct : CPartObject::PARTOBJECT_DESC
 	{
+		LEVELID m_eLevelID{};
 		const _uint* pParentState_Upper = { nullptr };
 		const _uint* pParentState_Lower = { nullptr };
 		_bool* m_bAttackState = { nullptr };
@@ -197,7 +198,7 @@ private:
 	_bool   m_bRunState = false;		// 뛸 때 애니메이션 속도 다르게
 
 	_float3					Rotation{};
-
+	LEVELID m_eLevelID{};
 
 public:
 	_uint* Get_UpperMotion() {	return &m_iUpperMotion;	}

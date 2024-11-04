@@ -2,6 +2,8 @@
 #include "..\Public\Helicopter.h"
 
 #include "GameInstance.h"
+#include <Monster_Bullet.h>
+
 CHelicopter::CHelicopter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
@@ -25,6 +27,7 @@ HRESULT CHelicopter::Initialize(void* pArg)
 	pDesc->fScale = _float3(3.f, 3.f, 3.f);
 
 	m_vecTargetPos = pDesc->vecTargetPos;
+	m_pBuild = pDesc->pBuild;
 	m_iModelIndex = ANIM_HELICOPTER;
 	m_eLevel = pDesc->eID;
 
@@ -60,7 +63,7 @@ void CHelicopter::Update(_float fTimeDelta)
 
 	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, vPos);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(XMVectorGetX(vPos), 20.f, XMVectorGetZ(vPos),1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos = XMVectorSet(XMVectorGetX(vPos), 20.f, XMVectorGetZ(vPos),1.f));
 
 	if (fDistance >= 350.f)
 	{
@@ -77,6 +80,34 @@ void CHelicopter::Update(_float fTimeDelta)
 		{
 			
 			m_fRotation += fTimeDelta * 20.f;
+		}
+		else // 다 돌았을 때
+		{
+			// 총알 생성 
+			// 몇 초에 한 번씩 총알이 생성되게 만들면 되지 않을까 
+			if (m_fShot_Time_Delay >= 4.f)
+			{
+				if(m_iShot_Count < 3)
+				{
+					_float3 fPos{};
+					XMStoreFloat3(&fPos, vPos);
+					CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
+					Desc.eID = m_eLevel;
+					Desc.fPosition = fPos;
+					Desc.m_iModelNumber = 1;
+					Desc.eType = CMonster_Bullet::HELICOPTER_BULLET;
+					Desc.vTargetPos = *m_vecTargetPos;
+					Desc.m_pBuild = m_pBuild;
+					static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+					m_iShot_Count++;
+				}
+				else
+				{
+					m_fShot_Time_Delay = 0.f;
+					m_iShot_Count = 0;
+				}
+			}
+			m_fShot_Time_Delay += fTimeDelta;
 		}
 			
 		m_pTransformCom->Rotation(0.f, XMConvertToRadians(m_fRotation), 0.f);
@@ -135,7 +166,7 @@ HRESULT CHelicopter::Add_Components()
 	SphereDesc.fRadius = 1.2f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 	return S_OK;

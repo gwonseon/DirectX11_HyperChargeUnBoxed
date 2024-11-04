@@ -27,6 +27,10 @@ HRESULT CPlayer::Initialize(void* pArg)
 	Desc.fSpeedPerSec = 25.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.f);
 	Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
+	
+	PLAYER_DESC* pPlayer = static_cast<PLAYER_DESC*>(pArg);
+	m_eLevelID = pPlayer->m_eLevelID;
+	
 	m_fMouseSensor = 0.1f;
 	PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
 	m_vecCameraAt = pDesc->vCameraAt;
@@ -36,6 +40,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
+
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	if (FAILED(Add_PartObjects()))
@@ -224,11 +229,27 @@ HRESULT CPlayer::Add_Components()
 
 	Desc.iCurrentCellIndex = 7;
 
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
-		return E_FAIL;
+	switch (m_eLevelID)
+	{
 
-	
+	case Client::LEVEL_GAMEPLAY:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			return E_FAIL;
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			return E_FAIL;
+		break;
+	}
+
+	default:
+		break;
+	}
 
 	return S_OK;
 }
@@ -243,6 +264,7 @@ HRESULT CPlayer::Add_PartObjects()
 	BodyDesc.pParentState_Lower = &m_iState_Lower;
 	BodyDesc.m_iViewState = &m_iViewState;
 	BodyDesc.m_bAttackState = &m_bAttackState;
+	BodyDesc.m_eLevelID = m_eLevelID;
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"), TPS_PART_BODY, &BodyDesc)))
 		return E_FAIL;
 
@@ -257,7 +279,8 @@ HRESULT CPlayer::Add_PartObjects()
 	HeadDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("chest_SKEL");
 	HeadDesc.m_iViewState = &m_iViewState;
 	HeadDesc.m_iWeaponState = &m_iWeaponState;
-		/*head_SKEL*/
+	HeadDesc.m_eLevelID = m_eLevelID;
+	/*head_SKEL*/
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Head_Player"), TPS_PART_HEAD, &HeadDesc)))
 		return E_FAIL;
 	
@@ -273,6 +296,7 @@ HRESULT CPlayer::Add_PartObjects()
 	WeaponDesc.bShotStart =  Get_ShotStart();
 	WeaponDesc.bReload = &m_bReloading;
 	WeaponDesc.fReloadingTime = &m_fReload_Charging;
+	WeaponDesc.m_eLevelID = m_eLevelID;
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Weapon"), TPS_PART_WEAPON, &WeaponDesc)))
 		return E_FAIL;
 
@@ -283,6 +307,7 @@ HRESULT CPlayer::Add_PartObjects()
 	KatanaDesc.pParentState = &m_iState_Upper;
 	KatanaDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	KatanaDesc.m_iViewState = &m_iViewState;
+	KatanaDesc.m_eLevelID = m_eLevelID;
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Katana"), TPS_PART_KATANA, &KatanaDesc)))
 		return E_FAIL;
 
@@ -293,6 +318,7 @@ HRESULT CPlayer::Add_PartObjects()
 	PivotDesc.pParentState = &m_iState_Upper;
 	PivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	PivotDesc.m_iViewState = &m_iViewState;
+	
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Pivot"), TPS_PART_PIVOT, &PivotDesc)))
 		return E_FAIL;
 

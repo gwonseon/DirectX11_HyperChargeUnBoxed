@@ -162,9 +162,19 @@ void CCollisionMgr::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _
 					// 충돌 비교
 					if (pSrcCol->Intersect(pTarget))
 					{
+						if(pDst->Get_CanAttacked() == true)
+						{
+							pSrc->Set_Damaged(pDst->Get_Attack()); // 가해자 공격력만큼 피 깎음(Set_Damage 내부에서 에너지량에 따라 데미지 입힘)
+							pDst->Set_CanAttacked(false);
+						}
 						pSrc->Set_Attacked(true); // 공격 당했음을 알림
-						pSrc->Set_Damaged(pDst->Get_Attack()); // 가해자 공격력만큼 피 깎음(Set_Damage 내부에서 에너지량에 따라 데미지 입힘)
-						pDst->Set_Dead(); // 총알 없앰
+							
+						// 총알 일 때
+						if(pDst->Get_IsBullet() == true)
+						{
+							pDst->Set_Dead(); // 총알 없앰
+						}
+						
 						// HP가 0일 때
 						if (pSrc->Get_Hp() <= 0.f)
 						{
