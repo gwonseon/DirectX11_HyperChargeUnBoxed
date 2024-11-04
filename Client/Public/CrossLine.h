@@ -52,7 +52,7 @@ private:
 
 private:
 	_int iChangeNum = 0;
-
+	LEVELID m_eLevel{};
 public:
 	static CCrossLine* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

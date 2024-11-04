@@ -169,6 +169,17 @@ void CTransform::Go_Backward_Nav(_float fTimeDelta, CNavigation* pNavigation)
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
+void CTransform::Go_Straight_Nav_Type2(_float fTimeDelta, _vector vPos, CNavigation* pNavigation)
+{
+	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
+	_vector vecSlidingPos{};
+	if (nullptr != pNavigation && false == pNavigation->isMove(vPos, vCurrentPos, vecSlidingPos))
+	{
+		vPos = vecSlidingPos;
+	}
+	Set_State(CTransform::STATE_POSITION, vPos);
+}
+
 void CTransform::Go_Right_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vRight = Get_State(CTransform::STATE_RIGHT);

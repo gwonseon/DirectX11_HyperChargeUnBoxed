@@ -26,6 +26,10 @@ HRESULT CTerrain::Initialize(void* pArg)
 {
 	TERRAIN_DESC* pDesc = static_cast<TERRAIN_DESC*>(pArg);
 	m_eLevel = pDesc->eID;
+	if(m_eLevel == LEVEL_IMGUI || m_eLevel == LEVEL_NAVIGATION || m_eLevel == LEVEL_MONSTERSPAWN)
+	{
+		m_eTargetID = pDesc->eTargetID;
+	}
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
@@ -147,10 +151,101 @@ HRESULT CTerrain::Add_Components()
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
-	/* For.Com_Navigation */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
-		return E_FAIL;
+	switch (m_eLevel)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			return E_FAIL;
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			return E_FAIL;
+		break;
+	}
+	case Client::LEVEL_IMGUI:
+	{
+		switch (m_eTargetID)
+		{
+
+		case Client::LEVEL_GAMEPLAY:
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+				return E_FAIL;
+			break;
+		}
+		case Client::LEVEL_YARD:
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+				return E_FAIL;
+			break;
+		}
+
+		default:
+			break;
+		}
+	
+		break;
+	}
+	case Client::LEVEL_NAVIGATION:
+	{
+		switch (m_eTargetID)
+		{
+
+		case Client::LEVEL_GAMEPLAY:
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+				return E_FAIL;
+			break;
+		}
+		case Client::LEVEL_YARD:
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+				return E_FAIL;
+			break;
+		}
+
+		default:
+			break;
+		}
+		break;
+	}
+	case Client::LEVEL_MONSTERSPAWN:
+	{
+		switch (m_eTargetID)
+		{
+		case Client::LEVEL_GAMEPLAY:
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+				return E_FAIL;
+			break;
+		}
+		case Client::LEVEL_YARD:
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+				return E_FAIL;
+			break;
+		}
+
+		default:
+			break;
+		}
+
+		break;
+	}
+	default:
+		break;
+	}
 
 	/* For.Com_Texture_Mask */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain_Mask"),

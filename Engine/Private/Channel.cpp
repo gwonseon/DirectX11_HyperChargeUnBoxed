@@ -308,9 +308,6 @@ _bool CChannel::Update_LinearInterPolation_UpperBody(const vector<class CBone*>&
 
 	_matrix	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
-
-
-
 	if (m_iBoneIndex <= 26)
 		Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformMatrix);
 	if (fTemp_UpperBody >= m_fInterPolation_TargetTime)

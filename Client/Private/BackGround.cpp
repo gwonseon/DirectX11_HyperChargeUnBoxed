@@ -119,6 +119,11 @@ HRESULT CBackGround::Add_Components()
 			TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
 			return E_FAIL;
 		break;
+	case Client::LEVEL_YARD:
+		if (FAILED(__super::Add_Component(LEVEL_YARD, TEXT("Prototype_Component_Texture_Logo"),
+			TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}

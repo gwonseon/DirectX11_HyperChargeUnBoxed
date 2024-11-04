@@ -9,6 +9,7 @@
 #include "Monster_Path.h"
 #include "Navigation_Leve.h"
 #include "BackGround.h"
+#include "Level_Yard.h"
 
 #include "GameInstance.h"
 
@@ -83,7 +84,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
 		case LEVEL_GAMEPLAY:
 			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CLevel_GamePlay::Create(m_pDevice, m_pContext));
 			break;
-
+		case LEVEL_YARD:
+			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CLevel_Yard::Create(m_pDevice, m_pContext));
+			break;
 		case LEVEL_IMGUI:
 			hr = m_pGameInstance->Open_Level(m_eNextLevelID, CLevel_ImGui::Create(m_pDevice, m_pContext));
 			break;

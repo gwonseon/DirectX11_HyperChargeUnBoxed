@@ -163,6 +163,7 @@
     <ClInclude Include="..\Public\Alien.h" />
     <ClInclude Include="..\Public\AttackState_Pony.h" />
     <ClInclude Include="..\Public\Battery.h" />
+    <ClInclude Include="..\Public\Blimp.h" />
     <ClInclude Include="..\Public\BrainCore.h" />
     <ClInclude Include="..\Public\BackGround.h" />
     <ClInclude Include="..\Public\Body_Player.h" />
@@ -185,10 +186,14 @@
     <ClInclude Include="..\Public\Head_Player.h" />
     <ClInclude Include="..\Public\Helicopter.h" />
     <ClInclude Include="..\Public\InGameUI.h" />
+    <ClInclude Include="..\Public\Level_Yard.h" />
     <ClInclude Include="..\Public\Level_ImGui.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Level_Select.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Loading_UI.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -206,6 +211,9 @@
     <ClInclude Include="..\Public\Player_FPS.h" />
     <ClInclude Include="..\Public\Pony.h" />
     <ClInclude Include="..\Public\Pony_State.h" />
+    <ClInclude Include="..\Public\RifleMan.h" />
+    <ClInclude Include="..\Public\RifleMan_Fire.h" />
+    <ClInclude Include="..\Public\RifleMan_Move.h" />
     <ClInclude Include="..\Public\RunState_Pony.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Tank.h" />
@@ -219,6 +227,8 @@
     <ClInclude Include="..\Public\Weapon_Katana.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Pony_Defines.h" />
+    <ClInclude Include="RifleMan_Defines.h" />
+    <ClInclude Include="RifleMan_State.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -228,6 +238,7 @@
     <ClCompile Include="..\Private\AttackState_Pony.cpp" />
     <ClCompile Include="..\Private\BackGround.cpp" />
     <ClCompile Include="..\Private\Battery.cpp" />
+    <ClCompile Include="..\Private\Blimp.cpp" />
     <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\BrainCore.cpp" />
     <ClCompile Include="..\Private\Broken_Bricks.cpp" />
@@ -248,10 +259,14 @@
     <ClCompile Include="..\Private\Head_Player.cpp" />
     <ClCompile Include="..\Private\Helicopter.cpp" />
     <ClCompile Include="..\Private\InGameUI.cpp" />
+    <ClCompile Include="..\Private\Level_Yard.cpp" />
     <ClCompile Include="..\Private\Level_ImGui.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Level_Select.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Loading_UI.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
@@ -268,6 +283,9 @@
     <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />
     <ClCompile Include="..\Private\Pony.cpp" />
+    <ClCompile Include="..\Private\RifleMan.cpp" />
+    <ClCompile Include="..\Private\RifleMan_Fire.cpp" />
+    <ClCompile Include="..\Private\RifleMan_Move.cpp" />
     <ClCompile Include="..\Private\RunState_Pony.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />

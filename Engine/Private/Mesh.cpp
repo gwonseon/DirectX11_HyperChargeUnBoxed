@@ -62,7 +62,7 @@ HRESULT CMesh::Initialize_Prototype_NonAnim(CModel::TYPE eModelType, CModel* pMo
 	delete[] buffer;
 
 	// cout을 통해 문자열 출력
-	// cout << m_szName << endl;
+	cout << m_szName << endl;
 
 
 

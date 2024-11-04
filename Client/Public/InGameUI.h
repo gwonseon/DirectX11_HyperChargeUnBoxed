@@ -101,6 +101,8 @@ private:
 	// 그릴지 안그릴지 결정
 	_bool						m_bDraw = true;
 
+	LEVELID m_eLevel{};
+
 	//  플레이어에게서 가져와야 하는 값이 많아서 플레이어 포인터를 들고옴 ( 아차피 삭제 안됨 ㄱㅊ)
 	CPlayer*					m_pPlayer = { nullptr };
 private:

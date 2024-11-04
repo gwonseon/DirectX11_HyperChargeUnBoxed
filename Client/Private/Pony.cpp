@@ -33,7 +33,9 @@ HRESULT CPony::Initialize(void* pArg)
 	m_eLevel = pDesc->eID;
 	m_matPlayerWorld = pDesc->matPlayerWorld;
 	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
+	m_pBuild = pDesc->m_pBuild;
 
+	m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
 
 	pDesc->fScale = _float3(2.f, 2.f, 2.f);
 	pDesc->fSpeedPerSec = 8.f;
@@ -50,8 +52,8 @@ HRESULT CPony::Initialize(void* pArg)
 	m_fAttack = 10.f;
 
 	m_pModelCom->Set_Animation(0, true);
-
-
+	m_bCanAttacked = true;
+	m_bIsBullet = false;
 	return S_OK;
 }
 
@@ -61,6 +63,17 @@ void CPony::Priority_Update(_float fTimeDelta)
 	vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	XMStoreFloat3(&m_fPos, vPos);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
+
+	// 트랩 데미지 2초에 한 번씩만 줄 수 있게
+	if (m_bCanAttacked == false)
+	{
+		if (m_fAttackTime >= 2.f)
+		{
+			m_bCanAttacked = true;
+			m_fAttackTime = 0.f;
+		}
+		m_fAttackTime += fTimeDelta;
+	}
 }
 
 void CPony::Update(_float fTimeDelta)
@@ -76,7 +89,7 @@ void CPony::Update(_float fTimeDelta)
 	m_pCurrentState->Update(this,fTimeDelta);
 	// 타겟 찾는 시간 딜레이
 	m_fTime_For_Target += fTimeDelta;
-	// 넉백이 True일 때 넉백 모션하게 하기
+	// 넉백이 True일 때 넉백 모션하게 하기, 카타나만
 	if (m_bAttacked == true)
 	{
 		m_fKnockBack_Height = XMVectorGetY(vPos);
@@ -87,7 +100,7 @@ void CPony::Update(_float fTimeDelta)
 
 	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
 	// 사정거리 안에 플레이어가 없으면 
-	if (fDistance > 4000.f)
+	if (fDistance > 3000.f)
 	{
 		if (m_bFind_Path == false)
 		{
@@ -122,11 +135,22 @@ void CPony::Update(_float fTimeDelta)
 			}
 		}
 	
-		if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 100.f)
+		if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 1000.f)
 		{
 			m_pTransformCom->LookAt(*m_vecTargetPos);
 			if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 30.f)
 			{
+				if (m_fAttackTime >= 2.f)
+				{
+					// 2초마다 데미지 주기( 브레인 코어에)
+					_bool bCollision = m_pColliderCom->Intersect(m_pTargetCollider);
+					if (bCollision == true)
+					{
+						m_pBuild->Set_Damaged(m_fAttack);
+						m_fAttackTime = 0.f;
+					}
+				}
+				m_fAttackTime += fTimeDelta;
 				m_ePonyState = ATTACK_STATE;
 				m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * 0.1f, true);
 				m_bAttackState = true;
@@ -198,7 +222,6 @@ void CPony::Update(_float fTimeDelta)
 		}
 	}
 
-	cout << m_pNavigationCom->Get_CurrentCell_Index() << endl;
 	/*
 	// 대각선 거리에 따라 행동 다르게 하기
 	if(fDistance < 5000.f)
@@ -228,13 +251,14 @@ void CPony::Update(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta, false);
 	}
 	*/
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	
 }
 
 void CPony::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 	
+
 	// 넉백이 true일 때 넉백 모션
 	if (m_bKnockBacking == true)
 	{
@@ -296,17 +320,33 @@ HRESULT CPony::Add_Components()
 	SphereDesc.fRadius = 1.5f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
 	Desc.iCurrentCellIndex = m_iCell_Idx;
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
-		return E_FAIL;
+	switch (m_eLevel)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			return E_FAIL;
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			return E_FAIL;
+		break;
+	}
 
+	default:
+		break;
+	}
 	return S_OK;
 }
 

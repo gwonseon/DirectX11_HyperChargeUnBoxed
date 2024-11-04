@@ -15,6 +15,7 @@ class CWeapon final : public CPartObject
 public:
 	typedef struct : CPartObject::PARTOBJECT_DESC
 	{
+		LEVELID m_eLevelID{};
 		const _uint* pParentState = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr };
 		_vector* vCameraAt = { nullptr };
@@ -133,8 +134,7 @@ private:
 
 private:
 
-
-
+	LEVELID m_eLevelID{};
 	_bool		m_bTPSState{};
 	_bool		m_bBulletIn = false;
 

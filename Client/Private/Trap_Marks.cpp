@@ -31,7 +31,7 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 		return E_FAIL;
 	
 	CTrap_Bricks::TRAP_BRICKS_DESC Bricks_Desc{};
-	Bricks_Desc.eID = LEVEL_GAMEPLAY;
+	Bricks_Desc.eID = m_eLevel;
 	Bricks_Desc.fScale = { 5.f,5.f,5.f };
 	Bricks_Desc.pPlayer = m_pPlayer;
 	if (m_eType == BRICKS_TRAP)
@@ -41,8 +41,7 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 	Bricks_Desc.m_bBuild = &m_bBuild;
 	Bricks_Desc.fPosition = pDesc->fPosition;
 	Bricks_Desc.m_bBuild_PreView = &m_bBuild_PreView;
-	m_pBricks = static_cast<CTrap_Bricks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Trap_Shield"), TEXT("Prototype_GameObject_TrapBricks"), &Bricks_Desc));
-	
+	m_pBricks = static_cast<CTrap_Bricks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Trap_Shield"), TEXT("Prototype_GameObject_TrapBricks"), &Bricks_Desc));
 	
 	m_bDraw = true;
 	return S_OK;
@@ -50,8 +49,6 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 
 void CTrap_Marks::Priority_Update(_float fTimeDelta)
 {
-	
-
 	if(m_bBuild == false)
 	{
 		// 위치 비교해서 트랩 설치가 가능한지 확인
@@ -89,7 +86,6 @@ HRESULT CTrap_Marks::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
@@ -102,7 +98,6 @@ HRESULT CTrap_Marks::Render()
 
 		m_pModelCom->Render(i);
 	}
-	
 	return S_OK;
 }
 

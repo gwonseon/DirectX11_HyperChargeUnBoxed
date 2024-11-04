@@ -28,7 +28,7 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_iIndex = pDesc->iIndex;
     m_fUIPosition = { pDesc->fX, pDesc->fY, 0.f};
     m_pPlayer = pDesc->pPlayer;
-   
+    m_eLevel = pDesc->eLevel;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -269,157 +269,157 @@ HRESULT CInGameUI::Add_Components(_int iNum)
     switch (m_eUIType)
     {
     case Client::CInGameUI::UI_SHIFT:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Shift"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Shift"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_RBUTTON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RButton"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_RButton"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_LBUTTON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_LButton"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_LButton"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_SPACE:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Space"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Space"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_V:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_VIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_VIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_F:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_FIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_BUILDMODE_F:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_FIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
         
     case Client::CInGameUI::UI_C:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
         
         
     case Client::CInGameUI::UI_DEAD:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Death"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Death"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_BATTERY:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Battery"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Battery"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_BATTERY_GAGE:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_CHARACTER:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Character"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Character"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_CONVERSATIONBOX:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBackGround"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBackGround"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_BUILDMODE_CONVERSATIONBOX:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBackGround"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBackGround"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
         
     case Client::CInGameUI::UI_MACHINE_HP:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_MACHINE_ENERGY:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_DAMAGED:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIDamaged"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIDamaged"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_PLAYER_ENERGY:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_PLAYER_HP:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBar"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_ENERGY_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_EnergyIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_EnergyIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_HP_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_HpIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_HpIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_CREDIT_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CreditIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CreditIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
 
         break;
     case Client::CInGameUI::UI_RUN_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RunIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_RunIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_JUMP_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_JumpIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_JumpIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_MODECHANGE_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_ModeChangeIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_ModeChangeIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_PUNCH_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_PuchIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_PuchIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_VIEWCHANGE_ICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_ViewChangeIcon"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_ViewChangeIcon"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_CENTERICON:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CenterUI"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CenterUI"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_BULLET:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CenterUI"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CenterUI"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
     case Client::CInGameUI::UI_SLICE:
-        if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Slice"),
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Slice"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;

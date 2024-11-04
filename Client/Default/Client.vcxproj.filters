@@ -184,6 +184,27 @@
     <Filter Include="02. GameObjects\Monster\Pony\PonyState\Run">
       <UniqueIdentifier>{32a41391-cbed-427b-b65c-cd96d989808f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Monster\RifleMan">
+      <UniqueIdentifier>{05a84495-cb99-4a4e-b626-dff4901b9de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\RifleMan\RifleState">
+      <UniqueIdentifier>{c74b7d69-4ebf-4dda-bae0-46ba6dd690ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\RifleMan\RifleState\Move">
+      <UniqueIdentifier>{ef887411-95f8-4219-939d-1c79b8ed578f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\RifleMan\RifleState\Fire">
+      <UniqueIdentifier>{e8c5ff00-902a-49de-ae09-ba464a751aa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Blimp">
+      <UniqueIdentifier>{0cd2b8c8-f6a4-473c-ab3b-a14aa3bbc3c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\Level_Select">
+      <UniqueIdentifier>{77ce3ac7-86a9-4da9-853a-fb5fdf6b9b82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Game_Yard">
+      <UniqueIdentifier>{ef8d556f-7b84-4f02-91db-eec1a6ee363e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -360,6 +381,30 @@
     <ClInclude Include="Pony_Defines.h">
       <Filter>02. GameObjects\Monster\Pony\PonyState</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RifleMan.h">
+      <Filter>02. GameObjects\Monster\RifleMan</Filter>
+    </ClInclude>
+    <ClInclude Include="RifleMan_State.h">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState</Filter>
+    </ClInclude>
+    <ClInclude Include="RifleMan_Defines.h">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RifleMan_Fire.h">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState\Fire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RifleMan_Move.h">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Blimp.h">
+      <Filter>02. GameObjects\Monster\Blimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Yard.h">
+      <Filter>01. Levels\02. Game_Yard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Select.h">
+      <Filter>01. Levels\Level_Select</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -520,6 +565,24 @@
     </ClCompile>
     <ClCompile Include="..\Private\RunState_Pony.cpp">
       <Filter>02. GameObjects\Monster\Pony\PonyState\Run</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RifleMan.cpp">
+      <Filter>02. GameObjects\Monster\RifleMan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RifleMan_Fire.cpp">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState\Fire</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RifleMan_Move.cpp">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Blimp.cpp">
+      <Filter>02. GameObjects\Monster\Blimp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Yard.cpp">
+      <Filter>01. Levels\02. Game_Yard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Select.cpp">
+      <Filter>01. Levels\Level_Select</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

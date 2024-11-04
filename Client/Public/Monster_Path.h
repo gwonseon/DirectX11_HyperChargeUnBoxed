@@ -72,6 +72,7 @@ private:
 	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // 터레인 피킹
 	CTerrain* m_pTerrain = { nullptr };
 
+	LEVELID m_eTargetID = LEVEL_GAMEPLAY;
 
 private:// 이미지 버튼
 	void Create_ImageButton();

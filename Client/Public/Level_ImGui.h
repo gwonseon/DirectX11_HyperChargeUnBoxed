@@ -32,7 +32,7 @@ private:
 private:
 	float Position[3] = { 0,0,0 };
 	float Scale[3] = { 0,0,0 };
-	float Rotation[3] = { 0,0,0 };
+
 	float CollisionBox_Scale[3] = { 1,1,1 };
 	float CollisionBox_Pos[3] = { 0,0,0 };
 
@@ -102,7 +102,7 @@ private:
 	vector<_int> m_vecBuildIndex; // Build Index 저장용
 
 
-
+	LEVELID m_eID = LEVEL_YARD;   // 이거 바꿔서 어떤 레벨을 수정할지 설정
 
 private:
 	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // 터레인 피킹

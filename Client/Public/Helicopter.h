@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "Monster.h"
-
+#include "Player_Build.h"
 BEGIN(Engine)
 class CShader;
 class CModel;
@@ -11,13 +11,13 @@ END
 
 BEGIN(Client)
 
-class CHelicopter :   public CMonster
+class CHelicopter : public CMonster
 {
 public:
 	typedef struct : CMonster::MONSTER_DESC
 	{
+		CPlayer_Build* pBuild = { nullptr };
 		_vector* vecTargetPos{};
-
 	}HELICOPTER_DESC;
 
 	enum HELICOPTER_ANIM { HELICOPTER_CENTER, HELICOPTER_EAST, HELICOPTER_NORTH_EAST, HELICOPTER_NORTH_WEST, HELICOPTER_NOTRH, HELICOPTER_SOUTH, HELICOPTER_WEST, HELICOPTER_DIORAMA };
@@ -28,11 +28,7 @@ private:
 	virtual ~CHelicopter() = default;
 
 public:
-	/* 원형생성시 호출 : 생성시 필요한 상당히 무거운 작업들을 수행한다.(패킷, 파일 입출력) */
 	virtual HRESULT Initialize_Prototype() override;
-
-	/* 패킷이나 파일 입출력을 통해서 받아오지 못하는 정보들도 분명히 존재한다. */
-	/* 원형에게 존재하는 않는 추가적인 초기화가 필요한 경우 호출한ㄴ다. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -48,20 +44,25 @@ private:
 	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	_vector* m_vecTargetPos;
 	CCollider* pTargetCollider = { nullptr };
+	CPlayer_Build* m_pBuild = { nullptr };
+
+private:
+	_vector* m_vecTargetPos = { nullptr };
+
 
 private:
 	_bool		m_bAnimState{};
-
 	_float		m_fRotation{};
+
+
+	_float		m_iShot_Count = 0; // 3발 쏘기 위해 몇 발 쐈는지 저장
+	_float		m_fShot_Time_Delay = 3.f; // 총알 쏘기용 딜레이 시간
 
 public:
 	static CHelicopter* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
-
-
 };
 
 END

@@ -22,7 +22,7 @@ public:
 	typedef struct : CMonster::MONSTER_DESC
 	{
 		_vector* vecTargetPos{};
-	
+		CPlayer_Build* m_pBuild = { nullptr };
 	}PONY_DESC;
 
 	enum PONY_ANIM {
@@ -80,6 +80,8 @@ private:
 	CShader*		m_pShaderCom				= { nullptr };
 	CModel*			m_pModelCom					= { nullptr };
 	CNavigation*	m_pNavigationCom		= { nullptr };
+	CCollider*	m_pTargetCollider = { nullptr };
+	CPlayer_Build* m_pBuild = { nullptr };
 
 	_vector* m_vecTargetPos				= { nullptr };
 
@@ -88,7 +90,7 @@ private:
 	_vector vPos{};
 	_float3 m_fPos{};
 	_float m_fRunSpeed = 0.f;
-	
+	_float m_fAttackTime = 0.f;
 	_bool	m_bWalkState = true;
 	_bool		m_bAnimState{};
 	_bool	m_bFind_Path = false;

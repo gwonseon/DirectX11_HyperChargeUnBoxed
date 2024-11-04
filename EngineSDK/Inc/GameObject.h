@@ -83,11 +83,15 @@ public:
 	_float	Get_Attack()					{ return m_fAttack; }	// 공격력 얼마인지 
 	_uint	Get_Coin()						{ return m_iCoin; }		// 돈 얼마나 있는지
 
-	_bool	Get_CanAttacked()				{ return m_bCanAttacked; }    // 공격을 당해도 되는지 알려줌
+	_bool	Get_CanAttacked()				{ return m_bCanAttacked; }    // 공격을 당해도(혹은 해도) 되는지 알려줌
 	_bool	Get_Attacked()					{ return m_bAttacked; }    // 공격을 당했는지 알려줌
 	_bool	Get_DontDestroyAble()			{ return m_bDontDestroy; } // 객체 삭제하면 안되는 애인지 아닌지 알려줌
 	_bool	Get_knockdown()					{ return m_bKnockdown; }   // 객체 삭제하면 안되는 애들 죽었다고 알리기 위함
 	_bool	Get_AttackState()				{ return m_bAttackState; } // 공격 모션인지 아닌지 확인용(이때만 충돌이 되어야 함)
+	_bool	Get_IsBullet()					{ return m_bIsBullet; }
+
+
+
 	// 에너지가 있으면 에너지 깎고, 에너지 없으면 Hp깎음
 	void	Set_Damaged(_float Attack) {
 		if (m_fEnergy > 0)	{
@@ -121,6 +125,7 @@ protected:
 	_bool							m_bAttackState	= false;
 	_bool							m_bCanAttacked	= true; // 맞을 수 있는 상태인지 확인
 	_bool							m_bCollision_Check = false;
+	_bool							m_bIsBullet = false;	// 총알인지 판단 ( 총알이면 삭제함)
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 

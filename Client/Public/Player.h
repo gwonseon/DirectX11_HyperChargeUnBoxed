@@ -23,6 +23,7 @@ class CPlayer final : public CContainerObject
 public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
+		LEVELID m_eLevelID{};
 		_vector* vCameraAt = {};
 		_vector* vCameraPos = {};
 		_uint* iRound = {};
@@ -196,7 +197,7 @@ private:
 
 	_uint					m_iWeaponState = WEAPON_RIFLE;
 
-
+	LEVELID m_eLevelID{};
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();

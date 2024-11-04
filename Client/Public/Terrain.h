@@ -18,6 +18,7 @@ class CTerrain final : public CGameObject
 public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
+		LEVELID eTargetID = {}; // ImGUI 모드에서 이걸로 Navi결정
 		LEVELID eID = {};
 	}TERRAIN_DESC;
 
@@ -56,6 +57,8 @@ private:
 
 private:
 	LEVELID		m_eLevel = {};
+	LEVELID		m_eTargetID = {}; // ImGUI 모드에서 이걸로 Navi결정
+
 	vector<CCollisionBox*> m_vecCollisionBox;
 
 private:

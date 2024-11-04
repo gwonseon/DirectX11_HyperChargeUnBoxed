@@ -13,9 +13,8 @@ CNavigation_Leve::CNavigation_Leve(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CNavigation_Leve::Initialize()
 {
+	m_eLevel = LEVEL_YARD;
 	// 네비게이션
-
-
 	ShowCursor(true);
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 카메라 생성
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
@@ -30,8 +29,9 @@ HRESULT CNavigation_Leve::Initialize()
 	m_pLoad = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Load.jpg"));
 	my_Savetexture = *m_pSave->Get_SRV().begin();
 	my_Loadtexture = *m_pLoad->Get_SRV().begin();
-
-	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	
+//	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
 		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
@@ -515,7 +515,8 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 HRESULT CNavigation_Leve::Save_Navigation(_float fTimeDelta)
 {
 	_ulong		dwByte = { 0 };
-	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation_Yard.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+//	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;
 
@@ -567,9 +568,11 @@ HRESULT CNavigation_Leve::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_NAVIGATION;
+	pDesc.eTargetID = m_eLevel;
 	CGameObject* pTerrain =	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc);
 	m_pTerrain = static_cast<CTerrain*>(pTerrain);
 	return S_OK;
+
 }
 HRESULT CNavigation_Leve::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
@@ -609,11 +612,11 @@ HRESULT CNavigation_Leve::Ready_Lights()
 }
 void CNavigation_Leve::Load_Map()
 {
-	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
+//	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+		MessageBox(NULL, L"Load Environment_Yard File Failed", L"Error", MB_OK);
 		return;
 	}
 	DWORD dwByte = 0;
@@ -654,11 +657,12 @@ void CNavigation_Leve::Load_Map()
 		}
 	}
 	CloseHandle(hFile);
+//	hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+		MessageBox(NULL, L"Load Build_Yard File Failed", L"Error", MB_OK);
 		return;
 	}
 
@@ -690,7 +694,6 @@ void CNavigation_Leve::Load_Map()
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
 		}
-	}
-
+	};
 	CloseHandle(hFile);
 }

@@ -14,6 +14,7 @@ CMonster_Path::CMonster_Path(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 HRESULT CMonster_Path::Initialize()
 {
 	ShowCursor(true);
+	m_eTargetID = LEVEL_GAMEPLAY;
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 카메라 생성
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
 	if (FAILED(Ready_Lights()))										return E_FAIL;	// 빛
@@ -110,6 +111,7 @@ HRESULT CMonster_Path::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_MONSTERSPAWN;
+	pDesc.eTargetID = m_eTargetID;
 	m_pTerrain = static_cast<CTerrain*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc));
 		
 	return S_OK;
@@ -411,6 +413,12 @@ void CMonster_Path::ButtonImage_List()
 				break;
 			case 3:
 				m_iModelIndex = ANIM_PONY;
+				break;
+			case 4:
+				m_iModelIndex = ANIM_RIFLEMAN;
+				break;
+			case 5:
+				m_iModelIndex = ANIM_BLIMP;
 				break;
 			default:
 				break;

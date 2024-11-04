@@ -33,6 +33,7 @@ HRESULT CBody_Player::Initialize(void* pArg)
 	m_pParentState_Upper = pDesc->pParentState_Upper;
 	m_pParentState_Lower = pDesc->pParentState_Lower;
 	m_bAttackState = pDesc->m_bAttackState;
+	m_eLevelID = pDesc->m_eLevelID;
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -793,7 +794,7 @@ HRESULT CBody_Player::Add_Components()
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Anim7"),
+	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Model_Anim7"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
@@ -802,7 +803,7 @@ HRESULT CBody_Player::Add_Components()
 
 	AABBDesc.vExtents = _float3(0.5f, 1.f, 0.5f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y + 1.f, 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Collider_AABB"),
 		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 

@@ -26,34 +26,81 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
     m_vecDir = pDesc->vDir;
     m_vecTargetPos = pDesc->vTargetPos;
     m_pBuild = pDesc->m_pBuild;
+    m_pPlayer = pDesc->pPlayer;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
     if (FAILED(Add_Components()))
         return E_FAIL;
-
-    if (m_eType == TANK_BULLET)
+    _vector vPos{};
+    switch (m_eType)
+    {
+    case Client::CMonster_Bullet::TANK_BULLET:
     {
         m_pTransformCom->Set_Scaling(5.f, 5.f, 5.f);
         m_pTransformCom->LookAt(m_vecTargetPos);
-        _vector vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
+        vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
         vPos = vPos + XMVector3Normalize(m_vecTargetPos - vPos) * 6.8f;
         vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+        m_fAttack = 20.f;
+        break;
+    }
+    case Client::CMonster_Bullet::HELICOPTER_BULLET:
+        m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
+        m_pTransformCom->LookAt(m_vecTargetPos);
+        vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
+        m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+        m_fAttack = 5.f; 
+        break;
+    case Client::CMonster_Bullet::RIFLEMAN_BULLET:
+        m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
+        vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
+        m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+        m_fAttack = 5.f;
+        break;
+
+        
+
+    case Client::CMonster_Bullet::MONSTERBULLET_END:
+        break;
+    default:
+        break;
     }
 
-    m_fAttack = 20.f;
-    m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
-    m_pTrapCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_Trap"), TEXT("Com_Collider_AABB")));
 
+    m_bCanAttacked = true;
+    m_bIsBullet = true;
+   
+    m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
+    m_pPlayerCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_Player"), TEXT("Com_Collider_AABB")));
     return S_OK;
 }
 
 void CMonster_Bullet::Priority_Update(_float fTimeDelta)
 {
-   
-    m_pTransformCom->LookAt(m_vecTargetPos); // 목표를 항상 바라보고 있게
-    m_pTransformCom->Go_Straight(fTimeDelta * 20.f); // 날아간당
+    _vector vPos{};
+    switch (m_eType)
+    {
+    case Client::CMonster_Bullet::TANK_BULLET:
+    {
+        m_pTransformCom->LookAt(m_vecTargetPos); // 목표를 항상 바라보고 있게
+        m_pTransformCom->Go_Straight(fTimeDelta * 20.f); // 날아간당
+        break;
+    }
+    case Client::CMonster_Bullet::HELICOPTER_BULLET:
+        m_pTransformCom->LookAt(m_vecTargetPos); // 목표를 항상 바라보고 있게
+        m_pTransformCom->Go_Straight(fTimeDelta * 60.f); // 날아간당
+        break;
+    case Client::CMonster_Bullet::RIFLEMAN_BULLET:
+        vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+        vPos = vPos + m_vecDir * fTimeDelta * 50.f;
+        m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos); // 날아간당
+        break;
+
+    default:
+        break;
+    }
 }
 void CMonster_Bullet::Update(_float fTimeDelta)
 {
@@ -63,10 +110,16 @@ void CMonster_Bullet::Update(_float fTimeDelta)
 
 void CMonster_Bullet::Late_Update(_float fTimeDelta)
 {
-    _bool bCollision = m_pColliderCom->Intersect(m_pTargetCollider);
+    _bool bCollision = m_pColliderCom->Intersect(m_pTargetCollider); // 브레인 코어와 충돌체크 
     if (bCollision == true && m_bDead == false)
     {
         m_pBuild->Set_Damaged(m_fAttack);
+        m_bDead = true;
+    }
+    bCollision = m_pColliderCom->Intersect(m_pPlayerCollider); // 브레인 코어와 충돌체크 
+    if (bCollision == true && m_bDead == false)
+    {
+        m_pPlayer->Set_Damaged(m_fAttack);
         m_bDead = true;
     }
     

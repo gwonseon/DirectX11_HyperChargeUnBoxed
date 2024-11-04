@@ -59,12 +59,14 @@ private:
 private:
 	HRESULT Loading_For_LogoLevel();
 	HRESULT Loading_For_GamePlayLevel();
+	HRESULT Loading_For_GameYardLevel();
 	HRESULT Loading_For_ImGuiLevel();
 	HRESULT Loading_For_NavigationLevel();
 	HRESULT Loading_For_MonsterSpawnLevel();
 
 	HRESULT Loading_DataFile(LEVELID eLevelID);
 	HRESULT Loading_DataFile_For_GameLevel();
+	HRESULT Loading_DataFile_For_YardLevel();
 	HRESULT Loading_DataFile_For_NavigationLevel();
 	HRESULT Loading_DataFile_For_MonsterSpawnLevel();
 

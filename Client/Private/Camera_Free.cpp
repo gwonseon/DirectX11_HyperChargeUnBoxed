@@ -71,8 +71,10 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
         }
     }
 
-   if(m_eLevelID == LEVEL_GAMEPLAY)
-        *m_pShotStart = false;
+   if(m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD)
+   {
+       *m_pShotStart = false;
+   }
 
   
 }
@@ -94,6 +96,11 @@ void CCamera_Free::Update(_float fTimeDelta)
         break;
     case Client::LEVEL_GAMEPLAY:
        ClientToScreen(g_hWnd, &clientPos);
+        SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
+        ShowCursor(FALSE);
+        break;
+    case Client::LEVEL_YARD:
+        ClientToScreen(g_hWnd, &clientPos);
         SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
         ShowCursor(FALSE);
         break;
@@ -192,7 +199,7 @@ void CCamera_Free::Update(_float fTimeDelta)
 
 void CCamera_Free::Late_Update(_float fTimeDelta)
 {
-    if (m_eLevelID == LEVEL_GAMEPLAY)
+    if (m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD )
     {
         XMMATRIX matWorld = XMLoadFloat4x4(m_matPlayerWorld); // 플레이어 월드 매트릭스
         // 카메라 회전
