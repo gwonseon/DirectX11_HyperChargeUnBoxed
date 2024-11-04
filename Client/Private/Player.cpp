@@ -26,16 +26,15 @@ HRESULT CPlayer::Initialize(void* pArg)
 	Desc.iNumPartObjects = PART_END;
 	Desc.fSpeedPerSec = 25.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.f);
-	Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
-	
+
 	PLAYER_DESC* pPlayer = static_cast<PLAYER_DESC*>(pArg);
 	m_eLevelID = pPlayer->m_eLevelID;
-	
+	m_iCellidx = pPlayer->iCellIdx;
 	m_fMouseSensor = 0.1f;
-	PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
-	m_vecCameraAt = pDesc->vCameraAt;
-	m_vecCameraPos = pDesc->vCameraPos;
-	m_iRound = pDesc->iRound;
+
+	m_vecCameraAt = pPlayer->vCameraAt;
+	m_vecCameraPos = pPlayer->vCameraPos;
+	m_iRound = pPlayer->iRound;
  
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(&Desc)))
@@ -47,8 +46,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 		return E_FAIL;
 
 	
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(386.295f, 1.f, 450.425f, 1.f));
-//	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Desc.fPosition.x, Desc.fPosition.y, Desc.fPosition.z, 1.f));
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pPlayer->fPosition.x, pPlayer->fPosition.y, pPlayer->fPosition.z, 1.f));
 	m_pTransformCom->Set_Scaling(2.f, 2.f, 2.f);
 	m_iWeaponState = WEAPON_RIFLE;
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
@@ -227,9 +226,9 @@ HRESULT CPlayer::Add_Components()
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
 
-	Desc.iCurrentCellIndex = 7;
+	Desc.iCurrentCellIndex = m_iCellidx;
 
-	switch (m_eLevelID)
+	 switch (m_eLevelID)
 	{
 
 	case Client::LEVEL_GAMEPLAY:

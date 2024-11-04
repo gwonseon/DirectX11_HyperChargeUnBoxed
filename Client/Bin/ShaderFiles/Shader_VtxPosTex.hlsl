@@ -96,8 +96,6 @@ TEXCOORD는 버텍스 사이의 보간만 발생하고, 픽셀 좌표계로 변환되지 않는다. 즉, 뷰�
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
- //   Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
-    // 색으로 채우는 것이 이미지를 가져와서 색을 채워줌
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
 
     return Out;
@@ -246,6 +244,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
 

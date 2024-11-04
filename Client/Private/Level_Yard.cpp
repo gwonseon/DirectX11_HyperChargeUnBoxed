@@ -647,6 +647,10 @@ HRESULT CLevel_Yard::Ready_Layer_Player(const _tchar* pLayerTag)
 	Desc.vCameraPos = m_pCamera->Get_Camera_Pos();
 	Desc.iRound = &m_iCurrentRound;
 	Desc.m_eLevelID = LEVEL_YARD;
+	Desc.iCellIdx = 601;
+	Desc.fPosition = _float3(645.566f, 0.f, 557.93f);
+//Cell: 601
+//645.566     0     557.93
 	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
 	m_pPlayer = static_cast<CPlayer*>(pPlayer);
 
@@ -885,13 +889,43 @@ HRESULT CLevel_Yard::Ready_Layer_Trap(const _tchar* pLayerTag)
 #pragma region ≈ ≈©∆Æ∑¶
 	Mark_Desc.eType = CTrap_Marks::TANK_TRAP;
 
-	Mark_Desc.fPosition = _float3(485.692f, 0.11f, 437.152f);
+	Mark_Desc.fPosition = _float3(620.293f, 0.f, 526.778f);
 	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(440.698f, 0.11f, 428.292f);
+	Mark_Desc.fPosition = _float3(575.161f, 0.f, 598.337f);
 	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(440.114f, 0.11f, 520.027f);
+	Mark_Desc.fPosition = _float3(586.718f, 0.f, 518.17f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(496.737f, 0.f, 594.82f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(399.722f, 0.f, 576.963f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(399.895f, 0.f, 428.506f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(453.112f, 0.f, 374.234f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(550.279f, 0.f, 405.683f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(600.133f, 0.f, 439.33f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(482.854f, 0.f, 379.527f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(434.03f, 0.f, 400.054f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(370.759f, 0.f, 484.017f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(356.141f, 0.f, 516.032f);
 	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
 
 

@@ -21,12 +21,10 @@ HRESULT CCrossLine::Initialize_Prototype()
 HRESULT CCrossLine::Initialize(void* pArg)
 {
 
-	UIOBJECT_DESC* pDesc = (UIOBJECT_DESC*)pArg;
-	pDesc->fSpeedPerSec = 0.f;
-	pDesc->fRotationPerSec = 0.f;
+	UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
 	m_eLevel = pDesc->eLevel;
 
-	if (FAILED(__super::Initialize(&pDesc)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
@@ -54,8 +52,6 @@ void CCrossLine::Late_Update(_float fTimeDelta)
 
 HRESULT CCrossLine::Render()
 {
-	m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
-
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -87,8 +83,6 @@ HRESULT CCrossLine::Add_Components()
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
-
-
 	return S_OK;
 
 }
@@ -98,12 +92,10 @@ HRESULT CCrossLine::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
-
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", iChangeNum)))
 		return E_FAIL;
 	return S_OK;

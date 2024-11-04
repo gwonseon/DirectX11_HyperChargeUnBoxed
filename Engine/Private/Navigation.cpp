@@ -413,10 +413,10 @@ HRESULT CNavigation::Render()
 	{
 		if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 			return E_FAIL;
-		_float4 vColorGreen = _float4(0.f, 1.f, 0.f, 1.f);
+		/*_float4 vColorGreen = _float4(0.f, 1.f, 0.f, 1.f);
 		m_pShader->Bind_RawValue("g_vColor", &vColorGreen, sizeof(_float4));
 
-		m_pShader->Begin(0);
+		m_pShader->Begin(0);*/
 
 		for (auto& pCell : m_Cells)
 			pCell->Render();
