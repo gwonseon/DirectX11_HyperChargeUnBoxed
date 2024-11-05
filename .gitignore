@@ -469,6 +469,9 @@ FodyWeavers.xsd
 *.png
 *.dds
 
+# Ignore zip files
+*.zip
+
 
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
