@@ -34,13 +34,16 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 	Bricks_Desc.eID = m_eLevel;
 	Bricks_Desc.fScale = { 5.f,5.f,5.f };
 	Bricks_Desc.pPlayer = m_pPlayer;
+	Bricks_Desc.m_bBuild = &m_bBuild;
+	Bricks_Desc.fPosition = pDesc->fPosition;
+	Bricks_Desc.m_bBuild_PreView = &m_bBuild_PreView;
+
 	if (m_eType == BRICKS_TRAP)
 		Bricks_Desc.iModel_Idx = 1; // ·¹°í Æ®·¦
 	if (m_eType == TANK_TRAP)
 		Bricks_Desc.iModel_Idx = 9; // ÅÊÅ© Æ®·¦
-	Bricks_Desc.m_bBuild = &m_bBuild;
-	Bricks_Desc.fPosition = pDesc->fPosition;
-	Bricks_Desc.m_bBuild_PreView = &m_bBuild_PreView;
+
+
 	m_pBricks = static_cast<CTrap_Bricks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Trap_Shield"), TEXT("Prototype_GameObject_TrapBricks"), &Bricks_Desc));
 	
 	m_bDraw = true;

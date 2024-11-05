@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "UIObject.h"
 #include <Player.h>
+#include "UI_CircleGuage.h"
 
 BEGIN(Engine)
 class CShader;
@@ -32,7 +33,7 @@ public:
 		GAMEUI eUITag{};
 		_uint	iIndex{};
 		CPlayer* pPlayer{};
-	
+		CUI_CircleGuage* pCircle = { nullptr };
 	}INGAMEUI_DESC;
 
 private:
@@ -109,6 +110,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CUI_CircleGuage* m_pCircle = { nullptr };
 
 
 	GAMEUI		m_eUIType = UI_END;

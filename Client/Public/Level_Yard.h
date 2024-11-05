@@ -62,7 +62,6 @@ private:
 	CBattery* m_pBattery = { nullptr };
 	CInGameUI* m_pBatteryUI = { nullptr };
 	CInGameUI* m_pBatteryGaugeUI = { nullptr };
-
 	CWeapon_Item* m_pWeaponItem[2];
 
 	_float	m_fDelay{};
