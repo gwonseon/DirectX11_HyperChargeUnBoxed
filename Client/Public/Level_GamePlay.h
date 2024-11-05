@@ -38,6 +38,7 @@ private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WeaponITem(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_ITem(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Icon(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);

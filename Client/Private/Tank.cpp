@@ -35,6 +35,7 @@ HRESULT CTank::Initialize(void* pArg)
 	m_eLevel = pDesc->eID;
 	m_pBuild = pDesc->m_pBuild;
 	m_iCell_Idx = pDesc->iCell_Idx;
+	m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
 	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
@@ -47,7 +48,7 @@ HRESULT CTank::Initialize(void* pArg)
 	m_fEnergy = 0.f;
 	m_fAttack = 0.f; //  탱크 자체의 공격력은 0, 미사일이 공격력 갖게 하자
 
-	Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_iCell_Idx, 99);
+	Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_iCell_Idx, m_iBraincore_CellNumber);
 	return S_OK;
 }
 

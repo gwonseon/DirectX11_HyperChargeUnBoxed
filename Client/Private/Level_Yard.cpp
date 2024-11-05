@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "Level_Loading.h"
+#include "Yard_Round.h"
 
 #include "CrossLine.h"
 #include "NumberUI.h"
@@ -22,6 +23,8 @@
 #include "Helicopter.h"
 #include "Alien.h"
 #include "Pony.h"
+#include <Coin_Item.h>
+#include <Hp_Item.h>
 
 CLevel_Yard::CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -51,6 +54,9 @@ HRESULT CLevel_Yard::Initialize()
 	if (FAILED(Ready_Layer_WeaponITem(TEXT("Layer_WeaponItem"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_ITem(TEXT("Layer_Item"))))
+		return E_FAIL;
+
 	if (FAILED(Ready_Layer_Icon(TEXT("Layer_UI_Icon"))))
 		return E_FAIL;
 
@@ -65,8 +71,20 @@ HRESULT CLevel_Yard::Initialize()
 	pTrap = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Trap"));
 
 #pragma region 라운드
+	// 라운드( 각 라운드 마다 데이터가 다르기 때문에 각각 따로 라운드를 생성해서 관리해줌)
+	m_pRound[0] = CYard_Round::Create(m_pDevice, m_pContext, 1);
+	m_pRound[1] = CYard_Round::Create(m_pDevice, m_pContext, 2);
+	m_pRound[2] = CYard_Round::Create(m_pDevice, m_pContext, 3);
+	for (int i = 0; i < 3; i++)
+	{
+		m_pRound[i]->Set_Player(m_pPlayer);
+		m_pRound[i]->Set_TrapLayer(pTrap);
+		m_pRound[i]->Set_BrainPos(m_pBrain->Get_BrainPos());
+		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
+		m_pRound[i]->Set_BrainCoreWorld_matrix(m_pBrain->Get_Transform()->Get_WorldMatrixPtr());
+		m_pRound[i]->Set_PlayerWorld_matrix(m_pPlayer->Get_Transform()->Get_WorldMatrixPtr());
 
-
+	}
 #pragma endregion 라운드
 
 	m_pPlayer->Set_RoundStart(&m_bRoundStart);
@@ -85,7 +103,7 @@ void CLevel_Yard::Update(_float fTimeDelta)
 	Build_Check(); // 트랩 설치관련 
 
 	Interaction_Weapon();
-
+	RoundMgr_And_MonsterSpawn(fTimeDelta);
 
 #pragma region Collision
 	if (pTrap_Shield == nullptr)
@@ -647,10 +665,9 @@ HRESULT CLevel_Yard::Ready_Layer_Player(const _tchar* pLayerTag)
 	Desc.vCameraPos = m_pCamera->Get_Camera_Pos();
 	Desc.iRound = &m_iCurrentRound;
 	Desc.m_eLevelID = LEVEL_YARD;
-	Desc.iCellIdx = 601;
-	Desc.fPosition = _float3(645.566f, 0.f, 557.93f);
-//Cell: 601
-//645.566     0     557.93
+	Desc.iCellIdx = 598;
+	Desc.fPosition = _float3(645.424f, 0.f, 559.107f);
+
 	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
 	m_pPlayer = static_cast<CPlayer*>(pPlayer);
 
@@ -690,6 +707,49 @@ HRESULT CLevel_Yard::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_Yard::Ready_Layer_ITem(const _tchar* pLayerTag)
+{
+
+	// 코인 아이템
+	CCoin_Item::COINITEM_DESC pCoinItem{};
+	pCoinItem.eID = LEVEL_YARD;
+	pCoinItem.pPlayer = m_pPlayer;
+	pCoinItem.fScale = { 6.f, 6.f,6.f };
+	pCoinItem.fPosition = { 571.985, 3.f, 237.756 };
+	pCoinItem.iModelIndex = 47;
+	pCoinItem.pGuage = m_pGuage;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+	
+	pCoinItem.fPosition = { 554.751, 3.f, 219.951 };
+	pCoinItem.iModelIndex = 47;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+
+	pCoinItem.fPosition = { 540.489, 3.f, 614.398 };
+	pCoinItem.iModelIndex = 48;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+
+	pCoinItem.fPosition = { 305.877, 3.f, 608.576 };
+	pCoinItem.iModelIndex = 48;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+
+	pCoinItem.fPosition = { 293.493, 3.f, 304.906 };
+	pCoinItem.iModelIndex = 49;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+
+	// 힐 아이템
+	CHp_Item::HPITEM_DESC pHpItem{};
+	pHpItem.eID = LEVEL_YARD;
+	pHpItem.pPlayer = m_pPlayer;
+	pHpItem.fScale = { 8.f, 8.f,8.f };
+	pHpItem.fPosition = { 644.512f, 3.f, 565.156f };
+	pHpItem.pGuage = m_pGuage;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_HpItem"), &pHpItem));
+
+
+
+	return S_OK;
+}
+
 HRESULT CLevel_Yard::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 {
 	// 브레인 코어
@@ -699,7 +759,7 @@ HRESULT CLevel_Yard::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	pDesc.fScale = { 4.f,4.f,4.f };
 	pDesc.iModelComponentIndex = 205;
 	m_pBrain = static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
-
+	// 563
 	// 에너지 머신
 	CEnergy_Machine::ENERGYMACHINE_DESC pEnergyMachine{};
 	pEnergyMachine.eID = LEVEL_YARD;
@@ -1106,47 +1166,48 @@ void CLevel_Yard::Build_Check()
 	}
 }
 
-//void CLevel_Yard::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
-//{
-//	m_iPreviousRound = m_iCurrentRound;
-//	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
-//	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart, m_fSkipTimer);
-//	if (m_iPreviousRound != m_iCurrentRound && m_iCurrentRound == 0)
-//	{
-//		// 빌드 모드 시작 (쉬는 시간 시작)
-//		for (auto pMark : m_vecTrapMark)
-//		{
-//			// 만든 레고 브릭이 부숴졌을 때 다시 만들 수 있게 값 초기화
-//			if (pMark->Get_Bricks_KnockDown() == true)
-//			{
-//				pMark->Set_ReBuild();
-//			}
-//		}
-//	}
-//	if (m_bRoundStart == true && m_iCurrentRound < 4)
-//	{		// 배열은 0부터 시작이라 1 빼줌 
-//		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
-//		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
-//		if (m_bOnce == false) // 한 번만 찾으면 된다
-//		{
-//			// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
-//			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Near"));
-//			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Far"));
-//			m_bOnce = true;
-//		}
-//		if (pMonsterBullet == nullptr)
-//			pMonsterBullet = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("MonsterBullet_Layer"));
-//
-//		if (pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
-//		{
-//			// 남은 몬스터 수를 보내줌
-//			m_pRound[m_iCurrentRound - 1]->Set_RemainMonster_Count(pNearMonsterLayer->Get_GameObjectList_Size() + pFarMonsterLayer->Get_GameObjectList_Size());
-//		}
-//		else
-//			m_bOnce = false;
-//	}
-//
-//}
+
+void CLevel_Yard::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
+{
+	m_iPreviousRound = m_iCurrentRound;
+	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
+	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart, m_fSkipTimer);
+	if (m_iPreviousRound != m_iCurrentRound && m_iCurrentRound == 0)
+	{
+		// 빌드 모드 시작 (쉬는 시간 시작)
+		for (auto pMark : m_vecTrapMark)
+		{
+			// 만든 레고 브릭이 부숴졌을 때 다시 만들 수 있게 값 초기화
+			if (pMark->Get_Bricks_KnockDown() == true)
+			{
+				pMark->Set_ReBuild();
+			}
+		}
+	}
+	if (m_bRoundStart == true && m_iCurrentRound < 4)
+	{		// 배열은 0부터 시작이라 1 빼줌 
+		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
+		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
+		if (m_bOnce == false) // 한 번만 찾으면 된다
+		{
+			// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
+			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Near"));
+			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Far"));
+			m_bOnce = true;
+		}
+		if (pMonsterBullet == nullptr)
+			pMonsterBullet = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("MonsterBullet_Layer"));
+
+		if (pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
+		{
+			// 남은 몬스터 수를 보내줌
+			m_pRound[m_iCurrentRound - 1]->Set_RemainMonster_Count(pNearMonsterLayer->Get_GameObjectList_Size() + pFarMonsterLayer->Get_GameObjectList_Size());
+		}
+		else
+			m_bOnce = false;
+	}
+
+}
 
 CLevel_Yard* CLevel_Yard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -1164,6 +1225,9 @@ CLevel_Yard* CLevel_Yard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 void CLevel_Yard::Free()
 {
 	__super::Free();
-
 	ShowCursor(true);
+	Safe_Release(m_pRound[0]);
+	Safe_Release(m_pRound[1]);
+	Safe_Release(m_pRound[2]);
+
 }

@@ -70,6 +70,7 @@ public:
 
 	void	Set_GetEnergy(_float Energy)	{ m_fEnergy += Energy; }
 	void	Set_Heal(_float Heal)			{ m_fHp += Heal; }
+	void	Set_FullHeal()					{ m_fHp = 100.f; }
 	void	UseCoin(_uint Price)		{ m_iCoin -= Price; }
 	void	Set_PickUp_Coin(_uint Price)	{ m_iCoin += Price; }
 

@@ -18,6 +18,7 @@ public:
 		_vector* vecTargetPos = {nullptr};
 
 		LEVELID		eID = {};
+		_uint		iBraincore_CellNumber{};
 		_int		iModelComponentIndex{};
 		_uint		iCell_Idx{};
 	}MONSTER_DESC;
@@ -72,6 +73,7 @@ public:
 protected:
 	LEVELID	m_eLevel = {};
 	_int	m_iModelIndex = {};
+	_uint	m_iBraincore_CellNumber = {};
 	const _float4x4* m_matPlayerWorld = { nullptr };
 	const _float4x4* m_matBrainCoreWorld = { nullptr };
 

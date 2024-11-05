@@ -24,6 +24,8 @@
 #include "Pony.h"
 
 #include "Sky.h"
+#include <Coin_Item.h>
+#include <Hp_Item.h>
 
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -52,6 +54,9 @@ HRESULT CLevel_GamePlay::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_WeaponITem(TEXT("Layer_WeaponItem"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_ITem(TEXT("Layer_Item"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Icon(TEXT("Layer_UI_Icon"))))
@@ -190,7 +195,7 @@ void CLevel_GamePlay::Interaction_Weapon()
 		}
 	}
 
-	if ( *m_pReloading == true)
+	if (*m_pReloading == true)
 	{
 		m_pGuage->Set_Charging(true);
 	}
@@ -281,6 +286,28 @@ HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	m_pBattery = static_cast<CBattery*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Battery"), &pBattery));
 
 	
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_ITem(const _tchar* pLayerTag)
+{
+	CCoin_Item::COINITEM_DESC pCoinItem{};
+	pCoinItem.eID = LEVEL_GAMEPLAY;
+	pCoinItem.pPlayer = m_pPlayer;
+	pCoinItem.fScale = { 6.f, 6.f,6.f };
+	pCoinItem.fPosition = { 644.512f, 0.f, 560.156f };
+	pCoinItem.iModelIndex = 47;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+
+
+	CHp_Item::HPITEM_DESC pHpItem{};
+	pHpItem.eID = LEVEL_GAMEPLAY;
+	pHpItem.pPlayer = m_pPlayer;
+	pHpItem.fScale = { 6.f, 6.f,6.f };
+	pHpItem.fPosition = { 644.512f, 0.f, 560.156f };
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HpItem"), &pHpItem));
+
+
 	return S_OK;
 }
 

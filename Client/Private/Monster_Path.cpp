@@ -13,8 +13,9 @@ CMonster_Path::CMonster_Path(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 HRESULT CMonster_Path::Initialize()
 {
+	m_eTargetID = LEVEL_YARD;
+
 	ShowCursor(true);
-	m_eTargetID = LEVEL_GAMEPLAY;
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 카메라 생성
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
 	if (FAILED(Ready_Lights()))										return E_FAIL;	// 빛
@@ -25,7 +26,7 @@ HRESULT CMonster_Path::Initialize()
 
 	// 저장 로드 버튼(이미지 버튼)
 	Create_ImageButton();
-	m_iLevel = 3;
+	m_iLevel = m_eTargetID;  // 찍을 때 디폴트 값(원하는 레벨)
 	m_iCellIndex = 0;
 	m_iRound = 0;
 	
@@ -85,7 +86,7 @@ HRESULT CMonster_Path::Render()
 
 	const char* pText = "Monster Spawn";
 	ImGui::Text("0Round is BreakTime");
-	ImGui::Text("F1 F2 F3 -> Save");
+	ImGui::Text("F1 F2 F3 -> Save");  // 각 라운드별 저장
 
 	ImGui::Text(pText);
 	ImGui::Text(" ");
@@ -95,6 +96,7 @@ HRESULT CMonster_Path::Render()
 	ImGui::InputInt("Level", &m_iLevel);
 
 	ImGui::Text("Round Data");
+	ImGui::Text("Round 0은 안됨");
 	ImGui::InputInt("Round", &m_iRound);
 	
 	ImGui::Text("Position Data");
@@ -159,12 +161,26 @@ void CMonster_Path::Save_FirstRound()
 {
 	_ulong		dwByte = { 0 };
 	_wstring strLast = TEXT(".dat");
-	_wstring strPath = TEXT("../Bin/Data/Gameplay_Monster");
+	_wstring strPath{};
+	switch (m_eTargetID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		strPath = TEXT("../Bin/Data/Gameplay_Monster");
+		break;
+	case Client::LEVEL_YARD:
+		strPath = TEXT("../Bin/Data/Yard_Monster");
+		break;
+	default:
+		break;
+	}
+	
 	_wstring Path_Result = strPath + to_wstring(1) + strLast;
 	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return;
-	for (auto& pMonster : m_vecMonsterSpawn[LEVEL_GAMEPLAY][1])
+
+
+	for (auto& pMonster : m_vecMonsterSpawn[m_eTargetID][1])
 	{
 		_float3 fPos = pMonster.fPos;
 		_uint	iModelIdx = pMonster.iModel_Idx;
@@ -174,19 +190,30 @@ void CMonster_Path::Save_FirstRound()
 		WriteFile(hFile, &iCellIdx, sizeof(_uint), &dwByte, nullptr);
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL, L"Monster1Round Saved Successfully", L"Success", MB_OK);
 }
 
 void CMonster_Path::Save_SecondRound()
 {
 	_ulong		dwByte = { 0 };
 	_wstring strLast = TEXT(".dat");
-	_wstring strPath = TEXT("../Bin/Data/Gameplay_Monster");
+	_wstring strPath{};
+	switch (m_eTargetID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		strPath = TEXT("../Bin/Data/Gameplay_Monster");
+		break;
+	case Client::LEVEL_YARD:
+		strPath = TEXT("../Bin/Data/Yard_Monster");
+		break;
+	default:
+		break;
+	}
 	_wstring Path_Result = strPath + to_wstring(2) + strLast;
 	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return;
-	for (auto& pMonster : m_vecMonsterSpawn[LEVEL_GAMEPLAY][2])
+	for (auto& pMonster : m_vecMonsterSpawn[m_eTargetID][2])
 	{
 		_float3 fPos = pMonster.fPos;
 		_uint	iModelIdx = pMonster.iModel_Idx;
@@ -196,19 +223,30 @@ void CMonster_Path::Save_SecondRound()
 		WriteFile(hFile, &iCellIdx, sizeof(_uint), &dwByte, nullptr);
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL, L"Monster2Round Saved Successfully", L"Success", MB_OK);
 }
 
 void CMonster_Path::Save_ThirdRound()
 {
 	_ulong		dwByte = { 0 };
 	_wstring strLast = TEXT(".dat");
-	_wstring strPath = TEXT("../Bin/Data/Gameplay_Monster");
+	_wstring strPath{};
+	switch (m_eTargetID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		strPath = TEXT("../Bin/Data/Gameplay_Monster");
+		break;
+	case Client::LEVEL_YARD:
+		strPath = TEXT("../Bin/Data/Yard_Monster");
+		break;
+	default:
+		break;
+	}
 	_wstring Path_Result = strPath + to_wstring(3) + strLast;
 	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return;
-	for (auto& pMonster : m_vecMonsterSpawn[LEVEL_GAMEPLAY][3])
+	for (auto& pMonster : m_vecMonsterSpawn[m_eTargetID][3])
 	{
 		_float3 fPos = pMonster.fPos;
 		_uint	iModelIdx = pMonster.iModel_Idx;
@@ -218,7 +256,7 @@ void CMonster_Path::Save_ThirdRound()
 		WriteFile(hFile, &iCellIdx, sizeof(_uint), &dwByte, nullptr);
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL, L"Monster3Round Saved Successfully", L"Success", MB_OK);
 }
 
 void CMonster_Path::Load()
@@ -292,21 +330,39 @@ void CMonster_Path::Picking_Create()
 
 void CMonster_Path::Load_Map()
 {
-	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile{};
+	switch (m_eTargetID)
 	{
-		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
+	case Client::LEVEL_YARD:
+	{
+		hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Environment_Yard File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_uint iImGuiMode{};
 	_int  iModelIndex{};
 	_float3 fPos{}, fCollisionBoxScale{}, fScale{};
 	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
-
-
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
 	{
 
@@ -338,13 +394,33 @@ void CMonster_Path::Load_Map()
 	}
 	CloseHandle(hFile);
 
-	hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	
+	
+	switch (m_eTargetID)
 	{
-		MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
-		return;
+	case Client::LEVEL_GAMEPLAY:
+	{
+		hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
 	}
-
+	case Client::LEVEL_YARD:
+	{
+		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Build_Yard File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
 	{
 

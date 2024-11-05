@@ -152,7 +152,7 @@ void CInGameUI::Update(_float fTimeDelta)
         {
             m_bDraw = true;
             m_iIndex = 1;
-        }
+        } // 특정 조건들 가져와서 인덱스 2번으로 
         else
             m_bDraw = false;
         

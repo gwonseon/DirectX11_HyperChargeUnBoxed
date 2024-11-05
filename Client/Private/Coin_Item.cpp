@@ -1,101 +1,133 @@
 #include "stdafx.h"
-#include "..\Public\Weapon_Item.h"
+#include "..\Public\Coin_Item.h"
 
 #include "GameInstance.h"
-#include "InGameUI.h"
 
 
-CWeapon_Item::CWeapon_Item(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCoin_Item::CCoin_Item(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
 
-CWeapon_Item::CWeapon_Item(const CWeapon_Item& Prototype)
+CCoin_Item::CCoin_Item(const CCoin_Item& Prototype)
     : CGameObject{ Prototype }
 {
 }
 
-HRESULT CWeapon_Item::Initialize_Prototype()
+HRESULT CCoin_Item::Initialize_Prototype()
 {
+
     return S_OK;
 }
 
-HRESULT CWeapon_Item::Initialize(void* pArg)
+HRESULT CCoin_Item::Initialize(void* pArg)
 {
-    WEAPONITEM_DESC* pDesc = static_cast<WEAPONITEM_DESC*>(pArg);
-    m_eLevel = pDesc->eID;
+    COINITEM_DESC* pDesc = static_cast<COINITEM_DESC*>(pArg);
+    m_pPlayer = pDesc->pPlayer;
+    m_pGuage = pDesc->pGuage;
+
+    m_fScale = pDesc->fScale;
     m_iModelIndex = pDesc->iModelIndex;
-    pDesc->fRotationPerSec = 5.f;
-    fScale = pDesc->fScale;
+    m_eLevel = pDesc->eID;
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
-
     if (FAILED(Add_Components()))
         return E_FAIL;
+
+    m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
-    m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
-    m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
- 
+    m_pTransformCom->Rotation(XMConvertToRadians(90.f), 0.f, 0.f);
+    // 중점위치 변경 ( 회전 위치를 바꿔줌)
     _float4x4 matSecondPreTransform{};
     XMStoreFloat4x4(&matSecondPreTransform, XMMatrixTranslation(0.f, 0.f, -0.15f));
     m_pModelCom->Set_SecondPreTransform(matSecondPreTransform);
-    if (m_iModelIndex == 7) // 카타나
+
+    switch (m_iModelIndex)
     {
-    
-        Rotation = { XMConvertToRadians(90.5), XMConvertToRadians(47), XMConvertToRadians(32) };
-        m_pTransformCom->Rotation(Rotation.x, Rotation.y, Rotation.z);
+    case 47:
+    {
+        m_iCoin = 100;
+        break;
+    }
+    case 48:
+    {
+        m_iCoin = 80;
+        break;
+    }
+    case 49:
+    {
+        m_iCoin = 50;
+        break;
+    }
+    default:
+        break;
     }
     return S_OK;
 }
 
-void CWeapon_Item::Priority_Update(_float fTimeDelta)
-{
-    m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
-}
-
-void CWeapon_Item::Update(_float fTimeDelta)
-{
-    if (m_bDead)
-    {
-        return;
-    }
-   
+void CCoin_Item::Priority_Update(_float fTimeDelta)
+{    
+    // 회전
     _vector Axis = { 0.f, 1.f, 0.f };
     m_pTransformCom->Turn(Axis, fTimeDelta * 0.3f);
-    if (m_bInteration == true)
+}
+
+void CCoin_Item::Update(_float fTimeDelta)
+{
+    if (m_bDead)
+        return;
+
+    _vector vecPlayerPos = m_pPlayer->Get_Position();
+    m_vecItemPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+    // 플레이어와 아이템 거리가 가까워졌을 때
+    if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecItemPos) <= 80.f)
     {
-        m_pTransformCom->Set_Scaling(fScale.x + 3.f, fScale.y + 3.f, fScale.z + 3.f);
-        if (m_bCharging == true)
+        // 사이즈 커지기
+        m_pTransformCom->Set_Scaling(m_fScale.x + 2.f, m_fScale.y + 2.f, m_fScale.z + 2.f);
+        
+        if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
         {
-            m_fCharging += fTimeDelta;
+            m_pGuage->Set_CoinItem_Interation(true);
+
+            m_fCharging_Time += fTimeDelta;
         }
         else
-            m_fCharging = 0.f;
-        if (m_fCharging >= 1.f)
         {
-            m_bEquip = true;
-            m_bDead = true;
+            m_pGuage->Set_CoinItem_Interation(false);
+            m_fCharging_Time = 0.f;
         }
+
     }
     else
     {
-        m_fCharging = 0.f;
-        m_pTransformCom->Set_Scaling(fScale.x, fScale.y, fScale.z);
+        m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+        m_pGuage->Set_CoinItem_Interation(false);
+        m_fCharging_Time = 0.f;
+    }
+
+
+    if (m_fCharging_Time >= 1.f)
+    {
+        m_pPlayer->Set_PickUp_Coin(m_iCoin);
+        m_pGuage->Set_CoinItem_Interation(false);
+        m_bDead = true;
     }
 
 }
 
-void CWeapon_Item::Late_Update(_float fTimeDelta)
+void CCoin_Item::Late_Update(_float fTimeDelta)
 {
-    if(m_bDead == false)
+    if (m_bDead == false)
     {
         if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
             return;
     }
+
 }
 
-HRESULT CWeapon_Item::Render()
+HRESULT CCoin_Item::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
@@ -113,20 +145,18 @@ HRESULT CWeapon_Item::Render()
         m_pModelCom->Render(i);
     }
 
-
     return S_OK;
 }
 
-HRESULT CWeapon_Item::Add_Components()
+HRESULT CCoin_Item::Add_Components()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
- 
-   const _wstring Model_Component = TEXT("Prototype_Component_Model_Weapon");
-   const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex +1);
+
+    const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
+    const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex + ENVIRONMENT_EA);
     /* For.Com_Model */
-    ;
     if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
         return E_FAIL;
@@ -134,28 +164,23 @@ HRESULT CWeapon_Item::Add_Components()
     return S_OK;
 }
 
-HRESULT CWeapon_Item::Bind_ShaderResources()
+HRESULT CCoin_Item::Bind_ShaderResources()
 {
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_Matrix("g_SecondMatrix", m_pModelCom->Get_SecondPreTransform())))
         return E_FAIL;
-
     auto SecondPreTrans = *m_pModelCom->Get_SecondPreTransform();
-    
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
     const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
@@ -168,38 +193,33 @@ HRESULT CWeapon_Item::Bind_ShaderResources()
     return S_OK;
 }
 
-CWeapon_Item* CWeapon_Item::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCoin_Item* CCoin_Item::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CWeapon_Item* pInstance = new CWeapon_Item(pDevice, pContext);
-
+    CCoin_Item* pInstance = new CCoin_Item(pDevice, pContext);
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created : CWeapon_Item");
+        MSG_BOX("Failed to Created : CCoin_Item");
         Safe_Release(pInstance);
     }
-
     return pInstance;
 }
 
-CGameObject* CWeapon_Item::Clone(void* pArg)
+CGameObject* CCoin_Item::Clone(void* pArg)
 {
-    CWeapon_Item* pInstance = new CWeapon_Item(*this);
-
+    CCoin_Item* pInstance = new CCoin_Item(*this);
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Created : CWeapon_Item");
+        MSG_BOX("Failed to Created : CCoin_Item");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CWeapon_Item::Free()
+void CCoin_Item::Free()
 {
     __super::Free();
 
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
-
-
 }

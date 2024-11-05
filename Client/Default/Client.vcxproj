@@ -173,6 +173,7 @@
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
+    <ClInclude Include="..\Public\Coin_Item.h" />
     <ClInclude Include="..\Public\CollisionBox.h" />
     <ClInclude Include="..\Public\CrossLine.h" />
     <ClInclude Include="..\Public\Energy_Cap.h" />
@@ -185,6 +186,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Head_Player.h" />
     <ClInclude Include="..\Public\Helicopter.h" />
+    <ClInclude Include="..\Public\Hp_Item.h" />
     <ClInclude Include="..\Public\InGameUI.h" />
     <ClInclude Include="..\Public\Level_Yard.h" />
     <ClInclude Include="..\Public\Level_ImGui.h" />
@@ -193,6 +195,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_Select.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Loading_UI.h" />
@@ -225,6 +228,7 @@
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Weapon_Item.h" />
     <ClInclude Include="..\Public\Weapon_Katana.h" />
+    <ClInclude Include="..\Public\Yard_Round.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Pony_Defines.h" />
     <ClInclude Include="RifleMan_Defines.h" />
@@ -246,6 +250,7 @@
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
+    <ClCompile Include="..\Private\Coin_Item.cpp" />
     <ClCompile Include="..\Private\CollisionBox.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
     <ClCompile Include="..\Private\Energy_Cap.cpp" />
@@ -258,6 +263,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Head_Player.cpp" />
     <ClCompile Include="..\Private\Helicopter.cpp" />
+    <ClCompile Include="..\Private\Hp_Item.cpp" />
     <ClCompile Include="..\Private\InGameUI.cpp" />
     <ClCompile Include="..\Private\Level_Yard.cpp" />
     <ClCompile Include="..\Private\Level_ImGui.cpp" />
@@ -266,6 +272,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_Select.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Loading_UI.cpp" />
@@ -297,6 +304,7 @@
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon_Item.cpp" />
     <ClCompile Include="..\Private\Weapon_Katana.cpp" />
+    <ClCompile Include="..\Private\Yard_Round.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

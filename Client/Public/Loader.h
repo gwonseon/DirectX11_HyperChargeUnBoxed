@@ -52,7 +52,7 @@ private:
 
 
 private:
-	// vector<CModel*>				m_Model; Assimp Outer º¸·ù
+	LEVELID m_eTargetLevel = LEVEL_MONSTERSPAWN;
 
 
 
@@ -68,7 +68,7 @@ private:
 	HRESULT Loading_DataFile_For_GameLevel();
 	HRESULT Loading_DataFile_For_YardLevel();
 	HRESULT Loading_DataFile_For_NavigationLevel();
-	HRESULT Loading_DataFile_For_MonsterSpawnLevel();
+	HRESULT Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);

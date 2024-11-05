@@ -66,7 +66,7 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 			}
 		}
 	}
-
+	// 배터리 줍기
 	if (*m_pPlayer->Get_WeaponState() == CPlayer::BATTERY)
 	{
 		if (m_pTransformCom->Cal_Distance_vec(m_pEnergy_Machine->Get_EnergyMachinePos(), m_pPlayer->Get_Position()) <= 80.f)
@@ -87,12 +87,27 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 	{
 		m_bBattery_Insert_End = false;
 	}
+	// 아이템과의 상호 작용
+	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false)
+	{
+		if (m_fReal_Gauging_Time >= 1.f)
+		{
+			m_bItem_Interaction = false;
+			m_bItem_Interaction_End = true;
+			m_bItemCharging = false;
+			m_fGuaging_Time = 0.f;
+			m_fReal_Gauging_Time = 0.f;
+		}
+	}
+
+
 
 }
 
 void CUI_CircleGuage::Update(_float fTimeDelta)
 {
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true)
+	// 게이지 차징
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bCoinItem_Interaction == true)
 	{
 			m_fReal_Gauging_Time += fTimeDelta;
 			m_fGuaging_Time += fTimeDelta * 10;
@@ -107,18 +122,7 @@ void CUI_CircleGuage::Update(_float fTimeDelta)
 
 void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 {
-	// 아이템과의 상호 작용
-	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false)
-	{
-		if (m_fReal_Gauging_Time >= 1.f)
-		{
-			m_bItem_Interaction = false;
-			m_bItem_Interaction_End = true;
-			m_bItemCharging = false;
-			m_fGuaging_Time = 0.f;
-			m_fReal_Gauging_Time = 0.f;
-		}
-	}
+
 	// 배터리 삽입
 	if (m_bBattery_Insert == true && m_bBattery_Insert_End == false)
 	{
@@ -139,8 +143,8 @@ void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 		}
 	}
 	
-
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true)
+	// 그리기
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bCoinItem_Interaction == true)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
 			return;
@@ -149,18 +153,14 @@ void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 
 HRESULT CUI_CircleGuage::Render()
 {
-	
-		m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
-
-		if (FAILED(Bind_ShaderResources()))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
-		if (FAILED(m_pVIBufferCom->Bind_Buffers()))
-			return E_FAIL;
-		if (FAILED(m_pVIBufferCom->Render()))
-			return E_FAIL;
-	
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Begin(0)))
+		return E_FAIL;
+	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+		return E_FAIL;
+	if (FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -173,7 +173,6 @@ HRESULT CUI_CircleGuage::Add_Components(_int iNum)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCircleGuage"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
@@ -184,25 +183,19 @@ HRESULT CUI_CircleGuage::Add_Components(_int iNum)
 
 HRESULT CUI_CircleGuage::Bind_ShaderResources()
 {
-
-	_float2 Winsize = { g_iWinSizeX,g_iWinSizeY };
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_Time", &m_fGuaging_Time, sizeof(float))))
 		return E_FAIL;
+	_float2 Winsize = { g_iWinSizeX,g_iWinSizeY };
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_Winsize", &Winsize,	sizeof(_float2))))
 		return E_FAIL;
-
-
-
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
 		return E_FAIL;
-
 
 	return S_OK;
 }
