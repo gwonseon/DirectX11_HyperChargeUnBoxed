@@ -73,7 +73,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pRound_Manager = CRound_Manager::Create();
 	if (nullptr == m_pRound_Manager)
 		return E_FAIL;
-
+	
+	m_pUI_Manager = CUIManager::Create();
+	if (nullptr == m_pUI_Manager)
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -455,6 +458,11 @@ void CGameInstance::Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool&
 	return m_pRound_Manager->Update(fTimeDelta, iCurrentRound, bBuildMode, Monster_Near, Monster_Far, bRoundStart, SkipTimer);
 }
 
+void CGameInstance::CircleGauge_Interaction(CLayer* Item, CLayer* UI)
+{
+	m_pUI_Manager->CircleGauge_Interaction(Item, UI);
+}
+
 
 void CGameInstance::Release_Engine()
 {
@@ -476,5 +484,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);
-	Safe_Release(m_pRound_Manager);
+	Safe_Release(m_pRound_Manager); 
+	Safe_Release(m_pUI_Manager);
 }

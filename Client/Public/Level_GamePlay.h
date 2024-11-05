@@ -29,7 +29,7 @@ public:
 
 
 public:
-	void	Interaction_Weapon();
+	void	Interaction();
 	void    Texture_Render();
 private:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
@@ -73,6 +73,10 @@ private:
 	CLayer* pTrap				= { nullptr };
 	CLayer* pTrap_Shield		= { nullptr };
 	CLayer* pMonsterBullet		= { nullptr };
+	CLayer* pCircleUI = { nullptr };
+	CLayer* pItem = { nullptr };
+
+
 	_bool* m_pReloading			= { nullptr };
 	_uint	m_iCurrentRound		= 0;
 	_uint	m_iPreviousRound	= 0;

@@ -88,7 +88,7 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 		m_bBattery_Insert_End = false;
 	}
 	// 아이템과의 상호 작용
-	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false)
+	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false && m_bCoinItem_Interaction == false)
 	{
 		if (m_fReal_Gauging_Time >= 1.f)
 		{
@@ -100,14 +100,22 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 		}
 	}
 
-
-
+	//  아이템과의 상호 작용
+	if (m_bInteraction == true)
+	{
+		if (m_fReal_Gauging_Time >= 1.f)
+		{
+			m_bInteraction = false;
+			m_fGuaging_Time = 0.f;
+			m_fReal_Gauging_Time = 0.f;
+		}
+	}
 }
 
 void CUI_CircleGuage::Update(_float fTimeDelta)
 {
 	// 게이지 차징
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bCoinItem_Interaction == true)
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bInteraction == true)
 	{
 			m_fReal_Gauging_Time += fTimeDelta;
 			m_fGuaging_Time += fTimeDelta * 10;
@@ -144,7 +152,7 @@ void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 	}
 	
 	// 그리기
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bCoinItem_Interaction == true)
+	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true ||  m_bInteraction == true)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
 			return;

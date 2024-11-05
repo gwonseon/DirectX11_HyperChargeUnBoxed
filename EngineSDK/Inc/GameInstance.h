@@ -8,7 +8,7 @@
 #include "Picking_Manager.h"
 #include "CollisionMgr.h"
 #include "Round_Manager.h"
-
+#include "UIManager.h"
 
 
 /* CGameInstance : */
@@ -121,6 +121,9 @@ public: /* For.Font_Manager */
 public: // Round Manager
 	void Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer);
 
+public: // UI_Manager
+	void CircleGauge_Interaction(CLayer* Item, CLayer* UI);
+
 
 
 private:
@@ -137,7 +140,7 @@ private:
 	class CCollisionMgr* m_pCollision_Manager = { nullptr };
 	class CFont_Manager* m_pFont_Manager = { nullptr };
 	class CRound_Manager* m_pRound_Manager = { nullptr };
-
+	class CUIManager* m_pUI_Manager = { nullptr };
 
 public:
 	static void Release_Engine();
