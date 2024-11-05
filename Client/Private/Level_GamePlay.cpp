@@ -92,6 +92,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	m_pReloading = m_pPlayer->Get_Reloading();
 	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Player"));
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Coin"));
+	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_CircleUI"));
+	pItem = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Item"));
+
 	return S_OK;
 }
 
@@ -111,8 +114,8 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	// 업데이트에서 해당 조건을 만족했을 때 작동하는 식으로 하면 어떨까
 
 
-	// 무기와 상호작용
-	Interaction_Weapon();
+	//  상호작용
+	Interaction();
 
 #pragma region Collision
 	if(pTrap_Shield == nullptr)
@@ -164,8 +167,10 @@ HRESULT CLevel_GamePlay::Render()
 	return S_OK; 
 }
 
-void CLevel_GamePlay::Interaction_Weapon()
+void CLevel_GamePlay::Interaction()
 {
+	m_pGameInstance->CircleGauge_Interaction(pItem, pCircleUI);
+
 	_vector vPlayerPos = m_pPlayer->Get_Position();
 	_float3 fPlayerPos{}, fWeaponPos{};
 	XMStoreFloat3(&fPlayerPos, vPlayerPos);
@@ -231,8 +236,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 
 	CSky::SKY_DESC pSky{};
 	pSky.m_eLevel = LEVEL_GAMEPLAY;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag,
-		TEXT("Prototype_GameObject_Sky"),&pSky)))
+	pSky.pCamPos = m_pCamera->Get_Camera_Pos();
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Sky"),&pSky)))
 		return E_FAIL;
 
 	return S_OK;
@@ -842,7 +847,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.vecMarks = &m_vecTrapMark;
 	pCircleDesc.pEnergy_Machine = m_pEnergyMachine;
 	pCircleDesc.pEnergyMachine_Cap = m_pEnergyMachine_Cap;
-	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
+	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"), TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
 
 	// 총알 아이콘

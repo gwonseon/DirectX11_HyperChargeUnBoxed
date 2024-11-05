@@ -91,6 +91,10 @@ HRESULT CLevel_Yard::Initialize()
 	m_pReloading = m_pPlayer->Get_Reloading();
 	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Player"));
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Coin"));
+	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_CircleUI"));
+	pItem = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Item"));
+
+
 	return S_OK;
 
 
@@ -102,7 +106,7 @@ void CLevel_Yard::Update(_float fTimeDelta)
 	__super::Update(fTimeDelta);
 	Build_Check(); // 트랩 설치관련 
 
-	Interaction_Weapon();
+	Interaction();
 	RoundMgr_And_MonsterSpawn(fTimeDelta);
 
 #pragma region Collision
@@ -156,8 +160,10 @@ HRESULT CLevel_Yard::Render()
 	return S_OK;
 }
 
-void CLevel_Yard::Interaction_Weapon()
+void CLevel_Yard::Interaction()
 {
+	m_pGameInstance->CircleGauge_Interaction( pItem, pCircleUI);
+
 	_vector vPlayerPos = m_pPlayer->Get_Position();
 	_float3 fPlayerPos{}, fWeaponPos{};
 	XMStoreFloat3(&fPlayerPos, vPlayerPos);
@@ -240,7 +246,7 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.vecMarks = &m_vecTrapMark;
 	pCircleDesc.pEnergy_Machine = m_pEnergyMachine;
 	pCircleDesc.pEnergyMachine_Cap = m_pEnergyMachine_Cap;
-	CGameObject* pGuage = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
+	CGameObject* pGuage = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, TEXT("Layer_CircleUI"), TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
 
 	// 총알 아이콘
@@ -604,8 +610,9 @@ HRESULT CLevel_Yard::Ready_Layer_Terrain(const _tchar* pLayerTag)
 
 	CSky::SKY_DESC pSky{};
 	pSky.m_eLevel = LEVEL_YARD;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
-		TEXT("Prototype_GameObject_Sky"),&pSky)))
+	pSky.pCamPos = m_pCamera->Get_Camera_Pos();
+	pSky.pCamera = m_pCamera;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Sky"),&pSky)))
 		return E_FAIL;
 
 	return S_OK;
@@ -620,7 +627,7 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
-	Desc.fFar = 500.f;
+	Desc.fFar = 2000.f;
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);

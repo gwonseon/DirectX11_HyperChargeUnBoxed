@@ -78,6 +78,7 @@ public:
 	void	Set_Attacked(_bool bAttacked)	{ m_bAttacked = bAttacked; }  // 공격 당했음을 알려줌
 	void	Set_knockdown(_bool bknockdown) { m_bKnockdown = bknockdown; }
 
+	void	Set_Interaction(_bool bInteraction) { m_bInteraction = bInteraction; }
 	
 	_float	Get_Hp()						{ return m_fHp; }		// 체력 얼마나 있는지
 	_float	Get_Energy()					{ return m_fEnergy; }	// 쉴드량 얼마나 있는지
@@ -91,6 +92,7 @@ public:
 	_bool	Get_AttackState()				{ return m_bAttackState; } // 공격 모션인지 아닌지 확인용(이때만 충돌이 되어야 함)
 	_bool	Get_IsBullet()					{ return m_bIsBullet; }
 
+	_bool	Get_Interaction()				{ return m_bInteraction; }
 
 
 	// 에너지가 있으면 에너지 깎고, 에너지 없으면 Hp깎음
@@ -127,6 +129,8 @@ protected:
 	_bool							m_bCanAttacked	= true; // 맞을 수 있는 상태인지 확인
 	_bool							m_bCollision_Check = false;
 	_bool							m_bIsBullet = false;	// 총알인지 판단 ( 총알이면 삭제함)
+
+	_bool							m_bInteraction = false; // 아이템관련 상호작용
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 

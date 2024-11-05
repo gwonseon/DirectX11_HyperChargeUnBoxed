@@ -175,6 +175,9 @@
     <Filter Include="01. Utility\08. Manager\04. RoundMgr">
       <UniqueIdentifier>{b1226719-9b98-499b-b205-0a6b1847ccbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\08. Manager\05. UIMgr">
+      <UniqueIdentifier>{cd517d86-da2c-469a-b484-d53c3adbcdbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -332,6 +335,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Round_Manager.cpp">
       <Filter>01. Utility\08. Manager\04. RoundMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UIManager.cpp">
+      <Filter>01. Utility\08. Manager\05. UIMgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -502,6 +508,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Round_Manager.h">
       <Filter>01. Utility\08. Manager\04. RoundMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UIManager.h">
+      <Filter>01. Utility\08. Manager\05. UIMgr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

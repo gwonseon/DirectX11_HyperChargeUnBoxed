@@ -11,6 +11,7 @@ CCoin_Item::CCoin_Item(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CCoin_Item::CCoin_Item(const CCoin_Item& Prototype)
     : CGameObject{ Prototype }
+    , m_vecItemPos{Prototype.m_vecItemPos }
 {
 }
 
@@ -42,7 +43,7 @@ HRESULT CCoin_Item::Initialize(void* pArg)
     _float4x4 matSecondPreTransform{};
     XMStoreFloat4x4(&matSecondPreTransform, XMMatrixTranslation(0.f, 0.f, -0.15f));
     m_pModelCom->Set_SecondPreTransform(matSecondPreTransform);
-
+    m_fCharging_Time = 0.f;
     switch (m_iModelIndex)
     {
     case 47:
@@ -63,6 +64,10 @@ HRESULT CCoin_Item::Initialize(void* pArg)
     default:
         break;
     }
+    
+
+
+
     return S_OK;
 }
 
@@ -82,20 +87,20 @@ void CCoin_Item::Update(_float fTimeDelta)
     m_vecItemPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
     // 플레이어와 아이템 거리가 가까워졌을 때
-    if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecItemPos) <= 80.f)
+    if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecItemPos) <= 50.f)
     {
         // 사이즈 커지기
         m_pTransformCom->Set_Scaling(m_fScale.x + 2.f, m_fScale.y + 2.f, m_fScale.z + 2.f);
         
         if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
         {
-            m_pGuage->Set_CoinItem_Interation(true);
+            m_bInteraction = true;
 
             m_fCharging_Time += fTimeDelta;
         }
         else
         {
-            m_pGuage->Set_CoinItem_Interation(false);
+            m_bInteraction = false;
             m_fCharging_Time = 0.f;
         }
 
@@ -103,7 +108,6 @@ void CCoin_Item::Update(_float fTimeDelta)
     else
     {
         m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-        m_pGuage->Set_CoinItem_Interation(false);
         m_fCharging_Time = 0.f;
     }
 
@@ -111,7 +115,6 @@ void CCoin_Item::Update(_float fTimeDelta)
     if (m_fCharging_Time >= 1.f)
     {
         m_pPlayer->Set_PickUp_Coin(m_iCoin);
-        m_pGuage->Set_CoinItem_Interation(false);
         m_bDead = true;
     }
 

@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Camera_Free.h"
 
 BEGIN(Engine)
 class CShader;
@@ -17,7 +18,8 @@ public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID m_eLevel{};
-
+		CCamera_Free* pCamera = { nullptr };
+		_vector* pCamPos = { nullptr };
 	}SKY_DESC;
 private:
 	CSky(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -25,7 +27,6 @@ private:
 	virtual ~CSky() = default;
 
 public:
-
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
@@ -45,6 +46,9 @@ private:
 
 private:
 	LEVELID m_eLevel{};
+	_vector* m_vecCameraPos = { nullptr };
+	CCamera_Free* m_pCamera = { nullptr };
+
 
 public:
 	static CSky* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

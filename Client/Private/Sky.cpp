@@ -22,6 +22,8 @@ HRESULT CSky::Initialize(void* pArg)
 {
     SKY_DESC* pSky = static_cast<SKY_DESC*>(pArg);
     m_eLevel = pSky->m_eLevel;
+    m_vecCameraPos = pSky->pCamPos;
+    m_pCamera = pSky->pCamera;
     if (FAILED(__super::Initialize(nullptr)))
         return E_FAIL;
 
@@ -36,12 +38,13 @@ void CSky::Priority_Update(_float fTimeDelta)
 
 void CSky::Update(_float fTimeDelta)
 {
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(m_pGameInstance->Get_CamPosition()));
 
 }
 
 void CSky::Late_Update(_float fTimeDelta)
 {
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, *m_vecCameraPos);
+
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_PRIORITY, this)))
         return;
 }
@@ -89,7 +92,7 @@ HRESULT CSky::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
-    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 3)))
+    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 2)))
         return E_FAIL;
 
     return S_OK;

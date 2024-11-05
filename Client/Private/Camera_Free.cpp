@@ -194,12 +194,7 @@ void CCamera_Free::Update(_float fTimeDelta)
         break;
     }
 
- 
-}
-
-void CCamera_Free::Late_Update(_float fTimeDelta)
-{
-    if (m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD )
+    if (m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD)
     {
         XMMATRIX matWorld = XMLoadFloat4x4(m_matPlayerWorld); // 플레이어 월드 매트릭스
         // 카메라 회전
@@ -268,8 +263,13 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
 
         }
     }
-
+    m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     __super::Priority_Update(fTimeDelta);
+}
+
+void CCamera_Free::Late_Update(_float fTimeDelta)
+{
+   
 }
 
 HRESULT CCamera_Free::Render()

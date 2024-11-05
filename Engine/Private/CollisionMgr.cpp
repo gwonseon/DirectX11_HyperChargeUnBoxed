@@ -223,9 +223,6 @@ void CCollisionMgr::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const
 						// 둘 사이의 대각선 거리를 가져와서 반지름 길이를 더한 값 만큼의 길이가 되게 밀어주기
 						// 토요일에 하자 귀찮다
 					}
-
-
-
 				}
 			}
 		}

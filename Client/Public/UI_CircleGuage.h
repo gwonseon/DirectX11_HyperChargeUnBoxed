@@ -74,7 +74,8 @@ public:
 
 	_bool	Get_Charging() { return m_bCharging; }
 	_bool   Get_ItemInteraction_End() { return m_bItem_Interaction_End; }
-	
+	_bool*	Get_CoinItem_Interaction() { return &m_bCoinItem_Interaction; }
+
 private:
 	float	m_fGuaging_Time{};
 	_float	m_fReal_Gauging_Time{};
@@ -94,6 +95,9 @@ private:
 
 	// 코인 아이템
 	_bool	m_bCoinItem_Interaction = false;
+	_bool	m_bCoinItem_Interaction_End = false;
+
+
 	LEVELID m_eLevel{};
 
 public:

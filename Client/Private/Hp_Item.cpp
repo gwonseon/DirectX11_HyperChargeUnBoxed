@@ -62,13 +62,13 @@ void CHp_Item::Update(_float fTimeDelta)
 
         if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
         {
-            m_pGuage->Set_CoinItem_Interation(true);
+            m_bInteraction = true;
 
             m_fCharging_Time += fTimeDelta;
         }
         else
         {
-            m_pGuage->Set_CoinItem_Interation(false);
+            m_bInteraction = false;
             m_fCharging_Time = 0.f;
         }
 
@@ -76,7 +76,6 @@ void CHp_Item::Update(_float fTimeDelta)
     else
     {
         m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-        m_pGuage->Set_CoinItem_Interation(false);
         m_fCharging_Time = 0.f;
     }
 
@@ -84,7 +83,6 @@ void CHp_Item::Update(_float fTimeDelta)
     if (m_fCharging_Time >= 1.f)
     {
         m_pPlayer->Set_FullHeal();
-        m_pGuage->Set_CoinItem_Interation(false);
         m_bDead = true;
     }
 

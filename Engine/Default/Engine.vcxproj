@@ -189,6 +189,7 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\Public\Round_Manager.h" />
     <ClInclude Include="..\Public\SphereCollider.h" />
+    <ClInclude Include="..\Public\UIManager.h" />
     <ClInclude Include="..\Public\VIBuffer_Box.h" />
     <ClInclude Include="..\Public\Input_Device.h" />
     <ClInclude Include="..\Public\Layer.h" />
@@ -243,6 +244,7 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Private\Navigation.cpp" />
     <ClCompile Include="..\Private\Round_Manager.cpp" />
     <ClCompile Include="..\Private\SphereCollider.cpp" />
+    <ClCompile Include="..\Private\UIManager.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Box.cpp" />
     <ClCompile Include="..\Private\Input_Device.cpp" />
     <ClCompile Include="..\Private\Layer.cpp" />
