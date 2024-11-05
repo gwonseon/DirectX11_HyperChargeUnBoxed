@@ -35,7 +35,7 @@ HRESULT CRifleMan::Initialize(void* pArg)
     m_matPlayerWorld = pDesc->matPlayerWorld;
     m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
     m_pBuild = pDesc->m_pBuild;
-    
+    m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
     m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
 
     pDesc->fScale = _float3(2.f, 2.f, 2.f);
@@ -81,7 +81,7 @@ void CRifleMan::Update(_float fTimeDelta)
     {
         if (m_bFind_Path == false)
         {
-            Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_pNavigationCom->Get_CurrentCell_Index(), 99);
+            Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_pNavigationCom->Get_CurrentCell_Index(), m_iBraincore_CellNumber);
             m_bFind_Path = true;
         }
         if (m_fTime_For_Target >= 3.f) // 항상 검사하기엔 검사량이 많아서 검사 빈도수를 줄여줌
@@ -135,7 +135,7 @@ void CRifleMan::Update(_float fTimeDelta)
                     Desc.vDir = XMVector3Normalize(vecTargetPos - vPos);
                     Desc.m_pBuild = m_pBuild;
                     Desc.pPlayer = m_pPlayer;
-                    static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+                    static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
                     m_iShot_Count++;
                 }
                 else
@@ -221,7 +221,7 @@ void CRifleMan::Update(_float fTimeDelta)
                     Desc.vDir = XMVector3Normalize(vPlayerPos - vPos);
                     Desc.m_pBuild = m_pBuild;
                     Desc.pPlayer = m_pPlayer;
-                    static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+                    static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
                     m_iShot_Count++;
                 }
                 else
@@ -291,7 +291,7 @@ HRESULT CRifleMan::Add_Components()
     SphereDesc.fRadius = 1.5f;
     SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
         TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
         return E_FAIL;
 

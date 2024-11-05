@@ -69,6 +69,8 @@ public:
 			m_bItemCharging = false;
 	}
 	void	Set_Item_InteractionEnd(_bool bEnd) { m_bItem_Interaction_End = bEnd; }
+	void	Set_CoinItem_Interation(_bool bInteraction)	{	m_bCoinItem_Interaction = bInteraction;	}
+
 
 	_bool	Get_Charging() { return m_bCharging; }
 	_bool   Get_ItemInteraction_End() { return m_bItem_Interaction_End; }
@@ -78,15 +80,20 @@ private:
 	_float	m_fReal_Gauging_Time{};
 	_bool	m_bCharging{}, m_bItemCharging{};
 	
+	// 빌드
 	_bool	m_bBuild_Draw = false;
 	
+	// 무기
 	_bool   m_bItem_Interaction = false;
 	_bool   m_bItem_Interaction_End = false;
 
+	// 배터리
 	_bool	m_bBattery_Insert = false;
 	_bool	m_bBattery_Insert_End = false;
 	_bool	m_bBattery_Insert_First = false;
 
+	// 코인 아이템
+	_bool	m_bCoinItem_Interaction = false;
 	LEVELID m_eLevel{};
 
 public:

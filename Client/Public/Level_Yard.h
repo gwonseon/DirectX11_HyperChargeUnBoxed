@@ -2,6 +2,8 @@
 
 #include "Client_Defines.h"
 #include "Level.h"
+
+
 #include "Camera_Free.h"
 #include "Player.h"
 #include "UI_CircleGuage.h"
@@ -13,8 +15,10 @@
 #include "Battery.h"
 #include "InGameUI.h"
 
+
 BEGIN(Client)
 
+class CYard_Round;
 class CLevel_Yard : public CLevel
 {
 protected:
@@ -37,6 +41,7 @@ private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_WeaponITem(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_ITem(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Icon(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
@@ -46,7 +51,7 @@ private:
 private:
 	void Load_Map();
 	void Build_Check();
-	//void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
+	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
 private:
 	CCamera_Free* m_pCamera = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };
@@ -81,7 +86,10 @@ private:
 	// ¶ó¿îµå
 private:
 	_float	m_fSkipTimer{};
+	CYard_Round* m_pRound[3] = { nullptr };
 	_bool		m_bRoundStart = false;
+
+
 public:
 	static CLevel_Yard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

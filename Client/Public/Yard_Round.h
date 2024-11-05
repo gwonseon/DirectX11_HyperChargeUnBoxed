@@ -1,11 +1,11 @@
 #pragma once
 #include "Client_Defines.h"
-#include "Level_GamePlay.h"
+#include "Level_Yard.h"
 #include "Player.h"
 
 BEGIN(Client)
 
-class CGamePlay_Round : public CLevel_GamePlay
+class CYard_Round : public CLevel_Yard
 {
 public:
 	typedef struct
@@ -14,13 +14,14 @@ public:
 		_float3		fPos{};
 		_uint		iCell_Idx{};
 
-	}MONSTER_CREATE_DESC;
+	}MONSTER_CREATE_FOR_YARD_DESC;
+
 private:
-	CGamePlay_Round(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual ~CGamePlay_Round() = default;
+	CYard_Round(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual ~CYard_Round() = default;
 
 public:
-	virtual HRESULT Initialize(_uint iRound) ;
+	virtual HRESULT Initialize(_uint iRound);
 	virtual void Update(_float fTimeDelta) override;
 
 public:
@@ -44,8 +45,10 @@ private:
 	_uint m_iMonsterCount{};
 	_uint m_iCurrent_RemainMonster{};
 	_float fRound_Time{}, fCreate_Time{};
-	vector< MONSTER_CREATE_DESC> m_vecMonsterCreate;
+	vector< MONSTER_CREATE_FOR_YARD_DESC> m_vecMonsterCreate;
+
 	ANIMMODEL_INDEX eModel_Index{};
+
 
 	CLayer* m_pTrapLeyer = { nullptr };
 	_vector* vecBrainPos = { nullptr };
@@ -60,8 +63,9 @@ private:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
 public:
-	static CGamePlay_Round* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,_uint iRound );
+	static CYard_Round* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iRound);
 	virtual void Free() override;
+
 };
 
 END

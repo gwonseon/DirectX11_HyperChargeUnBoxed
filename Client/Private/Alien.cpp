@@ -144,7 +144,7 @@ HRESULT CAlien::Add_Components()
 	SphereDesc.fRadius = 1.8f;
 	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 

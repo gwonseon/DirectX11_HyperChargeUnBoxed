@@ -34,7 +34,7 @@ HRESULT CPony::Initialize(void* pArg)
 	m_matPlayerWorld = pDesc->matPlayerWorld;
 	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
 	m_pBuild = pDesc->m_pBuild;
-
+	m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
 	m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
 
 	pDesc->fScale = _float3(2.f, 2.f, 2.f);
@@ -104,7 +104,7 @@ void CPony::Update(_float fTimeDelta)
 	{
 		if (m_bFind_Path == false)
 		{
-			Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_pNavigationCom->Get_CurrentCell_Index(), 99);
+			Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_pNavigationCom->Get_CurrentCell_Index(), m_iBraincore_CellNumber);
 			m_bFind_Path = true;
 		}
 

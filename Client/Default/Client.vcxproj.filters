@@ -205,6 +205,15 @@
     <Filter Include="01. Levels\02. Game_Yard">
       <UniqueIdentifier>{ef8d556f-7b84-4f02-91db-eec1a6ee363e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Environment\Coin_Item">
+      <UniqueIdentifier>{338993a4-951e-49ba-aaaf-dcddd4043934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Environment\Hp_Item">
+      <UniqueIdentifier>{9b95b059-579d-4156-b622-344150a7e38f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Game_Yard\Round">
+      <UniqueIdentifier>{f1f03257-541c-4ada-a28b-309d557d8c8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -405,6 +414,15 @@
     <ClInclude Include="..\Public\Level_Select.h">
       <Filter>01. Levels\Level_Select</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Coin_Item.h">
+      <Filter>02. GameObjects\Environment\Coin_Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Hp_Item.h">
+      <Filter>02. GameObjects\Environment\Hp_Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Yard_Round.h">
+      <Filter>01. Levels\02. Game_Yard\Round</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -583,6 +601,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Select.cpp">
       <Filter>01. Levels\Level_Select</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Coin_Item.cpp">
+      <Filter>02. GameObjects\Environment\Coin_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Hp_Item.cpp">
+      <Filter>02. GameObjects\Environment\Hp_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Yard_Round.cpp">
+      <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
