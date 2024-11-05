@@ -29,7 +29,7 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_fUIPosition = { pDesc->fX, pDesc->fY, 0.f};
     m_pPlayer = pDesc->pPlayer;
     m_eLevel = pDesc->eLevel;
-
+    m_pCircle = pDesc->pCircle;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
     if (FAILED(Add_Components(pDesc->iData)))
@@ -153,6 +153,11 @@ void CInGameUI::Update(_float fTimeDelta)
             m_bDraw = true;
             m_iIndex = 1;
         } // 특정 조건들 가져와서 인덱스 2번으로 
+        else if (m_pCircle->Get_Interaction() == true)
+        {
+            m_bDraw = true;
+            m_iIndex = 2;
+        }
         else
             m_bDraw = false;
         

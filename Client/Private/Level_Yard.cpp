@@ -221,18 +221,7 @@ void CLevel_Yard::Texture_Render()
 
 HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 {
-	CInGameUI::INGAMEUI_DESC	DescCenterIcon{};
-	DescCenterIcon.eLevel = LEVEL_YARD;
-	DescCenterIcon.eUITag = CInGameUI::UI_CENTERICON;
-	DescCenterIcon.fSizeX = 26.f;
-	DescCenterIcon.fSizeY = 26.f;
-	DescCenterIcon.iData = 0;
-	DescCenterIcon.fX = g_iWinSizeX * 0.5f;
-	DescCenterIcon.fY = g_iWinSizeY * 0.5f;
-	DescCenterIcon.fDepth = 0.1f;
-	DescCenterIcon.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescCenterIcon)))
-		return E_FAIL;
+
 
 	CUI_CircleGuage::CIRCLEGAUGE_DESC pCircleDesc{};
 	pCircleDesc.eLevel = LEVEL_YARD;
@@ -248,6 +237,20 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.pEnergyMachine_Cap = m_pEnergyMachine_Cap;
 	CGameObject* pGuage = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, TEXT("Layer_CircleUI"), TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
+
+	CInGameUI::INGAMEUI_DESC	DescCenterIcon{};
+	DescCenterIcon.eLevel = LEVEL_YARD;
+	DescCenterIcon.eUITag = CInGameUI::UI_CENTERICON;
+	DescCenterIcon.fSizeX = 26.f;
+	DescCenterIcon.fSizeY = 26.f;
+	DescCenterIcon.iData = 0;
+	DescCenterIcon.fX = g_iWinSizeX * 0.5f;
+	DescCenterIcon.fY = g_iWinSizeY * 0.5f;
+	DescCenterIcon.fDepth = 0.1f;
+	DescCenterIcon.pPlayer = m_pPlayer;
+	DescCenterIcon.pCircle = m_pGuage;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescCenterIcon)))
+		return E_FAIL;
 
 	// 총알 아이콘
 	CInGameUI::INGAMEUI_DESC	DescBulletIcon{};
