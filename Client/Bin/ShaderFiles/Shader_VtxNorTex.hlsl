@@ -17,20 +17,7 @@ float4 g_vCamPosition;
 //m_pGraphic_Device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 // 샘플러 선언과 동시에 초기화하기, Min Mag Mip 모두 Linear(선형으)로 초기화
-sampler LinearSampler = sampler_state
-{ 
-// 텍스처 좌표가 0에서 1을 벗어날 때 텍스처가 반복되도록 처리한다.
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = WRAP; 
-    AddressV = WRAP;
-};
 
-
-sampler PointSampler = sampler_state
-{
-    filter = MIN_MAG_MIP_POINT;
-
-};
 
 
 struct VS_IN

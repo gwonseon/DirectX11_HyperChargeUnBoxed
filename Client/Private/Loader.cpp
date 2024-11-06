@@ -9,7 +9,6 @@
 #include "ButtonUI.h"
 #include "NumberUI.h"
 
-
 #include "Terrain.h"
 #include "Camera_Free.h"
 
@@ -49,6 +48,10 @@
 #include "FPS_Pivot.h"
 
 #include "Sky.h"
+
+#include "Particle_Explosion.h"
+#include "Particle_Snow.h"
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -675,6 +678,11 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Texture_Snow */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Snow"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
+		return E_FAIL;
+
 
 #pragma region UI텍스처 생성
 	// 크로스 라인
@@ -811,6 +819,35 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
+	/* For.Prototype_Component_VIBuffer_Particle_Snow*/
+	CVIBuffer_Instancing::INSTANCING_DESC		ParticleSnowDesc{};
+	ParticleSnowDesc.iNumInstance = 3000;
+	ParticleSnowDesc.vCenter = _float3(645.424f, 20.f, 559.107f);
+	ParticleSnowDesc.vRange = _float3(128.f, 1.f, 128.f);
+	ParticleSnowDesc.vSize = _float2(0.05f, 0.1f);
+	ParticleSnowDesc.vSpeed = _float2(1.f, 7.f);
+	ParticleSnowDesc.vLifeTime = _float2(3.f, 10.f);
+	ParticleSnowDesc.isLoop = true;
+	
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Snow"),
+		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext, &ParticleSnowDesc))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Particle_Explosion */
+	CVIBuffer_Instancing::INSTANCING_DESC		ParticleExploDesc{};
+	ParticleExploDesc.iNumInstance = 700;
+	ParticleExploDesc.vCenter = _float3(645.424f, 0.f, 559.107f);
+	ParticleExploDesc.vRange = _float3(4.f, 4.f, 4.f);
+	ParticleExploDesc.vSize = _float2(0.05f, 0.1f);
+	ParticleExploDesc.vSpeed = _float2(0.3f, 1.f);
+	ParticleExploDesc.vLifeTime = _float2(0.1f, 0.5f);
+	ParticleExploDesc.vPivot = _float3(0.f, -0.5f, 0.f);
+	ParticleExploDesc.isLoop = true;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Explosion"),
+		CVIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &ParticleExploDesc))))
+		return E_FAIL;
+
 
 	/* For.Prototype_Component_VIBuffer_Cube */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Cube"),
@@ -828,10 +865,28 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Shader_VtxParticleRect */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticleRect"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticleRect.hlsl"), VTXPARTICLE_RECT::Elements, VTXPARTICLE_RECT::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxParticlePoint */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticlePoint"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticlePoint.hlsl"), VTXPARTICLE_POINT::Elements, VTXPARTICLE_POINT::iNumElements))))
+		return E_FAIL;
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
-	/* For.Prototype_GameObject_BackGround */
+
+	/* Prototype_GameObject_Particle_Snow */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Snow"),
+		CParticle_Snow::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Particle_Explosion */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Explosion"),
+		CParticle_Explosion::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	/* Prototype_GameObject_Sky */

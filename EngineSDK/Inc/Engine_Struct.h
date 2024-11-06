@@ -77,6 +77,16 @@ namespace Engine
 	typedef struct ENGINE_DLL
 	{
 		XMFLOAT3		vPosition;
+		XMFLOAT2		vPSize;
+
+		static const unsigned int		iNumElements = 2;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
+	}VTXPOINT;
+
+
+	typedef struct ENGINE_DLL
+	{
+		XMFLOAT3		vPosition;
 		XMFLOAT3		vTexcoord;
 
 		static const unsigned int		iNumElements = 2;
@@ -130,7 +140,27 @@ namespace Engine
 	}VTXANIMMESH;
 
 
+	typedef struct
+	{
+		XMFLOAT4		vRight;
+		XMFLOAT4		vUp;
+		XMFLOAT4		vLook;
+		XMFLOAT4		vTranslation;
+		XMFLOAT2		vLifeTime;
+	}VTXMATRIX;
 
+
+	typedef struct ENGINE_DLL
+	{
+		static const unsigned int		iNumElements = 7;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXPARTICLE_RECT;
+
+	typedef struct ENGINE_DLL
+	{
+		static const unsigned int		iNumElements = 7;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXPARTICLE_POINT;
 
 
 }

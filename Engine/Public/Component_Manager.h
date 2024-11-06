@@ -8,6 +8,8 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Cube.h"
 #include "VIBuffer_Terrain.h"
+#include "VIBuffer_Particle_Rect.h"
+#include "VIBuffer_Particle_Point.h"
 
 /* 보관하는역활. */
 /* 컴포넌트 원형을 보관한다. */

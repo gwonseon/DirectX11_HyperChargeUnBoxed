@@ -23,7 +23,7 @@ public:
 
 	void	Chang_Topology();
 public:
-	HRESULT Bind_Buffers(); // 그리기 위해 필요한 값들을 장치에 올린다.
+	virtual HRESULT Bind_Buffers(); // 그리기 위해 필요한 값들을 장치에 올린다.
 	HRESULT Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 protected:
 	ID3D11Buffer*					m_pVB = { nullptr };		// 정점을 저장하는 버퍼, 정점 데이터를 GPU메모리에 저장, 엑세스 할 수 있게 해준다

@@ -13,17 +13,7 @@ texture2D           g_Texture;
 //m_pGraphic_Device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 // 샘플러 선언과 동시에 초기화하기, Min Mag Mip 모두 Linear(선형으)로 초기화
-sampler LinearSampler = sampler_state
-{
-    Filter = MIN_MAG_MIP_LINEAR;
 
-};
-
-
-sampler PointSampler = sampler_state
-{
-    filter = MIN_MAG_MIP_POINT;
-};
 
 
 struct VS_IN

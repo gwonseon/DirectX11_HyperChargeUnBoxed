@@ -16,17 +16,7 @@ float4			g_vCamPosition;
 float4x4		g_BoneMatrices[512];
 
 
-sampler LinearSampler = sampler_state
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
 
-sampler PointSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_POINT;
-};
 
 struct VS_IN
 {
