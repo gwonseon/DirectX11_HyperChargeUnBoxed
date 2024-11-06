@@ -51,7 +51,7 @@
 
 #include "Particle_Explosion.h"
 #include "Particle_Snow.h"
-
+#include "Grass_Instancing.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -819,6 +819,9 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
+	Loading_DataFile_For_YardLevel();
+
+
 	/* For.Prototype_Component_VIBuffer_Particle_Snow*/
 	CVIBuffer_Instancing::INSTANCING_DESC		ParticleSnowDesc{};
 	ParticleSnowDesc.iNumInstance = 3000;
@@ -838,23 +841,35 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	ParticleExploDesc.iNumInstance = 700;
 	ParticleExploDesc.vCenter = _float3(645.424f, 0.f, 559.107f);
 	ParticleExploDesc.vRange = _float3(4.f, 4.f, 4.f);
-	ParticleExploDesc.vSize = _float2(0.05f, 0.1f);
+	ParticleExploDesc.vSize = _float2(1.01f, 1.1f);
 	ParticleExploDesc.vSpeed = _float2(0.3f, 1.f);
 	ParticleExploDesc.vLifeTime = _float2(0.1f, 0.5f);
 	ParticleExploDesc.vPivot = _float3(0.f, -0.5f, 0.f);
 	ParticleExploDesc.isLoop = true;
+	
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Explosion"),
 		CVIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &ParticleExploDesc))))
 		return E_FAIL;
 
+	CVIBuffer_Instancing::INSTANCING_DESC	GrassInstancing{};
+	GrassInstancing.iNumInstance = 1000;
+	GrassInstancing.vCenter = _float3(645.424f, 0.f, 559.107f);
+	GrassInstancing.vRange = _float3(100.f, 4.f, 100.f);
+	GrassInstancing.vSize = _float2(50.1f, 50.1f);
+	GrassInstancing.vSpeed = _float2(0.3f, 1.f);
+	GrassInstancing.vLifeTime = _float2(0.1f, 0.5f);
+	GrassInstancing.vPivot = _float3(0.f, -0.5f, 0.f);
+	GrassInstancing.isLoop = true;
 
-	/* For.Prototype_Component_VIBuffer_Cube */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Cube"),
-		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+	const _wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim146.dat");
+	_matrix			PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.01, 0.01, 0.01) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass"),
+		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, &GrassInstancing))))
 		return E_FAIL;
 
-	Loading_DataFile_For_YardLevel();
+
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
@@ -875,6 +890,18 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticlePoint.hlsl"), VTXPARTICLE_POINT::Elements, VTXPARTICLE_POINT::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_VIBuffer_Cube */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Particle_Mesh */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticleMesh"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticleMesh.hlsl"), VTXPARTICLE_MESH::Elements, VTXPARTICLE_MESH::iNumElements))))
+		return E_FAIL;
+
+
+
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
 
@@ -886,6 +913,11 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	/* Prototype_GameObject_Particle_Explosion */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Explosion"),
 		CParticle_Explosion::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Particle_Explosion */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
+		CGrass_Instancing::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

@@ -184,6 +184,7 @@
     <ClInclude Include="..\Public\GamePlay_Round.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Grass_Instancing.h" />
     <ClInclude Include="..\Public\Head_Player.h" />
     <ClInclude Include="..\Public\Helicopter.h" />
     <ClInclude Include="..\Public\Hp_Item.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="..\Private\GamePlay_Round.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Grass_Instancing.cpp" />
     <ClCompile Include="..\Private\Head_Player.cpp" />
     <ClCompile Include="..\Private\Helicopter.cpp" />
     <ClCompile Include="..\Private\Hp_Item.cpp" />
@@ -332,6 +334,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxItem.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleRect.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

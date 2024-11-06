@@ -100,7 +100,6 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	return Out;
 }
-
 /* 지정해준 색을 지정한 렌더타겟에 그려준다. */
 
 technique11 DefaultTechnique

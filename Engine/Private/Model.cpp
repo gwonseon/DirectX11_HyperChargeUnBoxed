@@ -78,6 +78,7 @@ HRESULT CModel::Initialize_Prototype_ReadDataFile(TYPE eModelType, const wstring
 	if (FAILED(Ready_Materials_ReadData_NonAnim(hFileRead)))
 		return E_FAIL;
 
+
 	CloseHandle(hFileRead);
 	return S_OK;
 }
@@ -166,7 +167,7 @@ HRESULT CModel::Ready_Meshes_ReadData_NonAnim(HANDLE hFileRead)
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
 		CMesh* pMesh = CMesh::Create_NonAnim(m_pDevice, m_pContext, TYPE_NONANIM, this, XMLoadFloat4x4(&m_PreTransformMatrix), hFileRead);
-		if (nullptr == pMesh)
+		if (nullptr == pMesh) 
 			return E_FAIL;
 
 		m_Meshes.push_back(pMesh);

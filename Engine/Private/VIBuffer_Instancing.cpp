@@ -79,7 +79,7 @@ void CVIBuffer_Instancing::Spread(_float fTimeDelta)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		_vector				vMoveDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f);
+		_vector	vMoveDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f);
 
 		XMStoreFloat4(&pVertices[i].vTranslation,
 			XMLoadFloat4(&pVertices[i].vTranslation) + XMVector3Normalize(vMoveDir) * m_pSpeed[i] * fTimeDelta);

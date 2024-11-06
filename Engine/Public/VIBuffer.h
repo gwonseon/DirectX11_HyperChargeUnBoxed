@@ -24,7 +24,7 @@ public:
 	void	Chang_Topology();
 public:
 	virtual HRESULT Bind_Buffers(); // 그리기 위해 필요한 값들을 장치에 올린다.
-	HRESULT Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
+	//HRESULT Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 protected:
 	ID3D11Buffer*					m_pVB = { nullptr };		// 정점을 저장하는 버퍼, 정점 데이터를 GPU메모리에 저장, 엑세스 할 수 있게 해준다
 	ID3D11Buffer*					m_pIB = { nullptr };		// 인덱스를 저장하는 버퍼, 인덱스는 정점 버퍼 내의 정점들을 참조하여 효율적으로 렌더링하게 한다.

@@ -10,7 +10,7 @@
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Particle_Rect.h"
 #include "VIBuffer_Particle_Point.h"
-
+#include "VIBuffer_Grass.h"
 /* 보관하는역활. */
 /* 컴포넌트 원형을 보관한다. */
 /* 컴포넌트 원형은 객체 원형과 달리 덩치가 크다. 레벨별로 구분하여 저장할께. */

@@ -89,10 +89,10 @@ HRESULT CVIBuffer::Bind_Buffers()
 	return S_OK;
 }
 
-HRESULT CVIBuffer::Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName)
-{
-	return E_NOTIMPL;
-}
+//HRESULT CVIBuffer::Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName)
+//{
+//	return E_NOTIMPL;
+//}
 
 HRESULT CVIBuffer::Create_Buffer(ID3D11Buffer** ppOut)
 {
