@@ -226,6 +226,9 @@
     <Filter Include="02. GameObjects\Effect\Particle\Point">
       <UniqueIdentifier>{68868494-6ff3-4ac1-8d3e-b8b53162969b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle\Grass">
+      <UniqueIdentifier>{de992f9e-da48-43c0-b601-58dd40f04962}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -441,6 +444,9 @@
     <ClInclude Include="..\Public\Particle_Explosion.h">
       <Filter>02. GameObjects\Effect\Particle\Point</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Grass_Instancing.h">
+      <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -635,6 +641,9 @@
     <ClCompile Include="..\Private\Particle_Explosion.cpp">
       <Filter>02. GameObjects\Effect\Particle\Point</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Grass_Instancing.cpp">
+      <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -684,6 +693,9 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\..\..\..\1101_파티클3(포인트)\Client\Bin\ShaderFiles\Shader_VtxParticlePoint.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleMesh.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

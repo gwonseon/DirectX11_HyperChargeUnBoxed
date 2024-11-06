@@ -35,7 +35,7 @@ void CParticle_Snow::Priority_Update(_float fTimeDelta)
 
 void CParticle_Snow::Update(_float fTimeDelta)
 {
-    m_pVIBufferCom->Drop(fTimeDelta);
+    // m_pVIBufferCom->Drop(fTimeDelta);
 }
 
 void CParticle_Snow::Late_Update(_float fTimeDelta)
@@ -48,16 +48,12 @@ HRESULT CParticle_Snow::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Begin(0)))
         return E_FAIL;
-
     if (FAILED(m_pVIBufferCom->Bind_Buffers()))
         return E_FAIL;
-
     if (FAILED(m_pVIBufferCom->Render()))
         return E_FAIL;
-
     return S_OK;
 }
 

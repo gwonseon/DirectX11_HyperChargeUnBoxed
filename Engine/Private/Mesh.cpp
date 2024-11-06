@@ -62,7 +62,7 @@ HRESULT CMesh::Initialize_Prototype_NonAnim(CModel::TYPE eModelType, CModel* pMo
 	delete[] buffer;
 
 	// cout을 통해 문자열 출력
-	cout << m_szName << endl;
+	//cout << m_szName << endl;
 
 
 
@@ -182,11 +182,6 @@ HRESULT CMesh::Ready_VIBuffer_For_NonAnim_DataRead(HANDLE hFileRead, _fmatrix Pr
 		pVertices[i].vTexcoord = fVerticesTex;
 		pVertices[i].vTangent = fVerticesTangent;
 
-		//if (i < 3)
-		//{
-		//	cout << "vPosition.x   : " << pVertices[i].vPosition.x << "vPosition.y   : " << pVertices[i].vPosition.y << "vPosition.z   : " << pVertices[i].vPosition.z << endl;
-		//
-		//}
 	}
 
 	m_InitialDesc.pSysMem = pVertices;
@@ -227,10 +222,7 @@ HRESULT CMesh::Ready_VIBuffer_For_Anim_DataRead(HANDLE hFileRead, CModel* pModel
 		ReadFile(hFileRead, &pVertices[i].vTexcoord, sizeof(_float2), &dwByte, nullptr);  // for Export 
 		ReadFile(hFileRead, &pVertices[i].vTangent, sizeof(_float3), &dwByte, nullptr);  // for Export 
 
-	
-
 	}
-
 
 	ReadFile(hFileRead, &m_iNumBones, sizeof(_uint), &dwByte, nullptr);  // for Export 
 

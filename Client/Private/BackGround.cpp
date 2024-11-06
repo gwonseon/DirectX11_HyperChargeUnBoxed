@@ -65,7 +65,7 @@ void CBackGround::Late_Update(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
-	m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);
+
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL; 

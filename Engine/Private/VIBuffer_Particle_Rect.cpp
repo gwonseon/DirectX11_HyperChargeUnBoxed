@@ -27,14 +27,8 @@ HRESULT CVIBuffer_Particle_Rect::Initialize_Prototype(const CVIBuffer_Instancing
 
 #pragma region VERTEX_BUFFER
 
-	/* dx9 : �������۸� �Ҵ��ϰ� -> ������ؼ� �������ۿ� �ʱⰪ�� ä���. */
-	/* dx9 : �������ۿ� �ʱⰪ�� ä��鼭 �������۸� �Ҵ��Ѵ�*/
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
-	/* �Ҵ��ϰ����ϴ� �޸𸮰����� ũ��(Byte)*/
 	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
-
-	/* ������ �Ӽ� (����, ����) */
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_BufferDesc.CPUAccessFlags = 0;

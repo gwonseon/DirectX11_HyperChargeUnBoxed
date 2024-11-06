@@ -98,12 +98,15 @@ HRESULT CEnvironment::Render()
 	{
 		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 			return E_FAIL;
-		if (m_iModelIndex == 84 + ENVIRONMENT_EA ||
-			m_iModelIndex == 91 + ENVIRONMENT_EA ||
-			m_iModelIndex == 116 + ENVIRONMENT_EA||
-			m_iModelIndex == 142 + ENVIRONMENT_EA||
-			m_iModelIndex == 143 + ENVIRONMENT_EA||
-			m_iModelIndex == 152 + ENVIRONMENT_EA)
+		if (
+			m_iModelIndex == 84		+	ENVIRONMENT_EA ||
+			m_iModelIndex == 91		+	ENVIRONMENT_EA ||
+			m_iModelIndex == 92		+	ENVIRONMENT_EA ||
+			m_iModelIndex == 116	+	ENVIRONMENT_EA ||
+			m_iModelIndex == 142	+	ENVIRONMENT_EA ||
+			m_iModelIndex == 143	+	ENVIRONMENT_EA ||
+			m_iModelIndex == 152	+	ENVIRONMENT_EA		
+			)
 		{
 			if (FAILED(m_pShaderCom->Begin(2)))
 				return E_FAIL;

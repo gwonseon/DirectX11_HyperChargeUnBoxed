@@ -187,6 +187,9 @@
     <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle_Rect">
       <UniqueIdentifier>{163b5b1a-51c0-41af-96b3-23c39150b712}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Grass">
+      <UniqueIdentifier>{664e1bfa-aa5b-4784-bfbf-35f5edd75f55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -356,6 +359,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Particle_Point.cpp">
       <Filter>01. Utility\04. Component\VIBuffer\Instancing\Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Grass.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing\Grass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -538,6 +544,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Particle_Point.h">
       <Filter>01. Utility\04. Component\VIBuffer\Instancing\Point</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Grass.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing\Grass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

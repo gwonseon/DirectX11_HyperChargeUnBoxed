@@ -162,6 +162,11 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
 	}VTXPARTICLE_POINT;
 
+	typedef struct ENGINE_DLL
+	{
+		static const unsigned int		iNumElements = 9;
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXPARTICLE_MESH;
 
 }
 

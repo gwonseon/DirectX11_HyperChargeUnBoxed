@@ -1056,6 +1056,10 @@ HRESULT CLevel_Yard::Ready_Layer_Effect(const _tchar* pLayerTag)
 		TEXT("Prototype_GameObject_Particle_Explosion"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Grass"))))
+		return E_FAIL;
+
 	return S_OK;;
 }
 

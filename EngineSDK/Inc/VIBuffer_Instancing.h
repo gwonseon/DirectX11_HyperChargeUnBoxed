@@ -32,7 +32,8 @@ public:
 
 public:
 	void Spread(_float fTimeDelta);
-	virtual void Drop(_float fTimeDelta);
+	void Drop(_float fTimeDelta);
+	
 
 protected:
 	D3D11_BUFFER_DESC		m_InstanceBufferDesc = {};
@@ -45,7 +46,7 @@ protected:
 	_uint					m_iInstanceVertexStride = {};
 	_uint					m_iNumInstance = { 0 };
 
-	_float* m_pSpeed = { nullptr };
+	_float*					m_pSpeed = { nullptr };
 	_float3					m_vPivot = {};
 	_bool					m_isLoop = { false };
 
