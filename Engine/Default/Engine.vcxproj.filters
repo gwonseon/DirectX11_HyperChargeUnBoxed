@@ -178,6 +178,15 @@
     <Filter Include="01. Utility\08. Manager\05. UIMgr">
       <UniqueIdentifier>{cd517d86-da2c-469a-b484-d53c3adbcdbf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing">
+      <UniqueIdentifier>{4d18199a-1ae0-48d2-8da1-7e8495bbd876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Point">
+      <UniqueIdentifier>{2ebd63ed-b2cb-48c5-ad8c-6a0e3acfb8fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle_Rect">
+      <UniqueIdentifier>{163b5b1a-51c0-41af-96b3-23c39150b712}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -338,6 +347,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\UIManager.cpp">
       <Filter>01. Utility\08. Manager\05. UIMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Particle_Rect.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing\Particle_Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Instancing.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Particle_Point.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing\Point</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -512,10 +530,24 @@
     <ClInclude Include="..\Public\UIManager.h">
       <Filter>01. Utility\08. Manager\05. UIMgr</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Particle_Rect.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing\Particle_Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Instancing.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Particle_Point.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Instancing\Point</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cell.hlsl">
       <Filter>08. ShaderFiles</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
+      <Filter>08. ShaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

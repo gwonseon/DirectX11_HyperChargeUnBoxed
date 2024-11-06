@@ -92,8 +92,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	m_pReloading = m_pPlayer->Get_Reloading();
 	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Player"));
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Coin"));
-	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_CircleUI"));
-	pItem = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Item"));
+	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"));
+	pItem = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Item"));
 
 	return S_OK;
 }

@@ -13,17 +13,7 @@ float3 g_Color;
 
 //float4 g_vCamPosition;
 
-sampler LinearSampler = sampler_state
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = wrap;
-    AddressV = wrap;
-};
 
-sampler PointSampler = sampler_state
-{
-    filter = MIN_MAG_MIP_POINT;
-};
 
 struct VS_IN
 {

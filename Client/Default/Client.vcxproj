@@ -208,6 +208,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Navigation_Leve.h" />
     <ClInclude Include="..\Public\NumberUI.h" />
+    <ClInclude Include="..\Public\Particle_Explosion.h" />
+    <ClInclude Include="..\Public\Particle_Snow.h" />
     <ClInclude Include="..\Public\Pivot.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\Player_Build.h" />
@@ -285,6 +287,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Navigation_Leve.cpp" />
     <ClCompile Include="..\Private\NumberUI.cpp" />
+    <ClCompile Include="..\Private\Particle_Explosion.cpp" />
+    <ClCompile Include="..\Private\Particle_Snow.cpp" />
     <ClCompile Include="..\Private\Pivot.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\Player_Build.cpp" />
@@ -319,6 +323,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\..\..\..\..\1101_파티클3(포인트)\Client\Bin\ShaderFiles\Shader_VtxParticlePoint.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxBoxColor.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCircle_Gauge.hlsl" />
@@ -327,6 +332,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxItem.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleRect.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>

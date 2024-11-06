@@ -67,6 +67,11 @@ HRESULT CLevel_Yard::Initialize()
 	if (FAILED(Ready_Layer_Damaged(TEXT("Layer_UI_Damaged"))))
 		return E_FAIL;
 
+
+	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
+		return E_FAIL;
+
+
 	Load_Map();
 	pTrap = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Trap"));
 
@@ -241,8 +246,8 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 	CInGameUI::INGAMEUI_DESC	DescCenterIcon{};
 	DescCenterIcon.eLevel = LEVEL_YARD;
 	DescCenterIcon.eUITag = CInGameUI::UI_CENTERICON;
-	DescCenterIcon.fSizeX = 26.f;
-	DescCenterIcon.fSizeY = 26.f;
+	DescCenterIcon.fSizeX = 40.f;
+	DescCenterIcon.fSizeY = 40.f;
 	DescCenterIcon.iData = 0;
 	DescCenterIcon.fX = g_iWinSizeX * 0.5f;
 	DescCenterIcon.fY = g_iWinSizeY * 0.5f;
@@ -1039,6 +1044,19 @@ HRESULT CLevel_Yard::Ready_Layer_Damaged(const _tchar* pLayerTag)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+HRESULT CLevel_Yard::Ready_Layer_Effect(const _tchar* pLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Particle_Snow"))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Particle_Explosion"))))
+		return E_FAIL;
+
+	return S_OK;;
 }
 
 void CLevel_Yard::Load_Map()

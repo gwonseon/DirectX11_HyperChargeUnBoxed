@@ -47,6 +47,7 @@ private:
 	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Damaged(const _tchar* pLayerTag);
 
+	HRESULT Ready_Layer_Effect(const _tchar* pLayerTag);
 
 private:
 	void Load_Map();

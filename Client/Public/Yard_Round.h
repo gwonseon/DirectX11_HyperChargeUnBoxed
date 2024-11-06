@@ -33,8 +33,8 @@ public:
 	const void Set_PlayerWorld_matrix(const _float4x4* vMatrix) { matPlayerWorld = vMatrix; }
 	const void Set_BrainCoreWorld_matrix(const _float4x4* vMatrix) { matBrainCoreWorld = vMatrix; }
 	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
-	void Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
-	void Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+	void	Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
+	void	Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 	_uint	Get_MonsterCount() { return m_iMonsterCount; }
 	void	MonsterCreate(_float fTimeDelta);
 

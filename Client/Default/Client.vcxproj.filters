@@ -214,6 +214,18 @@
     <Filter Include="01. Levels\02. Game_Yard\Round">
       <UniqueIdentifier>{f1f03257-541c-4ada-a28b-309d557d8c8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Effect">
+      <UniqueIdentifier>{6da46bf3-5ec2-4d58-a4f9-043b48015039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle">
+      <UniqueIdentifier>{3aac91b1-1474-4019-954c-f17400b181f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle\Rect">
+      <UniqueIdentifier>{c5cafe1e-3af3-4af9-9dd9-2e664f8ffb28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle\Point">
+      <UniqueIdentifier>{68868494-6ff3-4ac1-8d3e-b8b53162969b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -423,6 +435,12 @@
     <ClInclude Include="..\Public\Yard_Round.h">
       <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Particle_Snow.h">
+      <Filter>02. GameObjects\Effect\Particle\Rect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle_Explosion.h">
+      <Filter>02. GameObjects\Effect\Particle\Point</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -611,6 +629,12 @@
     <ClCompile Include="..\Private\Yard_Round.cpp">
       <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Particle_Snow.cpp">
+      <Filter>02. GameObjects\Effect\Particle\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle_Explosion.cpp">
+      <Filter>02. GameObjects\Effect\Particle\Point</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -654,6 +678,12 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrap.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleRect.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\..\..\1101_파티클3(포인트)\Client\Bin\ShaderFiles\Shader_VtxParticlePoint.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
