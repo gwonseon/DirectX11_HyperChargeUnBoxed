@@ -680,7 +680,7 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 
 	/* For.Prototype_Component_Texture_Snow */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Snow"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Model/Grass.png")))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png")))))
 		return E_FAIL;
 
 
@@ -857,9 +857,8 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	GrassInstancing.vCenter = _float3(645.424f, 0.f, 559.107f);
 	GrassInstancing.vRange = _float3(128.f, 0.f, 128.f);
 	GrassInstancing.vSize = _float2(8.f, 8.f);
-	GrassInstancing.vSpeed = _float2(1.f, 7.f);
-	GrassInstancing.vLifeTime = _float2(3.f, 10.f);
-	GrassInstancing.isLoop = true;
+
+
 	
 	const _wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build108.dat");
 	_matrix			PreTransformMatrix = XMMatrixIdentity();

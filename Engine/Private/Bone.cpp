@@ -52,31 +52,7 @@ void CBone::Update_CombinedTransformationMatrix(const vector<class CBone*>& Bone
 
 		return;
 	}
-
 	string strName(m_szName);
-	/*if (GetAsyncKeyState(VK_UP))
-	{
-		fChest += 0.1f;
-	}
-	if (GetAsyncKeyState(VK_DOWN))
-	{
-		fChest -= 0.1f;
-	}
-	if (GetAsyncKeyState(VK_LEFT))
-	{
-		fLowerBody += 0.1f;
-	}
-	if (GetAsyncKeyState(VK_RIGHT))
-	{
-		fLowerBody -= 0.1f;
-	}
-
-	if (GetAsyncKeyState('P'))
-	{
-		cout << "fChest		: " << fChest << endl;
-		cout << "fLowerBody : " << fLowerBody << endl;
-
-	}*/
 
 	if (iUpperMotion == ATTACK_KATANA_MOTION)
 	{
