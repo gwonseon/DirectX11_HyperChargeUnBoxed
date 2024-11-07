@@ -19,9 +19,7 @@ struct VS_IN
     float3 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float3 vTangent : TANGENT;
-    
     row_major float4x4 TransformMatrix : WORLD;
-
     float2 vLifeTime : TEXCOORD1;
 };
 
@@ -31,7 +29,6 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
-    
     float2 vLifeTime : TEXCOORD2;
 };
 
@@ -40,6 +37,10 @@ VS_OUT VS_MAIN( /* 내가 그릴려고 했던 정점을 받아오는거다*/VS_IN In)
     VS_OUT Out = (VS_OUT) 0;
 
     vector vPosition = mul(float4(In.vPosition, 1.f), In.TransformMatrix);
+    	/* 진짜 순수하게 곱하기만 수행한다. */
+    vPosition = mul(vPosition, g_WorldMatrix);
+    vPosition = mul(vPosition, g_ViewMatrix);
+    vPosition = mul(vPosition, g_ProjMatrix);
     Out.vPosition = vPosition;
     
     Out.vNormal = mul(float4(In.vNormal, 0.f), In.TransformMatrix);

@@ -57,13 +57,10 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
         m_eIndexFormat = DXGI_FORMAT_R32_UINT;
         m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 #pragma region VERTEX_BUFFER
-
         m_iVertexStride = sizeof(VTXMESH);
         ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
         /* 할당하고자하는 메모리공간의 크기(Byte)*/
         m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
-
         /* 버퍼의 속성 (정적, 동적) */
         m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
         m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -78,18 +75,17 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
         _float3			fVerticesPos{}, fVerticesNor{}, fVerticesTangent{};
         _float2			fVerticesTex{};
 
-        for (_uint i = 0; i < iVertice; i++)
+        for (_uint j = 0; j < iVertice; j++)
         {
             ReadFile(hFileRead, &fVerticesPos, sizeof(_float3), &dwByte, nullptr);
             ReadFile(hFileRead, &fVerticesNor, sizeof(_float3), &dwByte, nullptr);
             ReadFile(hFileRead, &fVerticesTex, sizeof(_float2), &dwByte, nullptr);
             ReadFile(hFileRead, &fVerticesTangent, sizeof(_float3), &dwByte, nullptr);
 
-            pVertices[i].vPosition = fVerticesPos;
-            pVertices[i].vNormal = fVerticesNor;
-            pVertices[i].vTexcoord = fVerticesTex;
-            pVertices[i].vTangent = fVerticesTangent;
-
+            pVertices[j].vPosition = fVerticesPos;
+            pVertices[j].vNormal = fVerticesNor;
+            pVertices[j].vTexcoord = fVerticesTex;
+            pVertices[j].vTangent = fVerticesTangent;
         }
 
         m_InitialDesc.pSysMem = pVertices;
@@ -98,7 +94,6 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
             return E_FAIL;
         Safe_Delete_Array(pVertices);
 #pragma endregion
-
 #pragma region INDEX_BUFFER
         ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
         m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices * m_iNumInstance;
@@ -111,25 +106,21 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
         ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
         _uint* pIndices = new _uint[m_iNumIndices * m_iNumInstance];
         _uint* pStore = new _uint[m_iNumIndices];
-
         m_iNumIndexPerInstance = m_iNumIndices;
-
         _uint		iNumIndices = { 0 };
-
         _uint iFaceSize = 0;
         _uint iIndiciesNum = 0;
-    
         ReadFile(hFileRead, &iFaceSize, sizeof(_uint), &dwByte, nullptr);
- 
-        for (_uint i = 0; i < iFaceSize; i++)
+        for (_uint j = 0; j < iFaceSize; j++)
         {
             ReadFile(hFileRead, &iIndiciesNum, sizeof(_uint), &dwByte, nullptr);
             pStore[iNumIndices++] = iIndiciesNum;
         }
         iNumIndices = 0;
-        for (size_t i = 0; i < m_iNumInstance; i++)
+        for (size_t j = 0; j < m_iNumInstance; j++)
         {
-            memcpy(&pIndices[i * m_iNumIndices], &pStore[0], sizeof(_uint) * m_iNumIndices);
+            memcpy(&pIndices[iNumIndices], &pStore[0], sizeof(_uint) * m_iNumIndices);
+            iNumIndices += m_iNumIndices;
         }
         
         m_InitialDesc.pSysMem = pIndices;
@@ -156,20 +147,21 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
         m_pInstanceVertices = new VTXMATRIX[m_iNumInstance];
         m_pSpeed = new _float[m_iNumInstance];
 
-        for (size_t i = 0; i < m_iNumInstance; i++)
+        for (size_t j = 0; j < m_iNumInstance; j++)
         {
+
             _float		fScale = m_pGameInstance->Compute_Random(pDesc->vSize.x, pDesc->vSize.y);
-            m_pSpeed[i] = m_pGameInstance->Compute_Random(pDesc->vSpeed.x, pDesc->vSpeed.y);
+            m_pSpeed[j] = m_pGameInstance->Compute_Random(pDesc->vSpeed.x, pDesc->vSpeed.y);
 
-            m_pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-            m_pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
-            m_pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+            m_pInstanceVertices[j].vRight = _float4(fScale, 0.f, 0.f, 0.f);
+            m_pInstanceVertices[j].vUp = _float4(0.f, fScale, 0.f, 0.f);
+            m_pInstanceVertices[j].vLook = _float4(0.f, 0.f, fScale, 0.f);
 
-            m_pInstanceVertices[i].vTranslation = _float4(m_pGameInstance->Compute_Random(pDesc->vCenter.x - pDesc->vRange.x * 0.5f, pDesc->vCenter.x + pDesc->vRange.x * 0.5f),
+            m_pInstanceVertices[j].vTranslation = _float4(m_pGameInstance->Compute_Random(pDesc->vCenter.x - pDesc->vRange.x * 0.5f, pDesc->vCenter.x + pDesc->vRange.x * 0.5f),
                 m_pGameInstance->Compute_Random(pDesc->vCenter.y - pDesc->vRange.y * 0.5f, pDesc->vCenter.y + pDesc->vRange.y * 0.5f),
                 m_pGameInstance->Compute_Random(pDesc->vCenter.z - pDesc->vRange.z * 0.5f, pDesc->vCenter.z + pDesc->vRange.z * 0.5f),
                 1.f);
-            m_pInstanceVertices[i].vLifeTime = _float2(m_pGameInstance->Compute_Random(pDesc->vLifeTime.x, pDesc->vLifeTime.y), 0.f);
+            m_pInstanceVertices[j].vLifeTime = _float2(m_pGameInstance->Compute_Random(pDesc->vLifeTime.x, pDesc->vLifeTime.y), 0.f);
         }
         
         m_InstanceInitialDesc.pSysMem = m_pInstanceVertices;
@@ -180,7 +172,7 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
 
         ReadFile(hFileRead, &m_iNumMaterials, sizeof(_uint), &dwByte, nullptr);
 
-        for (size_t i = 0; i < m_iNumMaterials; i++)
+        for (size_t q = 0; q < m_iNumMaterials; q++)
         {
             for (size_t i = 0; i < aiTextureType_UNKNOWN; i++)
             {
@@ -224,7 +216,7 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
             }
         }
     }
-
+    CloseHandle(hFileRead);
     return S_OK;
 }
 
