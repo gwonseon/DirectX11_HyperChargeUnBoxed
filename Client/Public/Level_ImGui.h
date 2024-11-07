@@ -8,6 +8,7 @@
 #include "Environment.h"
 #include "Player.h"
 #include "Coin.h"
+#include "Grass_Instancing.h"
 
 BEGIN(Client)
 
@@ -15,7 +16,15 @@ BEGIN(Client)
 class CLevel_ImGui final : public CLevel
 {
 public:
-	enum IMGUI_TYPE{ IMGUI_OBJECT_NONANIM, IMGUI_OBJECT_ANIM, IMGUI_BUILD, IMGUI_ITEM, IMGUI_END};
+	typedef struct 
+	{
+		LEVELID eID = {};
+		_float3	fPos = {};
+		_uint	iModelNumber = {};
+	}INSTANCING_DESC; 
+
+public:
+	enum IMGUI_TYPE{ IMGUI_OBJECT_NONANIM, IMGUI_OBJECT_ANIM, IMGUI_BUILD, IMGUI_ITEM,IMGUI_GRASS, IMGUI_END};
 	enum IMGUI_MODE{ IMGUI_CREATE, IMGUI_SELECT, MODE_END};
 private:
 	CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -56,12 +65,14 @@ public:
 	void Object_Anim_Update(_float fTimeDelta);
 	void Build_Update(_float fTimeDelta);
 	void Item_Update(_float fTimeDelta);
+	void Grass_Update(_float fTimeDelta);
 
 
 	void Object_NonAnim();
 	void Object_Anim();
 	void Object_Build();
 	void Object_Item();
+	void Object_Grass();
 
 public:
 	HRESULT Picking_Create();
@@ -85,24 +96,43 @@ public:
 	HRESULT Item_Select();
 
 
+	HRESULT Grass_Add();
+	HRESULT Grass_DataChange(_float fTimeDelta);
+	void	Grass_Save();
+	void	Grass_Load();
+	HRESULT Grass_Select();
+
+
+
 private:
 	vector<CEnvironment*> m_vecEnvironment;
 	vector<CEnvironment*> m_vecBuild;
 	vector<CCoin*> m_vecCoin;
+	vector<INSTANCING_DESC> m_vecInstancing;
+	vector<CEnvironment*> m_vecInstancing_Environ;
 
 	CGameObject* pGameObj = { nullptr };
 private:
 	_uint		m_iEnvironment_Count = 0; // 생성한 개수
 	_uint		m_iBuild_Count = 0;			// 생성한 개수
 	_uint		m_iCoin_Count = 0;			// 생성한 코인개수
-
+	_uint		m_iGrass_Count = 0;			// 생성한 잔디 개수
 
 
 	vector<_int> m_vecModelIndex; // Environment Index 저장용
 	vector<_int> m_vecBuildIndex; // Build Index 저장용
 
-
+	INSTANCING_DESC m_Instance = {  };
 	LEVELID m_eID = LEVEL_YARD;   // 이거 바꿔서 어떤 레벨을 수정할지 설정
+
+
+private:// 인스턴싱
+	_bool		m_bGrassDelete = false;
+	_bool		m_bInstancing_Model_Choice = false;
+	_float		m_fTimer_for_Instancing_Delete = 0.f; //  인스턴싱용 
+	_float		m_fTimer_for_Instancing_Add = 0.f; //  인스턴싱용 
+
+
 
 private:
 	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // 터레인 피킹

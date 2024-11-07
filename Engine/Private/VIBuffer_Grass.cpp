@@ -145,13 +145,12 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
 
         ZeroMemory(&m_InstanceInitialDesc, sizeof m_InstanceInitialDesc);
         m_pInstanceVertices = new VTXMATRIX[m_iNumInstance];
-        m_pSpeed = new _float[m_iNumInstance];
 
         for (size_t j = 0; j < m_iNumInstance; j++)
         {
 
             _float		fScale = m_pGameInstance->Compute_Random(pDesc->vSize.x, pDesc->vSize.y);
-            m_pSpeed[j] = m_pGameInstance->Compute_Random(pDesc->vSpeed.x, pDesc->vSpeed.y);
+           
 
             m_pInstanceVertices[j].vRight = _float4(fScale, 0.f, 0.f, 0.f);
             m_pInstanceVertices[j].vUp = _float4(0.f, fScale, 0.f, 0.f);
@@ -161,7 +160,6 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
                 m_pGameInstance->Compute_Random(pDesc->vCenter.y - pDesc->vRange.y * 0.5f, pDesc->vCenter.y + pDesc->vRange.y * 0.5f),
                 m_pGameInstance->Compute_Random(pDesc->vCenter.z - pDesc->vRange.z * 0.5f, pDesc->vCenter.z + pDesc->vRange.z * 0.5f),
                 1.f);
-            m_pInstanceVertices[j].vLifeTime = _float2(m_pGameInstance->Compute_Random(pDesc->vLifeTime.x, pDesc->vLifeTime.y), 0.f);
         }
         
         m_InstanceInitialDesc.pSysMem = m_pInstanceVertices;

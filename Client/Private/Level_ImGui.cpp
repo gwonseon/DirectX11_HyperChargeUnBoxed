@@ -96,6 +96,24 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 		m_iModelIndex = 0;
 		m_fPickingPos = { 0.f,0.f,0.f };
 	}
+	// 잔디
+	if (GetAsyncKeyState(VK_F5) & 0x0001) // 잔디
+	{
+		for (auto& pEnviron : m_vecEnvironment)
+		{
+			pEnviron->Set_PickingCheck(false);
+			pEnviron->Set_ImGuiMode(IMGUI_GRASS);
+		}
+		for (auto& pBuild : m_vecBuild)
+		{
+			pBuild->Set_ImGuiMode(IMGUI_GRASS);
+		}
+		m_bInstancing_Model_Choice = false;
+		m_eImGui_Type = IMGUI_GRASS;
+		m_iModelIndex = 0;
+		m_fPickingPos = { 0.f,0.f,0.f };
+	}
+
 	// 모드 선택 ,   create   select 모드 
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_TAB))
 	{
@@ -147,7 +165,13 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 					vPos = m_vecCoin.back()->Get_Pos();
 					fScale = m_vecCoin.back()->Get_Scale();
 				}
-
+				break;
+			case Client::CLevel_ImGui::IMGUI_GRASS:
+				if (m_vecInstancing.size() > 0)
+				{
+					vPos = XMVectorSet(m_vecInstancing.back().fPos.x, m_vecInstancing.back().fPos.y, m_vecInstancing.back().fPos.z,1.f);
+					fScale = {8.f,8.f,8.f};
+				}
 				break;
 			case Client::CLevel_ImGui::IMGUI_END:
 				break;
@@ -189,6 +213,9 @@ void CLevel_ImGui::Update(_float fTimeDelta)
 	case Client::CLevel_ImGui::IMGUI_ITEM:
 		Item_Update(fTimeDelta);
 		break;
+	case Client::CLevel_ImGui::IMGUI_GRASS:
+		Grass_Update(fTimeDelta);
+		break;
 	case Client::CLevel_ImGui::IMGUI_END:
 		break;
 	default:
@@ -227,6 +254,9 @@ HRESULT CLevel_ImGui::Render()
 	case Client::CLevel_ImGui::IMGUI_ITEM:
 		Object_Item();
 		break;
+	case Client::CLevel_ImGui::IMGUI_GRASS:
+		Object_Grass();
+		break;
 	case Client::CLevel_ImGui::IMGUI_END:
 		break;
 	default:
@@ -262,6 +292,9 @@ HRESULT CLevel_ImGui::Render()
 		case Client::CLevel_ImGui::IMGUI_ITEM:
 			Item_Load();
 			break;
+		case Client::CLevel_ImGui::IMGUI_GRASS:
+			Grass_Load();
+			break;
 		case Client::CLevel_ImGui::IMGUI_END:
 			break;
 		default:
@@ -289,7 +322,31 @@ HRESULT CLevel_ImGui::Ready_Layer_Terrain(const _tchar* pLayerTag)
 
 HRESULT CLevel_ImGui::Picking_Create()
 {
-	if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)) && (bAble_Select == true) && m_iModeSelect == IMGUI_CREATE)
+	if (IMGUI_GRASS == m_eImGui_Type && m_fTimer_for_Instancing_Add >= 0.3f)
+	{
+		if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB))
+		{
+			_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+			XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
+			XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
+			XMVECTOR RayPos, RayDir;
+
+			m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+
+			RayDir = XMVector3Normalize(RayDir);
+
+			const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 배열의 시작 주소 반환
+			_uint VtxCountX = pVIBuffer_Terrain->Get_VtxCountX();
+			_uint VtxCountZ = pVIBuffer_Terrain->Get_VtxCountZ();
+
+
+			m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+
+			Grass_Add();
+			m_fTimer_for_Instancing_Add = 0.f;
+		}
+	}
+	else if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)) && (bAble_Select == true) && m_iModeSelect == IMGUI_CREATE)
 	{
 		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
@@ -319,6 +376,9 @@ HRESULT CLevel_ImGui::Picking_Create()
 				break;
 			case Client::CLevel_ImGui::IMGUI_ITEM:
 				Item_Add();
+				break;
+			case Client::CLevel_ImGui::IMGUI_GRASS:
+				
 				break;
 			case Client::CLevel_ImGui::IMGUI_END:
 				break;
@@ -380,6 +440,29 @@ void CLevel_ImGui::Item_Update(_float fTimeDelta)
 		Item_Save();
 		Save = false;
 	}
+}
+
+void CLevel_ImGui::Grass_Update(_float fTimeDelta)
+{
+	if(m_bInstancing_Model_Choice == true)
+	{
+		if (m_iGrass_Count > 0)
+			Grass_DataChange(fTimeDelta);
+		Picking_Create();
+		Grass_Select();
+	}
+
+	if (m_iModelIndex != 0 )
+	{
+		m_bInstancing_Model_Choice = true;
+	}
+	
+	if (Save == true)
+	{
+		Grass_Save();
+		Save = false;
+	}
+	m_fTimer_for_Instancing_Add += fTimeDelta;
 }
 
 
@@ -526,6 +609,38 @@ void CLevel_ImGui::Object_Item()
 
 }
 
+void CLevel_ImGui::Object_Grass()
+{
+	const char* pText = "Grass Tool";
+	ImGui::Text(pText);
+	ImGui::Text(" ");
+	if (m_iModeSelect == IMGUI_CREATE)
+	{
+		const char* pModeText = "Create Mode";
+		ImGui::Text(pModeText);
+	}
+	if (m_iModeSelect == IMGUI_SELECT)
+	{
+		const char* pModeText = "Select Mode";
+		ImGui::Text(pModeText);
+	}
+	// 위치 크기 방향 수정창
+	ImGui::Text("Build Data");
+	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
+
+	// 모델 선택창
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+	ImGui::Text(" ");
+
+	ImGui::Text("Build List ");
+	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
+	ButtonImage_List(); // ImGui 선택 리스트 ( Environment 리스트 )
+	ImGui::EndChild();
+
+}
+
 
 void CLevel_ImGui::ButtonImage_List()
 {
@@ -571,6 +686,23 @@ void CLevel_ImGui::ButtonImage_List()
 	}
 		break;
 	case Client::CLevel_ImGui::IMGUI_ITEM:
+	{
+		auto& SRVs = m_pBuild->Get_SRV();
+		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		{
+			if (iButton % 4 != 0)
+				ImGui::SameLine();
+			string tag = "Build" + to_string(iButton);
+			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			{
+				m_iModelIndex = iButton;
+			}
+			iButton++;
+		}
+		ImGui::EndChild();
+	}
+	break;
+	case Client::CLevel_ImGui::IMGUI_GRASS:
 	{
 		auto& SRVs = m_pBuild->Get_SRV();
 		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
@@ -1738,7 +1870,7 @@ void CLevel_ImGui::Item_Load()
 		pCoin->Set_Dead();
 	}
 	m_vecCoin.clear();
-	return;
+	
 
 	m_iCoin_Count = 0;
 	HANDLE hFile{};
@@ -1817,6 +1949,240 @@ void CLevel_ImGui::Item_Load()
 }
 
 HRESULT CLevel_ImGui::Item_Select()
+{
+	return S_OK;
+}
+
+HRESULT CLevel_ImGui::Grass_Add()
+{
+	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+		return S_OK;
+
+	CEnvironment::ENVIRONMENT_DESC			Desc{};
+	Desc.eID = LEVEL_IMGUI;
+	Desc.fPosition = m_fPickingPos;
+	Desc.iModelComponentIndex = m_iModelIndex + ENVIRONMENT_EA;
+	Desc.fScale = { 8.f,8.f ,8.f };
+	Desc.iImGuiMode = IMGUI_GRASS;
+	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
+
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
+		TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
+	if (pGameObj != nullptr)
+	{
+		m_Instance.eID = m_eID;
+		m_Instance.fPos = m_fPickingPos;
+		m_Instance.iModelNumber = m_iModelIndex + ENVIRONMENT_EA;
+		
+		m_vecInstancing_Environ.push_back(dynamic_cast<CEnvironment*>(pGameObj));
+		m_vecInstancing.push_back(m_Instance);
+
+		m_iGrass_Count++;
+		
+	}
+
+	return S_OK;
+
+}
+
+HRESULT CLevel_ImGui::Grass_DataChange(_float fTimeDelta)
+{
+	if (m_iModeSelect == IMGUI_CREATE)  
+	{
+		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iGrass_Count > 0)
+		{
+			m_vecInstancing_Environ.back()->Set_Dead();
+			m_vecInstancing.erase(m_vecInstancing.end() - 1);
+			m_vecInstancing_Environ.erase(m_vecInstancing_Environ.end() - 1); // 가장 마지막 설치한 잔디 삭제
+
+			--m_iGrass_Count;
+			cout << "남은 Grass 개수 : " << m_iGrass_Count << endl;
+		}
+
+
+	}
+	else if (m_iModeSelect == IMGUI_SELECT)
+	{
+		if (m_bGrassDelete == true)
+		{
+			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_BACKSPACE) && m_iGrass_Count > 0 && m_fTimer_for_Instancing_Delete >= 0.3f)
+			{
+				m_fTimer_for_Instancing_Delete = 0.f; // 타이머 ( 0.5초에 한 번씩 실행 )
+				m_vecInstancing_Environ.back()->Set_Dead();
+				m_vecInstancing.erase(m_vecInstancing.end() - 1); // 가장 마지막 설치한 잔디 삭제
+				m_vecInstancing_Environ.erase(m_vecInstancing_Environ.end() - 1); // 가장 마지막 설치한 잔디 삭제
+				--m_iGrass_Count;
+				cout << "남은 Grass 개수 : " << m_iGrass_Count << endl;
+
+			}
+			m_fTimer_for_Instancing_Delete += fTimeDelta;
+		}
+
+
+		if (m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE))
+		{
+			if (m_bGrassDelete == true)
+				m_bGrassDelete = false;
+			else
+				m_bGrassDelete = true;
+		}
+
+	}
+	return S_OK;
+}
+
+void CLevel_ImGui::Grass_Save()
+{
+	HANDLE hFile{};
+	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
+	_wstring Last_Path = TEXT(".dat");
+	_wstring Result_Path{}; 
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		Result_Path = Grass_Path + TEXT("_GamePlay") + to_wstring(m_iModelIndex) + Last_Path;
+		hFile = CreateFile(Result_Path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Save Coin File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
+		hFile = CreateFile(Result_Path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Save Coin_Yard File Creation Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+
+	DWORD dwByte = 0;
+	_float3 fPos;
+	for (auto& pInstance : m_vecInstancing)
+	{
+		if (pInstance.iModelNumber == (m_iModelIndex + ENVIRONMENT_EA)) // 더한 값과 비교해야함, 구조체에는 더한 값임
+		{
+		WriteFile(hFile, &pInstance.eID, sizeof(LEVELID), &dwByte, nullptr);
+		WriteFile(hFile, &pInstance.fPos, sizeof(_float3), &dwByte, nullptr);
+		}
+	}
+	CloseHandle(hFile);
+
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"Instancing_Gameplay Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"Instancing_Yard Saved Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
+
+}
+
+void CLevel_ImGui::Grass_Load()
+{
+	m_iGrass_Count = 0;
+	HANDLE hFile{};
+	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
+	_wstring Last_Path = TEXT(".dat");
+	_wstring Result_Path{};
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{		
+		Result_Path = Grass_Path + TEXT("_GamePlay") + to_wstring(m_iModelIndex) + Last_Path;
+
+		hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{		Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
+
+		hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL, L"Load Coin_Yard File Failed", L"Error", MB_OK);
+			return;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+
+	DWORD dwByte = 0;
+	LEVELID iLevel;
+	_float3 fPos{};
+
+	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	{
+		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		
+		CEnvironment::ENVIRONMENT_DESC			Desc{};
+		Desc.eID = LEVEL_IMGUI;
+		Desc.fPosition = fPos;
+		Desc.iModelComponentIndex = m_iModelIndex + ENVIRONMENT_EA;
+		Desc.fScale = { 8.f,8.f ,8.f };
+		Desc.iImGuiMode = IMGUI_GRASS;
+		Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
+
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
+		if (pGameObj != nullptr)
+		{
+			m_Instance.eID = m_eID;
+			m_Instance.fPos = fPos;
+			m_Instance.iModelNumber = m_iModelIndex + ENVIRONMENT_EA;
+
+			m_vecInstancing_Environ.push_back(dynamic_cast<CEnvironment*>(pGameObj));
+			m_vecInstancing.push_back(m_Instance);
+			m_iGrass_Count++;
+
+		}
+	}
+
+	CloseHandle(hFile);
+
+	switch (m_eID)
+	{
+	case Client::LEVEL_GAMEPLAY:
+	{
+		MessageBox(NULL, L"Instancing_Gameplay Loaded Successfully", L"Success", MB_OK);
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		MessageBox(NULL, L"Instancing_Yard Loaded Successfully", L"Success", MB_OK);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+HRESULT CLevel_ImGui::Grass_Select()
 {
 	return S_OK;
 }
