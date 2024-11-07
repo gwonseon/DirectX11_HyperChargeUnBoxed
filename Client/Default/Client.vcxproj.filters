@@ -692,10 +692,10 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleRect.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\..\..\..\1101_파티클3(포인트)\Client\Bin\ShaderFiles\Shader_VtxParticlePoint.hlsl">
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleMesh.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticleMesh.hlsl">
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticlePoint.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

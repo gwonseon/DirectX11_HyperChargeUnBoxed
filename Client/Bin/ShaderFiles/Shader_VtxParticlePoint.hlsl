@@ -137,9 +137,9 @@ PS_OUT PS_MAIN(PS_IN In)
 	if (Out.vColor.a == 0.f)
 		discard;
 
-	Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
+	//Out.vColor = vector(0.f, 1.f, 0.f, 1.f);
 
-	Out.vColor.a = saturate(In.vLifeTime.x - In.vLifeTime.y);
+	//Out.vColor.a = saturate(In.vLifeTime.x - In.vLifeTime.y);
 
 	return Out;
 }
@@ -152,7 +152,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = compile gs_5_0 GS_MAIN();

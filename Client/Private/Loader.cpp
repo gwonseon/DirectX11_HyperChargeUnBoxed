@@ -680,7 +680,7 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 
 	/* For.Prototype_Component_Texture_Snow */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Snow"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Model/Grass.png")))))
 		return E_FAIL;
 
 
@@ -825,9 +825,9 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	/* For.Prototype_Component_VIBuffer_Particle_Snow*/
 	CVIBuffer_Instancing::INSTANCING_DESC		ParticleSnowDesc{};
 	ParticleSnowDesc.iNumInstance = 3000;
-	ParticleSnowDesc.vCenter = _float3(645.424f, 20.f, 559.107f);
-	ParticleSnowDesc.vRange = _float3(128.f, 1.f, 128.f);
-	ParticleSnowDesc.vSize = _float2(0.05f, 0.1f);
+	ParticleSnowDesc.vCenter = _float3(645.424f, 0.f, 559.107f);
+	ParticleSnowDesc.vRange = _float3(128.f, 0.f, 128.f);
+	ParticleSnowDesc.vSize = _float2(100.f, 100.f);
 	ParticleSnowDesc.vSpeed = _float2(1.f, 7.f);
 	ParticleSnowDesc.vLifeTime = _float2(3.f, 10.f);
 	ParticleSnowDesc.isLoop = true;
@@ -853,18 +853,17 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 		return E_FAIL;
 
 	CVIBuffer_Instancing::INSTANCING_DESC	GrassInstancing{};
-	GrassInstancing.iNumInstance = 1000;
+	GrassInstancing.iNumInstance = 3000;
 	GrassInstancing.vCenter = _float3(645.424f, 0.f, 559.107f);
-	GrassInstancing.vRange = _float3(100.f, 4.f, 100.f);
-	GrassInstancing.vSize = _float2(50.1f, 50.1f);
-	GrassInstancing.vSpeed = _float2(0.3f, 1.f);
-	GrassInstancing.vLifeTime = _float2(0.1f, 0.5f);
-	GrassInstancing.vPivot = _float3(0.f, -0.5f, 0.f);
+	GrassInstancing.vRange = _float3(128.f, 0.f, 128.f);
+	GrassInstancing.vSize = _float2(8.f, 8.f);
+	GrassInstancing.vSpeed = _float2(1.f, 7.f);
+	GrassInstancing.vLifeTime = _float2(3.f, 10.f);
 	GrassInstancing.isLoop = true;
-
-	const _wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim146.dat");
+	
+	const _wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build108.dat");
 	_matrix			PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(0.01, 0.01, 0.01) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass"),
 		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, &GrassInstancing))))
 		return E_FAIL;

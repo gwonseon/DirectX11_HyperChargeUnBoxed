@@ -25,6 +25,7 @@ HRESULT CGrass_Instancing::Initialize(void* pArg)
 
     if (FAILED(Add_Components()))
         return E_FAIL;
+
     return S_OK;
 }
 
@@ -34,6 +35,9 @@ void CGrass_Instancing::Priority_Update(_float fTimeDelta)
 
 void CGrass_Instancing::Update(_float fTimeDelta)
 {
+    _float3 aa =  m_pTransformCom->Get_Scaled();
+    aa;
+
 }
 
 void CGrass_Instancing::Late_Update(_float fTimeDelta)
@@ -87,6 +91,7 @@ HRESULT CGrass_Instancing::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
+
 
     const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
