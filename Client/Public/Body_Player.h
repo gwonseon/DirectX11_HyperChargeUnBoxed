@@ -169,11 +169,8 @@ public:
 	const _float4x4* Get_SocketMatrix(const _char* pBoneName);
 
 public:
-	/* 원형생성시 호출 : 생성시 필요한 상당히 무거운 작업들을 수행한다.(패킷, 파일 입출력) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* 패킷이나 파일 입출력을 통해서 받아오지 못하는 정보들도 분명히 존재한다. */
-	/* 원형에게 존재하는 않는 추가적인 초기화가 필요한 경우 호출한ㄴ다. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -188,6 +185,7 @@ public:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CCollider* m_pColliderCom = { nullptr };
 
 private:
 	_bool	m_bAnimInit = false;		// 애니메이션 초기화용
@@ -220,8 +218,6 @@ private:
 		const _uint* m_pParentState_Lower = { nullptr };
 		_uint*		 m_iViewState		  = { nullptr };	// 1인칭인지 3인칭인지
 
-		CCollider* m_pColliderCom = { nullptr };
-		CCollider* pTargetCollider = { nullptr };
 
 public:// 점프
 	_uint Get_JumpState() { return m_iJumpState; }

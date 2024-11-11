@@ -29,7 +29,6 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
     m_pPlayer = pDesc->pPlayer;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
-
     if (FAILED(Add_Components()))
         return E_FAIL;
     _vector vPos{};
@@ -110,18 +109,35 @@ void CMonster_Bullet::Update(_float fTimeDelta)
 
 void CMonster_Bullet::Late_Update(_float fTimeDelta)
 {
+
     _bool bCollision = m_pColliderCom->Intersect(m_pTargetCollider); // 브레인 코어와 충돌체크 
     if (bCollision == true && m_bDead == false)
     {
         m_pBuild->Set_Damaged(m_fAttack);
         m_bDead = true;
     }
-    bCollision = m_pColliderCom->Intersect(m_pPlayerCollider); // 브레인 코어와 충돌체크 
-    if (bCollision == true && m_bDead == false)
+
+
+
+    switch (m_eType)
     {
-        m_pPlayer->Set_Damaged(m_fAttack);
-        m_bDead = true;
+    case Client::CMonster_Bullet::TANK_BULLET:
+        break;
+    case Client::CMonster_Bullet::HELICOPTER_BULLET:
+        break;
+    case Client::CMonster_Bullet::RIFLEMAN_BULLET:
+        bCollision = m_pColliderCom->Intersect(m_pPlayerCollider); // 플레이어와 충돌체크 
+        if (bCollision == true && m_bDead == false)
+        {
+            m_pPlayer->Set_Damaged(m_fAttack);
+            m_bDead = true;
+        }
+        break;
+    default:
+        break;
     }
+    
+
     
     
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))

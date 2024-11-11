@@ -16,7 +16,7 @@ private:
 
 public:
 	HRESULT Initialize(class CModel* pModel, HANDLE hFileRead);
-	_bool Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop,  _float fTimeDelta);
+	_bool Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop,  _float fTimeDelta, _bool bPlay = true);
 	_bool Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion, _bool& bShot);
 
 private:

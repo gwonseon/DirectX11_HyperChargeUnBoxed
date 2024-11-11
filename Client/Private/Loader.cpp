@@ -8,6 +8,8 @@
 #include "MenuUI.h"
 #include "ButtonUI.h"
 #include "NumberUI.h"
+#include "UI_3D.h"
+
 
 #include "Terrain.h"
 #include "Camera_Free.h"
@@ -18,6 +20,11 @@
 #include "Pony.h"
 #include "RifleMan.h"
 #include "Blimp.h"
+#include "Missile_Truck.h"
+#include "TruckBody.h"
+#include "TruckShooter.h"
+#include "Tracker.h"
+
 
 #include "Environment.h"
 #include "BrainCore.h"
@@ -52,6 +59,11 @@
 #include "Particle_Explosion.h"
 #include "Particle_Snow.h"
 #include "Grass_Instancing.h"
+#include "Truck_Missile.h"
+
+
+#include "Explosion.h"
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -685,11 +697,21 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 
 
 #pragma region UI텍스처 생성
+	// Nuclear
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Nuclear"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Nuclear.dds")))))
+		return E_FAIL;
+
 	// 크로스 라인
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Logo2"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CrossLine/CrossLine%d.png"), 24))))
 		return E_FAIL;
 
+	// UI_MISSILE_TIMER
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Missile_Timer"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/MISSILE_TIMER.dds")))))
+		return E_FAIL;
+	
 	// LButton
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_LButton"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/LButton.dds")))))
@@ -820,7 +842,9 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	m_strLoadingText = TEXT("모델 로딩중입니다.");
 
 	Loading_DataFile_For_YardLevel();
+	Loading_DataFile_For_Instancing_YardLevel();
 
+#pragma region 인스턴싱
 
 	/* For.Prototype_Component_VIBuffer_Particle_Snow*/
 	CVIBuffer_Instancing::INSTANCING_DESC		ParticleSnowDesc{};
@@ -831,7 +855,6 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	ParticleSnowDesc.vSpeed = _float2(1.f, 7.f);
 	ParticleSnowDesc.vLifeTime = _float2(3.f, 10.f);
 	ParticleSnowDesc.isLoop = true;
-	
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Snow"),
 		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext, &ParticleSnowDesc))))
 		return E_FAIL;
@@ -846,26 +869,25 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	ParticleExploDesc.vLifeTime = _float2(0.1f, 0.5f);
 	ParticleExploDesc.vPivot = _float3(0.f, -0.5f, 0.f);
 	ParticleExploDesc.isLoop = true;
-	
-
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Explosion"),
 		CVIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &ParticleExploDesc))))
 		return E_FAIL;
 
+	// 잔디
 	CVIBuffer_Instancing::INSTANCING_DESC	GrassInstancing{};
-	GrassInstancing.iNumInstance = 3000;
+	GrassInstancing.iNumInstance = m_iGrass_Count[0];
 	GrassInstancing.vCenter = _float3(645.424f, 0.f, 559.107f);
 	GrassInstancing.vRange = _float3(128.f, 0.f, 128.f);
 	GrassInstancing.vSize = _float2(8.f, 8.f);
 
-
-	
 	const _wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build108.dat");
 	_matrix			PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, &GrassInstancing))))
+		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0,m_vecGrassPos[0], &GrassInstancing))))
 		return E_FAIL;
+
+#pragma endregion 인스턴싱
 
 
 
@@ -902,22 +924,47 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
+	
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_3DUI")) == nullptr)
+	{
+		// 3D UI
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_3DUI"),
+			CUI_3D::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 
-	/* Prototype_GameObject_Particle_Snow */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Snow"),
-		CParticle_Snow::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Particle_Snow")) == nullptr)
+	{
+		/* Prototype_GameObject_Particle_Snow */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Snow"),
+			CParticle_Snow::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 
-	/* Prototype_GameObject_Particle_Explosion */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Explosion"),
-		CParticle_Explosion::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Particle_Explosion")) == nullptr)
+	{
+		/* Prototype_GameObject_Particle_Explosion */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Explosion"),
+			CParticle_Explosion::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 
-	/* Prototype_GameObject_Particle_Explosion */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
-		CGrass_Instancing::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
 
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Grass")) == nullptr)
+	{
+		/* Prototype_GameObject_Particle_Explosion */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
+			CGrass_Instancing::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	/* Explosion */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Explosion")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Explosion"),
+			CExplosion::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 
 	/* Prototype_GameObject_Sky */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
@@ -1114,6 +1161,51 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Blimp"),
 			CBlimp::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// 미사일 트럭
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck")) == nullptr)
+	{
+		/* Prototype GameObject Player*/
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck"),
+			CMissile_Truck::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// 미사일 트럭 몸
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck_Body")) == nullptr)
+	{
+		/* Prototype GameObject Player*/
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck_Body"),
+			CTruckBody::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// 미사일 트럭 발사대
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck_Shooter")) == nullptr)
+	{
+		/* Prototype GameObject Player*/
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck_Shooter"),
+			CTruckShooter::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// 미사일
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile")) == nullptr)
+	{
+		/* Prototype GameObject Player*/
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile"),
+			CTruck_Missile::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	
+	// 추적장치
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tracker")) == nullptr)
+	{
+		/* Prototype GameObject Player*/
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tracker"),
+			CTracker::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 	}
 
@@ -2015,7 +2107,7 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	cout << "----------------------------------------------------------------------------------------" << endl;
 	const _wstring Model_Bullet_Component = TEXT("Prototype_Component_Model_Bullet");
 	PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
-	for(int i = 0; i <4;i++)
+	for(int i = 0; i < BULLET_EA;i++)
 	{
 		const _wstring Model_Component_Bullet_Result = Model_Bullet_Component + to_wstring(i);
 		const _wstring Model_Path_Bullet_Result = Model_Bullet_Path + to_wstring(i) + Ext;
@@ -2263,9 +2355,19 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	cout << "Bullet ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 	const _wstring Model_Bullet_Component = TEXT("Prototype_Component_Model_Bullet");
-	PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < BULLET_EA; i++)
 	{
+		if (i == 4)
+		{
+			PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f)/* * XMMatrixRotationZ(XMConvertToRadians(-90.f))*/; // 미사일
+		}
+		
+		else
+		{
+			PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
+
+		}
+
 		const _wstring Model_Component_Bullet_Result = Model_Bullet_Component + to_wstring(i);
 		const _wstring Model_Path_Bullet_Result = Model_Bullet_Path + to_wstring(i) + Ext;
 		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Bullet_Result,
@@ -2632,6 +2734,39 @@ HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID)
 }
 
 
+
+HRESULT CLoader::Loading_DataFile_For_Instancing_YardLevel()
+{
+	// 108번 잔디 인스턴스 생성
+	_uint m_iModelIndex = 108;
+	m_iGrass_Count[0] = 0;
+	HANDLE hFile{};
+	DWORD dwByte = 0;
+	LEVELID iLevel;
+	_float3 fPos{};
+
+	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
+	_wstring Last_Path = TEXT(".dat");
+	_wstring Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
+	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		return E_FAIL; 
+	} 
+
+	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	{
+		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		m_vecGrassPos[0].push_back(fPos);
+		m_iGrass_Count[0]++;
+	}
+	CloseHandle(hFile);
+
+
+
+	return S_OK;
+}
 
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID)
 {

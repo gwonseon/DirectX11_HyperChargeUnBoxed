@@ -73,8 +73,10 @@ public:
 		WEAPON_RIFLE_SECOND,
 		WEAPON_KATANA,
 		BATTERY = 11,
+		TRACKER,
 		WEAPON_END
 	};
+
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPlayer(const CPlayer& Prototype);
@@ -230,11 +232,19 @@ public:
 	}
 	_vector* Get_BatteryPos() { return &m_vecBatteryPos; }
 	_bool* Get_Visible_Battery() { return &m_bVisible_Battery; }
+
+	_vector* Get_TrackerPos() { return &m_vecTrackerPos; }
+	_bool* Get_Visible_Tracker() { return &m_bVisible_Tracker; }
+
+	void	Set_Explosion(_bool bExplo) { m_bMissile_Explosion = bExplo; }
+	_bool	Get_Explosion() { return m_bMissile_Explosion; }
 private:
 	_uint					m_iPrev_WeaponState = WEAPON_RIFLE;
 	_vector					m_vecBatteryPos{};
+	_vector					m_vecTrackerPos{};
 	_bool					m_bVisible_Battery = true;
-
+	_bool					m_bVisible_Tracker = false;
+	_bool					m_bMissile_Explosion = false;
 #pragma endregion πË≈Õ∏Æ
 
 public:

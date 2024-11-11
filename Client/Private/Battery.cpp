@@ -128,7 +128,7 @@ void CBattery::Priority_Update(_float fTimeDelta)
 				m_pGauge->Set_Item_Interaction(false);
 				m_pGauge->Set_Item_InteractionEnd(false); // 상호작용 끝났는지 알려주는 값 초기화 해주기
 				// 플레이어한테 배터리 들라고 알려주기
-				m_pPlayer->PickUp_Battery(CPlayer::BATTERY); //8번 
+				m_pPlayer->PickUp_Battery(CPlayer::BATTERY); //111번 
 				m_vecPos = m_pPlayer->Get_BatteryPos();
 			}
 		}

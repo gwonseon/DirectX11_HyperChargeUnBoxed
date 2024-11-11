@@ -18,6 +18,8 @@ public:
 public:
 	void Move(CRifleMan* rifleman) override;
 	void Fire(CRifleMan* rifleman) override;
+	void Idle(CRifleMan* rifleman) override;
+
 };
 
 END

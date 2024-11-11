@@ -223,7 +223,14 @@ PS_OUT PS_MAIN7(PS_IN In)
 // Pass는 여러개 할 수 있음 , 지금은 1개뿐, 그래서 Begin 함수 매개변수가 0이었음
 // VertexShader 와 PixelShader 는 각각의 패스에서 사용할 셰이더의 프로그램을 지정한다.  위의 VS_MAIN 을 지정함
 
+// 후면 추리기 안함
+PS_OUT PS_MAIN8(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    return Out;
 
+}
 // 같은 픽셀에 대한 쉐이딩 방식을 여러 개 두기 위해 Pass를 여러 개 둔다.
 
 //  compile vs_5_0 은 셰이더 모델 5.0을 사용하여 셰이더를 컴파일하도록 하는 명령어
@@ -288,6 +295,16 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN7();
+    }
+
+    pass DefaultPass7
+    {
+        // 블렌드. 컬안함, 깊이 안함
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN8();
     }
 
 }

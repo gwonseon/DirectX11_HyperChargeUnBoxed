@@ -22,7 +22,7 @@ CAnimation::CAnimation(const CAnimation& Prototype)
 
 }
  
-_bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta)
+_bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bPlay)
 {
 	//if (m_fCurrentPosition <= 0.f && bChangeAnim == true)
 	//{
@@ -43,8 +43,9 @@ _bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones,
 		m_vecName.resize(m_iNumChannels);
 		LastKeyFrame = nullptr; // LastKeyFrame을 nullptr로 초기화
 	}
+	if(bPlay == true)
+		m_fCurrentPosition += m_fTickPerSecond * fTimeDelta;
 
-	m_fCurrentPosition += m_fTickPerSecond * fTimeDelta;
 	if (m_fCurrentPosition >= m_fDuration &&
 		true == isLoop)
 	{
@@ -247,7 +248,6 @@ CAnimation* CAnimation::Create(CModel* pModel, HANDLE hFileRead)
 
 HRESULT CAnimation::Initialize(CModel* pModel, HANDLE hFileRead)
 {
-
 	_uint iAnimationNameLen = 0;
 	ReadFile(hFileRead, &iAnimationNameLen, sizeof(_uint), &dwByte, nullptr);
 	char* m_szName = new char[iAnimationNameLen + 1]; // +1 for null terminator

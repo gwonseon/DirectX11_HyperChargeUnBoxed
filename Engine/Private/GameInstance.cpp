@@ -442,6 +442,11 @@ void CGameInstance::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _
 	m_pCollision_Manager->Collision_Trap(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
 }
 
+void CGameInstance::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iCount, _uint iSrcPartObjID, _uint iDstPartObjID)
+{
+	m_pCollision_Manager->Collision_Explosion(pExplosionLayer, pAttackedLayer, strSrcComponentTag, strDstComponentTag, iCount,iSrcPartObjID, iDstPartObjID);
+}
+
 HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
 {
 	return m_pFont_Manager->Add_Font(strFontTag, pFontFilePath);

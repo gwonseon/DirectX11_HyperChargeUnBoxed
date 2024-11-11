@@ -63,36 +63,37 @@ protected:
 
 	
 public:
-	void	Set_Hp(_float Hp)				{ m_fHp = Hp; }
-	void	Set_Energy(_float Energy)		{ m_fEnergy = Energy; }
-	void	Set_Attact(_float Attack)		{ m_fAttack = Attack; }
-	void	Set_Coin(_uint Coin)			{ m_iCoin = Coin; }
+	void	Set_Hp(_float Hp)					{ m_fHp = Hp; }
+	void	Set_Energy(_float Energy)			{ m_fEnergy = Energy; }
+	void	Set_Attact(_float Attack)			{ m_fAttack = Attack; }
+	void	Set_Coin(_uint Coin)				{ m_iCoin = Coin; }
 
-	void	Set_GetEnergy(_float Energy)	{ m_fEnergy += Energy; }
-	void	Set_Heal(_float Heal)			{ m_fHp += Heal; }
-	void	Set_FullHeal()					{ m_fHp = 100.f; }
-	void	UseCoin(_uint Price)		{ m_iCoin -= Price; }
-	void	Set_PickUp_Coin(_uint Price)	{ m_iCoin += Price; }
+	void	Set_GetEnergy(_float Energy)		{ m_fEnergy += Energy; }
+	void	Set_Heal(_float Heal)				{ m_fHp += Heal; }
+	void	Set_FullHeal()						{ m_fHp = 100.f; }
+	void	UseCoin(_uint Price)				{ m_iCoin -= Price; }
+	void	Set_PickUp_Coin(_uint Price)		{ m_iCoin += Price; }
 
 	void	Set_CanAttacked(_bool bCanAttacked) { m_bCanAttacked = bCanAttacked; }  // 공격 당해도 되는지 알림
-	void	Set_Attacked(_bool bAttacked)	{ m_bAttacked = bAttacked; }  // 공격 당했음을 알려줌
-	void	Set_knockdown(_bool bknockdown) { m_bKnockdown = bknockdown; }
+	void	Set_Attacked(_bool bAttacked)		{ m_bAttacked = bAttacked; }		// 공격 당했음을 알려줌
+	void	Set_knockdown(_bool bknockdown)		{ m_bKnockdown = bknockdown; }
 
 	void	Set_Interaction(_bool bInteraction) { m_bInteraction = bInteraction; }
-	
-	_float	Get_Hp()						{ return m_fHp; }		// 체력 얼마나 있는지
-	_float	Get_Energy()					{ return m_fEnergy; }	// 쉴드량 얼마나 있는지
-	_float	Get_Attack()					{ return m_fAttack; }	// 공격력 얼마인지 
-	_uint	Get_Coin()						{ return m_iCoin; }		// 돈 얼마나 있는지
+	void	Set_AttackState(_bool bAttackState) { m_bAttackState = bAttackState; }
 
-	_bool	Get_CanAttacked()				{ return m_bCanAttacked; }    // 공격을 당해도(혹은 해도) 되는지 알려줌
-	_bool	Get_Attacked()					{ return m_bAttacked; }    // 공격을 당했는지 알려줌
-	_bool	Get_DontDestroyAble()			{ return m_bDontDestroy; } // 객체 삭제하면 안되는 애인지 아닌지 알려줌
-	_bool	Get_knockdown()					{ return m_bKnockdown; }   // 객체 삭제하면 안되는 애들 죽었다고 알리기 위함
-	_bool	Get_AttackState()				{ return m_bAttackState; } // 공격 모션인지 아닌지 확인용(이때만 충돌이 되어야 함)
-	_bool	Get_IsBullet()					{ return m_bIsBullet; }
+	_float	Get_Hp()							{ return m_fHp; }			// 체력 얼마나 있는지
+	_float	Get_Energy()						{ return m_fEnergy; }		// 쉴드량 얼마나 있는지
+	_float	Get_Attack()						{ return m_fAttack; }		// 공격력 얼마인지 
+	_uint	Get_Coin()							{ return m_iCoin; }			// 돈 얼마나 있는지
 
-	_bool	Get_Interaction()				{ return m_bInteraction; }
+	_bool	Get_CanAttacked()					{ return m_bCanAttacked; }	// 공격을 당해도(혹은 해도) 되는지 알려줌
+	_bool	Get_Attacked()						{ return m_bAttacked; }		// 공격을 당했는지 알려줌
+	_bool	Get_DontDestroyAble()				{ return m_bDontDestroy; }	// 객체 삭제하면 안되는 애인지 아닌지 알려줌
+	_bool	Get_knockdown()						{ return m_bKnockdown; }	// 객체 삭제하면 안되는 애들 죽었다고 알리기 위함
+	_bool	Get_AttackState()					{ return m_bAttackState; }	// 공격 모션인지 아닌지 확인용(이때만 충돌이 되어야 함)
+	_bool	Get_IsBullet()						{ return m_bIsBullet; }
+
+	_bool	Get_Interaction()					{ return m_bInteraction; }
 
 
 	// 에너지가 있으면 에너지 깎고, 에너지 없으면 Hp깎음

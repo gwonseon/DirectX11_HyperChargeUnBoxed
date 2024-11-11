@@ -113,6 +113,7 @@ public: // 콜리전 매니저
 	void Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
 	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos,  _bool* bShot, _float fDamage,_uint iTargetPartObjID = 0);
 	void Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
+	void Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iCount, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
 
 public: /* For.Font_Manager */
 	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePaht);

@@ -192,6 +192,60 @@ void CCollisionMgr::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _
 	}
 }
 
+void CCollisionMgr::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iCount, _uint iSrcPartObjID, _uint iDstPartObjID)
+{
+	if (pExplosionLayer != nullptr && pAttackedLayer != nullptr)
+	{
+		for (auto& pExplosion : pExplosionLayer->Get_GameObject_List())
+		{
+			CCollider* pExplosionCol = static_cast<CCollider*>(pExplosion->Find_Component(strSrcComponentTag, iSrcPartObjID));
+			// 당하는 오브젝트 위치 가져오기
+			CTransform* m_pExplosionTrans = pExplosion->Get_Transform();
+			_vector vExplosionPos = m_pExplosionTrans->Get_State(CTransform::STATE_POSITION);
+			_float3 fExplosionPos{};
+			XMStoreFloat3(&fExplosionPos, vExplosionPos);
+			if(pExplosion->Get_AttackState() == true)
+			{
+				for (auto& pAttacked : pAttackedLayer->Get_GameObject_List())
+				{
+					_vector vAttackedTargetPos = pAttacked->Get_Transform()->Get_State(CTransform::STATE_POSITION);
+					_float3 fAttackedTargetPos{};
+					XMStoreFloat3(&fAttackedTargetPos, vAttackedTargetPos);
+					// 위치 비교해서 안에 들어온 애들만 검사
+					if (!(m_pExplosionTrans->Cal_Distance(fExplosionPos, fAttackedTargetPos) < 2000.f))
+						continue;
+					 // 트랩 오브젝트 Collider 컴포넌트 가져오기
+					CCollider* pAttackedCol = static_cast<CCollider*>(pAttacked->Find_Component(strDstComponentTag, iDstPartObjID));
+					if (pAttackedCol == nullptr)
+						continue;
+					// 충돌 비교
+					if (pAttacked->Get_CanAttacked() == false)
+						continue;
+					if (pExplosionCol->Intersect(pAttackedCol))
+					{
+						pAttacked->Set_Damaged(pExplosion->Get_Attack()); // 가해자 공격력만큼 피 깎음(Set_Damage 내부에서 에너지량에 따라 데미지 입힘
+						// HP가 0일 때
+						if (pAttacked->Get_Hp() <= 0.f)
+						{
+							// 삭제하면 안되는 객체는 넉다운으로 따로 처리
+							if (pAttacked->Get_DontDestroyAble() == true)
+								pAttacked->Set_knockdown(true);
+							else // 삭제하는 애들은 데드시킴
+								pAttacked->Set_Dead();
+						}
+					}
+				}
+				
+			}
+			if(iCount == 1)
+			{
+				pExplosion->Set_AttackState(false);
+				pExplosion->Set_Dead();
+			}
+		}
+	}
+}
+
 void CCollisionMgr::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
 {
 	if (pSrcLayer != nullptr && pDstLayer != nullptr)

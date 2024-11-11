@@ -96,6 +96,8 @@ public:
 	_float Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget);
 
 
+
+	_bool  IsPass_TargetPosition(_vector prevPos, _vector currentPos, _vector targetPos);
 	// A스타 이동
 public:
 	vector<_float3> PathFind(_float fTimeDelta, CNavigation* pNavigation,_int CurrentCell_Idx, _int TargetCell_Idx);

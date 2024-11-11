@@ -107,6 +107,7 @@ void CCoin_Item::Update(_float fTimeDelta)
     }
     else
     {
+        m_bInteraction = false;
         m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
         m_fCharging_Time = 0.f;
     }
@@ -114,6 +115,7 @@ void CCoin_Item::Update(_float fTimeDelta)
 
     if (m_fCharging_Time >= 1.f)
     {
+        m_bInteraction = false; 
         m_pPlayer->Set_PickUp_Coin(m_iCoin);
         m_bDead = true;
     }

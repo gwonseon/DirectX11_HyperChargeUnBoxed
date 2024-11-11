@@ -89,7 +89,6 @@ HRESULT CBrainCore::Add_Components()
 		return E_FAIL;
 
 	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
-
 	AABBDesc.vExtents = _float3(1.f, 2.5f, 1.f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y , 0.f);
 	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),

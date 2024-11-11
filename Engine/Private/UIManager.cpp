@@ -25,7 +25,6 @@ void CUIManager::CircleGauge_Interaction(CLayer* Item, CLayer* UI)
     {
         for (auto& pUI : UI->Get_GameObject_List())
         {
-          
             for (auto& pItem : Item->Get_GameObject_List())
             {
                 if (pItem->Get_Interaction() == true)

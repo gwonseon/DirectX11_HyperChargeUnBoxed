@@ -105,7 +105,6 @@ PS_OUT PS_MAIN(PS_IN In)
     float fAngle = atan2(-fPos.x, fPos.y)  + 3.141532f;
     float fResult_Angle = (fAngle - fProgress * 2.f * 3.141532f) + 1.f;
 
-    
     fResult_Angle = clamp(fResult_Angle , 0.f, 1.f);
     
     float4 color2 = float4(0.5f, 0.5f, 0.5f, 1.f);
@@ -116,7 +115,6 @@ PS_OUT PS_MAIN(PS_IN In)
     
     float4 BackGround = float4(0.f, 0.f, 0.f, 0.f);
     fResult_Color = lerp(BackGround, fResult_Color, fResult_Color.a);
-    
 
     if (fResult_Color.a < 0.001)  // 0에 가까운 값을 체크하여 불필요한 픽셀을 제거
         discard;

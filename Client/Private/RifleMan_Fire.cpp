@@ -8,7 +8,7 @@ void CRifleMan_Fire::Enter(CRifleMan* rifleman)
 
 void CRifleMan_Fire::Update(CRifleMan* rifleman, float fTimeDelta)
 {
-	rifleman->Get_ModelCom()->Set_Animation(CRifleMan::AA_SpaceMen01_Fire, false);
+	rifleman->Get_ModelCom()->Set_Animation(CRifleMan::AA_ArmyMen_LoopFir, false);
 }
 
 void CRifleMan_Fire::Exit(CRifleMan* rifleman)
@@ -22,4 +22,9 @@ void CRifleMan_Fire::Move(CRifleMan* rifleman)
 
 void CRifleMan_Fire::Fire(CRifleMan* rifleman)
 {
+}
+
+void CRifleMan_Fire::Idle(CRifleMan* rifleman)
+{
+	rifleman->ChangeState(new CRifleMan_Idle());
 }

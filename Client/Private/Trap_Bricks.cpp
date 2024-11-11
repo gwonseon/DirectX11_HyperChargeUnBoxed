@@ -27,6 +27,7 @@ HRESULT CTrap_Bricks::Initialize(void* pArg)
 	m_eLevel = pDesc->eID;
 	m_bBuild = pDesc->m_bBuild;
 	m_bBuild_PreView = pDesc->m_bBuild_PreView;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;	
 	if (FAILED(Add_Components()))
@@ -85,10 +86,12 @@ void CTrap_Bricks::Update(_float fTimeDelta)
 	// 건설되었을 때
 	if(*m_bBuild == true)
 	{
+		m_bCanAttacked = true;
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	}
 	else
 	{
+		m_bCanAttacked = false;
 		// 건설 안되었을 때
 		// 살 수 있을 때와 없을 때 구분
 		if (m_pPlayer->Get_Coin() > m_iCoin)
@@ -171,7 +174,7 @@ HRESULT CTrap_Bricks::Add_Components()
 	if (m_iModel_Idx == 9)
 		AABBDesc.vExtents = _float3(0.6f, 0.6f, 0.6f);
 
-	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
+	AABBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
 		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;

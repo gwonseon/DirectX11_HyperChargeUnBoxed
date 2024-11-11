@@ -37,10 +37,11 @@ HRESULT CBody_Player::Initialize(void* pArg)
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
 	if (FAILED(Add_Components()))
 		return E_FAIL;
+
 	m_iViewState = pDesc->m_iViewState;
+
 	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed, true);
 	m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base, true);
 	m_iUpperMotion = IDLE_MOTION;
@@ -137,7 +138,6 @@ void CBody_Player::Update(_float fTimeDelta)
 		m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 		m_pColliderCom->Update(XMLoadFloat4x4(&m_WorldMatrix));
-
 }
 
 void CBody_Player::Late_Update(_float fTimeDelta)
@@ -800,7 +800,6 @@ HRESULT CBody_Player::Add_Components()
 
 	/* For.Com_Collider_AABB */
 	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
-
 	AABBDesc.vExtents = _float3(0.5f, 1.f, 0.5f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y + 1.f, 0.f);
 	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Collider_AABB"),
@@ -865,7 +864,6 @@ CGameObject* CBody_Player::Clone(void* pArg)
 		MSG_BOX("Failed to Created : CBody_Player");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

@@ -50,7 +50,7 @@ public:
 public:
 	HRESULT Bind_Material_ShaderResource(class CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 	HRESULT Bind_Mesh_BoneMatrices(class CShader* pShader, _uint iMeshIndex, const _char* pConstantName);
-	_bool Play_Animation(_float fTimeDelta, _bool Once);
+	_bool Play_Animation(_float fTimeDelta, _bool Once = false, _bool bPlay = true);
 	_bool Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle, _uint iUpperMotion, _bool& bShot);
 	_bool Play_Animation_LowerBody(_float fTimeDelta);
 

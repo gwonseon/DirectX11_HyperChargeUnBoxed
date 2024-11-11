@@ -25,6 +25,8 @@
 #include "Pony.h"
 #include <Coin_Item.h>
 #include <Hp_Item.h>
+#include <UI_3D.h>
+
 
 CLevel_Yard::CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -46,6 +48,9 @@ HRESULT CLevel_Yard::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_MissileTruck(TEXT("Layer_MissileTruck"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
@@ -98,10 +103,7 @@ HRESULT CLevel_Yard::Initialize()
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Coin"));
 	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_CircleUI"));
 	pItem = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Item"));
-
-
-	return S_OK;
-
+	// pTruck = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_MissileTruck"));
 
     return S_OK;
 }
@@ -110,13 +112,18 @@ void CLevel_Yard::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 	Build_Check(); // 트랩 설치관련 
-
 	Interaction();
 	RoundMgr_And_MonsterSpawn(fTimeDelta);
 
 #pragma region Collision
 	if (pTrap_Shield == nullptr)
 		pTrap_Shield = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Trap_Shield"));
+	if (pBuild == nullptr)
+		pBuild = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_PlayerBuild"));
+	//if (pTruck == nullptr)
+	//	pTruck = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_MissileTruck"));
+
+	_uint iExplosionCount = 0;
 	// 앞이 당하는 애
 	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
 	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
@@ -124,6 +131,14 @@ void CLevel_Yard::Update(_float fTimeDelta)
 	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
 	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
 	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
+	m_pGameInstance->Collision_Explosion(pExplosion, pBuild, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), iExplosionCount);
+	iExplosionCount++; 
+	m_pGameInstance->Collision_Explosion(pExplosion, pTrap_Shield, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), iExplosionCount);
+	//iExplosionCount++; 
+	//m_pGameInstance->Collision_Explosion(pExplosion, pTruck, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), iExplosionCount);
+	
+	if (pExplosion == nullptr)
+		pExplosion = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
 
 
 #pragma endregion Collision	
@@ -226,6 +241,28 @@ void CLevel_Yard::Texture_Render()
 
 HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 {
+	CUI_3D::UIOBJ_DESC pObjDesc{};
+	pObjDesc.eUIType = CUI_3D::UI_NUCLEAR;
+	pObjDesc.fScale = _float3{ 2.5f,2.5f,2.5f };
+	pObjDesc.m_eLevel = LEVEL_YARD;
+	pObjDesc.pCamera = m_pCamera;
+	pObjDesc.pPlayer = m_pPlayer;
+	pObjDesc.m_pMissile_Truck = m_pMissile_Truck;
+	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_3DUI"), &pObjDesc);
+
+
+	CInGameUI::INGAMEUI_DESC	Missile_Timer_Desc{};
+	Missile_Timer_Desc.eLevel = LEVEL_YARD;
+	Missile_Timer_Desc.eUITag = CInGameUI::UI_MISSILE_TIMER;
+	Missile_Timer_Desc.fX = g_iWinSizeX * 0.5f;
+	Missile_Timer_Desc.fY = g_iWinSizeY * 0.1f;
+	Missile_Timer_Desc.fDepth = 0.1f;
+	Missile_Timer_Desc.fSizeX = 400.f;
+	Missile_Timer_Desc.fSizeY = 100.f;
+	Missile_Timer_Desc.fTimer = m_pMissile_Truck->Get_Timer();
+	Missile_Timer_Desc.iRound = &m_iCurrentRound;
+	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &Missile_Timer_Desc);
+
 
 
 	CUI_CircleGuage::CIRCLEGAUGE_DESC pCircleDesc{};
@@ -696,14 +733,14 @@ HRESULT CLevel_Yard::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	Desc.iModelIndex = 5;
 	Desc.fScale = { 30.f,30.f,30.f };
 	Desc.fPosition = { 469.82f, 3.f, 442.094f };
-	CGameObject* pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
-	m_pWeaponItem[0] = static_cast<CWeapon_Item*>(pItem);
+	CGameObject* m_pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
+	m_pWeaponItem[0] = static_cast<CWeapon_Item*>(m_pItem);
 
 	Desc.fScale = { 10.f,10.f,10.f };
 	Desc.iModelIndex = 7;
 	Desc.fPosition = { 433.203f, 2.f, 457.242f };
-	pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
-	m_pWeaponItem[1] = static_cast<CWeapon_Item*>(pItem);
+	m_pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
+	m_pWeaponItem[1] = static_cast<CWeapon_Item*>(m_pItem);
 
 
 	CBattery::BATTERY_DESC pBattery;
@@ -1042,6 +1079,20 @@ HRESULT CLevel_Yard::Ready_Layer_Damaged(const _tchar* pLayerTag)
 	pDesc4.pPlayer = m_pPlayer;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc4)))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Yard::Ready_Layer_MissileTruck(const _tchar* pLayerTag)
+{
+	CMissile_Truck::MISSILETRUCK_DESC MissileTruckDesc{};
+	MissileTruckDesc.iRound = &m_iCurrentRound;
+	MissileTruckDesc.m_eLevelID = LEVEL_YARD;
+	MissileTruckDesc.fPosition = _float3(301.378f, 0.f, 528.018f);
+	MissileTruckDesc.fScale = { 8.f,8.f ,8.f };
+	MissileTruckDesc.pPlayer = m_pPlayer;
+	m_pMissile_Truck = static_cast<CMissile_Truck*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_MissileTruck"), &MissileTruckDesc));
+
 
 	return S_OK;
 }
