@@ -420,6 +420,24 @@ _float CTransform::Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget)
 }
 
 
+_bool CTransform::IsPass_TargetPosition(_vector prevPos, _vector currentPos, _vector targetPos)
+{
+	currentPos = XMVectorSetY(currentPos, 0.f);
+	prevPos = XMVectorSetY(prevPos, 0.f);
+	targetPos = XMVectorSetY(targetPos, 0.f);
+	_vector directionToTarget = targetPos - currentPos;// XMVectorSubtract(targetPos, currentPos);
+	_vector previousDirection = targetPos - prevPos;		// XMVectorSubtract(targetPos, prevPos);
+
+	float dotProduct = XMVectorGetX(XMVector3Dot(directionToTarget, previousDirection));
+	if (dotProduct < 0.0f) // 음수면 목표 지나침
+	{
+		return true;
+	}
+	return false; 
+
+
+}
+
 vector<_float3> CTransform::PathFind(_float fTimeDelta, CNavigation* pNavigation,_int StartCell_Idx, _int TargetCell_Idx)
 {
 	vector<_float3> vecPath = pNavigation->Find_Path_AStar(StartCell_Idx, TargetCell_Idx);

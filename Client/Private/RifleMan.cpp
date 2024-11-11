@@ -116,27 +116,34 @@ void CRifleMan::Update(_float fTimeDelta)
             _vector vecTargetPos = *m_vecTargetPos;
             vecTargetPos = XMVectorSetY(vecTargetPos, 1.f);
             m_pTransformCom->LookAt(vecTargetPos);
-            // 애니메이션 변경
-            m_pCurrentState->Fire(this);
-            m_pModelCom->Play_Animation(fTimeDelta, true);
             // 총알 생성
             if (m_fShot_Time_Delay >= 4.f)
             {
-                if (m_iShot_Count < 3)
+                m_fShotTimer += fTimeDelta;
+                if (m_pModelCom->Play_Animation(fTimeDelta, false, m_bShot))
+                    m_bShot = false;
+                // 애니메이션 변경
+                if (m_iShot_Count < 3  )
                 {
-                    
-                    CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
-                    Desc.eID = m_eLevel;
-                    _float3 fBulletPos = m_fPos;
-                    fBulletPos.y = 2.f;
-                    Desc.fPosition = fBulletPos;
-                    Desc.m_iModelNumber = 1;
-                    Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
-                    Desc.vDir = XMVector3Normalize(vecTargetPos - vPos);
-                    Desc.m_pBuild = m_pBuild;
-                    Desc.pPlayer = m_pPlayer;
-                    static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
-                    m_iShot_Count++;
+                    if(m_fShotTimer >= 0.2f)
+                    {
+                        m_fShotTimer = 0.f;
+                        m_bShot = true;
+                        // 애니메이션 변경
+                        m_pCurrentState->Fire(this);
+                        CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
+                        Desc.eID = m_eLevel;
+                        _float3 fBulletPos = m_fPos;
+                        fBulletPos.y = 2.f;
+                        Desc.fPosition = fBulletPos;
+                        Desc.m_iModelNumber = 1;
+                        Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
+                        Desc.vDir = XMVector3Normalize(vecTargetPos - vPos);
+                        Desc.m_pBuild = m_pBuild;
+                        Desc.pPlayer = m_pPlayer;
+                        static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+                        m_iShot_Count++;
+                    }
                 }
                 else
                 {
@@ -145,7 +152,6 @@ void CRifleMan::Update(_float fTimeDelta)
                 }
             }
             m_fShot_Time_Delay += fTimeDelta;
-           
         }
         else // 사정거리 밖일 때 움직임
         {
@@ -201,28 +207,36 @@ void CRifleMan::Update(_float fTimeDelta)
                 m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta, vMovePos, m_pNavigationCom);
             }
         }
-        else
+        else // 플레이어가 사정거리 안에 있으면
         {
-            // 애니메이션 변경
-            m_pCurrentState->Fire(this);
-            m_pModelCom->Play_Animation(fTimeDelta, true);
+            
+            if (m_pModelCom->Play_Animation(fTimeDelta,false, m_bShot))
+                m_bShot = false;
             // 총알 생성
             if (m_fShot_Time_Delay >= 4.f)
-            {
-                if (m_iShot_Count < 3)
+            {            
+                m_fShotTimer += fTimeDelta;
+                // 애니메이션 변경
+                if (m_iShot_Count < 3  )
                 {
-                    CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
-                    Desc.eID = m_eLevel;
-                    _float3 fBulletPos = m_fPos;
-                    fBulletPos.y = 2.f;
-                    Desc.fPosition = fBulletPos;
-                    Desc.m_iModelNumber = 1;
-                    Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
-                    Desc.vDir = XMVector3Normalize(vPlayerPos - vPos);
-                    Desc.m_pBuild = m_pBuild;
-                    Desc.pPlayer = m_pPlayer;
-                    static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
-                    m_iShot_Count++;
+                    if(m_fShotTimer >= 0.2f)
+                    {
+                        m_fShotTimer = 0.f;
+                        m_bShot = true;
+                        m_pCurrentState->Fire(this);
+                        CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
+                        Desc.eID = m_eLevel;
+                        _float3 fBulletPos = m_fPos;
+                        fBulletPos.y = 2.f;
+                        Desc.fPosition = fBulletPos;
+                        Desc.m_iModelNumber = 1;
+                        Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
+                        Desc.vDir = XMVector3Normalize(vPlayerPos - vPos);
+                        Desc.m_pBuild = m_pBuild;
+                        Desc.pPlayer = m_pPlayer;
+                        static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+                        m_iShot_Count++;
+                    }
                 }
                 else
                 {
@@ -286,7 +300,6 @@ HRESULT CRifleMan::Add_Components()
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
         return E_FAIL;
 
-    /* For.Com_Collider_OBB */
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
     SphereDesc.fRadius = 1.5f;
     SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);

@@ -130,9 +130,6 @@
     <Filter Include="02. GameObjects\Monster\Pony\PonyState">
       <UniqueIdentifier>{6789da16-12d8-452b-9edb-f89660d4faa1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\SkyBox">
-      <UniqueIdentifier>{74b89f2b-2c46-4e83-a151-ccdf8a1b30eb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Player\Weapon\Player_Bullet">
       <UniqueIdentifier>{393b5cff-3b49-41b0-942c-4a6c843ed3b2}</UniqueIdentifier>
     </Filter>
@@ -228,6 +225,36 @@
     </Filter>
     <Filter Include="02. GameObjects\Effect\Particle\Grass">
       <UniqueIdentifier>{de992f9e-da48-43c0-b601-58dd40f04962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck">
+      <UniqueIdentifier>{217e1ef8-cb66-4cff-b262-fc9bb210e244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck\TruckBody">
+      <UniqueIdentifier>{246e61e4-a0b0-49b1-aa65-5e7f2516039e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Shooter">
+      <UniqueIdentifier>{021238db-56f7-4d4c-a3d1-11cf57418491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Missile">
+      <UniqueIdentifier>{f782c1a1-e83b-4b0d-83ee-d56b1e5c3d32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck\Tracker">
+      <UniqueIdentifier>{02a2422e-71f5-4e25-9627-339faa96fafb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Explosion">
+      <UniqueIdentifier>{dab86687-b7ae-43d5-915d-ba7345fb61aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Terrain\SkyBox">
+      <UniqueIdentifier>{74b89f2b-2c46-4e83-a151-ccdf8a1b30eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\RifleMan\RifleState\Idle">
+      <UniqueIdentifier>{bf55b354-2926-4f3a-b25b-5c00e0534e9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI_3D">
+      <UniqueIdentifier>{00f6e596-1553-4c42-83f1-98fbfe87101d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Environment\CorrectItem">
+      <UniqueIdentifier>{9cd406c9-853e-4075-ad4b-6722f20bb1e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -355,7 +382,7 @@
       <Filter>02. GameObjects\Player\Weapon\Player_Bullet</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
-      <Filter>02. GameObjects\SkyBox</Filter>
+      <Filter>02. GameObjects\Terrain\SkyBox</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_Bullet.h">
       <Filter>02. GameObjects\Monster\Monster_Bullet</Filter>
@@ -446,6 +473,30 @@
     </ClInclude>
     <ClInclude Include="..\Public\Grass_Instancing.h">
       <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Missile_Truck.h">
+      <Filter>02. GameObjects\Monster\Missile_Truck</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TruckShooter.h">
+      <Filter>02. GameObjects\Monster\Missile_Truck\Truck_Shooter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TruckBody.h">
+      <Filter>02. GameObjects\Monster\Missile_Truck\TruckBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Truck_Missile.h">
+      <Filter>02. GameObjects\Monster\Missile_Truck\Truck_Missile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tracker.h">
+      <Filter>02. GameObjects\Monster\Missile_Truck\Tracker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Explosion.h">
+      <Filter>02. GameObjects\Effect\Explosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RifleMan_Idle.h">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_3D.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI_3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -564,7 +615,7 @@
       <Filter>02. GameObjects\Player\Weapon\Player_Bullet</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
-      <Filter>02. GameObjects\SkyBox</Filter>
+      <Filter>02. GameObjects\Terrain\SkyBox</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_Bullet.cpp">
       <Filter>02. GameObjects\Monster\Monster_Bullet</Filter>
@@ -643,6 +694,30 @@
     </ClCompile>
     <ClCompile Include="..\Private\Grass_Instancing.cpp">
       <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Missile_Truck.cpp">
+      <Filter>02. GameObjects\Monster\Missile_Truck</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TruckShooter.cpp">
+      <Filter>02. GameObjects\Monster\Missile_Truck\Truck_Shooter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TruckBody.cpp">
+      <Filter>02. GameObjects\Monster\Missile_Truck\TruckBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Truck_Missile.cpp">
+      <Filter>02. GameObjects\Monster\Missile_Truck\Truck_Missile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tracker.cpp">
+      <Filter>02. GameObjects\Monster\Missile_Truck\Tracker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Explosion.cpp">
+      <Filter>02. GameObjects\Effect\Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RifleMan_Idle.cpp">
+      <Filter>02. GameObjects\Monster\RifleMan\RifleState\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_3D.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI_3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

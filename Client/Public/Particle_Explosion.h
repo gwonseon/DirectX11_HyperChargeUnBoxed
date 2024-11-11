@@ -5,7 +5,6 @@
 BEGIN(Engine)
 class CShader;
 class CTexture;
-
 class CVIBuffer_Particle_Rect;
 END
 

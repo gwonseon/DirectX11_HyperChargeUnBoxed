@@ -21,17 +21,21 @@ public:
 		UI_MACHINE_HP,UI_BULLET,UI_CHARACTER,UI_CONVERSATIONBOX, UI_BUILDMODE_CONVERSATIONBOX, UI_BUILDMODE_F,
 		UI_MACHINE_ENERGY,UI_DAMAGED,UI_PLAYER_HP, UI_PLAYER_ENERGY,
 		UI_ENERGY_ICON, UI_HP_ICON, UI_CREDIT_ICON,UI_RUN_ICON, UI_JUMP_ICON, UI_MODECHANGE_ICON, UI_VIEWCHANGE_ICON,
-		UI_PUNCH_ICON, UI_V, UI_F, UI_C, UI_CENTERICON, UI_SLICE,
+		UI_PUNCH_ICON, UI_V, UI_F, UI_C, UI_CENTERICON, UI_SLICE, UI_MISSILE_TIMER, UI_NUCLEAR,
 		UI_END};
 
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
+		_uint* iRound			= { nullptr };
+
 		_float* fPlayerHP		= { nullptr };
 		_float* fPlayerEnergy	= { nullptr };
 		_float* fBrainHP		= { nullptr };
 		_float* fBrainEnergy	= { nullptr };
-		GAMEUI eUITag{};
+		_float* fTimer			= { nullptr };
+		GAMEUI	eUITag{};
 		_uint	iIndex{};
+	
 		CPlayer* pPlayer{};
 		CUI_CircleGuage* pCircle = { nullptr };
 	}INGAMEUI_DESC;
@@ -106,6 +110,13 @@ private:
 
 	//  플레이어에게서 가져와야 하는 값이 많아서 플레이어 포인터를 들고옴 ( 아차피 삭제 안됨 ㄱㅊ)
 	CPlayer*					m_pPlayer = { nullptr };
+
+	// 타이머
+	_float*						m_fTimer = { nullptr };
+
+	// 라운드
+	_uint*						m_iRound = { nullptr };
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };

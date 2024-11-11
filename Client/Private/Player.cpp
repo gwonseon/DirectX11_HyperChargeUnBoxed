@@ -80,7 +80,6 @@ HRESULT CPlayer::Initialize(void* pArg)
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
 
-
 	// 빌드 모드 ( 건축)
 	if (m_bBuildMode == true && m_bBuild_Able == true)
 	{
@@ -170,6 +169,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	m_pWaepon->Set_WeaponState(m_iWeaponState);		// 무기에게 무기 상태 보내주기
 	
 	if (m_iWeaponState == BATTERY)		m_iViewState = PLAYER_FPS_VIEW; // 배터리는 무조건 1인칭
+	if (m_iWeaponState == TRACKER)		m_iViewState = PLAYER_FPS_VIEW; // 추적기는 무조건 1인칭
 
 	if (m_iWeaponState == WEAPON_KATANA)			// 칼에게 무기 상태 보내주기	
 	{
@@ -383,6 +383,13 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		m_iWeaponState = m_iPrev_WeaponState; // 건전지 내리고 이전 무기로 돌아가기
 		m_vecBatteryPos = m_vecPos;
 		m_bVisible_Battery = true;
+	}
+	else if ((m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_iWeaponState == TRACKER) || (m_bMissile_Explosion == true && m_iWeaponState == TRACKER))
+	{
+		m_iWeaponState = m_iPrev_WeaponState; // 건전지 내리고 이전 무기로 돌아가기
+		m_vecTrackerPos = m_vecPos;
+		m_bVisible_Tracker = false;  // 트래커를 들었을 때 안보이고, 놓았을 때 보이게 했음 배터리랑 반대
+		m_bMissile_Explosion = false;
 	}
 	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
 	{

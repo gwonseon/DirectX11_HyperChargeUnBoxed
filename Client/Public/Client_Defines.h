@@ -2,13 +2,13 @@
 
 #include <process.h>
 
-#define BUILD_EA	153
+#define BUILD_EA	154
 #define ENVIRONMENT_EA 165
-#define WEAPON_EA		12
+#define WEAPON_EA		13
 #define MONSTER_EA		6
 #define OBJ_DEAD 1
-#define TRAP_EA 14
-
+#define TRAP_EA 17
+#define	BULLET_EA 6
 
 namespace Client
 {

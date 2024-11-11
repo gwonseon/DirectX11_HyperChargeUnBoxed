@@ -27,17 +27,15 @@ public:
 
 	enum RIFLEMAN_ANIM
 	{
-	
-
-		AA_ArmyMen_EndFire	,
-		AA_ArmyMen_LoopFir	,
-		AA_ArmyMen_Mov		,
-		AA_ArmyMen_Mov001	,
-		AA_ArmyMen_Move_01	,
-		AA_ArmyMen_Move_03	,
-		AA_ArmyMen_StartFi	,
-		AA_SpaceMen01_Fire	,
-		AA_SpaceMen02_Fire	,
+		 AA_ArmyMen_EndFire
+		,AA_ArmyMen_LoopFir
+		,AA_ArmyMen_Mov
+		,AA_ArmyMen_Mov001
+		,AA_ArmyMen_Move_01
+		,AA_ArmyMen_Move_03
+		,AA_ArmyMen_StartFi
+		,AA_SpaceMen01_Fire
+		,AA_SpaceMen02_Fire
 	};
 
 private:
@@ -82,12 +80,12 @@ private:
 	_float	m_fMoveTime = 0.f;
 	_float	m_fMoveSpeed = 0.f;
 	_float	m_fTime_For_Target = 0.f;  // 트랩 찾는 경로 탐색 지연 시간
-
+	_float	m_fShotTimer = 0.f;
 
 	_float		m_iShot_Count = 0; // 3발 쏘기 위해 몇 발 쐈는지 저장
 	_float		m_fShot_Time_Delay = 3.f; // 총알 쏘기용 딜레이 시간
 
-
+	_bool m_bShot = false;
 	_bool m_bMove_Anim = false;
 	_bool	m_bFind_Path = false;
 private:

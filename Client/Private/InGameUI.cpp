@@ -30,6 +30,8 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_pPlayer = pDesc->pPlayer;
     m_eLevel = pDesc->eLevel;
     m_pCircle = pDesc->pCircle;
+    m_fTimer = pDesc->fTimer;
+    m_iRound = pDesc->iRound;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
     if (FAILED(Add_Components(pDesc->iData)))
@@ -179,8 +181,16 @@ void CInGameUI::Update(_float fTimeDelta)
         else
             m_bDraw = true;
         break;
-
-        
+    case Client::CInGameUI::UI_MISSILE_TIMER:
+        if(*m_iRound == 1)
+        {
+            m_bDraw = true;
+        }
+        else 
+        {
+            m_bDraw = false;
+        }
+        break;
     case Client::CInGameUI::UI_END:
         break;
     default:
@@ -242,7 +252,7 @@ HRESULT CInGameUI::Render()
             if (FAILED(m_pShaderCom->Begin(0)))
                 return E_FAIL;
         }
-        else if (UI_MACHINE_ENERGY == m_eUIType || UI_MACHINE_HP == m_eUIType || UI_PLAYER_ENERGY == m_eUIType || UI_PLAYER_HP == m_eUIType)
+        else if (UI_MISSILE_TIMER == m_eUIType || UI_MACHINE_ENERGY == m_eUIType || UI_MACHINE_HP == m_eUIType || UI_PLAYER_ENERGY == m_eUIType || UI_PLAYER_HP == m_eUIType)
         {
             if (FAILED(m_pShaderCom->Begin(5)))
                 return E_FAIL;
@@ -420,7 +430,17 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
-
+    case Client::CInGameUI::UI_MISSILE_TIMER:
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Missile_Timer"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+    case Client::CInGameUI::UI_NUCLEAR:
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Nuclear"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+        
         
     case Client::CInGameUI::UI_END:
         break;
@@ -502,6 +522,13 @@ HRESULT CInGameUI::Bind_ShaderResources()
     else if (m_eUIType == UI_CENTERICON)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
+            return E_FAIL;
+    }
+    else if (UI_MISSILE_TIMER == m_eUIType)
+    {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fTimer, sizeof(float))))
             return E_FAIL;
     }
     else

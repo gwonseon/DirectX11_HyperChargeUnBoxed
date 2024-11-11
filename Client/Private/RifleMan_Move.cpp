@@ -26,3 +26,8 @@ void CRifleMan_Move::Fire(CRifleMan* rifleman)
 {
 	rifleman->ChangeState(new CRifleMan_Fire());
 }
+
+void CRifleMan_Move::Idle(CRifleMan* rifleman)
+{
+	rifleman->ChangeState(new CRifleMan_Idle());
+}

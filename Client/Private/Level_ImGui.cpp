@@ -322,7 +322,7 @@ HRESULT CLevel_ImGui::Ready_Layer_Terrain(const _tchar* pLayerTag)
 
 HRESULT CLevel_ImGui::Picking_Create()
 {
-	if (IMGUI_GRASS == m_eImGui_Type && m_fTimer_for_Instancing_Add >= 0.3f)
+	if (IMGUI_GRASS == m_eImGui_Type && m_fTimer_for_Instancing_Add >= 0.15f)
 	{
 		if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB))
 		{
@@ -2005,7 +2005,7 @@ HRESULT CLevel_ImGui::Grass_DataChange(_float fTimeDelta)
 	{
 		if (m_bGrassDelete == true)
 		{
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_BACKSPACE) && m_iGrass_Count > 0 && m_fTimer_for_Instancing_Delete >= 0.3f)
+			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_BACKSPACE) && m_iGrass_Count > 0 && m_fTimer_for_Instancing_Delete >= 0.15f)
 			{
 				m_fTimer_for_Instancing_Delete = 0.f; // 타이머 ( 0.5초에 한 번씩 실행 )
 				m_vecInstancing_Environ.back()->Set_Dead();
@@ -2118,8 +2118,8 @@ void CLevel_ImGui::Grass_Load()
 		break;
 	}
 	case Client::LEVEL_YARD:
-	{		Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-
+	{	
+		Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
 		hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (INVALID_HANDLE_VALUE == hFile)
 		{

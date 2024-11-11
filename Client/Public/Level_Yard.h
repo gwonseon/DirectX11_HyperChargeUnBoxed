@@ -14,7 +14,7 @@
 #include "Energy_Cap.h"
 #include "Battery.h"
 #include "InGameUI.h"
-
+#include "Missile_Truck.h"
 
 BEGIN(Client)
 
@@ -47,6 +47,8 @@ private:
 	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Damaged(const _tchar* pLayerTag);
 
+	HRESULT Ready_Layer_MissileTruck(const _tchar* pLayerTag);
+
 	HRESULT Ready_Layer_Effect(const _tchar* pLayerTag);
 
 private:
@@ -64,6 +66,8 @@ private:
 	CInGameUI* m_pBatteryUI = { nullptr };
 	CInGameUI* m_pBatteryGaugeUI = { nullptr };
 	CWeapon_Item* m_pWeaponItem[2];
+	CMissile_Truck* m_pMissile_Truck = { nullptr };
+
 
 	_float	m_fDelay{};
 	_bool m_bOnce = false;
@@ -78,7 +82,9 @@ private:
 	CLayer* pMonsterBullet = { nullptr };
 	CLayer* pCircleUI = { nullptr };
 	CLayer* pItem = { nullptr };
-
+	CLayer* pExplosion = { nullptr };
+	CLayer* pBuild = { nullptr };
+	CLayer* pTruck = { nullptr };
 
 	_bool* m_pReloading = { nullptr };
 	_uint	m_iCurrentRound = 0;

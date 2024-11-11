@@ -26,7 +26,6 @@ HRESULT CCoin::Initialize(void* pArg)
     m_eLevel = pDesc->eID;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
-
     if (FAILED(Add_Components()))
         return E_FAIL;
 
@@ -180,7 +179,6 @@ CGameObject* CCoin::Clone(void* pArg)
         MSG_BOX("Failed to Created : CCoin");
         Safe_Release(pInstance);
     }
-
     return pInstance;
 }
 

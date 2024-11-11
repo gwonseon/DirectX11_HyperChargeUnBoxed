@@ -122,12 +122,8 @@ void CWeapon::Update(_float fTimeDelta)
 	}
 	else
 		m_iShaderPassNum = 0;
+	
 
-
-	if (m_iWeaponState == BATTERY)
-		Scale = 2.3f;
-	else
-		Scale = 2.3f;
 
 	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
 
@@ -358,6 +354,19 @@ HRESULT CWeapon::Weapon_Exchange()
 			m_pModelCom[BATTERY]->Render(i);
 		}
 		break;
+	case Client::CWeapon::TRACKER:
+	{
+		iNumMeshes = m_pModelCom[TRACKER]->Get_NumMeshes();
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom[TRACKER]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+				return E_FAIL;
+			m_pModelCom[TRACKER]->Render(i);
+		}
+		break;
+	}
 	default:
 		break;
 	}

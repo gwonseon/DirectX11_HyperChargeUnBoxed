@@ -8,6 +8,7 @@
 BEGIN(Engine)
 class CGameInstance;
 class CModel;
+
 END
 
 BEGIN(Client)
@@ -52,6 +53,11 @@ private:
 
 
 private:
+	_uint m_iGrass_Count[1];
+	vector<_float3> m_vecGrassPos[1];
+	
+
+private:
 	LEVELID m_eTargetLevel = LEVEL_MONSTERSPAWN;
 
 
@@ -70,6 +76,8 @@ private:
 	HRESULT Loading_DataFile_For_NavigationLevel();
 	HRESULT Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID);
 
+
+	HRESULT Loading_DataFile_For_Instancing_YardLevel();
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);
 	virtual void Free() override;

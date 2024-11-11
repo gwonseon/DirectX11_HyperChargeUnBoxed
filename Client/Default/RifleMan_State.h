@@ -17,6 +17,7 @@ public:
 public:
 	virtual void Move(CRifleMan* rifleman) = 0;
 	virtual void Fire(CRifleMan* rifleman) = 0;
+	virtual void Idle(CRifleMan* rifleman) = 0;
 };
 
 END

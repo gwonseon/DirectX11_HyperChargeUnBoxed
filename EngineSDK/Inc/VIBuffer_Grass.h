@@ -11,7 +11,7 @@ private:
 	virtual ~CVIBuffer_Grass() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc);
+	virtual HRESULT Initialize_Prototype(const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex,  vector<_float3> fPos, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc);
 	virtual HRESULT Initialize(void* pArg) override;
 	HRESULT Bind_ShaderResource(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 
@@ -29,7 +29,7 @@ private:
 
 
 public:
-	static CVIBuffer_Grass* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc);
+	static CVIBuffer_Grass* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex,vector<_float3> fPos , const CVIBuffer_Instancing::INSTANCING_DESC* pDesc);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

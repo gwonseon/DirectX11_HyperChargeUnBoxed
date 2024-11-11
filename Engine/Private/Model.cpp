@@ -223,7 +223,7 @@ HRESULT CModel::Bind_Mesh_BoneMatrices(CShader* pShader, _uint iMeshIndex, const
 	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, m_Bones, pConstantName);
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
+_bool CModel::Play_Animation(_float fTimeDelta, _bool Once, _bool bPlay)
 {
 
 	if (m_bAnim_NoneLoop == true) // 마지막 동작을 한 번 더 하는 문제를 해결하기 위해 루프가 끝났을 때를 기억해 초기화만 해준다
@@ -267,7 +267,7 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
 		if(m_iPrevAnimIndex == m_iCurrentAnimIndex)
 		{
 			// 모델의 뼈의 행렬(TransformationMatrix)을 현재 애니메이션에 맞는 상태로 갱신해준다.
-			isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(m_Bones, m_isLoop, fTimeDelta);
+			isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(m_Bones, m_isLoop, fTimeDelta, bPlay);
 
 			// 모든 뼈들의 CombinedTransformationMatrix를 갱신한다.
 			for (auto& pBone : m_Bones)

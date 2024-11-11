@@ -180,6 +180,7 @@
     <ClInclude Include="..\Public\Energy_Lader.h" />
     <ClInclude Include="..\Public\Energy_Machine.h" />
     <ClInclude Include="..\Public\Environment.h" />
+    <ClInclude Include="..\Public\Explosion.h" />
     <ClInclude Include="..\Public\FPS_Pivot.h" />
     <ClInclude Include="..\Public\GamePlay_Round.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -202,6 +203,7 @@
     <ClInclude Include="..\Public\Loading_UI.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MenuUI.h" />
+    <ClInclude Include="..\Public\Missile_Truck.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Monster_Bullet.h" />
     <ClInclude Include="..\Public\Monster_Path.h">
@@ -219,14 +221,20 @@
     <ClInclude Include="..\Public\Pony_State.h" />
     <ClInclude Include="..\Public\RifleMan.h" />
     <ClInclude Include="..\Public\RifleMan_Fire.h" />
+    <ClInclude Include="..\Public\RifleMan_Idle.h" />
     <ClInclude Include="..\Public\RifleMan_Move.h" />
     <ClInclude Include="..\Public\RunState_Pony.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Tank.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\Tracker.h" />
     <ClInclude Include="..\Public\Trap_Bricks.h" />
     <ClInclude Include="..\Public\Trap_Marks.h" />
     <ClInclude Include="..\Public\TrotState_Pony.h" />
+    <ClInclude Include="..\Public\TruckBody.h" />
+    <ClInclude Include="..\Public\TruckShooter.h" />
+    <ClInclude Include="..\Public\Truck_Missile.h" />
+    <ClInclude Include="..\Public\UI_3D.h" />
     <ClInclude Include="..\Public\UI_CircleGuage.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Weapon_Item.h" />
@@ -260,6 +268,7 @@
     <ClCompile Include="..\Private\Energy_Lader.cpp" />
     <ClCompile Include="..\Private\Energy_Machine.cpp" />
     <ClCompile Include="..\Private\Environment.cpp" />
+    <ClCompile Include="..\Private\Explosion.cpp" />
     <ClCompile Include="..\Private\FPS_Pivot.cpp" />
     <ClCompile Include="..\Private\GamePlay_Round.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -282,6 +291,7 @@
     <ClCompile Include="..\Private\Loading_UI.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MenuUI.cpp" />
+    <ClCompile Include="..\Private\Missile_Truck.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Monster_Bullet.cpp" />
     <ClCompile Include="..\Private\Monster_Path.cpp">
@@ -298,14 +308,20 @@
     <ClCompile Include="..\Private\Pony.cpp" />
     <ClCompile Include="..\Private\RifleMan.cpp" />
     <ClCompile Include="..\Private\RifleMan_Fire.cpp" />
+    <ClCompile Include="..\Private\RifleMan_Idle.cpp" />
     <ClCompile Include="..\Private\RifleMan_Move.cpp" />
     <ClCompile Include="..\Private\RunState_Pony.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\Tracker.cpp" />
     <ClCompile Include="..\Private\Trap_Bricks.cpp" />
     <ClCompile Include="..\Private\Trap_Marks.cpp" />
     <ClCompile Include="..\Private\TrotState_Pony.cpp" />
+    <ClCompile Include="..\Private\TruckBody.cpp" />
+    <ClCompile Include="..\Private\TruckShooter.cpp" />
+    <ClCompile Include="..\Private\Truck_Missile.cpp" />
+    <ClCompile Include="..\Private\UI_3D.cpp" />
     <ClCompile Include="..\Private\UI_CircleGuage.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon_Item.cpp" />

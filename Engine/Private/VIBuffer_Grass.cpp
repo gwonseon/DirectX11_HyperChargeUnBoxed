@@ -20,7 +20,7 @@ CVIBuffer_Grass::CVIBuffer_Grass(const CVIBuffer_Grass& Prototype)
    }
 }
 
-HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
+HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex, vector<_float3> fPos, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
 {
     m_isLoop = pDesc->isLoop;
     m_iNumInstance = pDesc->iNumInstance;
@@ -153,13 +153,14 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
            
 
             m_pInstanceVertices[j].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-            m_pInstanceVertices[j].vUp = _float4(0.f, fScale, 0.f, 0.f);
+            m_pInstanceVertices[j].vUp = _float4(0.f, 4.f, 0.f, 0.f);
             m_pInstanceVertices[j].vLook = _float4(0.f, 0.f, fScale, 0.f);
 
-            m_pInstanceVertices[j].vTranslation = _float4(m_pGameInstance->Compute_Random(pDesc->vCenter.x - pDesc->vRange.x * 0.5f, pDesc->vCenter.x + pDesc->vRange.x * 0.5f),
-                m_pGameInstance->Compute_Random(pDesc->vCenter.y - pDesc->vRange.y * 0.5f, pDesc->vCenter.y + pDesc->vRange.y * 0.5f),
-                m_pGameInstance->Compute_Random(pDesc->vCenter.z - pDesc->vRange.z * 0.5f, pDesc->vCenter.z + pDesc->vRange.z * 0.5f),
-                1.f);
+            m_pInstanceVertices[j].vTranslation = _float4(fPos.back().x, fPos.back().y, fPos.back().z, 1.f);
+            if(fPos.size() > 0)
+            {
+                fPos.erase(fPos.end() - 1);
+            }
         }
         
         m_InstanceInitialDesc.pSysMem = m_pInstanceVertices;
@@ -234,11 +235,11 @@ HRESULT CVIBuffer_Grass::Bind_ShaderResource(CShader* pShader, _uint iMeshIndex,
     return pShader->Bind_SRV(pConstantName, m_Materials[eMaterialType][iIndex]);
 }
 
-CVIBuffer_Grass* CVIBuffer_Grass::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
+CVIBuffer_Grass* CVIBuffer_Grass::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex, vector<_float3> fPos, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
 {
     CVIBuffer_Grass* pInstance = new CVIBuffer_Grass(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize_Prototype(pDataFilePath,  PreTransformMatrix,  iIndex, pDesc)))
+    if (FAILED(pInstance->Initialize_Prototype(pDataFilePath,  PreTransformMatrix,  iIndex, fPos, pDesc)))
     {
         MSG_BOX("Failed to Created : CVIBuffer_Grass");
         Safe_Release(pInstance);
