@@ -2,7 +2,7 @@
 
 #include <process.h>
 
-#define BUILD_EA	154
+#define BUILD_EA	155
 #define ENVIRONMENT_EA 165
 #define WEAPON_EA		13
 #define MONSTER_EA		6

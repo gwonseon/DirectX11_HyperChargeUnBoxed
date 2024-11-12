@@ -57,7 +57,7 @@ private:
 	_bool		m_bAnimState{};
 
 	_vector vPlayerPos{};
-	_vector vPos{};
+
 
 
 public:

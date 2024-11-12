@@ -2067,7 +2067,7 @@ void CLevel_ImGui::Grass_Save()
 
 
 	DWORD dwByte = 0;
-	_float3 fPos;
+	_float3 fPos{};
 	for (auto& pInstance : m_vecInstancing)
 	{
 		if (pInstance.iModelNumber == (m_iModelIndex + ENVIRONMENT_EA)) // 더한 값과 비교해야함, 구조체에는 더한 값임

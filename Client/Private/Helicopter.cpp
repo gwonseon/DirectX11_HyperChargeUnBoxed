@@ -47,6 +47,8 @@ HRESULT CHelicopter::Initialize(void* pArg)
 void CHelicopter::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
+
+
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 	if (m_bCanAttacked == false)
 		m_fCurrentTime += fTimeDelta;
@@ -61,9 +63,9 @@ void CHelicopter::Update(_float fTimeDelta)
 		m_fCurrentTime = 0.f;
 	}
 
-	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, vPos);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos = XMVectorSet(XMVectorGetX(vPos), 20.f, XMVectorGetZ(vPos),1.f));
+	_vector m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, m_vecPosition);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition = XMVectorSet(XMVectorGetX(m_vecPosition), 20.f, XMVectorGetZ(m_vecPosition),1.f));
 
 	if (fDistance >= 350.f)
 	{
@@ -90,7 +92,7 @@ void CHelicopter::Update(_float fTimeDelta)
 				if(m_iShot_Count < 3)
 				{
 					_float3 fPos{};
-					XMStoreFloat3(&fPos, vPos);
+					XMStoreFloat3(&fPos, m_vecPosition);
 					CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
 					Desc.eID = m_eLevel;
 					Desc.fPosition = fPos;
@@ -119,7 +121,11 @@ void CHelicopter::Update(_float fTimeDelta)
 void CHelicopter::Late_Update(_float fTimeDelta)
 {
 //	m_pColliderCom->Intersect(pTargetCollider);
-
+	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+	{
+		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+	}
 	__super::Late_Update(fTimeDelta);
 }
 

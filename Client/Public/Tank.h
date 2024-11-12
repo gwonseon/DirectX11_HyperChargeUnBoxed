@@ -62,7 +62,6 @@ private:
 	CNavigation* m_pNavigationCom = nullptr;
 
 private:
-	_vector vPos{};
 	
 
 

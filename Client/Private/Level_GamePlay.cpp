@@ -120,6 +120,11 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 #pragma region Collision
 	if(pTrap_Shield == nullptr)
 		pTrap_Shield = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Trap_Shield"));
+	if (pExplosion == nullptr)
+		pExplosion = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
+	if (pBuild == nullptr)
+		pBuild = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_PlayerBuild"));
+
 	// 앞이 당하는 애
 	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
 	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
@@ -127,6 +132,14 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
 	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
 	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
+	m_pGameInstance->Collision_Explosion(pExplosion, pBuild, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 3);
+	m_pGameInstance->Collision_Explosion(pExplosion, pTrap_Shield, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 3);
+	m_pGameInstance->Collision_Explosion(pExplosion, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 3, 0, CPlayer::TPS_PART_BODY);
+
+//	m_pGameInstance->Anti_OverLapping(pFarMonsterLayer, pNearMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
+	m_pGameInstance->Anti_OverLapping(pNearMonsterLayer, pFarMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
 
 
 #pragma endregion Collision	
@@ -822,19 +835,6 @@ void CLevel_GamePlay::Free()
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 {
 
-	CInGameUI::INGAMEUI_DESC	DescCenterIcon{};
-	DescCenterIcon.eLevel = LEVEL_GAMEPLAY;
-	DescCenterIcon.eUITag = CInGameUI::UI_CENTERICON;
-	DescCenterIcon.fSizeX = 26.f;
-	DescCenterIcon.fSizeY = 26.f;
-	DescCenterIcon.iData = 0;
-	DescCenterIcon.fX = g_iWinSizeX * 0.5f;
-	DescCenterIcon.fY = g_iWinSizeY * 0.5f;
-	DescCenterIcon.fDepth = 0.1f;
-	DescCenterIcon.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescCenterIcon)))
-		return E_FAIL;
-
 	CUI_CircleGuage::CIRCLEGAUGE_DESC pCircleDesc{};
 	pCircleDesc.eLevel = LEVEL_GAMEPLAY;
 	pCircleDesc.fSizeX = 200.f;
@@ -847,8 +847,24 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.vecMarks = &m_vecTrapMark;
 	pCircleDesc.pEnergy_Machine = m_pEnergyMachine;
 	pCircleDesc.pEnergyMachine_Cap = m_pEnergyMachine_Cap;
-	CGameObject* pGuage= m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"), TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
+	CGameObject* pGuage = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"), TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
+
+
+	CInGameUI::INGAMEUI_DESC	DescCenterIcon{};
+	DescCenterIcon.eLevel = LEVEL_GAMEPLAY;
+	DescCenterIcon.eUITag = CInGameUI::UI_CENTERICON;
+	DescCenterIcon.fSizeX = 40.f;
+	DescCenterIcon.fSizeY = 40.f;
+	DescCenterIcon.iData = 0;
+	DescCenterIcon.fX = g_iWinSizeX * 0.5f;
+	DescCenterIcon.fY = g_iWinSizeY * 0.5f;
+	DescCenterIcon.fDepth = 0.1f;
+	DescCenterIcon.pPlayer = m_pPlayer;
+	DescCenterIcon.pCircle = m_pGuage;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescCenterIcon)))
+		return E_FAIL;
+
 
 	// 총알 아이콘
 	CInGameUI::INGAMEUI_DESC	DescBulletIcon{};
@@ -1131,27 +1147,27 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	//CInGameUI::INGAMEUI_DESC	pDesc7{};
 	//pDesc7.eLevel = LEVEL_GAMEPLAY;
 	//pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
-	//pDesc7.fSizeX = 170.f;
-	//pDesc7.fSizeY = 60.f;
-	//pDesc7.iData = 0;
-	//pDesc7.fX = g_iWinSizeX * 0.55f;
-	//pDesc7.fY = 65.f;
-	//pDesc7.fDepth = 0.2f;
-	//pDesc7.iIndex = 0;	
-	//pDesc7.pPlayer = m_pPlayer;
+	//	pDesc7.fSizeX = 450.f;
+	//	pDesc7.fSizeY = 90.f;
+	//	pDesc7.iData = 0;
+	//	pDesc7.fX = g_iWinSizeX * 0.55f;
+	//	pDesc7.fY = 65.f;
+	//	pDesc7.fDepth = 0.2f;
+	//	pDesc7.iIndex = 0;	
+	//	pDesc7.pPlayer = m_pPlayer;
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
 	//	return E_FAIL;
 
 	//CInGameUI::INGAMEUI_DESC	pDesc6{};
 	//pDesc6.eLevel = LEVEL_GAMEPLAY;
 	//pDesc6.eUITag = CInGameUI::UI_CHARACTER;
-	//pDesc6.fSizeX = 100.f;
-	//pDesc6.fSizeY = 100.f;
-	//pDesc6.iData = 0;
-	//pDesc6.fX = g_iWinSizeX * 0.6f;
-	//pDesc6.fY = 65.f;
-	//pDesc6.fDepth = 0.1f;
-	//pDesc6.pPlayer = m_pPlayer;
+	//	pDesc6.fSizeX = 100.f;
+	//	pDesc6.fSizeY = 100.f;
+	//	pDesc6.iData = 0;
+	//	pDesc6.fX = g_iWinSizeX * 0.7f;
+	//	pDesc6.fY = 65.f;
+	//	pDesc6.fDepth = 0.1f;
+	//	pDesc6.pPlayer = m_pPlayer;
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc6)))
 	//	return E_FAIL;
 

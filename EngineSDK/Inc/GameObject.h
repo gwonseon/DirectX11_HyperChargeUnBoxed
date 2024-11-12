@@ -59,8 +59,9 @@ protected:
 	_uint							m_iData = {};
 	_float3							m_fPickingPos{};
 	_bool							m_bDead = false;
-	_vector							m_vecPosition{};
 
+	_vector							m_vecPosition{};
+	_vector							m_vecDirection{};
 	
 public:
 	void	Set_Hp(_float Hp)					{ m_fHp = Hp; }
@@ -73,6 +74,7 @@ public:
 	void	Set_FullHeal()						{ m_fHp = 100.f; }
 	void	UseCoin(_uint Price)				{ m_iCoin -= Price; }
 	void	Set_PickUp_Coin(_uint Price)		{ m_iCoin += Price; }
+	void	Set_Count()							{ m_iCount += 1; }
 
 	void	Set_CanAttacked(_bool bCanAttacked) { m_bCanAttacked = bCanAttacked; }  // 공격 당해도 되는지 알림
 	void	Set_Attacked(_bool bAttacked)		{ m_bAttacked = bAttacked; }		// 공격 당했음을 알려줌
@@ -85,7 +87,8 @@ public:
 	_float	Get_Energy()						{ return m_fEnergy; }		// 쉴드량 얼마나 있는지
 	_float	Get_Attack()						{ return m_fAttack; }		// 공격력 얼마인지 
 	_uint	Get_Coin()							{ return m_iCoin; }			// 돈 얼마나 있는지
-
+	_uint	Get_Count()							{ return m_iCount; }
+	_bool	Get_Affected()						{ return m_bAffected; }		// 폭발 영향에 대함
 	_bool	Get_CanAttacked()					{ return m_bCanAttacked; }	// 공격을 당해도(혹은 해도) 되는지 알려줌
 	_bool	Get_Attacked()						{ return m_bAttacked; }		// 공격을 당했는지 알려줌
 	_bool	Get_DontDestroyAble()				{ return m_bDontDestroy; }	// 객체 삭제하면 안되는 애인지 아닌지 알려줌
@@ -95,19 +98,25 @@ public:
 
 	_bool	Get_Interaction()					{ return m_bInteraction; }
 
+	_vector Get_ObjPosition()					{ return m_vecPosition; }
+
 
 	// 에너지가 있으면 에너지 깎고, 에너지 없으면 Hp깎음
-	void	Set_Damaged(_float Attack) {
-		if (m_fEnergy > 0)	{
+	void	Set_Damaged(_float Attack) 
+	{
+		// 쉴드가 있을 때
+		if (m_fEnergy > 0.f)	{
 			m_fEnergy -= Attack;
-		}
-		else {
-			m_fHp -= Attack;
-		}
-		if (m_fEnergy < 0)	{
 			// 에너지가 음수면 그만큼 Hp 깎아준다.
-			m_fHp -= m_fEnergy;
-			m_fEnergy = 0.f;
+			if (m_fEnergy < 0.f)
+			{
+				m_fHp += m_fEnergy;
+				m_fEnergy = 0.f;
+			}
+		}
+		else  // 쉴드가 없을 때
+		{
+			m_fHp -= Attack;
 		}
 	}
 
@@ -115,23 +124,43 @@ public:
 	void Set_CollisionChecking(_bool bCheck) { m_bCollision_Check = bCheck; }
 	_bool Get_CollisionChecing() { return m_bCollision_Check; }
 
+	// 방향에 대한것, 겹쳤는지 확인용
+	_vector Get_DIrection() { return m_vecDirection; }
+	void	Set_Direction(_vector vecDirection) { m_vecDirection = vecDirection; }
+
+protected:
 
 
 protected:
 	_float							m_fHp{};
 	_float							m_fEnergy{};
 	_float							m_fAttack{};
-
+	_uint							m_iCount{};
 	_uint							m_iCoin{};
 	_bool							m_bAttacked		= false; // 공격 받았음을 표시 
 	_bool							m_bDontDestroy	= false;
 	_bool							m_bKnockdown	= false; // 삭제되면 안되는 애들 죽음 상태를 얘로 대체
 	_bool							m_bAttackState	= false;
-	_bool							m_bCanAttacked	= true; // 맞을 수 있는 상태인지 확인
-	_bool							m_bCollision_Check = false;
+	_bool							m_bCanAttacked	= true;  // 맞을 수 있는 상태인지 확인
+	_bool							m_bCollision_Check = false; 
 	_bool							m_bIsBullet = false;	// 총알인지 판단 ( 총알이면 삭제함)
 
+	_bool							m_bAffected = false; // 폭발 영향 받는지 
 	_bool							m_bInteraction = false; // 아이템관련 상호작용
+
+	_bool							m_bOverlab_DifferentLayer = false;
+	_bool							m_bOverlab_SameLayer = false;
+
+
+
+public:
+	void Set_OverLap_DifferentLayer(_bool bOverlab) { m_bOverlab_DifferentLayer = bOverlab; }
+	void Set_OverLap_SameLayer(_bool bOverlab) { m_bOverlab_SameLayer = bOverlab; }
+	
+	_bool Get_OverLap_SameLayer() { return m_bOverlab_SameLayer; }
+	_bool Get_OverLap_DifferentLayer() { return m_bOverlab_DifferentLayer; }
+
+
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 

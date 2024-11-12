@@ -8,6 +8,7 @@
 #include "Tracker.h"
 #include "TruckBody.h"
 #include "Player.h"
+#include "Explosion.h"
 
 BEGIN(Engine)
 class CCollider;

@@ -25,17 +25,30 @@ HRESULT CBullet::Initialize(void* pArg)
     m_vecWeaponDir = pDesc->m_vecWeaponDir;
     m_vecCameraAt = pDesc->m_vecCameraAt;
     m_vecCameraPos = pDesc->m_vecCameraPos;
+    m_eType = pDesc->eType;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
     if (FAILED(Add_Components()))
         return E_FAIL;
-
+    switch (m_eType)
+    {
+    case Client::CBullet::BULLET_RIFLE:
+        iRand = 2;
+        m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
+        break;
+    case Client::CBullet::BULLET_LOCKET:
+        iRand = 3; // ?
+        m_pTransformCom->Set_Scaling(0.3f, 0.3f, 0.3f);
+        break;
+    case Client::CBullet::BULLET_END:
+        break;
+    default:
+        break;
+    }
     m_bCanAttacked = true;
     m_bIsBullet = true;
     m_fBullet_Move = 0.f;
-    iRand = 2;
-    m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
     m_bChange_Root = false; // 타겟 위치 도달 후 총알 궤적 변경
     return S_OK;
 }

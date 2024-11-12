@@ -34,6 +34,7 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
+
 	if (m_fHp <= 0.f)
 	{
 		m_bDead = true;

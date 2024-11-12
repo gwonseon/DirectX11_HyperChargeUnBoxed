@@ -75,7 +75,8 @@ private:
 	CLayer* pMonsterBullet		= { nullptr };
 	CLayer* pCircleUI = { nullptr };
 	CLayer* pItem = { nullptr };
-
+	CLayer* pExplosion = { nullptr };
+	CLayer* pBuild = { nullptr };
 
 	_bool* m_pReloading			= { nullptr };
 	_uint	m_iCurrentRound		= 0;

@@ -13,15 +13,16 @@ BEGIN(Client)
 class CBullet final : public CGameObject
 {
 public:
+	enum BULLET_TYPE{BULLET_RIFLE, BULLET_LOCKET, BULLET_END};
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID eID = {};
+		BULLET_TYPE eType{};
 		_vector m_vecWeaponPos{};
 		_vector m_vecWeaponDir{};
 		_vector m_vecWeaponRight{};
 		_vector m_vecCameraAt{};
 		_vector m_vecCameraPos{};
-		
 	}BULLET_DESC;
 private:
 	CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -58,7 +59,7 @@ private:
 	float distance{};
 private:
 	LEVELID m_eLevel{};
-
+	BULLET_TYPE m_eType{};
 public:
 	static CBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

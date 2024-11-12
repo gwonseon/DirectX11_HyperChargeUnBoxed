@@ -58,7 +58,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
-	m_iFull_Bullet = m_iRifle_Bullet;
+
 	if (m_bBulletIn == true) // 장전 완료
 	{
 		m_iCurrent_Bullet = m_iFull_Bullet; // 나중에 총에 따라 나누기
@@ -141,23 +141,62 @@ void CWeapon::Update(_float fTimeDelta)
 void CWeapon::Late_Update(_float fTimeDelta)
 {
 
-
-
-
-	// 총알 발사
-	if (*m_bShotStart == true && *m_bReloading == false)
+	CBullet::BULLET_DESC Desc{};
+	switch (m_iWeaponState)
 	{
-		--m_iCurrent_Bullet;
-		CBullet::BULLET_DESC Desc{};
-		Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
-		Desc.m_vecWeaponDir = (*m_vecCameraAt - Desc.m_vecWeaponPos);	// At까지의 방향, 총구 방향과 다름 주의
-		Desc.m_vecCameraPos = *m_vecCameraPos;
-		
-		Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
-		Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-		Desc.eID = m_eLevelID;
-		static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+	case Client::CWeapon::WEAPON_UNARMED:
+		break;
+	case Client::CWeapon::WEAPON_RIFLE:
+		// 총알 발사
+		if (*m_bShotStart == true && *m_bReloading == false)
+		{
+			--m_iCurrent_Bullet;
+			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
+			Desc.m_vecWeaponDir = (*m_vecCameraAt - Desc.m_vecWeaponPos);	// At까지의 방향, 총구 방향과 다름 주의
+			Desc.m_vecCameraPos = *m_vecCameraPos;
+			Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
+			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+			Desc.eID = m_eLevelID;
+			Desc.eType = CBullet::BULLET_RIFLE;
+			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+		}
+		break;
+	case Client::CWeapon::WEAPON_SHOTGUN:
+		break;
+	case Client::CWeapon::WEAPON_PULSECANNON:
+
+		break;
+	case Client::CWeapon::WEAPON_TELEPORT:
+		break;
+	case Client::CWeapon::WEAPON_LOCKETLAUNCHER:
+		if (*m_bShotStart == true && *m_bReloading == false)
+		{
+			--m_iCurrent_Bullet;
+			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
+			Desc.m_vecWeaponDir = (*m_vecCameraAt - Desc.m_vecWeaponPos);	// At까지의 방향, 총구 방향과 다름 주의
+			Desc.m_vecCameraPos = *m_vecCameraPos;
+			Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
+			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+			Desc.eID = m_eLevelID;
+			Desc.eType = CBullet::BULLET_LOCKET;
+			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+			break;
+		}
+	case Client::CWeapon::WEAPON_RIFLE_SECOND:
+		break;
+	case Client::CWeapon::WEAPON_KATANA:
+		break;
+	case Client::CWeapon::BATTERY:
+		break;
+	case Client::CWeapon::TRACKER:
+		break;
+	case Client::CWeapon::WEAPON_END:
+		break;
+	default:
+		break;
 	}
+
+
 
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
 		return;

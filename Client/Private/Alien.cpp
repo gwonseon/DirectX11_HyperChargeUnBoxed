@@ -51,18 +51,21 @@ HRESULT CAlien::Initialize(void* pArg)
 void CAlien::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
-	vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	m_pModelCom->Set_Animation(0, true);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
-	if (XMVectorGetY(vPlayerPos) <= (XMVectorGetY(vPos) + 2.f))
+	if (XMVectorGetY(vPlayerPos) <= (XMVectorGetY(m_vecPosition) + 2.f))
 		m_pTransformCom->LookAt(vPlayerPos);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
+
 }
 
 void CAlien::Update(_float fTimeDelta)
 {
 	
-	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
+	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
 	if (fDistance > 4.f)
 	{
 		m_pTransformCom->Go_Straight_Nav(fTimeDelta,m_pNavigationCom);
@@ -71,7 +74,7 @@ void CAlien::Update(_float fTimeDelta)
 	// 넉백이 True일 때 넉백 모션하게 하기
 	if (m_bAttacked == true)
 	{
-		m_fKnockBack_Height = XMVectorGetY(vPos);
+		m_fKnockBack_Height = XMVectorGetY(m_vecPosition);
 		m_fKnockBack_Power = 8.f;
 		m_bKnockBacking = true;
 		m_bAttacked = false;
@@ -82,13 +85,16 @@ void CAlien::Update(_float fTimeDelta)
 void CAlien::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
-
+	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+	{
+		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+	}
 	// 넉백이 true일 때 넉백 모션
 	if (m_bKnockBacking == true)
 	{
-		_vector vKnockBack_DIr = vPos - vPlayerPos; // 플레이어 방향으로부터 반대방향으로 날아가기
+		_vector vKnockBack_DIr = m_vecPosition - vPlayerPos; // 플레이어 방향으로부터 반대방향으로 날아가기
 		vKnockBack_DIr = XMVector3Normalize(vKnockBack_DIr);
-
 		if (m_pTransformCom->KnockBack(fTimeDelta, vKnockBack_DIr, m_fKnockBack_Power, m_fKnockBack_Height) == true)
 		{
 			// 넉백 끝남
@@ -139,13 +145,19 @@ HRESULT CAlien::Add_Components()
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
-	/* For.Com_Collider_OBB */
-	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-	SphereDesc.fRadius = 1.8f;
-	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	///* For.Com_Collider_OBB */
+	//CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	//SphereDesc.fRadius = 1.8f;
+	//SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	//if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
+	//	TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+	//	return E_FAIL;
 
-	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
+	AABBDesc.vExtents = _float3(1.f, 1.f, 1.f);
+	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
+		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 
 	// For.Com_Navigation

@@ -32,6 +32,7 @@ public:
 
 	// 밀어내기, 파파고 영어 어렵넹
 	void Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
+	void Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring& strSrcComponentTag, _uint iSrcPartObjID = 0);
 
 public:
 	virtual void Free() override;

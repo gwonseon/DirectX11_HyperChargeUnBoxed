@@ -60,6 +60,9 @@ void CTank::Priority_Update(_float fTimeDelta)
 	if (m_bCanAttacked == false)
 		m_fCurrentTime += fTimeDelta;
 	m_fTime_For_Target += fTimeDelta;
+
+
+	
 }
 
 void CTank::Update(_float fTimeDelta)
@@ -73,6 +76,10 @@ void CTank::Update(_float fTimeDelta)
 		m_fCurrentTime = 0.f;
 	}
 
+
+
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
 	// 트랩이 있을 경우에 해당 트랩을 공격하도록 타겟을 변경해줌
 	if (m_fTime_For_Target >= 3.f) // 항상 검사하기엔 검사량이 많아서 검사 빈도수를 줄여줌
 	{
@@ -84,7 +91,7 @@ void CTank::Update(_float fTimeDelta)
 			{
 				m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
 				// 공격 사거리보다 먼거리까지 검사해야함
-				if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, vPos) <= 2500.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
+				if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, m_vecPosition) <= 2500.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
 				{
 					m_vecTargetPos = &m_vecNewTargetPos;
 					break;
@@ -97,12 +104,12 @@ void CTank::Update(_float fTimeDelta)
 			m_vecTargetPos = &m_vecStoreTargetPos;
 		}
 	}
-	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, vPos);
-
+	_float fAnimSpeed = 1.f;
+	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, m_vecPosition);
 	if (fDistance > 2000.f)
 	{
-		vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_float3 fPos{};		XMStoreFloat3(&fPos, vPos);
+		m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float3 fPos{};		XMStoreFloat3(&fPos, m_vecPosition);
 		// 목표 Path와 현재 내 위치 사이의 거리를 파악해서 Path 바꾸기 
 		if (m_pTransformCom->Cal_Distance(Path.front(), fPos) <= 200.f)
 		{
@@ -112,8 +119,8 @@ void CTank::Update(_float fTimeDelta)
 		// Path 따라 갈 때는 Path 목표 바라보기
 		m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
 		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f);
-
-		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
+		fAnimSpeed = 1.f;
+		
 		m_pModelCom->Set_Animation(MONSTER_Tank_Drive, true);
 		m_bFirstShot = false;
 	}
@@ -124,7 +131,7 @@ void CTank::Update(_float fTimeDelta)
 			m_bShotOnce = true;	m_bFirstShot = true;
 			// 포탄 발사
 			_float3 fPos{};
-			XMStoreFloat3(&fPos,vPos);
+			XMStoreFloat3(&fPos,m_vecPosition);
 			CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
 			Desc.eID = m_eLevel;
 			Desc.fPosition = fPos;
@@ -135,21 +142,25 @@ void CTank::Update(_float fTimeDelta)
 			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
 		}
 		m_pTransformCom->LookAt(*m_vecTargetPos);
-
-		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * 0.7f, false);
+		fAnimSpeed = 0.7f;
 		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire, false);
 		// 한 번만 쏘게 만들기 위함
 		if (m_bAnimState == false) 
 			m_bShotOnce = false;
 	}
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-
+	
+	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * fAnimSpeed, false);
 	__super::Update(fTimeDelta);
 }
 
 void CTank::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
+	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+	{
+		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+	}
 }
 
 HRESULT CTank::Render()
@@ -187,12 +198,11 @@ HRESULT CTank::Add_Components()
 		return E_FAIL;
 	/* For.Com_Collider_Sphere*/
 	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-	SphereDesc.fRadius = 1.7f;
-	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	SphereDesc.fRadius = 1.4f;
+	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
-
 
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
