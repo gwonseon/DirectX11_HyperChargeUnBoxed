@@ -253,7 +253,7 @@
     <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI_3D">
       <UniqueIdentifier>{00f6e596-1553-4c42-83f1-98fbfe87101d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Environment\CorrectItem">
+    <Filter Include="02. GameObjects\Environment\CollectItem">
       <UniqueIdentifier>{9cd406c9-853e-4075-ad4b-6722f20bb1e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -498,6 +498,9 @@
     <ClInclude Include="..\Public\UI_3D.h">
       <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI_3D</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Collector.h">
+      <Filter>02. GameObjects\Environment\CollectItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -718,6 +721,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_3D.cpp">
       <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI_3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Collector.cpp">
+      <Filter>02. GameObjects\Environment\CollectItem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

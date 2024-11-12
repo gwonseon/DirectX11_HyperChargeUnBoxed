@@ -41,6 +41,7 @@
 #include "Battery.h"
 #include "Coin_Item.h"
 #include "Hp_Item.h"
+#include "Collector.h"
 
 #include "Bullet.h"
 #include "Monster_Bullet.h"
@@ -925,9 +926,17 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
 	
+	// Collector Item
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collect_Item")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collect_Item"),
+			CCollector::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	// 3D UI
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_3DUI")) == nullptr)
 	{
-		// 3D UI
 		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_3DUI"),
 			CUI_3D::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
@@ -2314,36 +2323,46 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
 		return E_FAIL;
 
+	//외계인 아이템
+	Model_Component_Result = Model_Component + to_wstring(154 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(154) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
+		return E_FAIL;
+
+	//외계인 아이템
+	Model_Component_Result = Model_Component + to_wstring(155 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(155) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
+		return E_FAIL;
+
 	// 뱃지아이템
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
 	Model_Component_Result = Model_Component + to_wstring(46 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(46) + Ext;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
 		return E_FAIL;
+
 	// Coin_L아이템
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
 	Model_Component_Result = Model_Component + to_wstring(47 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(47) + Ext;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 47))))
 		return E_FAIL;
 	// Coin_M아이템
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
 	Model_Component_Result = Model_Component + to_wstring(48 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(48) + Ext;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 48))))
 		return E_FAIL;
 	// Coin_S아이템
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
 	Model_Component_Result = Model_Component + to_wstring(49 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(49) + Ext;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 49))))
 		return E_FAIL;
 	// HP아이템
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
 	Model_Component_Result = Model_Component + to_wstring(50 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(50) + Ext;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,

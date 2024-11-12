@@ -61,7 +61,7 @@ private:
 	MONSTERBULLET_TYPE m_eType{};
 	_uint m_iModelNumber{};
 	_vector m_vecDir{}, m_vecTargetPos{};
-
+	_bool bCollision = false;
 public:
 	static CMonster_Bullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

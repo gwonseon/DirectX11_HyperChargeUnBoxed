@@ -89,6 +89,10 @@ protected:
 	vector<_float3> Path{};
 	_uint		m_iCell_Idx{};
 	_uint		m_iPrevPlayer_Cell_Idx{};
+
+
+protected:
+
 protected:
 	_vector*	m_vecTargetPos;
 	_vector		m_vecNewTargetPos{};

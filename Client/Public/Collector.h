@@ -1,31 +1,32 @@
 #pragma once
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Player.h"
+#include "UI_CircleGuage.h"
 
 BEGIN(Engine)
 class CShader;
 class CModel;
-class CCollider;
 END
 
 BEGIN(Client)
 
-class CExplosion final : public CGameObject
+class CCollector final : public CGameObject
 {
 public:
-	enum EXPLOSION_TYPE { EXPLOSION_TRUCK, EXPLOSION_TANK ,EXPLOSION_END };
-
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
-		LEVELID eID{};
-		_uint	iModelIndex{};
-		EXPLOSION_TYPE eType{};
-	}EXPLOSION_DESC;
+		CPlayer* pPlayer = { nullptr };
+		CUI_CircleGuage* pGuage = { nullptr };
+		LEVELID eID = {};
+		_int	iModelIndex{};
+	}COLLECTOR_DESC;
+
 
 private:
-	CExplosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CExplosion(const CExplosion& Prototype);
-	virtual ~CExplosion() = default;
+	CCollector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCollector(const CCollector& Prototype);
+	virtual ~CCollector() = default;
 
 
 public:
@@ -37,29 +38,31 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+
+	CPlayer* m_pPlayer = { nullptr };
+	CUI_CircleGuage* m_pGuage = { nullptr };
 
 
 private:
 	LEVELID	m_eLevel = {};
-	EXPLOSION_TYPE m_eType{};
-
-
-
 	_uint	m_iModelIndex = 0;
+	_float m_fCharging_Time = 0.f;
+	_float3 m_fScale{};
+	_vector m_vecItemPos{};
+
 
 
 
 public:
-	static CExplosion* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CCollector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

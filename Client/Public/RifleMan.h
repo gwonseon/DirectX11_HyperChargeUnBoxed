@@ -74,7 +74,6 @@ public:
 
 private:
 	_vector vPlayerPos{};
-	_vector vPos{};
 	_float3 m_fPos{};
 
 	_float	m_fMoveTime = 0.f;

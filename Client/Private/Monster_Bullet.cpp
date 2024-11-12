@@ -2,6 +2,7 @@
 #include "..\Public\Monster_Bullet.h"
 
 #include "GameInstance.h"
+#include <Explosion.h>
 CMonster_Bullet::CMonster_Bullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -42,7 +43,7 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
         vPos = vPos + XMVector3Normalize(m_vecTargetPos - vPos) * 6.8f;
         vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-        m_fAttack = 20.f;
+       
         break;
     }
     case Client::CMonster_Bullet::HELICOPTER_BULLET:
@@ -110,19 +111,55 @@ void CMonster_Bullet::Update(_float fTimeDelta)
 void CMonster_Bullet::Late_Update(_float fTimeDelta)
 {
 
-    _bool bCollision = m_pColliderCom->Intersect(m_pTargetCollider); // 브레인 코어와 충돌체크 
-    if (bCollision == true && m_bDead == false)
+    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+        return;
+    
+    // 건물에 데미지 주기
+    if (m_pTargetCollider != nullptr)
     {
-        m_pBuild->Set_Damaged(m_fAttack);
-        m_bDead = true;
+
+        bCollision = m_pColliderCom->Intersect(m_pTargetCollider); // 브레인 코어와 충돌체크 
+        if (bCollision == true && m_bDead == false)
+        {
+            if (m_eType == TANK_BULLET)
+            {
+                m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+                CExplosion::EXPLOSION_DESC pExplosion{};
+                pExplosion.eType = CExplosion::EXPLOSION_TANK;
+                pExplosion.eID = m_eLevel;
+                pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+                pExplosion.fScale = _float3{ 3.f, 3.f, 3.f };
+                m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+                m_bDead = true;
+            }
+            else
+            {
+                m_pBuild->Set_Damaged(m_fAttack);
+                m_bDead = true;
+            }
+        }
     }
+ 
 
-
-
+    // 플레이어에게 데미지 주기
     switch (m_eType)
     {
     case Client::CMonster_Bullet::TANK_BULLET:
-        break;
+    {
+        bCollision = m_pColliderCom->Intersect(m_pPlayerCollider); // 플레이어와 충돌체크 
+        if (bCollision == true && m_bDead == false)
+        {
+            m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+            CExplosion::EXPLOSION_DESC pExplosion{};
+            pExplosion.eID = m_eLevel;
+            pExplosion.eType = CExplosion::EXPLOSION_TANK;
+            pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+            pExplosion.fScale = _float3{ 3.f, 3.f, 3.f };
+            m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+            m_bDead = true;
+            break;
+        }
+    }
     case Client::CMonster_Bullet::HELICOPTER_BULLET:
         break;
     case Client::CMonster_Bullet::RIFLEMAN_BULLET:
@@ -136,12 +173,7 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
     default:
         break;
     }
-    
 
-    
-    
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-        return;
 }
 
 HRESULT CMonster_Bullet::Render()

@@ -60,9 +60,13 @@ HRESULT CPony::Initialize(void* pArg)
 void CPony::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
-	vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	XMStoreFloat3(&m_fPos, vPos);
+
+
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	XMStoreFloat3(&m_fPos, m_vecPosition);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
+
+
 
 	// 트랩 데미지 2초에 한 번씩만 줄 수 있게
 	if (m_bCanAttacked == false)
@@ -92,13 +96,13 @@ void CPony::Update(_float fTimeDelta)
 	// 넉백이 True일 때 넉백 모션하게 하기, 카타나만
 	if (m_bAttacked == true)
 	{
-		m_fKnockBack_Height = XMVectorGetY(vPos);
+		m_fKnockBack_Height = XMVectorGetY(m_vecPosition);
 		m_fKnockBack_Power = 8.f;
 		m_bKnockBacking = true;
 		m_bAttacked = false;
 	}
 
-	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
+	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
 	// 사정거리 안에 플레이어가 없으면 
 	if (fDistance > 3000.f)
 	{
@@ -119,7 +123,7 @@ void CPony::Update(_float fTimeDelta)
 				{
 					m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
 					// 근접 공격이기 때문에 먼거리에서 트랩을 찾을 필요는 없음
-					if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, vPos) <= 1000.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
+					if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, m_vecPosition) <= 1000.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
 					{
 						// 새 타겟으로 바꿔줌
 						m_vecTargetPos = &m_vecNewTargetPos;
@@ -135,10 +139,10 @@ void CPony::Update(_float fTimeDelta)
 			}
 		}
 	
-		if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 1000.f)
+		if (m_pTransformCom->Cal_Distance_vec(m_vecPosition, *m_vecTargetPos) <= 1000.f)
 		{
 			m_pTransformCom->LookAt(*m_vecTargetPos);
-			if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 30.f)
+			if (m_pTransformCom->Cal_Distance_vec(m_vecPosition, *m_vecTargetPos) <= 30.f)
 			{
 				if (m_fAttackTime >= 2.f)
 				{
@@ -257,12 +261,16 @@ void CPony::Update(_float fTimeDelta)
 void CPony::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
-	
+	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+	{
+		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+	}
 
 	// 넉백이 true일 때 넉백 모션
 	if (m_bKnockBacking == true)
 	{
-		_vector vKnockBack_DIr = vPos - vPlayerPos; // 플레이어 방향으로부터 반대방향으로 날아가기
+		_vector vKnockBack_DIr = m_vecPosition - vPlayerPos; // 플레이어 방향으로부터 반대방향으로 날아가기
 		vKnockBack_DIr = XMVector3Normalize(vKnockBack_DIr);
 		if (m_pTransformCom->KnockBack(fTimeDelta, vKnockBack_DIr, m_fKnockBack_Power, m_fKnockBack_Height) == true)
 		{
@@ -315,13 +323,19 @@ HRESULT CPony::Add_Components()
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
-	/* For.Com_Collider_OBB */
-	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-	SphereDesc.fRadius = 1.5f;
-	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	///* For.Com_Collider_OBB */
+	//CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	//SphereDesc.fRadius = 1.2f;
+	//SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	//if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
+	//	TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+	//	return E_FAIL;
 
-	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
+	AABBDesc.vExtents = _float3(1.f, 1.2f, 1.f);
+	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
+		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
 
 	// For.Com_Navigation
@@ -354,12 +368,10 @@ HRESULT CPony::Bind_ShaderResources()
 {
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 		return E_FAIL;
 

@@ -199,6 +199,7 @@ private:
 	_vector					m_vecPivotPos{};
 
 	_uint					m_iWeaponState = WEAPON_RIFLE;
+	_uint					m_iPrevWeaponState = WEAPON_RIFLE;;
 	_uint					m_iCellidx = 0;
 	LEVELID m_eLevelID{};
 private:
@@ -246,6 +247,15 @@ private:
 	_bool					m_bVisible_Tracker = false;
 	_bool					m_bMissile_Explosion = false;
 #pragma endregion 배터리
+
+#pragma region 아이템
+public:
+	void Set_PickUp_CollectItem() { ++m_iItem_Collector_Count; }
+
+	_uint Get_CollectItem() { return m_iItem_Collector_Count; }
+private:
+	_uint m_iItem_Collector_Count = 0;
+#pragma endregion 아이템
 
 public:
 	_float* Get_PlayerHP() { return &m_fHp; }

@@ -32,7 +32,20 @@ HRESULT CExplosion::Initialize(void* pArg)
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
     m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
     m_bAttackState = true;
-    m_fAttack = 100.f;
+    switch (m_eType)
+    {
+    case Client::CExplosion::EXPLOSION_TRUCK:
+        m_fAttack = 100.f;
+        break;
+    case Client::CExplosion::EXPLOSION_TANK:
+        m_fAttack = 20.f;
+        break;
+    case Client::CExplosion::EXPLOSION_END:
+        break;
+    default:
+        break;
+    }
+   
 
     return S_OK;
 }
@@ -41,17 +54,7 @@ void CExplosion::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
     m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-    switch (m_eType)
-    {
-    case Client::CExplosion::EXPLOSION_TRUCK:
-    {
-        break;
-    }
-    case Client::CExplosion::EXPLOSION_END:
-        break;
-    default:
-        break;
-    }
+ 
 }
 
 void CExplosion::Update(_float fTimeDelta)
@@ -98,10 +101,6 @@ HRESULT CExplosion::Add_Components()
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
 
-    ///* For.Com_Model */
-    //if (FAILED(__super::Add_Component(m_eLevel, TEXT(""),
-    //    TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-    //    return E_FAIL;
 
     /* For.Com_Collider_Sphere*/
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};

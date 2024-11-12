@@ -50,6 +50,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pPlayer->fPosition.x, pPlayer->fPosition.y, pPlayer->fPosition.z, 1.f));
 	m_pTransformCom->Set_Scaling(2.f, 2.f, 2.f);
 	m_iWeaponState = WEAPON_RIFLE;
+	m_iPrevWeaponState = WEAPON_END;
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
 	m_pKatana = static_cast<CWeapon_Katana*>(m_PartObjects[TPS_PART_KATANA]);
 	m_pHead = static_cast<CHead_Player*>(m_PartObjects[TPS_PART_HEAD]);
@@ -72,7 +73,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 	m_fRun_FourDirection = 1.5f;
 	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
-
+	m_bAffected = true;
 	m_bBuildMode = true; 
 	return S_OK;
 }
@@ -128,12 +129,6 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
 		cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_0))
-	{
-		m_iWeaponState++;
-		if (m_iWeaponState > 7)
-			m_iWeaponState = 0;
-	}
 
 #pragma endregion 지워	
 
@@ -165,9 +160,12 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	}
 	m_pWaepon->Set_CameraPos(m_vecCameraPos);			// 카메라 At 보내주기
 	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// 카메라 At 보내주기
-	m_pBody->Set_WeaponState(m_iWeaponState);		// 몸에게 무기 상태 보내주기   TPS	
-	m_pWaepon->Set_WeaponState(m_iWeaponState);		// 무기에게 무기 상태 보내주기
-	
+	if(m_iPrevWeaponState != m_iWeaponState)
+	{
+		m_pBody->Set_WeaponState(m_iWeaponState);		// 몸에게 무기 상태 보내주기   TPS	
+		m_pWaepon->Set_WeaponState(m_iWeaponState);		// 무기에게 무기 상태 보내주기
+	}
+	m_iPrevWeaponState = m_iWeaponState;
 	if (m_iWeaponState == BATTERY)		m_iViewState = PLAYER_FPS_VIEW; // 배터리는 무조건 1인칭
 	if (m_iWeaponState == TRACKER)		m_iViewState = PLAYER_FPS_VIEW; // 추적기는 무조건 1인칭
 

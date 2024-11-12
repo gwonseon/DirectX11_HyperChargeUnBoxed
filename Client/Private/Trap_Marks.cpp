@@ -45,7 +45,7 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 
 
 	m_pBricks = static_cast<CTrap_Bricks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Trap_Shield"), TEXT("Prototype_GameObject_TrapBricks"), &Bricks_Desc));
-	
+	m_bAffected = false;
 	m_bDraw = true;
 	return S_OK;
 }

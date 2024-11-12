@@ -78,7 +78,40 @@ public:
 public:
 	void	Set_TPSState(_bool State) { m_bTPSState = State; }
 	void	Set_BulletIn(_bool bIn) { m_bBulletIn = bIn; }
-	void	Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
+	void	Set_WeaponState(_uint iState) { 
+		m_iWeaponState = iState;
+		switch (m_iWeaponState)
+		{
+		case Client::CWeapon::WEAPON_UNARMED:
+			break;
+		case Client::CWeapon::WEAPON_RIFLE:
+			m_iCurrent_Bullet = m_iRifle_Bullet;
+			m_iFull_Bullet = m_iRifle_Bullet;
+			break;
+		case Client::CWeapon::WEAPON_SHOTGUN:
+			break;
+		case Client::CWeapon::WEAPON_PULSECANNON:
+			break;
+		case Client::CWeapon::WEAPON_TELEPORT:
+			break;
+		case Client::CWeapon::WEAPON_LOCKETLAUNCHER:
+			m_iCurrent_Bullet = m_iLocket_Bullet;
+			m_iFull_Bullet = m_iLocket_Bullet;
+			break;
+		case Client::CWeapon::WEAPON_RIFLE_SECOND:
+			break;
+		case Client::CWeapon::WEAPON_KATANA:
+			break;
+		case Client::CWeapon::BATTERY:
+			break;
+		case Client::CWeapon::TRACKER:
+			break;
+		case Client::CWeapon::WEAPON_END:
+			break;
+		default:
+			break;
+		}
+	}
 	HRESULT Weapon_Exchange();
 
 	void	Set_SocketMatrix(const _float4x4* matSocket) { m_pSocketMatrix = matSocket; }
@@ -130,6 +163,8 @@ private:
 	// ÃÑ¾Ë
 private:
 	_uint m_iRifle_Bullet = 30;
+	_uint m_iLocket_Bullet = 5;
+
 	_uint m_iFull_Bullet{};
 	_uint m_iCurrent_Bullet = 30;
 

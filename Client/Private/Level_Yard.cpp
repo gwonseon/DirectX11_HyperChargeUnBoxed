@@ -26,6 +26,7 @@
 #include <Coin_Item.h>
 #include <Hp_Item.h>
 #include <UI_3D.h>
+#include <Collector.h>
 
 
 CLevel_Yard::CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -122,24 +123,25 @@ void CLevel_Yard::Update(_float fTimeDelta)
 		pBuild = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_PlayerBuild"));
 	//if (pTruck == nullptr)
 	//	pTruck = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_MissileTruck"));
-
-	_uint iExplosionCount = 0;
-	// 앞이 당하는 애
-	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
-	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
-	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
-	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
-	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
-	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
-	m_pGameInstance->Collision_Explosion(pExplosion, pBuild, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), iExplosionCount);
-	iExplosionCount++; 
-	m_pGameInstance->Collision_Explosion(pExplosion, pTrap_Shield, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), iExplosionCount);
-	//iExplosionCount++; 
-	//m_pGameInstance->Collision_Explosion(pExplosion, pTruck, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), iExplosionCount);
-	
 	if (pExplosion == nullptr)
 		pExplosion = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
 
+
+	// 앞이 당하는 애
+	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_AABB"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
+	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
+	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
+	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
+	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
+	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_AABB"));
+	m_pGameInstance->Collision_Explosion(pExplosion, pBuild, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 4);
+	m_pGameInstance->Collision_Explosion(pExplosion, pTrap_Shield, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 4);
+	m_pGameInstance->Collision_Explosion(pExplosion, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 4, 0, CPlayer::TPS_PART_BODY);
+	
+	// m_pGameInstance->Anti_OverLapping(pFarMonsterLayer, pNearMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
+	m_pGameInstance->Anti_OverLapping(pNearMonsterLayer, pFarMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), 0, 0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pNearMonsterLayer, TEXT("Com_Collider_AABB"), 0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
 
 #pragma endregion Collision	
 #pragma region 총알충돌검사
@@ -155,7 +157,7 @@ void CLevel_Yard::Update(_float fTimeDelta)
 		!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
 	{
 		_bool* bShot = m_pPlayer->Get_ShotStart();
-		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // 총과 근거리 몬스터
+		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_AABB"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // 총과 근거리 몬스터
 		m_pGameInstance->Collision_Bullet(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());  // 총과 장거리 몬스터
 
 	}
@@ -236,6 +238,12 @@ void CLevel_Yard::Texture_Render()
 {
 	if (*m_pPlayer->Get_BuildMode() == true)
 		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("건설 모드 건너뛰기"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+	if(m_pBrain->Get_Hp() <= 100.f)
+	{
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("이런 브레인 코어가 파괴되겠군."), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("어서 빨리 적을 무찌르게"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+
+	}
 
 }
 
@@ -574,35 +582,35 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 		return E_FAIL;
 
 
+#pragma region 대화상자
+	CInGameUI::INGAMEUI_DESC	pDesc7{};
+	pDesc7.eLevel = LEVEL_YARD;
+	pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	pDesc7.fSizeX = 450.f;
+	pDesc7.fSizeY = 90.f;
+	pDesc7.iData = 0;
+	pDesc7.fX = g_iWinSizeX * 0.55f;
+	pDesc7.fY = 65.f;
+	pDesc7.fDepth = 0.2f;
+	pDesc7.iIndex = 0;	
+	pDesc7.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
+		return E_FAIL;
 
-	//CInGameUI::INGAMEUI_DESC	pDesc7{};
-	//pDesc7.eLevel = LEVEL_YARD;
-	//pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
-	//pDesc7.fSizeX = 170.f;
-	//pDesc7.fSizeY = 60.f;
-	//pDesc7.iData = 0;
-	//pDesc7.fX = g_iWinSizeX * 0.55f;
-	//pDesc7.fY = 65.f;
-	//pDesc7.fDepth = 0.2f;
-	//pDesc7.iIndex = 0;	
-	//pDesc7.pPlayer = m_pPlayer;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
-	//	return E_FAIL;
+	CInGameUI::INGAMEUI_DESC	pDesc6{};
+	pDesc6.eLevel = LEVEL_YARD;
+	pDesc6.eUITag = CInGameUI::UI_CHARACTER;
+	pDesc6.fSizeX = 100.f;
+	pDesc6.fSizeY = 100.f;
+	pDesc6.iData = 0;
+	pDesc6.fX = g_iWinSizeX * 0.7f;
+	pDesc6.fY = 65.f;
+	pDesc6.fDepth = 0.1f;
+	pDesc6.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc6)))
+		return E_FAIL;
 
-	//CInGameUI::INGAMEUI_DESC	pDesc6{};
-	//pDesc6.eLevel = LEVEL_YARD;
-	//pDesc6.eUITag = CInGameUI::UI_CHARACTER;
-	//pDesc6.fSizeX = 100.f;
-	//pDesc6.fSizeY = 100.f;
-	//pDesc6.iData = 0;
-	//pDesc6.fX = g_iWinSizeX * 0.6f;
-	//pDesc6.fY = 65.f;
-	//pDesc6.fDepth = 0.1f;
-	//pDesc6.pPlayer = m_pPlayer;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc6)))
-	//	return E_FAIL;
-
-
+#pragma endregion 대화상자
 
 
 
@@ -761,6 +769,14 @@ HRESULT CLevel_Yard::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 
 HRESULT CLevel_Yard::Ready_Layer_ITem(const _tchar* pLayerTag)
 {
+	CCollector::COLLECTOR_DESC pCollectItem{};
+	pCollectItem.eID = LEVEL_YARD;
+	pCollectItem.fScale = { 8.f,8.f ,8.f };
+	pCollectItem.iModelIndex = 154;
+	pCollectItem.fPosition = { 644.512f, 3.f, 560.156f };
+	pCollectItem.pPlayer = m_pPlayer;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Collect_Item"), &pCollectItem));
+
 
 	// 코인 아이템
 	CCoin_Item::COINITEM_DESC pCoinItem{};

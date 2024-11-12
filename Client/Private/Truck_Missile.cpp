@@ -128,6 +128,7 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			// Æø¹ß »ý¼º
 			CExplosion::EXPLOSION_DESC pExplosion{};
 			pExplosion.eID = m_eLevel;
+			pExplosion.eType = CExplosion::EXPLOSION_TRUCK;
 			pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
 			pExplosion.fScale = _float3{ 10.f, 10.f, 10.f };
 			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
@@ -279,7 +280,6 @@ HRESULT CTruck_Missile::Add_Components()
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
-
 
 	return S_OK;
 }

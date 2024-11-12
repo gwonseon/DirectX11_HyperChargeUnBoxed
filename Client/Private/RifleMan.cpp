@@ -58,11 +58,14 @@ void CRifleMan::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 
-    vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-    vPos = XMVectorSetY(vPos, 0.f);
-    XMStoreFloat3(&m_fPos, vPos);
+
+    m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+    m_vecPosition = XMVectorSetY(m_vecPosition, 0.f);
+    XMStoreFloat3(&m_fPos, m_vecPosition);
    
     vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
+
+
 
 
 }
@@ -75,7 +78,7 @@ void CRifleMan::Update(_float fTimeDelta)
     // 상태패턴 업데이트
     m_pCurrentState->Update(this, fTimeDelta);
 
-    _float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, vPos);
+    _float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
     // 사정거리 안에 플레이어가 없으면 
     if (fDistance > 1500.f)
     {
@@ -95,7 +98,7 @@ void CRifleMan::Update(_float fTimeDelta)
                 {
                     m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
                     // 근접 공격이기 때문에 먼거리에서 트랩을 찾을 필요는 없음
-                    if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, vPos) <= 2500 && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
+                    if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, m_vecPosition) <= 2500 && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
                     {
                         // 새 타겟으로 바꿔줌
                         m_vecTargetPos = &m_vecNewTargetPos;
@@ -111,7 +114,7 @@ void CRifleMan::Update(_float fTimeDelta)
             }
         }
             // 사정거리 안에 들어가면
-        if (m_pTransformCom->Cal_Distance_vec(vPos, *m_vecTargetPos) <= 800.f)
+        if (m_pTransformCom->Cal_Distance_vec(m_vecPosition, *m_vecTargetPos) <= 800.f)
         {
             _vector vecTargetPos = *m_vecTargetPos;
             vecTargetPos = XMVectorSetY(vecTargetPos, 1.f);
@@ -138,7 +141,7 @@ void CRifleMan::Update(_float fTimeDelta)
                         Desc.fPosition = fBulletPos;
                         Desc.m_iModelNumber = 1;
                         Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
-                        Desc.vDir = XMVector3Normalize(vecTargetPos - vPos);
+                        Desc.vDir = XMVector3Normalize(vecTargetPos - m_vecPosition);
                         Desc.m_pBuild = m_pBuild;
                         Desc.pPlayer = m_pPlayer;
                         static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
@@ -175,7 +178,9 @@ void CRifleMan::Update(_float fTimeDelta)
                 m_fMoveTime += fTimeDelta;
                 _float fRatio = m_fMoveTime / 2.f;
                 m_fMoveSpeed = 10.f * sin(fRatio * 3.141592f);
-                _vector vMovePos = vPos + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
+                if (m_fMoveSpeed < 0)
+                    m_fMoveSpeed = 0;
+                _vector vMovePos = m_vecPosition + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
                 m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta, vMovePos, m_pNavigationCom);
             }
         }
@@ -184,7 +189,7 @@ void CRifleMan::Update(_float fTimeDelta)
     else
     {
         _vector vecTarget = vPlayerPos;
-        vecTarget = XMVectorSetY(vecTarget, 1.f);
+        vecTarget = XMVectorSetY(vecTarget, 0.f);
         m_pTransformCom->LookAt(vecTarget);
         m_bFind_Path = false;
         // 사정거리 밖에 있으면
@@ -203,7 +208,9 @@ void CRifleMan::Update(_float fTimeDelta)
                 m_fMoveTime += fTimeDelta;
                 _float fRatio = m_fMoveTime / 2.f;
                 m_fMoveSpeed = 10.f * sin(fRatio * 3.141592f);
-                _vector vMovePos = vPos + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
+                if (m_fMoveSpeed < 0)
+                    m_fMoveSpeed = 0;
+                _vector vMovePos = m_vecPosition + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
                 m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta, vMovePos, m_pNavigationCom);
             }
         }
@@ -231,7 +238,7 @@ void CRifleMan::Update(_float fTimeDelta)
                         Desc.fPosition = fBulletPos;
                         Desc.m_iModelNumber = 1;
                         Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
-                        Desc.vDir = XMVector3Normalize(vPlayerPos - vPos);
+                        Desc.vDir = XMVector3Normalize(vPlayerPos - m_vecPosition);
                         Desc.m_pBuild = m_pBuild;
                         Desc.pPlayer = m_pPlayer;
                         static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
@@ -257,6 +264,12 @@ void CRifleMan::Update(_float fTimeDelta)
 void CRifleMan::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+    if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+    {
+        m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
+        m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+    }
+
 }
 
 HRESULT CRifleMan::Render()
@@ -301,7 +314,7 @@ HRESULT CRifleMan::Add_Components()
         return E_FAIL;
 
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-    SphereDesc.fRadius = 1.5f;
+    SphereDesc.fRadius = 1.f;
     SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
     if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),

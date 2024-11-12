@@ -87,7 +87,6 @@ private:
 
 private:
 	_vector vPlayerPos{};
-	_vector vPos{};
 	_float3 m_fPos{};
 	_float m_fRunSpeed = 0.f;
 	_float m_fAttackTime = 0.f;

@@ -58,6 +58,7 @@ void CTrap_Bricks::Priority_Update(_float fTimeDelta)
 	// 파괴되었을 때
 	if (m_bKnockdown == true)
 	{
+		m_bAffected = false;
 		*m_bBuild = false;
 		*m_bBuild_PreView = false;
 
@@ -86,11 +87,13 @@ void CTrap_Bricks::Update(_float fTimeDelta)
 	// 건설되었을 때
 	if(*m_bBuild == true)
 	{
+		m_bAffected = true;
 		m_bCanAttacked = true;
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	}
 	else
 	{
+		m_bAffected = false;
 		m_bCanAttacked = false;
 		// 건설 안되었을 때
 		// 살 수 있을 때와 없을 때 구분

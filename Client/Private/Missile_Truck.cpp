@@ -46,7 +46,7 @@ HRESULT CMissile_Truck::Initialize(void* pArg)
     if (FAILED(Add_PartObjects()))
         return E_FAIL;
 
-    m_bCanAttacked = true;
+    m_bAffected = true;
     m_bDontDestroy = true;
     m_fHp = 200;
     return S_OK;
@@ -62,33 +62,38 @@ void CMissile_Truck::Priority_Update(_float fTimeDelta)
         m_pTruckBody->Set_knockdown(true);
         m_pMissile->Set_knockdown(true);
     }
-    if(m_fHp != 200)
-        cout << m_fHp << endl;
 
+    if (m_fHp <= 0.f)
+    {
+        m_bKnockdown = true;
+    }
 
     // 미사일 맞았을 떄
     if (m_bKnockdown == true)
         return;
+
     CLayer* pLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
     if (pLayer == nullptr)
         return;
-    for(int i = 0;i< pLayer->Get_GameObjectList_Size();i++)
+    _uint i = 0;
+    list<class CGameObject*> pList =  pLayer->Get_GameObject_List();
+    for (auto& pExplosion : pList)
     {
-        CCollider* pCol = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevelID, TEXT("Layer_Explosion"), TEXT("Com_Collider_Sphere"),i));
+        if (pExplosion == nullptr)
+            return;
+        CCollider* pCol = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevelID, TEXT("Layer_Explosion"), TEXT("Com_Collider_Sphere"), i));
         if (pCol != nullptr)
         {
             if (m_pColliderCom->Intersect(pCol))
             {
                 m_fHp -= 300.f;
             }
+            pExplosion->Set_Count();
+            if (pExplosion->Get_Count() >= 4)
+                pExplosion->Set_Dead();
         }
+        i++;
     }
-   
-    if (m_fHp <= 0.f)
-    {
-        m_bKnockdown = true;
-    }
-
 }
 
 void CMissile_Truck::Update(_float fTimeDelta)
@@ -119,7 +124,7 @@ HRESULT CMissile_Truck::Add_Components()
 {
     CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
     AABBDesc.vExtents = _float3(1.f, 1.5f, 4.f);
-    AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
+    AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 1.f);
     if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Collider_AABB"),
         TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
         return E_FAIL;

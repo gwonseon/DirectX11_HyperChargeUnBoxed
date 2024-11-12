@@ -447,6 +447,16 @@ void CGameInstance::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttack
 	m_pCollision_Manager->Collision_Explosion(pExplosionLayer, pAttackedLayer, strSrcComponentTag, strDstComponentTag, iCount,iSrcPartObjID, iDstPartObjID);
 }
 
+void CGameInstance::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+{
+	m_pCollision_Manager->Anti_OverLapping(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag,  iSrcPartObjID, iDstPartObjID);
+}
+
+void CGameInstance::Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring& strSrcComponentTag, _uint iSrcPartObjID)
+{
+	m_pCollision_Manager->Anti_OverLapping_SameLayer(pSrcLayer, strSrcComponentTag, iSrcPartObjID);
+}
+
 HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
 {
 	return m_pFont_Manager->Add_Font(strFontTag, pFontFilePath);

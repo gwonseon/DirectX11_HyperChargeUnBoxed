@@ -239,7 +239,7 @@ private:
 	_float					m_fShotGunDelay = 1.f;
 	_float					m_fPulseCannonDelay = 2.f;
 	_float					m_fTeleportDelay = 2.f;
-	_float					m_fLocketLauncherDelay = 2.f;
+	_float					m_fLocketLauncherDelay = 0.6f;
 	_float					m_fCurrentDelay = 0.f;
 
 	_bool					m_bShotStart = false;  // 쏘는 시작을 알려줌 (이때 총알 발사와 반동)
