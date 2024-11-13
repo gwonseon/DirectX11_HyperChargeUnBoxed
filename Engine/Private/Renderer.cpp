@@ -51,13 +51,14 @@ HRESULT CRenderer::Draw()
 	return S_OK;
 }
 
-void CRenderer::RenderList_Clear(RENDERGROUP eRender)
+void CRenderer::RenderList_Clear()
 {
-	//for (auto& pRender : m_RenderGameObjects[eRender])
-	//{
-	//	Safe_Release(pRender);
-	//}
-	//m_RenderGameObjects[eRender].clear();
+	for (auto& GameObjects : m_RenderGameObjects)
+	{
+		for (auto& pRenderGameObject : GameObjects)
+			Safe_Release(pRenderGameObject);
+		GameObjects.clear();
+	}
 }
 
 HRESULT CRenderer::Render_Priority()
@@ -141,12 +142,9 @@ HRESULT CRenderer::Render_UI()
 {
 	for (auto& pRenderGameObject : m_RenderGameObjects[RG_UI])
 	{
-		
-
 		if (nullptr != pRenderGameObject)
 			pRenderGameObject->Render();
 		
-
 		Safe_Release(pRenderGameObject);
 	}
 
@@ -159,10 +157,8 @@ HRESULT CRenderer::Render_UI_Last()
 {
 	for (auto& pRenderGameObject : m_RenderGameObjects[RG_UI_LAST])
 	{
-
 		if (nullptr != pRenderGameObject)
 			pRenderGameObject->Render();
-
 
 		Safe_Release(pRenderGameObject);
 	}

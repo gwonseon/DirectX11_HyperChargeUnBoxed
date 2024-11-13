@@ -117,14 +117,7 @@ CGameObject* CObject_Manager::Get_Prototype(_uint iLevelIndex, const _tchar* pLa
 
 }
 
-//CComponent* CObject_Manager::Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex)
-//{
-//	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
-//	if (nullptr == pLayer)
-//		return nullptr;
-//
-//	return pLayer->Get_Component(pComponentTag, iIndex);
-//}
+
 
 
 
@@ -133,15 +126,6 @@ void CObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (size_t i = 0; i < m_iNumLevels; i++)
 	{
-		/*auto it = m_pLayers[i].find(L"Layer_Player");  
-		if (it != m_pLayers[i].end())
-		{
-			CLayer* pLayer = it->second;
-			if (pLayer)
-			{
-				pLayer->Priority_Update(fTimeDelta);
-			}
-		}*/
 
 		for (auto& Pair : m_pLayers[i])
 		{

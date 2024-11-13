@@ -13,8 +13,6 @@ BEGIN(Client)
 
 class CBackGround final : public CUIObject
 {
-
-
 private:
 	CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBackGround(const CBackGround& Prototype);

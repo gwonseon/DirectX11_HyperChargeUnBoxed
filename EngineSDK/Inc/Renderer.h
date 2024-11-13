@@ -31,7 +31,7 @@ public:
 	HRESULT Initialize();
 	HRESULT Add_RenderGameObject(RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
 	HRESULT Draw();
-	void	RenderList_Clear(RENDERGROUP eRender);
+	void	RenderList_Clear();
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 

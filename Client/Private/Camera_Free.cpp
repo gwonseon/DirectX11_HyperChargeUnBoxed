@@ -308,4 +308,5 @@ CGameObject* CCamera_Free::Clone(void* pArg)
 void CCamera_Free::Free()
 {
     __super::Free();
+    
 }
