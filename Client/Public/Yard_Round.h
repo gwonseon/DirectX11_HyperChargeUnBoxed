@@ -35,16 +35,21 @@ public:
 	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
 	void	Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
 	void	Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+
 	_uint	Get_MonsterCount() { return m_iMonsterCount; }
 	void	MonsterCreate(_float fTimeDelta);
 
-
-private:
-	_uint m_iCurrentRound{};
+	_bool	IsRound_End() { return m_bthis_Round_End; }
+	void	Set_RoundEnd(_bool bEnd) { m_bthis_Round_End = bEnd; }
+private: 
+	_uint m_iCurrentRound{}; // 현재 라운드
 	_uint m_iMyRound{}; //  이 객체가 갖고 있는 라운드
-	_uint m_iMonsterCount{};
-	_uint m_iCurrent_RemainMonster{};
+	_uint m_iMonsterCount{}; // 생성할 몬스터 수
+	_uint m_iCurrent_RemainMonster{}; // 남은 몬스터수
+
+	_bool m_bthis_Round_End = false;
 	_float fRound_Time{}, fCreate_Time{};
+
 	vector< MONSTER_CREATE_FOR_YARD_DESC> m_vecMonsterCreate;
 
 	ANIMMODEL_INDEX eModel_Index{};
