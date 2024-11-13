@@ -518,9 +518,6 @@
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
       <Filter>01. Levels\01. Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>01. Levels\99. Loading</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01. Levels\99. Loading\Loader</Filter>
     </ClCompile>
@@ -724,6 +721,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Collector.cpp">
       <Filter>02. GameObjects\Environment\CollectItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Loading.cpp">
+      <Filter>01. Levels\99. Loading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -489,16 +489,19 @@ void CGameInstance::Release_Engine()
 void CGameInstance::Free()
 {
 	__super::Free();
-	Safe_Release(m_pFont_Manager);
-	Safe_Release(m_pLight_Manager);
-	Safe_Release(m_pPipeLine);
-	Safe_Release(m_pRenderer);
-	Safe_Release(m_pComponent_Manager);
-	Safe_Release(m_pObject_Manager);
-	Safe_Release(m_pLevel_Manager);
-	Safe_Release(m_pTimer_Manager);
-	Safe_Release(m_pInput_Device);
+
 	Safe_Release(m_pGraphic_Device);
-	Safe_Release(m_pRound_Manager); 
+	Safe_Release(m_pInput_Device);
+	Safe_Release(m_pTimer_Manager);
+	Safe_Release(m_pLevel_Manager);
+	Safe_Release(m_pObject_Manager);
+	Safe_Release(m_pComponent_Manager);
+	Safe_Release(m_pRenderer);
+	Safe_Release(m_pPipeLine);
+	Safe_Release(m_pLight_Manager);
+	Safe_Release(m_pPicking_Manager);
+	Safe_Release(m_pCollision_Manager);
+	Safe_Release(m_pFont_Manager);
+	Safe_Release(m_pRound_Manager);
 	Safe_Release(m_pUI_Manager);
 }

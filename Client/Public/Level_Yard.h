@@ -121,6 +121,7 @@ private:
 
 	_uint m_eTextState = STATE_DONT_DRAW;
 	_uint m_iDrawNumber = 99;
+	_uint m_iMissile_Round = 1;
 public:
 	static CLevel_Yard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

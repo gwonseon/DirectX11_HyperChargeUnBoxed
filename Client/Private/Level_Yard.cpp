@@ -130,19 +130,19 @@ void CLevel_Yard::Update(_float fTimeDelta)
 
 
 	// 앞이 당하는 애
-	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_AABB"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
-	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
+	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // 근접 공격 몬스터랑 플레이어
+	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
 	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // 칼이랑 몬스터
 	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
 	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
-	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_AABB"));
+	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
 	m_pGameInstance->Collision_Explosion(pExplosion, pBuild, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 4);
 	m_pGameInstance->Collision_Explosion(pExplosion, pTrap_Shield, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 4);
 	m_pGameInstance->Collision_Explosion(pExplosion, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 4, 0, CPlayer::TPS_PART_BODY);
 	
 	// m_pGameInstance->Anti_OverLapping(pFarMonsterLayer, pNearMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
-	m_pGameInstance->Anti_OverLapping(pNearMonsterLayer, pFarMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), 0, 0);
-	m_pGameInstance->Anti_OverLapping_SameLayer(pNearMonsterLayer, TEXT("Com_Collider_AABB"), 0);
+	m_pGameInstance->Anti_OverLapping(pNearMonsterLayer, pFarMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
 	m_pGameInstance->Anti_OverLapping_SameLayer(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
 
 #pragma endregion Collision	
@@ -159,7 +159,7 @@ void CLevel_Yard::Update(_float fTimeDelta)
 		!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
 	{
 		_bool* bShot = m_pPlayer->Get_ShotStart();
-		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_AABB"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // 총과 근거리 몬스터
+		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // 총과 근거리 몬스터
 		m_pGameInstance->Collision_Bullet(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());  // 총과 장거리 몬스터
 
 	}
@@ -276,53 +276,9 @@ void CLevel_Yard::Texture_Render()
 
 void CLevel_Yard::Texture_Update(_float fTimeDelta)
 {
-	CTransform* pTran = m_pMissile_Timer->Get_Transform();
-	_vector vPos = pTran->Get_State(CTransform::STATE_POSITION);
-	// 에너지 코어 경고
-	if (m_pBrain->Get_Energy() <= 30.f && (m_eTextState & STATE_HALF_ENERGY) == 0)
-	{
-		Conversation_Draw(true);
-		m_iDrawNumber = STATE_HALF_ENERGY;
-		m_fConversation_Draw_Timer += fTimeDelta;
-		// 3초 지나면 끄기
-		if (m_fConversation_Draw_Timer >= 3.f)
-		{
-			vPos = XMVectorSetY(vPos, g_iWinSizeY * 0.1f);
-			pTran->Set_State(CTransform::STATE_POSITION, vPos);
-			Conversation_Draw(false);
-			m_eTextState |= STATE_HALF_ENERGY;
-			m_fConversation_Draw_Timer = 0.f;
-		}
-		else
-		{
-			vPos = XMVectorSetY(vPos, (g_iWinSizeY * 0.1f) + 70.f);
-			pTran->Set_State(CTransform::STATE_POSITION, vPos);
-		}
-		
-	}
-	// HP경고
-	else if (m_pBrain->Get_Hp() <= 50.f && (m_eTextState & STATE_HALF_HP) == 0)
-	{
-		m_iDrawNumber = STATE_HALF_HP;
-		Conversation_Draw(true);
-		m_fConversation_Draw_Timer += fTimeDelta;
-		// 3초 지나면 끄기
-		if(m_fConversation_Draw_Timer >= 3.f)
-		{
-			vPos = XMVectorSetY(vPos, g_iWinSizeY * 0.1f);
-			pTran->Set_State(CTransform::STATE_POSITION, vPos);
-			Conversation_Draw(false);
-			m_eTextState |= STATE_HALF_HP;
-			m_fConversation_Draw_Timer = 0.f;
-		}
-		else
-		{
-			vPos = XMVectorSetY(vPos, (g_iWinSizeY * 0.1f) + 70.f);
-			pTran->Set_State(CTransform::STATE_POSITION, vPos);
-		}
-	}
+
 	// 미사일 성공
-	else if (m_pMissile_Truck->Get_knockdown() == true && (m_eTextState & STATE_GOOD) == 0)
+	if (m_pMissile_Truck->Get_knockdown() == true && (m_eTextState & STATE_GOOD) == 0)
 	{
 		m_iDrawNumber = STATE_GOOD;
 		Conversation_Draw(true);
@@ -336,7 +292,7 @@ void CLevel_Yard::Texture_Update(_float fTimeDelta)
 		}
 	}
 	// 미사일 경고, 미사일 라운드 시작전 쉬는 시간의 끝나기전?
-	else if (*m_pPlayer->Get_BuildMode() == true && m_pRound[1]->IsRound_End() == false && m_iCurrentRound == 0 && (m_eTextState & STATE_MISSILE_WARNING) == 0)
+	else if (*m_pPlayer->Get_BuildMode() == true && m_pRound[m_iMissile_Round -1 ]->IsRound_End() == false&& m_pRound[m_iMissile_Round]->IsRound_End() == false && m_iCurrentRound == 0 && (m_eTextState & STATE_MISSILE_WARNING) == 0)
 	{
 		_bool* bMode = m_pPlayer->Get_BuildMode();
 		*bMode = true;
@@ -351,20 +307,20 @@ void CLevel_Yard::Texture_Update(_float fTimeDelta)
 			m_fConversation_Draw_Timer = 0.f;
 		}
 	}
-	// 칭찬
-	else if (m_pBrain->Get_Hp() <= 50.f && (m_eTextState & STATE_GOOD) == 0)
-	{
-		m_iDrawNumber = STATE_GOOD;
-		Conversation_Draw(true);
-		m_fConversation_Draw_Timer += fTimeDelta;
-		// 3초 지나면 끄기
-		if (m_fConversation_Draw_Timer >= 3.f)
-		{
-			Conversation_Draw(false);
-			m_eTextState |= STATE_GOOD;
-			m_fConversation_Draw_Timer = 0.f;
-		}
-	}
+	//// 칭찬
+	//else if (m_pBrain->Get_Hp() <= 50.f && (m_eTextState & STATE_GOOD) == 0)
+	//{
+	//	m_iDrawNumber = STATE_GOOD;
+	//	Conversation_Draw(true);
+	//	m_fConversation_Draw_Timer += fTimeDelta;
+	//	// 3초 지나면 끄기
+	//	if (m_fConversation_Draw_Timer >= 3.f)
+	//	{
+	//		Conversation_Draw(false);
+	//		m_eTextState |= STATE_GOOD;
+	//		m_fConversation_Draw_Timer = 0.f;
+	//	}
+	//}
 	// 적들 약올리기
 	else if (m_iCurrentRound == 2 && (m_eTextState & STATE_PROVOKE) == 0)
 	{
@@ -380,12 +336,39 @@ void CLevel_Yard::Texture_Update(_float fTimeDelta)
 			m_fConversation_Draw_Timer = 0.f;
 		}
 	}
+	// 에너지 코어 경고, 미사일일 떄 안하기
+	//else if (m_pBrain->Get_Energy() <= 30.f && (m_eTextState & STATE_HALF_ENERGY) == 0 && m_iCurrentRound != m_iMissile_Round)
+	//{
+	//	Conversation_Draw(true);
+	//	m_iDrawNumber = STATE_HALF_ENERGY;
+	//	m_fConversation_Draw_Timer += fTimeDelta;
+	//	// 3초 지나면 끄기
+	//	if (m_fConversation_Draw_Timer >= 3.f)
+	//	{
+	//		Conversation_Draw(false);
+	//		m_eTextState |= STATE_HALF_ENERGY;
+	//		m_fConversation_Draw_Timer = 0.f;
+	//	}
 
-	if (m_eTextState != STATE_HALF_HP || m_eTextState != STATE_HALF_ENERGY)
-	{
-		vPos = XMVectorSetY(vPos, g_iWinSizeY * 0.1f);
-		pTran->Set_State(CTransform::STATE_POSITION, vPos);
-	}
+	//}
+	//// HP경고, 미사일일 때 안하기
+	//else if (m_pBrain->Get_Hp() <= 50.f && (m_eTextState & STATE_HALF_HP) == 0 && m_iCurrentRound != m_iMissile_Round)
+	//{
+	//	m_iDrawNumber = STATE_HALF_HP;
+	//	Conversation_Draw(true);
+	//	m_fConversation_Draw_Timer += fTimeDelta;
+	//	// 3초 지나면 끄기
+	//	if (m_fConversation_Draw_Timer >= 3.f)
+	//	{
+	//		Conversation_Draw(false);
+	//		m_eTextState |= STATE_HALF_HP;
+	//		m_fConversation_Draw_Timer = 0.f;
+	//	}
+	//}
+	else
+		Conversation_Draw(false);
+
+	
 	//if (m_iCurrentRound == 1) // 조건 바꾸자, 라운드 바뀔 때 상태 초기화 하는 로직
 	//{
 	//	m_eTextState &= ~STATE_HALF_HP;
@@ -415,7 +398,7 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 	Missile_Timer_Desc.fDepth = 0.1f;
 	Missile_Timer_Desc.fSizeX = 400.f;
 	Missile_Timer_Desc.fSizeY = 100.f;
-	Missile_Timer_Desc.fTimer = m_pMissile_Truck->Get_Timer();
+	Missile_Timer_Desc.fTimer = m_pMissile_Truck->Get_Hp_Ptr();
 	Missile_Timer_Desc.iRound = &m_iCurrentRound;
 	m_pMissile_Timer = static_cast<CInGameUI*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_UI"), &Missile_Timer_Desc));
 
@@ -528,7 +511,7 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 
 	CInGameUI::INGAMEUI_DESC	pDesc9{};
 	pDesc9.eLevel = LEVEL_YARD;
-	pDesc9.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	pDesc9.eUITag = CInGameUI::UI_CONVERSATIONBOX_BACKGROUND;
 	pDesc9.fSizeX = 180.f;
 	pDesc9.fSizeY = 90.f;
 	pDesc9.iData = 0;
@@ -614,7 +597,7 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 	// 플레이어 정보 뒷 배경
 	CInGameUI::INGAMEUI_DESC	pDesc22{};
 	pDesc22.eLevel = LEVEL_YARD;
-	pDesc22.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	pDesc22.eUITag = CInGameUI::UI_CONVERSATIONBOX_BACKGROUND;
 	pDesc22.fSizeX = 160.f;
 	pDesc22.fSizeY = 90.f;
 	pDesc22.iData = 0;

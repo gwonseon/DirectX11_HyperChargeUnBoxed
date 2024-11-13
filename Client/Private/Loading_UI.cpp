@@ -23,7 +23,7 @@ HRESULT CLoading_UI::Initialize(void* pArg)
 
     LOADINGUI_DESC		Desc{};
 
-    LOADINGUI_DESC* pDesc = (LOADINGUI_DESC*)pArg;
+    LOADINGUI_DESC* pDesc = static_cast<LOADINGUI_DESC*>(pArg);
 
     Desc.fX = pDesc->fX;
     Desc.fY = pDesc->fY;
@@ -37,11 +37,10 @@ HRESULT CLoading_UI::Initialize(void* pArg)
     Desc.eTag = pDesc->eTag;
 
     m_eTag = Desc.eTag;
-
-
+    m_eTargetLevel = pDesc->eTargetLevel;
+    Desc.eLevel = pDesc->eLevel;
     if (FAILED(__super::Initialize(&Desc)))
         return E_FAIL;
-
 
     if (FAILED(Add_Components(Desc.iData)))
         return E_FAIL;
@@ -57,44 +56,44 @@ void CLoading_UI::Priority_Update(_float fTimeDelta)
 void CLoading_UI::Update(_float fTimeDelta)
 {
 
-    m_fTick += fTimeDelta;
-    if (m_eTag == LOADING_GAGE)
-    {
-        if (m_fTick >= 0.05f)
-        {
-            m_iIndex += 1;
-        }
-        if (m_iIndex == 36)
-        {
-            m_iIndex = 0;
-        }
-    }
-    // 애니메이션
-    //if(m_eTag == LOADING_GAGE)
+    //m_fTick += fTimeDelta;
+    //if (m_eTag == LOADING_GAGE)
     //{
-    //    if (m_fIndex.x < 6)
+    //    if (m_fTick >= 0.05f)
     //    {
-    //        if (m_fTick >= 0.05f)
-    //        {
-    //            m_fTick = 0.f;
-    //            m_fIndex.x += 1;
-    //        }
+    //        m_iIndex += 1;
     //    }
-    //    else
+    //    if (m_iIndex == 36)
     //    {
-    //        if (m_fIndex.y == 5)
-    //        {
-    //            m_fIndex.y = 0;
-    //            m_fIndex.x = 0;
-    //        }
-    //        else
-    //        {
-    //            m_fIndex.x = 0;
-    //            if (m_fIndex.y < 6)
-    //                m_fIndex.y += 1;
-    //        }
+    //        m_iIndex = 0;
     //    }
     //}
+    //// 애니메이션
+    ////if(m_eTag == LOADING_GAGE)
+    ////{
+    ////    if (m_fIndex.x < 6)
+    ////    {
+    ////        if (m_fTick >= 0.05f)
+    ////        {
+    ////            m_fTick = 0.f;
+    ////            m_fIndex.x += 1;
+    ////        }
+    ////    }
+    ////    else
+    ////    {
+    ////        if (m_fIndex.y == 5)
+    ////        {
+    ////            m_fIndex.y = 0;
+    ////            m_fIndex.x = 0;
+    ////        }
+    ////        else
+    ////        {
+    ////            m_fIndex.x = 0;
+    ////            if (m_fIndex.y < 6)
+    ////                m_fIndex.y += 1;
+    ////        }
+    ////    }
+    ////}
 
 
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
@@ -190,13 +189,26 @@ HRESULT CLoading_UI::Bind_ShaderResources()
             return E_FAIL;
         break;
     case Client::CLoading_UI::LOADING_GAMENAME:
-        if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+        if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 1)))
             return E_FAIL;
+
+        if (m_eTargetLevel == LEVEL_GAMEPLAY)
+        {
+            if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+                return E_FAIL;
+        }
+        if (m_eTargetLevel == LEVEL_YARD)
+        {
+            if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 1)))
+                return E_FAIL;
+        }
 
         break;
     case Client::CLoading_UI::LOADING_BACKGROUND_GAMENAME:
-        if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
-            return E_FAIL;
+    {
+            if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+                return E_FAIL;
+    }
 
         break;
     case Client::CLoading_UI::LOADING_END:

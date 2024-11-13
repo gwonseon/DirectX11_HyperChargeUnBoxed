@@ -112,7 +112,7 @@ HRESULT CCoin::Add_Components()
 
     /* For.Com_Collider_Sphere*/
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-    SphereDesc.fRadius = 0.15f;
+    SphereDesc.fRadius = 0.25f;
     SphereDesc.vCenter = _float3(0.f, 0.f , 0.f);
 
     if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),

@@ -66,9 +66,21 @@ void CLevel_Loading::Update(_float fTimeDelta)
 	if (m_pLoadingUIBack != nullptr)
 	{
 		m_pLoadingUIBack->Update(fTimeDelta);
+	}	
+	if(m_eNextLevelID == LEVEL_GAMEPLAY)
+	{
+		if (m_pLoadingUI_GameTitle != nullptr)
+		{
+			m_pLoadingUI_GameTitle->Update(fTimeDelta);
+		}
 	}
-	m_pLoadingUI_GameTitle->Update(fTimeDelta);
-	
+	if (m_eNextLevelID == LEVEL_YARD)
+	{
+		if (m_pLoadingUI_GameTitle_Yard != nullptr)
+		{
+			m_pLoadingUI_GameTitle_Yard->Update(fTimeDelta);
+		}
+	}
 	/* 로더가 다음레벨에 대한 자원 생성을 끝냈다라면 */
  	if (true == m_pLoader->isFinished() /*&&
 		GetKeyState(VK_SPACE) & 0x8000*/)
@@ -117,17 +129,22 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Ready_Layer_UI(const _tchar* pLayerTag)
 {
-	m_pBackGround = CBackGround::Create(m_pDevice, m_pContext);
-	CBackGround::UIOBJECT_DESC	Desc{};
-	Desc.eLevel = LEVEL_LOADING;
-	Desc.fX = g_iWinSizeX * 0.5f;
-	Desc.fY = g_iWinSizeY * 0.5f;
-	Desc.fSizeX = g_iWinSizeX;
-	Desc.fSizeY = g_iWinSizeY;
-	Desc.iData = 10;
-	Desc.fDepth = 0.5f;
-	m_pBackGround->Initialize(&Desc);
+
+		m_pBackGround = CBackGround::Create(m_pDevice, m_pContext);
+		CBackGround::UIOBJECT_DESC	Desc{};
+		Desc.eLevel = LEVEL_LOADING;
+		Desc.fX = g_iWinSizeX * 0.5f;
+		Desc.fY = g_iWinSizeY * 0.5f;
+		Desc.fSizeX = g_iWinSizeX;
+		Desc.fSizeY = g_iWinSizeY;
+		Desc.iData = 10;
+		Desc.fDepth = 0.5f;
+		m_pBackGround->Initialize(&Desc);
+
+
+
 	return S_OK;
+
 }
 HRESULT CLevel_Loading::Ready_Layer_UI_Loading(const _tchar* pLayerTag)
 {
@@ -155,8 +172,8 @@ HRESULT CLevel_Loading::Ready_Layer_UI_LOGO(const _tchar* pLayerTag)
 }
 HRESULT CLevel_Loading::Ready_Layer_UI_GameTitle(const _tchar* pLayerTag)
 {
+	
 	m_pLoadingUI_GameTitle = CLoading_UI::Create(m_pDevice, m_pContext);
-
 	CLoading_UI::LOADINGUI_DESC	Desc{};
 	Desc.eLevel = LEVEL_LOADING;
 	Desc.fX = g_iWinSizeX * 0.2f;
@@ -164,12 +181,28 @@ HRESULT CLevel_Loading::Ready_Layer_UI_GameTitle(const _tchar* pLayerTag)
 	Desc.fSizeX = 500.f;
 	Desc.fSizeY = 50.f;
 	Desc.iData = 10;
-	Desc.fDepth = 0.f;
+	Desc.fDepth = 0.f;		
+	Desc.eTargetLevel = LEVEL_GAMEPLAY;
 	Desc.eTag = CLoading_UI::LOADING_GAMENAME;
 	m_pLoadingUI_GameTitle->Initialize(&Desc);
+	
+	
+	m_pLoadingUI_GameTitle_Yard = CLoading_UI::Create(m_pDevice, m_pContext);
+	CLoading_UI::LOADINGUI_DESC	DescYard{};
+	DescYard.eLevel = LEVEL_LOADING;
+	DescYard.fX = g_iWinSizeX * 0.2f;
+	DescYard.fY = g_iWinSizeY * 0.75f;
+	DescYard.fSizeX = 500.f;
+	DescYard.fSizeY = 50.f;
+	DescYard.iData = 10;
+	DescYard.fDepth = 0.f;
+	DescYard.eTargetLevel = LEVEL_YARD;
+	DescYard.eTag = CLoading_UI::LOADING_GAMENAME;
+	m_pLoadingUI_GameTitle_Yard->Initialize(&DescYard);
+	
+
 
 	m_pLoadingUIBack = CLoading_UI::Create(m_pDevice, m_pContext);
-
 	CLoading_UI::LOADINGUI_DESC	Desc2{};
 	Desc2.eLevel = LEVEL_LOADING;
 	Desc2.fX = g_iWinSizeX * 0.4f;
@@ -207,5 +240,6 @@ void CLevel_Loading::Free()
 	Safe_Release(m_pLoadingUI);
 	Safe_Release(m_pLoader);
 	Safe_Release(m_pBackGround);
+	Safe_Release(m_pLoadingUI_GameTitle_Yard);
 
 }

@@ -97,7 +97,7 @@ void CTrap_Bricks::Update(_float fTimeDelta)
 		m_bCanAttacked = false;
 		// 건설 안되었을 때
 		// 살 수 있을 때와 없을 때 구분
-		if (m_pPlayer->Get_Coin() > m_iCoin)
+		if (m_pPlayer->Get_Coin() >= m_iCoin)
 		{
 			m_bCanBuy = true;
 		}

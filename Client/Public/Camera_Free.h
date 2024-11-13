@@ -80,8 +80,8 @@ private:
 	_vector* m_vecWeaponPos = { nullptr };
 	_vector* m_vecWeaponDir = { nullptr };
 
-	_bool* m_pShotNow = { nullptr };
-	_bool* m_pShotStart = { nullptr };
+	_bool* m_pShotNow		= { nullptr };
+	_bool* m_pShotStart		= { nullptr };
 	_uint* m_pWeaponState = { nullptr };
 	_uint* m_iUpperMotion = {nullptr};
 

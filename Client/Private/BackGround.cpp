@@ -26,9 +26,9 @@ HRESULT CBackGround::Initialize(void * pArg)
 //	BACKGROUND_DESC*		pDesc = static_cast<BACKGROUND_DESC*>(pArg);
 
 	UIOBJECT_DESC			Desc{};
+	UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
 	Desc.fSpeedPerSec = 5.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
-	UIOBJECT_DESC* pDesc = (UIOBJECT_DESC*)pArg;
 	m_eLevel = pDesc->eLevel;
 	Desc.eLevel = m_eLevel;
 	Desc.fDepth = pDesc->fDepth;

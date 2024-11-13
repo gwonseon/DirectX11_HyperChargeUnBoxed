@@ -36,13 +36,11 @@ HRESULT CMissile_Truck::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-
     m_pTransformCom->Set_Scaling(pTruck->fScale.x, pTruck->fScale.y, pTruck->fScale.z);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pTruck->fPosition.x, pTruck->fPosition.y, pTruck->fPosition.z, 1.f));
     m_pTransformCom->Rotation(0.f, XMConvertToRadians(-90.f), 0.f);
     m_fPos = pTruck->fPosition;
     m_fScale = pTruck->fScale;
-
     if (FAILED(Add_PartObjects()))
         return E_FAIL;
 
@@ -86,7 +84,7 @@ void CMissile_Truck::Priority_Update(_float fTimeDelta)
         {
             if (m_pColliderCom->Intersect(pCol))
             {
-                m_fHp -= 300.f;
+                m_fHp -= 100.f;
             }
             pExplosion->Set_Count();
             if (pExplosion->Get_Count() >= 4)

@@ -32,6 +32,7 @@ HRESULT CInGameUI::Initialize(void* pArg)
     m_pCircle = pDesc->pCircle;
     m_fTimer = pDesc->fTimer;
     m_iRound = pDesc->iRound;
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
     if (FAILED(Add_Components(pDesc->iData)))
@@ -115,6 +116,10 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_CONVERSATIONBOX:
         UI_Conversation(fTimeDelta);
         break;
+    case Client::CInGameUI::UI_CONVERSATIONBOX_BACKGROUND:
+        UI_Conversation(fTimeDelta);
+        break;
+        
     case Client::CInGameUI::UI_CHARACTER:
         Charater_UI(fTimeDelta);
         break;
@@ -155,13 +160,11 @@ void CInGameUI::Update(_float fTimeDelta)
         }
         else if (m_pPlayer->Get_Build_Gauging() == true)
         {
-         //   m_pTransformCom->Set_Scaling(26.f, 26.f, 26.f);
             m_bDraw = true;
             m_iIndex = 1;
         } // 특정 조건들 가져와서 인덱스 2번으로 
         else if (m_pCircle->Get_Interaction() == true)
         {
-//          m_pTransformCom->Set_Scaling(30.f, 30.f, 30.f);
             m_bDraw = true;
             m_iIndex = 2;
         }
@@ -184,6 +187,8 @@ void CInGameUI::Update(_float fTimeDelta)
             m_bDraw = true;
         break;
     case Client::CInGameUI::UI_MISSILE_TIMER:
+        if(*m_fTimer <= 0.f)
+            m_bDraw = false;
         if(*m_iRound == 1)
         {
             m_bDraw = true;
@@ -220,18 +225,13 @@ void CInGameUI::Late_Update(_float fTimeDelta)
 
 HRESULT CInGameUI::Render()
 {
-    //if (*m_pPlayer->Get_Reloading() == true)
-    /*m_pGameInstance->Set_BlendState(CGraphic_Device::BS_ALPHA);*/
-
-    
-
 
     if(m_bDraw== true)
     {
         if (FAILED(Bind_ShaderResources()))
             return E_FAIL;
 
-        if (UI_CONVERSATIONBOX == m_eUIType && m_iIndex == 0)
+        if ((UI_CONVERSATIONBOX == m_eUIType || UI_CONVERSATIONBOX_BACKGROUND == m_eUIType) && m_iIndex == 0)
         {
             // 점점 투명해짐
             if (FAILED(m_pShaderCom->Begin(3)))
@@ -347,6 +347,12 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
+    case Client::CInGameUI::UI_CONVERSATIONBOX_BACKGROUND:
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBackGround"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+        
     case Client::CInGameUI::UI_BUILDMODE_CONVERSATIONBOX:
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBackGround"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -449,18 +455,15 @@ HRESULT CInGameUI::Add_Components(_int iNum)
     default:
         break;
     }
-   
 
     /* For.Com_Shader */
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
-
     /* For.Com_VIBuffer */
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
         return E_FAIL;
-
     return S_OK;
 }
 
@@ -479,7 +482,7 @@ HRESULT CInGameUI::Bind_ShaderResources()
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iBattery)))
             return E_FAIL;
     }
-    else if (m_eUIType == UI_CHARACTER || m_eUIType == UI_BUILDMODE_CONVERSATIONBOX || m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_MODECHANGE_ICON)
+    else if (m_eUIType == UI_CHARACTER || m_eUIType == UI_BUILDMODE_CONVERSATIONBOX || m_eUIType == UI_CONVERSATIONBOX_BACKGROUND || m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_MODECHANGE_ICON)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
@@ -490,7 +493,6 @@ HRESULT CInGameUI::Bind_ShaderResources()
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &m_fBatteryGauge, sizeof(float))))
             return E_FAIL;
-
     }
     else if (m_eUIType == UI_MACHINE_HP)
     {
@@ -530,7 +532,9 @@ HRESULT CInGameUI::Bind_ShaderResources()
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fTimer, sizeof(float))))
+        _float fMount = *m_fTimer;
+        fMount *= 0.5f;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &(fMount), sizeof(float))))
             return E_FAIL;
     }
     else

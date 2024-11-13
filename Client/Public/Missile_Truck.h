@@ -58,7 +58,7 @@ private:
 public:
 	_float* Get_Timer() { return (m_pTracker->Get_Timer()); }
 	CTracker* Get_Tracker() { return m_pTracker; }
-
+	_float* Get_Hp_Ptr() { return &m_fHp; }
 private:
 	CTruckShooter*	m_pShooter		=	{ nullptr };
 	CTracker*		m_pTracker		=	{ nullptr };

@@ -524,5 +524,5 @@ void CMonster_Path::Free()
 	Safe_Release(m_pSave);
 	Safe_Release(m_pLoad);
 	Safe_Release(m_pMonster);
-	
+
 }
