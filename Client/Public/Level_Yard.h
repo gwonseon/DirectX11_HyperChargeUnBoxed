@@ -21,6 +21,19 @@ BEGIN(Client)
 class CYard_Round;
 class CLevel_Yard : public CLevel
 {
+public:
+	enum TEXT_STATE_YARD
+	{
+		STATE_DONT_DRAW = 0x00000001,
+		STATE_HALF_HP = 0x00000002,
+		STATE_HALF_ENERGY = 0x00000004,
+		STATE_WARNING = 0x00000008,
+		STATE_MISSILE_WARNING = 0x00000010,
+		STATE_GOOD = 0x00000020,
+		STATE_PROVOKE = 0x00000040,
+
+	};
+	
 protected:
 	CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLevel_Yard() = default;
@@ -34,6 +47,7 @@ public:
 public:
 	void	Interaction();
 	void    Texture_Render();
+	void	Texture_Update(_float fTimeDelta);
 private:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
@@ -55,6 +69,7 @@ private:
 	void Load_Map();
 	void Build_Check();
 	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
+	void Conversation_Draw(_bool bDraw);
 private:
 	CCamera_Free* m_pCamera = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };
@@ -65,11 +80,16 @@ private:
 	CBattery* m_pBattery = { nullptr };
 	CInGameUI* m_pBatteryUI = { nullptr };
 	CInGameUI* m_pBatteryGaugeUI = { nullptr };
+	CInGameUI* m_pConversationBox = { nullptr };
+	CInGameUI* m_pCharacter = { nullptr };
+	CInGameUI* m_pMissile_Timer = { nullptr };
+
 	CWeapon_Item* m_pWeaponItem[2];
 	CMissile_Truck* m_pMissile_Truck = { nullptr };
 
 
 	_float	m_fDelay{};
+	_float  m_fConversation_Draw_Timer{};
 	_bool m_bOnce = false;
 	// Ãæµ¹¿ë
 private:
@@ -99,7 +119,8 @@ private:
 	CYard_Round* m_pRound[3] = { nullptr };
 	_bool		m_bRoundStart = false;
 
-
+	_uint m_eTextState = STATE_DONT_DRAW;
+	_uint m_iDrawNumber = 99;
 public:
 	static CLevel_Yard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

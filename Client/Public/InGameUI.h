@@ -70,6 +70,8 @@ public:
 
 public:
 	void Set_BatteryGauge(float fGauge) { m_fBatteryGauge = fGauge; }
+	void Set_Draw(_bool bDraw) { m_bDraw = bDraw; }
+
 private:
 	//_float						m_fX{}, m_fY{}, m_fSizeX{}, m_fSizeY{};
 	//_float4x4					m_ViewMatrix, m_ProjMatrix;

@@ -44,6 +44,8 @@ HRESULT CInGameUI::Initialize(void* pArg)
         m_fMachineHP = pDesc->fBrainHP;
     if (m_eUIType == UI_MACHINE_ENERGY)
         m_fMachineEnergy = pDesc->fBrainEnergy;
+    if (m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_CHARACTER)
+        m_bDraw = false;
 
     return S_OK;
 }
