@@ -161,6 +161,11 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 
 	}
 #pragma endregion 총알충돌검사
+
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	{
+		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
+	}
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -172,12 +177,7 @@ HRESULT CLevel_GamePlay::Render()
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 #endif
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
-	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
-			return E_FAIL;
-	}
-	return S_OK; 
+	return S_OK;
 }
 
 void CLevel_GamePlay::Interaction()

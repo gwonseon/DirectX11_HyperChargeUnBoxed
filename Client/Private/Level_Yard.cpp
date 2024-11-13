@@ -165,6 +165,11 @@ void CLevel_Yard::Update(_float fTimeDelta)
 	}
 #pragma endregion 총알충돌검사
 
+
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	{
+		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO)));
+	}
 }
 
 HRESULT CLevel_Yard::Render()
@@ -176,11 +181,7 @@ HRESULT CLevel_Yard::Render()
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("Yard레벨입니다."));
 #endif
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
-	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
-			return E_FAIL;
-	}
+	
 	return S_OK;
 }
 

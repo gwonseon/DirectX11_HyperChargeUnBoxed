@@ -17,9 +17,6 @@ private:
 public:
 	HRESULT Initialize();
 
-private:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
 
 public:
 	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos, _bool* bShot,_float fDamage ,_uint iTargetPartObjID = 0);

@@ -84,7 +84,7 @@ public: /* For.Component_Manager */
 
 public: /* For.Renderer	*/
 	HRESULT Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
-	void	RenderList_Clear(CRenderer::RENDERGROUP eRender);
+	void	RenderList_Clear();
 
 public:// For PipeLine
 	const _float4x4* Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState);

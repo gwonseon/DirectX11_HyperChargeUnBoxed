@@ -110,6 +110,7 @@ void CGameInstance::Clear(_uint iClearLevelID)
 {
 	m_pObject_Manager->Clear(iClearLevelID);
 	m_pComponent_Manager->Clear(iClearLevelID);
+	m_pRenderer->RenderList_Clear();
 	/*iClearLevelID에 해당하는 자원들을 정리한다.*/
 }
 
@@ -342,9 +343,9 @@ HRESULT CGameInstance::Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup,
 	return m_pRenderer->Add_RenderGameObject(eRenderGroup, pRenderGameObject);
 }
 
-void CGameInstance::RenderList_Clear(CRenderer::RENDERGROUP eRender)
+void CGameInstance::RenderList_Clear()
 {
-	m_pRenderer->RenderList_Clear(eRender);
+	m_pRenderer->RenderList_Clear();
 }
 
 const _float4x4* CGameInstance::Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState)
