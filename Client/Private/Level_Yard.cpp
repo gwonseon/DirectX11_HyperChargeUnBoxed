@@ -168,7 +168,7 @@ void CLevel_Yard::Update(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
-		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO)));
+		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY)));
 	}
 }
 
@@ -1484,5 +1484,18 @@ void CLevel_Yard::Free()
 	Safe_Release(m_pRound[0]);
 	Safe_Release(m_pRound[1]);
 	Safe_Release(m_pRound[2]);
+	Safe_Release(m_pMissile_Timer);
 
+	Safe_Release(m_pCamera                    );  
+	Safe_Release(m_pPlayer					  );
+	Safe_Release(m_pGuage					  );
+	Safe_Release(m_pBrain					  );
+	Safe_Release(m_pEnergyMachine			  );
+	Safe_Release(m_pEnergyMachine_Cap		  );
+	Safe_Release(m_pBattery					  );
+	Safe_Release(m_pBatteryUI				  );
+	Safe_Release(m_pBatteryGaugeUI			  );
+	Safe_Release(m_pConversationBox			  );
+	Safe_Release(m_pCharacter				  );
+	Safe_Release(m_pMissile_Truck			  );
 }

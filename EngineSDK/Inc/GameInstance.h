@@ -37,7 +37,7 @@ public:
 public: /* For.Graphic_Device */
 	HRESULT Render_Begin(_float4 vClearColor);
 	HRESULT Render_End();
-	HRESULT Set_BlendState(const CGraphic_Device::BLEND_STATE& BS);
+	// HRESULT Set_BlendState(const CGraphic_Device::BLEND_STATE& BS);
 	ID3D11Device* Get_Device();
 	ID3D11DeviceContext* Get_Context();
 
@@ -130,20 +130,20 @@ public: // UI_Manager
 
 
 private:
-	class CGraphic_Device* m_pGraphic_Device = { nullptr };
-	class CInput_Device* m_pInput_Device = { nullptr };
-	class CTimer_Manager* m_pTimer_Manager = { nullptr };
-	class CLevel_Manager* m_pLevel_Manager = { nullptr };
-	class CObject_Manager* m_pObject_Manager = { nullptr };
-	class CComponent_Manager* m_pComponent_Manager = { nullptr };
-	class CRenderer* m_pRenderer = { nullptr };
-	class CPipeLine* m_pPipeLine = { nullptr };
-	class CLight_Manager* m_pLight_Manager = { nullptr };
-	class CPicking_Manager* m_pPicking_Manager = { nullptr };
-	class CCollisionMgr* m_pCollision_Manager = { nullptr };
-	class CFont_Manager* m_pFont_Manager = { nullptr };
-	class CRound_Manager* m_pRound_Manager = { nullptr };
-	class CUIManager* m_pUI_Manager = { nullptr };
+	class CGraphic_Device*		m_pGraphic_Device	 = { nullptr };
+	class CInput_Device*		m_pInput_Device			= { nullptr };
+	class CTimer_Manager*		m_pTimer_Manager		= { nullptr };
+	class CLevel_Manager*		m_pLevel_Manager	 = { nullptr };
+	class CObject_Manager*		m_pObject_Manager		= { nullptr };
+	class CComponent_Manager*	m_pComponent_Manager	 = { nullptr };
+	class CRenderer*			m_pRenderer				 = { nullptr };
+	class CPipeLine*			m_pPipeLine				 = { nullptr };
+	class CLight_Manager*		m_pLight_Manager				= { nullptr };
+	class CPicking_Manager*		m_pPicking_Manager			= { nullptr };
+	class CCollisionMgr*		m_pCollision_Manager			 = { nullptr };
+	class CFont_Manager*		m_pFont_Manager			= { nullptr };
+	class CRound_Manager*		m_pRound_Manager		= { nullptr };
+	class CUIManager*			m_pUI_Manager			= { nullptr };
 
 public:
 	static void Release_Engine();

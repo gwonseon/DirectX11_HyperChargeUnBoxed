@@ -710,7 +710,9 @@ void CLevel_GamePlay::Load_Map()
 		{
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
 			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			
 		}
+		
 	}
 
 	CloseHandle(hFile);
@@ -740,6 +742,7 @@ void CLevel_GamePlay::Load_Map()
 		{
 			dynamic_cast<CCoin*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
 			dynamic_cast<CCoin*>(pGameObj)->MovePos(fPos.x, fPos.y, fPos.z);
+			
 		}
 	}
 

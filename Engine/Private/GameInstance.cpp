@@ -32,7 +32,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pTimer_Manager = CTimer_Manager::Create();
 	if (nullptr == m_pTimer_Manager)
 		return E_FAIL;
-	
 
 	/* 입력 장치를 초기화한다. */
 	/* 오브젝트, 컴포넌트 매니져를 사용할 준비를 한다. */
@@ -152,17 +151,17 @@ HRESULT CGameInstance::Render_End()
 
 	return S_OK;
 }
-
-HRESULT CGameInstance::Set_BlendState(const CGraphic_Device::BLEND_STATE& BS)
-{
-	if (nullptr == m_pGraphic_Device) return E_FAIL;
-
-	return m_pGraphic_Device->Set_BlendState(BS);
-}
-
-ID3D11Device* CGameInstance::Get_Device() { return m_pGraphic_Device->Get_Device(); }
-
-ID3D11DeviceContext* CGameInstance::Get_Context() { return m_pGraphic_Device->Get_Context(); }
+//
+//HRESULT CGameInstance::Set_BlendState(const CGraphic_Device::BLEND_STATE& BS)
+//{
+//	if (nullptr == m_pGraphic_Device) return E_FAIL;
+//
+//	return m_pGraphic_Device->Set_BlendState(BS);
+//}
+//
+//ID3D11Device* CGameInstance::Get_Device() { return m_pGraphic_Device->Get_Device(); }
+//
+//ID3D11DeviceContext* CGameInstance::Get_Context() { return m_pGraphic_Device->Get_Context(); }
 
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
@@ -490,16 +489,19 @@ void CGameInstance::Release_Engine()
 void CGameInstance::Free()
 {
 	__super::Free();
-	Safe_Release(m_pFont_Manager);
-	Safe_Release(m_pLight_Manager);
-	Safe_Release(m_pPipeLine);
-	Safe_Release(m_pRenderer);
-	Safe_Release(m_pComponent_Manager);
-	Safe_Release(m_pObject_Manager);
-	Safe_Release(m_pLevel_Manager);
-	Safe_Release(m_pTimer_Manager);
-	Safe_Release(m_pInput_Device);
-	Safe_Release(m_pGraphic_Device);
-	Safe_Release(m_pRound_Manager); 
-	Safe_Release(m_pUI_Manager);
+
+	Safe_Release(m_pGraphic_Device				   );
+	Safe_Release(m_pInput_Device				   );
+	Safe_Release(m_pTimer_Manager				   );
+	Safe_Release(m_pLevel_Manager				   );
+	Safe_Release(m_pObject_Manager				   );
+	Safe_Release(m_pComponent_Manager			   );
+	Safe_Release(m_pRenderer					   );
+	Safe_Release(m_pPipeLine					   );
+	Safe_Release(m_pLight_Manager				   );
+	Safe_Release(m_pPicking_Manager				   );
+	Safe_Release(m_pCollision_Manager			   );
+	Safe_Release(m_pFont_Manager				   );
+	Safe_Release(m_pRound_Manager				   );
+	Safe_Release(m_pUI_Manager					   );
 }

@@ -71,21 +71,21 @@ private:
 	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
 	void Conversation_Draw(_bool bDraw);
 private:
-	CCamera_Free* m_pCamera = { nullptr };
-	CPlayer* m_pPlayer = { nullptr };
-	CUI_CircleGuage* m_pGuage = { nullptr };
-	CBrainCore* m_pBrain = { nullptr };
-	CEnergy_Machine* m_pEnergyMachine = { nullptr };
-	CEnergy_Cap* m_pEnergyMachine_Cap = { nullptr };
-	CBattery* m_pBattery = { nullptr };
-	CInGameUI* m_pBatteryUI = { nullptr };
-	CInGameUI* m_pBatteryGaugeUI = { nullptr };
-	CInGameUI* m_pConversationBox = { nullptr };
-	CInGameUI* m_pCharacter = { nullptr };
-	CInGameUI* m_pMissile_Timer = { nullptr };
+	CCamera_Free*		m_pCamera					= { nullptr };
+	CPlayer*			m_pPlayer						= { nullptr };
+	CUI_CircleGuage*	m_pGuage				= { nullptr };
+	CBrainCore*			m_pBrain					= { nullptr };
+	CEnergy_Machine*	m_pEnergyMachine		= { nullptr };
+	CEnergy_Cap*		m_pEnergyMachine_Cap		= { nullptr };
+	CBattery*			m_pBattery						= { nullptr };
+	CInGameUI*			m_pBatteryUI						= { nullptr };
+	CInGameUI*			m_pBatteryGaugeUI				= { nullptr };
+	CInGameUI*			m_pConversationBox				= { nullptr };
+	CInGameUI*			m_pCharacter						= { nullptr };
+	CInGameUI*			m_pMissile_Timer					= { nullptr };
 
-	CWeapon_Item* m_pWeaponItem[2];
-	CMissile_Truck* m_pMissile_Truck = { nullptr };
+	CWeapon_Item*		m_pWeaponItem[2];
+	CMissile_Truck*		m_pMissile_Truck			= { nullptr };
 
 
 	_float	m_fDelay{};

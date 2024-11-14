@@ -18,6 +18,12 @@
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
+	Safe_AddRef(m_pLoadingUIBack);
+	Safe_AddRef(m_pLoadingUI_GameTitle);
+	Safe_AddRef(m_pLoadingUI_Logo);
+	Safe_AddRef(m_pLoadingUI);
+	Safe_AddRef(m_pLoader);
+	Safe_AddRef(m_pBackGround);
 }
 
 HRESULT CLevel_Loading::Initialize(LEVELID eNextLevelID)

@@ -46,7 +46,6 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
-
 	// 구미시 폰트
 	if (FAILED(m_pGameInstance->Add_Font(TEXT("GumiFont"), TEXT("../Bin/Resources/Fonts/GumiFont.spritefont"))))
 		return E_FAIL;
