@@ -23,7 +23,7 @@ private:
 	HRESULT Ready_Layer_GameTitle(const _tchar* pLayerTag);
 private:
 	CGameObject* m_pButton_GamePlay = nullptr;
-	CGameObject* m_pButton_ImGui = nullptr;
+	CGameObject* m_pButton_ImGui	= nullptr;
 public:
 	static CLevel_Logo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

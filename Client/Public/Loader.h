@@ -3,7 +3,6 @@
 /* 다음 레벨에 대한 자원을 준비한다. */
 #include "Client_Defines.h"
 #include "Base.h"
-#include "Loading_UI.h"
 
 BEGIN(Engine)
 class CGameInstance;
@@ -39,7 +38,6 @@ private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
 	CGameInstance* m_pGameInstance = { nullptr };
-	CLoading_UI* m_pLoadingUi = { nullptr };
 
 private:
 	LEVELID						m_eNextLevelID = { LEVEL_END };
