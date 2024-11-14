@@ -235,9 +235,6 @@
     <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Shooter">
       <UniqueIdentifier>{021238db-56f7-4d4c-a3d1-11cf57418491}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Missile">
-      <UniqueIdentifier>{f782c1a1-e83b-4b0d-83ee-d56b1e5c3d32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Monster\Missile_Truck\Tracker">
       <UniqueIdentifier>{02a2422e-71f5-4e25-9627-339faa96fafb}</UniqueIdentifier>
     </Filter>
@@ -255,6 +252,9 @@
     </Filter>
     <Filter Include="02. GameObjects\Environment\CollectItem">
       <UniqueIdentifier>{9cd406c9-853e-4075-ad4b-6722f20bb1e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Missile">
+      <UniqueIdentifier>{f782c1a1-e83b-4b0d-83ee-d56b1e5c3d32}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

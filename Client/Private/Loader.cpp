@@ -156,7 +156,9 @@ HRESULT CLoader::Loading_For_LogoLevel()
 {
 	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
 	/* For.Prototype_Component_Texture_Logo */
-
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_GameTitle"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_HyperchargeLogoBase.png")))))
+		return E_FAIL;
 	// 뒷배경
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Menu_Back"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_BackgroundStats_Background.png")))))

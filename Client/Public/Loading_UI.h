@@ -19,7 +19,7 @@ public:
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
 		enum UITAG eTag{};
-		
+		enum LEVELID eTargetLevel {};
 	}LOADINGUI_DESC;
 private:
 	CLoading_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -61,6 +61,8 @@ private:
 	_float		m_fPrePercent = 0.f;
 	UITAG		m_eTag{};
 	_float		m_fTick{};
+
+	LEVELID m_eTargetLevel{};
 public:
 	static CLoading_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

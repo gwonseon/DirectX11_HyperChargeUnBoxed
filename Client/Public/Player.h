@@ -167,7 +167,7 @@ private:
 	_uint* m_iRound = { nullptr };
 public:
 	void	Set_Build_Able(_bool bAble) { m_bBuild_Able = bAble; }
-
+	void	Set_BuildMode(_bool bMode) { m_bBuildMode = bMode; }
 	_bool* Get_BuildMode() { return &m_bBuildMode; }
 	_bool	Get_Build_Gauging() { return m_bBuild_Gauging; }
 

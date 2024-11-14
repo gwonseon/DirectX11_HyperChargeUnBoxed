@@ -323,19 +323,12 @@ HRESULT CPony::Add_Components()
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
-	///* For.Com_Collider_OBB */
-	//CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-	//SphereDesc.fRadius = 1.2f;
-	//SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
-	//if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
-	//	TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
-	//	return E_FAIL;
-
-	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
-	AABBDesc.vExtents = _float3(1.f, 1.2f, 1.f);
-	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
-	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
-		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+	/* For.Com_Collider_OBB */
+	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	SphereDesc.fRadius = 1.2f;
+	SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
 		return E_FAIL;
 
 	// For.Com_Navigation

@@ -13,7 +13,7 @@ CLevel::CLevel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel::Initialize()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 void CLevel::Update(_float fTimeDelta)
@@ -22,7 +22,7 @@ void CLevel::Update(_float fTimeDelta)
 
 HRESULT CLevel::Render()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 void CLevel::Free()
@@ -30,6 +30,6 @@ void CLevel::Free()
 	__super::Free();
 
 	Safe_Release(m_pGameInstance);
-	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
+	Safe_Release(m_pDevice);
 }

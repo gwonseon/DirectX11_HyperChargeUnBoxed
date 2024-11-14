@@ -35,7 +35,7 @@ HRESULT CLoading_UI::Initialize(void* pArg)
     Desc.fRotationPerSec = 0.f;
     Desc.fDepth = pDesc->fDepth;
     Desc.eTag = pDesc->eTag;
-
+    m_eTargetLevel = pDesc->eTargetLevel;
     m_eTag = Desc.eTag;
 
 
@@ -190,9 +190,16 @@ HRESULT CLoading_UI::Bind_ShaderResources()
             return E_FAIL;
         break;
     case Client::CLoading_UI::LOADING_GAMENAME:
-        if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
-            return E_FAIL;
-
+        if(m_eTargetLevel == LEVEL_GAMEPLAY)
+        {
+            if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+                return E_FAIL;
+        }
+        else if (m_eTargetLevel == LEVEL_YARD)
+        {
+            if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture",1)))
+                return E_FAIL;
+        }
         break;
     case Client::CLoading_UI::LOADING_BACKGROUND_GAMENAME:
         if (FAILED(m_pTextureCom_Loading2->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
@@ -239,25 +246,10 @@ CGameObject* CLoading_UI::Clone(void* pArg)
 void CLoading_UI::Free()
 {
     __super::Free();
-    switch (m_eTag)
-    {
-    case Client::CLoading_UI::LOADING_LOGO:
-        Safe_Release(m_pTextureCom_Loading0);
-        break;
-    case Client::CLoading_UI::LOADING_GAGE:
-        Safe_Release(m_pTextureCom_Loading1);
-        break;
-    case Client::CLoading_UI::LOADING_GAMENAME: 
-        Safe_Release(m_pTextureCom_Loading2);
-        break;
-    case Client::CLoading_UI::LOADING_BACKGROUND_GAMENAME:
-        Safe_Release(m_pTextureCom_Loading2);
-        break;
-    case Client::CLoading_UI::LOADING_END:
-        break;
-    default:
-        break;
-    }
+    Safe_Release(m_pTextureCom_Loading0);
+    Safe_Release(m_pTextureCom_Loading2);
+    Safe_Release(m_pTextureCom_Loading1);
+    
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);

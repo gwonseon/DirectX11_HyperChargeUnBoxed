@@ -44,8 +44,10 @@ HRESULT CInGameUI::Initialize(void* pArg)
         m_fMachineHP = pDesc->fBrainHP;
     if (m_eUIType == UI_MACHINE_ENERGY)
         m_fMachineEnergy = pDesc->fBrainEnergy;
-    if (m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_CHARACTER)
+    if (m_eUIType == UI_CONVERSATIONBOX|| m_eUIType == UI_CHARACTER)
         m_bDraw = false;
+    if (m_eUIType == UI_CONVERSATIONBOX_BACKGROUND)
+        m_bDraw = true;
 
     return S_OK;
 }
@@ -115,6 +117,8 @@ void CInGameUI::Update(_float fTimeDelta)
     case Client::CInGameUI::UI_CONVERSATIONBOX:
         UI_Conversation(fTimeDelta);
         break;
+
+        
     case Client::CInGameUI::UI_CHARACTER:
         Charater_UI(fTimeDelta);
         break;
@@ -184,7 +188,7 @@ void CInGameUI::Update(_float fTimeDelta)
             m_bDraw = true;
         break;
     case Client::CInGameUI::UI_MISSILE_TIMER:
-        if(*m_iRound == 1)
+        if(*m_iRound == MISSILEROUND)
         {
             m_bDraw = true;
         }
@@ -231,7 +235,7 @@ HRESULT CInGameUI::Render()
         if (FAILED(Bind_ShaderResources()))
             return E_FAIL;
 
-        if (UI_CONVERSATIONBOX == m_eUIType && m_iIndex == 0)
+        if ((UI_CONVERSATIONBOX == m_eUIType || UI_CONVERSATIONBOX_BACKGROUND == m_eUIType) && m_iIndex == 0)
         {
             // 점점 투명해짐
             if (FAILED(m_pShaderCom->Begin(3)))
@@ -347,6 +351,12 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
+    case Client::CInGameUI::UI_CONVERSATIONBOX_BACKGROUND:
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBackGround"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+        
     case Client::CInGameUI::UI_BUILDMODE_CONVERSATIONBOX:
         if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_UIBackGround"),
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -479,7 +489,11 @@ HRESULT CInGameUI::Bind_ShaderResources()
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iBattery)))
             return E_FAIL;
     }
-    else if (m_eUIType == UI_CHARACTER || m_eUIType == UI_BUILDMODE_CONVERSATIONBOX || m_eUIType == UI_CONVERSATIONBOX || m_eUIType == UI_MODECHANGE_ICON)
+    else if (m_eUIType == UI_CHARACTER ||
+        m_eUIType == UI_BUILDMODE_CONVERSATIONBOX ||
+        m_eUIType == UI_CONVERSATIONBOX_BACKGROUND ||
+        m_eUIType == UI_CONVERSATIONBOX ||
+        m_eUIType == UI_MODECHANGE_ICON)
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iIndex)))
             return E_FAIL;
@@ -530,7 +544,8 @@ HRESULT CInGameUI::Bind_ShaderResources()
     {
         if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", m_fTimer, sizeof(float))))
+          _float fGauge = *m_fTimer * 0.5f;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fGageAmount", &fGauge, sizeof(float))))
             return E_FAIL;
     }
     else

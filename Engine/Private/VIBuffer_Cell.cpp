@@ -113,5 +113,5 @@ CComponent* CVIBuffer_Cell::Clone(void* pArg)
 
 void CVIBuffer_Cell::Free()
 {
-	__super::Free();
+ 	__super::Free();
 }

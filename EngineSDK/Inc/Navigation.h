@@ -53,7 +53,7 @@ public:
 	_int		Get_CurrentCell_Index() { return m_iCurrentCellIndex;	}
 	vector<class CCell*> Get_Cells() { return m_Cells; }
 private:
-	vector<CCell*> vecResultCell{};
+	vector<class CCell*> vecResultCell{};
 
 
 #ifdef _DEBUG

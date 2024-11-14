@@ -118,10 +118,6 @@ CGameObject* CObject_Manager::Get_Prototype(_uint iLevelIndex, const _tchar* pLa
 }
 
 
-
-
-
-
 void CObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (size_t i = 0; i < m_iNumLevels; i++)
@@ -169,18 +165,15 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 		return;
 	for (auto& Pair : m_pLayers[iLevelIndex])
 	{
-		Pair.second->Set_Dead();
+		
 		Safe_Release(Pair.second);
 	}
 	m_pLayers[iLevelIndex].clear();
-	
-
 }
 
 CGameObject* CObject_Manager::Find_Prototype(const _wstring& strPrototypeTag)
 {
 	auto	iter = m_Prototypes.find(strPrototypeTag);
-
 	if (iter == m_Prototypes.end())
 		return nullptr;
 

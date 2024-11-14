@@ -100,7 +100,6 @@ void CGameInstance::Draw()
 	/* 게임내에 필요한 대다수의 객체들을 모두 그려낸다. */
 	
 	m_pRenderer->Draw();
-
 	/* 할일이 없어. 디버그모드에서만 디버그내용만 출력하는 용도 .*/
 	m_pLevel_Manager->Render();
 }
@@ -128,6 +127,11 @@ void CGameInstance::Reset_Object(_uint iClearLevelID)
 	m_pObject_Manager->Clear(iClearLevelID);
 }
 
+void CGameInstance::RenderGroup_Clear(_uint iClearLevelID)
+{
+	m_pRenderer->RenderList_Clear();
+}
+
 HRESULT CGameInstance::Render_Begin(_float4 vClearColor)
 {
 	if (nullptr == m_pGraphic_Device)
@@ -151,17 +155,6 @@ HRESULT CGameInstance::Render_End()
 
 	return S_OK;
 }
-//
-//HRESULT CGameInstance::Set_BlendState(const CGraphic_Device::BLEND_STATE& BS)
-//{
-//	if (nullptr == m_pGraphic_Device) return E_FAIL;
-//
-//	return m_pGraphic_Device->Set_BlendState(BS);
-//}
-//
-//ID3D11Device* CGameInstance::Get_Device() { return m_pGraphic_Device->Get_Device(); }
-//
-//ID3D11DeviceContext* CGameInstance::Get_Context() { return m_pGraphic_Device->Get_Context(); }
 
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
@@ -490,7 +483,7 @@ void CGameInstance::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pGraphic_Device				   );
+
 	Safe_Release(m_pInput_Device				   );
 	Safe_Release(m_pTimer_Manager				   );
 	Safe_Release(m_pLevel_Manager				   );
@@ -504,4 +497,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pFont_Manager				   );
 	Safe_Release(m_pRound_Manager				   );
 	Safe_Release(m_pUI_Manager					   );
+
+	Safe_Release(m_pGraphic_Device);
 }

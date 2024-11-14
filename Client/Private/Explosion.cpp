@@ -40,6 +40,9 @@ HRESULT CExplosion::Initialize(void* pArg)
     case Client::CExplosion::EXPLOSION_TANK:
         m_fAttack = 20.f;
         break;
+    case Client::CExplosion::EXPLOSION_LOCKET:
+        m_fAttack = 50.f;
+        break;
     case Client::CExplosion::EXPLOSION_END:
         break;
     default:

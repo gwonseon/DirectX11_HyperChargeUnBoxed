@@ -13,7 +13,7 @@ BEGIN(Client)
 class CExplosion final : public CGameObject
 {
 public:
-	enum EXPLOSION_TYPE { EXPLOSION_TRUCK, EXPLOSION_TANK ,EXPLOSION_END };
+	enum EXPLOSION_TYPE { EXPLOSION_TRUCK, EXPLOSION_TANK , EXPLOSION_LOCKET,EXPLOSION_END };
 
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{

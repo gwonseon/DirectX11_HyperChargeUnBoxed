@@ -26,12 +26,12 @@ private:
 	LEVELID						m_eNextLevelID = { LEVEL_END };
 	_float						m_fLoading_Per = 0.f;
 
-	CLoading_UI* m_pLoadingUI = { nullptr };
-	CLoading_UI* m_pLoadingUI_Logo = { nullptr };
-	CLoading_UI* m_pLoadingUI_GameTitle = { nullptr };
-	CLoading_UI* m_pLoadingUIBack = { nullptr };
-	
-	CBackGround* m_pBackGround = { nullptr };
+	//CLoading_UI* m_pLoadingUI = { nullptr };
+	//CLoading_UI* m_pLoadingUI_Logo = { nullptr };
+	//CLoading_UI* m_pLoadingUI_GameTitle = { nullptr };
+	//CLoading_UI* m_pLoadingUIBack = { nullptr };
+	//CBackGround* m_pBackGround = { nullptr };
+
 public:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_UI_Loading(const _tchar* pLayerTag);

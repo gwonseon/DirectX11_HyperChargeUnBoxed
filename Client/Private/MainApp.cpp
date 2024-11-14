@@ -7,6 +7,8 @@
 #include "BackGround.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Box.h"
+//#include "BackGround.h"
+//#include "Loading_UI.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
@@ -111,7 +113,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 	// 로딩페이지 검은 배경
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Loading"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/T_U_BackgroundStats_Soldiers.png")))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/T_U_BackgroundStats_Soldiers%d.png"),2))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Loading0"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Coin/T_U_HyperCoin_%d.png"),35))))
@@ -120,7 +122,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_HyperchargeLogoBase.png")))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GameName"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/GameLevelName%d.png"),1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/GameLevelName%d.png"),2))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_GameName"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/T_U_MenuBannerSide.dds")))))
@@ -129,6 +131,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
 		return E_FAIL;
+
+
+
 
 	/* For.Prototype_Component_Texture_Terrain_Mask */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain_Mask"),
@@ -178,19 +183,14 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 
 	// 네비게이션_ 튜토리얼맵 (LEVEL_GamePlay)
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation")) == nullptr)
-	{
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
-			return E_FAIL;
-	}
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
+		return E_FAIL;
 	// 네비게이션_ 마당맵 (LEVEL_YARD)
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Navigation_Yard")) == nullptr)
-	{
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-			CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation_Yard.dat")))))
-			return E_FAIL;
-	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation_Yard.dat")))))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -210,7 +210,6 @@ CMainApp* CMainApp::Create()
 void CMainApp::Free()
 {
 	__super::Free();
-
 
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
