@@ -49,7 +49,7 @@ public:
 
 public:
 	CCollider* Get_Collider() { return m_pColliderCom; }
-
+	_float* Get_HP_Ptr() { return &m_fHp; }
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();

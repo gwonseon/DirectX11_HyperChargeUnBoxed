@@ -95,6 +95,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"));
 	pItem = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Item"));
 
+	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;
 	return S_OK;
 }
 
@@ -161,7 +162,6 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 
 	}
 #pragma endregion 총알충돌검사
-
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
 		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
@@ -944,7 +944,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 
 	CInGameUI::INGAMEUI_DESC	pDesc9{};
 	pDesc9.eLevel = LEVEL_GAMEPLAY;
-	pDesc9.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	pDesc9.eUITag = CInGameUI::UI_CONVERSATIONBOX_BACKGROUND;
 	pDesc9.fSizeX = 180.f;
 	pDesc9.fSizeY = 90.f;
 	pDesc9.iData = 0;
@@ -1030,7 +1030,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	// 플레이어 정보 뒷 배경
 	CInGameUI::INGAMEUI_DESC	pDesc22{};
 	pDesc22.eLevel = LEVEL_GAMEPLAY;
-	pDesc22.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	pDesc22.eUITag = CInGameUI::UI_CONVERSATIONBOX_BACKGROUND;
 	pDesc22.fSizeX = 160.f;
 	pDesc22.fSizeY = 90.f;
 	pDesc22.iData = 0;

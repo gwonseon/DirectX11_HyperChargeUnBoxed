@@ -19,6 +19,7 @@ CNavigation::CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CNavigation::CNavigation(const CNavigation& Prototype)
     : CComponent{ Prototype }
     , m_Cells{ Prototype.m_Cells }
+	, vecResultCell{ Prototype.vecResultCell }
 
 #ifdef _DEBUG
     , m_pShader{ Prototype.m_pShader } 
@@ -26,7 +27,8 @@ CNavigation::CNavigation(const CNavigation& Prototype)
 {
     for (auto& pCell : m_Cells)
         Safe_AddRef(pCell);
-
+	for (auto& pCell : vecResultCell)
+		Safe_AddRef(pCell);
 #ifdef _DEBUG
     Safe_AddRef(m_pShader);
 #endif
@@ -45,7 +47,6 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 	}
 	else
 	{
-
 		while (true)
 		{
 			_float3		vPoints[3];
@@ -479,4 +480,5 @@ void CNavigation::Free()
 #ifdef _DEBUG
 	Safe_Release(m_pShader);
 #endif
+
 }

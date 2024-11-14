@@ -87,7 +87,7 @@ void CTruckShooter::Priority_Update(_float fTimeDelta)
     m_pTransformCom->Rotation(0.f, XMConvertToRadians(m_fRotY), fRotX);
 
 
-    if (*m_iRound == 1)
+    if (*m_iRound == MISSILEROUND)
     {
         m_bStart_Shoot = true;
     }

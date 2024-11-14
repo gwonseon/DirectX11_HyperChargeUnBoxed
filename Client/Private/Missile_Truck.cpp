@@ -86,7 +86,7 @@ void CMissile_Truck::Priority_Update(_float fTimeDelta)
         {
             if (m_pColliderCom->Intersect(pCol))
             {
-                m_fHp -= 300.f;
+                m_fHp -= 100.f;
             }
             pExplosion->Set_Count();
             if (pExplosion->Get_Count() >= 4)

@@ -12,7 +12,6 @@ CEnvironment::CEnvironment(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CEnvironment::CEnvironment(const CEnvironment& Prototype)
 	: CGameObject{ Prototype }
 {
-
 }
 
 HRESULT CEnvironment::Initialize_Prototype()
@@ -209,5 +208,4 @@ void CEnvironment::Free()
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pCollisionBox);
 }

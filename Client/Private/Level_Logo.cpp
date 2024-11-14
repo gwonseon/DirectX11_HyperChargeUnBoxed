@@ -18,7 +18,7 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Logo::Initialize()
 {
-	
+
 	if (FAILED(Ready_Layer_Menu_UI(TEXT("Layer_Menu_UI"))))
 		return E_FAIL;
 
@@ -27,11 +27,9 @@ HRESULT CLevel_Logo::Initialize()
 
 	if (FAILED(Ready_Layer_GameTitle(TEXT("Layer_Menu_GameTitle"))))
 		return E_FAIL;
-	
+
 	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))
 		return E_FAIL;
-	
-
 
 
 	return S_OK;
@@ -46,7 +44,7 @@ void CLevel_Logo::Update(_float fTimeDelta)
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_YARD))))
 			return;
 		return;
-
+			
 	}
 	if (GetKeyState(VK_NUMPAD2) & 0x8000)
 	{
@@ -102,7 +100,6 @@ HRESULT CLevel_Logo::Render()
 HRESULT CLevel_Logo::Ready_Layer_Menu_BackGround(const _tchar* pLayerTag)
 {
 	CMenuUI::MENUUI_DESC			Desc{};
-
 	Desc.fX = g_iWinSizeX * 0.5f;
 	Desc.fY = g_iWinSizeY * 0.5f;
 	Desc.fSizeX = g_iWinSizeX;
@@ -120,7 +117,6 @@ HRESULT CLevel_Logo::Ready_Layer_Menu_BackGround(const _tchar* pLayerTag)
 HRESULT CLevel_Logo::Ready_Layer_Menu_UI(const _tchar* pLayerTag)
 {
 	CButtonUI::BUTTONUI_DESC			Desc{};
-
 	Desc.fX = 250;
 	Desc.fY = 300;
 	Desc.fSizeX = 300;

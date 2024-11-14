@@ -103,6 +103,7 @@ private:
 	CLayer* pCircleUI = { nullptr };
 	CLayer* pItem = { nullptr };
 	CLayer* pExplosion = { nullptr };
+	CLayer* pExplosion_Player = { nullptr };
 	CLayer* pBuild = { nullptr };
 	CLayer* pTruck = { nullptr };
 
@@ -110,6 +111,8 @@ private:
 	_uint	m_iCurrentRound = 0;
 	_uint	m_iPreviousRound = 0;
 	_float XPos{}, ZPos{};
+
+
 private:
 	vector<CTrap_Marks*> m_vecTrapMark;
 

@@ -2,6 +2,7 @@
 #include "..\Public\Bullet.h"
 
 #include "GameInstance.h"
+#include <Explosion.h>
 CBullet::CBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -38,7 +39,7 @@ HRESULT CBullet::Initialize(void* pArg)
         m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
         break;
     case Client::CBullet::BULLET_LOCKET:
-        iRand = 3; // ?
+        iRand = 3; 
         m_pTransformCom->Set_Scaling(0.3f, 0.3f, 0.3f);
         break;
     case Client::CBullet::BULLET_END:
@@ -81,6 +82,16 @@ void CBullet::Update(_float fTimeDelta)
 
 void CBullet::Late_Update(_float fTimeDelta)
 {
+    if (m_eType == BULLET_LOCKET && m_bDead == true)
+    {
+        CExplosion::EXPLOSION_DESC pExplosion{};
+        pExplosion.eID = m_eLevel;
+        pExplosion.eType = CExplosion::EXPLOSION_LOCKET;
+        pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+        pExplosion.fScale = _float3{ 10.f, 10.f, 10.f };
+        m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion_Player"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+
+    }
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
         return;
 }

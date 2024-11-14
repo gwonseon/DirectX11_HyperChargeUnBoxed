@@ -1,3 +1,4 @@
+#include "Engine_Shader_Defines.hlsli"
 
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4			g_vColor = (float4)1.f;

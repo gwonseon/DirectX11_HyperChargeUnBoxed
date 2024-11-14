@@ -1,29 +1,5 @@
 #pragma once
 
-
-/*
-class C이름
-{
-private: or protected:
-	생성자();
-	~소멸자();
-public:
-	함수
-protected:
-	변수
-protected:
-	함수
-private:
-	변수
-private:
-	함수
-
-public:
-	생성을 위한 함수. 생성 루틴포함. (Create, Clone)
-	소멸을 위한 함수. 삭제 확인. (Free)
-};
-*/
-
 #include "Client_Defines.h"
 #include "Base.h"
 

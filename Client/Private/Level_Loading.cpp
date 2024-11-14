@@ -18,20 +18,30 @@
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
-	Safe_AddRef(m_pLoadingUIBack);
-	Safe_AddRef(m_pLoadingUI_GameTitle);
-	Safe_AddRef(m_pLoadingUI_Logo);
-	Safe_AddRef(m_pLoadingUI);
-	Safe_AddRef(m_pLoader);
-	Safe_AddRef(m_pBackGround);
+
 }
 
 HRESULT CLevel_Loading::Initialize(LEVELID eNextLevelID)
 {
+
 	/* 추후에 로딩이 끝날 시에 넘길 레벨에 대한 정보를 저장한다. */
 	m_eNextLevelID = eNextLevelID;
 
-	/* 로딩화면을 보여주기위한 객체들을 생성한다. */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BackGround")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
+			CBackGround::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_LoadingUI")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingUI"),
+			CLoading_UI::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+	if (FAILED(Ready_Layer_UI_GameTitle(TEXT("Layer_UI_TItle"))))
+		return E_FAIL;
 
   	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
@@ -39,8 +49,7 @@ HRESULT CLevel_Loading::Initialize(LEVELID eNextLevelID)
 		return E_FAIL;
 	if (FAILED(Ready_Layer_UI_LOGO(TEXT("Layer_UI_Logo"))))
 		return E_FAIL;
-	if (FAILED(Ready_Layer_UI_GameTitle(TEXT("Layer_UI_TItle"))))
-		return E_FAIL;
+
 	
 	/* 로딩 작업을 직접 수행할 하청업체를 선정한다. */
 	m_pLoader = CLoader::Create(m_pDevice, m_pContext, eNextLevelID);
@@ -54,26 +63,7 @@ void CLevel_Loading::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 
-
 	m_fLoading_Per = m_pLoader->Get_LoadingPer();
-	if (m_pBackGround != nullptr)
-		m_pBackGround->Update(fTimeDelta);
-
-	if (m_pLoadingUI != nullptr)
-	{
-		m_pLoadingUI->Update(fTimeDelta);
-
-	}
-	if (m_pLoadingUI_Logo != nullptr)
-	{
-		m_pLoadingUI_Logo->Update(fTimeDelta);
-
-	}
-	if (m_pLoadingUIBack != nullptr)
-	{
-		m_pLoadingUIBack->Update(fTimeDelta);
-	}
-	m_pLoadingUI_GameTitle->Update(fTimeDelta);
 	
 	/* 로더가 다음레벨에 대한 자원 생성을 끝냈다라면 */
  	if (true == m_pLoader->isFinished() /*&&
@@ -123,23 +113,22 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Ready_Layer_UI(const _tchar* pLayerTag)
 {
-	m_pBackGround = CBackGround::Create(m_pDevice, m_pContext);
-	CBackGround::UIOBJECT_DESC	Desc{};
+	CBackGround::UIOBJECT_DESC Desc{};
 	Desc.eLevel = LEVEL_LOADING;
 	Desc.fX = g_iWinSizeX * 0.5f;
 	Desc.fY = g_iWinSizeY * 0.5f;
 	Desc.fSizeX = g_iWinSizeX;
 	Desc.fSizeY = g_iWinSizeY;
 	Desc.iData = 10;
-	Desc.fDepth = 0.5f;
-	m_pBackGround->Initialize(&Desc);
+	Desc.fDepth = 0.3f;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_LOADING, pLayerTag, TEXT("Prototype_GameObject_BackGround"), &Desc));
+
 	return S_OK;
 }
 HRESULT CLevel_Loading::Ready_Layer_UI_Loading(const _tchar* pLayerTag)
 {
-	m_pLoadingUI = CLoading_UI::Create(m_pDevice, m_pContext);
 
-	CLoading_UI::LOADINGUI_DESC	Desc{};
+	CLoading_UI::LOADINGUI_DESC Desc{};
 	Desc.eLevel = LEVEL_LOADING;
 	Desc.fX = g_iWinSizeX * 0.9f;
 	Desc.fY = g_iWinSizeY * 0.8f;
@@ -148,7 +137,7 @@ HRESULT CLevel_Loading::Ready_Layer_UI_Loading(const _tchar* pLayerTag)
 	Desc.iData = 10;
 	Desc.fDepth = 0.1f;
 	Desc.eTag = CLoading_UI::LOADING_GAGE;
-	m_pLoadingUI->Initialize(&Desc);
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_LOADING, pLayerTag, TEXT("Prototype_GameObject_LoadingUI"), &Desc));
 
 
 
@@ -161,31 +150,29 @@ HRESULT CLevel_Loading::Ready_Layer_UI_LOGO(const _tchar* pLayerTag)
 }
 HRESULT CLevel_Loading::Ready_Layer_UI_GameTitle(const _tchar* pLayerTag)
 {
-	m_pLoadingUI_GameTitle = CLoading_UI::Create(m_pDevice, m_pContext);
-
-	CLoading_UI::LOADINGUI_DESC	Desc{};
-	Desc.eLevel = LEVEL_LOADING;
-	Desc.fX = g_iWinSizeX * 0.2f;
-	Desc.fY = g_iWinSizeY * 0.75f;
-	Desc.fSizeX = 500.f;
-	Desc.fSizeY = 50.f;
-	Desc.iData = 10;
-	Desc.fDepth = 0.f;
-	Desc.eTag = CLoading_UI::LOADING_GAMENAME;
-	m_pLoadingUI_GameTitle->Initialize(&Desc);
-
-	m_pLoadingUIBack = CLoading_UI::Create(m_pDevice, m_pContext);
-
-	CLoading_UI::LOADINGUI_DESC	Desc2{};
+	CLoading_UI::LOADINGUI_DESC Desc2{};
 	Desc2.eLevel = LEVEL_LOADING;
 	Desc2.fX = g_iWinSizeX * 0.4f;
 	Desc2.fY = g_iWinSizeY * 0.75f;
 	Desc2.fSizeX = g_iWinSizeX * 0.8f;
 	Desc2.fSizeY = g_iWinSizeY * 0.7f;
 	Desc2.iData = 10;
-	Desc2.fDepth = 0.15f;
+	Desc2.eTargetLevel = m_eNextLevelID;
+	Desc2.fDepth = 0.2f;
 	Desc2.eTag = CLoading_UI::LOADING_BACKGROUND_GAMENAME;
-	m_pLoadingUIBack->Initialize(&Desc2);
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_LOADING, pLayerTag, TEXT("Prototype_GameObject_LoadingUI"), &Desc2));
+
+	CLoading_UI::LOADINGUI_DESC Desc{};
+	Desc.eLevel = LEVEL_LOADING;
+	Desc.fX = g_iWinSizeX * 0.2f;
+	Desc.fY = g_iWinSizeY * 0.75f;
+	Desc.fSizeX = 500.f;
+	Desc.fSizeY = 50.f;
+	Desc.iData = 10;
+	Desc.eTargetLevel = m_eNextLevelID;
+	Desc.fDepth = 0.1f;
+	Desc.eTag = CLoading_UI::LOADING_GAMENAME;
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_LOADING, pLayerTag, TEXT("Prototype_GameObject_LoadingUI"), &Desc));
 
 	return S_OK;
 }
@@ -206,12 +193,5 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_Loading::Free()
 {
 	__super::Free();
-	
-	Safe_Release(m_pLoadingUIBack);
-	Safe_Release(m_pLoadingUI_GameTitle);
-	Safe_Release(m_pLoadingUI_Logo);
-	Safe_Release(m_pLoadingUI);
 	Safe_Release(m_pLoader);
-	Safe_Release(m_pBackGround);
-
 }

@@ -194,4 +194,5 @@ CYard_Round* CYard_Round::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 void CYard_Round::Free()
 {
 	__super::Free();
+	
 }

@@ -30,6 +30,7 @@ public:
 	void Draw();
 	void Clear(_uint iClearLevelID);
 	void Reset_Object(_uint iClearLevelID);
+	void RenderGroup_Clear(_uint iClearLevelID);
 
 	_float Compute_Random_Normal();
 	_float Compute_Random(_float fMin, _float fMax);
@@ -38,8 +39,7 @@ public: /* For.Graphic_Device */
 	HRESULT Render_Begin(_float4 vClearColor);
 	HRESULT Render_End();
 	// HRESULT Set_BlendState(const CGraphic_Device::BLEND_STATE& BS);
-	ID3D11Device* Get_Device();
-	ID3D11DeviceContext* Get_Context();
+
 
 public: /* for.Timer_Manager */
 	_float Get_TimeDelta(const _wstring& strTimerTag);
