@@ -102,7 +102,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             fTimeAcc = 0.f;
         }
-    }
+    }   
 
     Safe_Release(pGameInstance);
     Safe_Release(pMainApp);

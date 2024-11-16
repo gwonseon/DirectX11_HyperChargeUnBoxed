@@ -29,6 +29,7 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 VS_OUT VS_MAIN( /* 내가 그릴려고 했던 정점을 받아오는거다*/VS_IN In)
@@ -41,10 +42,11 @@ VS_OUT VS_MAIN( /* 내가 그릴려고 했던 정점을 받아오는거다*/VS_IN In)
     vPosition = mul(vPosition, g_ProjMatrix);
 
     Out.vPosition = vPosition;
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
-
+    Out.vProjPos = vPosition;
+    
     return Out;
 }
 
@@ -54,14 +56,15 @@ struct PS_IN
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 
 struct PS_OUT
 {
-	/* 변수에 대한 시멘틱을 정의한다. */
-    vector vColor : SV_TARGET0;
-
+    vector vDiffuse : SV_TARGET0;
+    vector vNormal : SV_TARGET1;
+    vector vDepth : SV_TARGET2;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -69,16 +72,9 @@ PS_OUT PS_MAIN(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord) * float4(1.2f, 1.2f, 0.f, 1.0) /* 색상 곱해줌*/;
 
-    float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
-     
-    float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    float4 vLook = In.vWorldPos - g_vCamPosition;
-
-    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 100.f);
-
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) * 1.2f /* 1.2 곱해서 밝기 조절*/+
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-
+    Out.vDiffuse = vMtrlDiffuse;;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 
     return Out;
 }

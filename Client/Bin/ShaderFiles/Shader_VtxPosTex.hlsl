@@ -243,6 +243,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
 
     }
@@ -252,6 +253,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN2();
 
     }
@@ -261,6 +263,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN3();
 
     }
@@ -270,6 +273,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN4();
     }
     pass DefaultPass4
@@ -278,6 +282,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN5();
     }
     pass DefaultPass5
@@ -286,6 +291,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN6();
     }
     pass DefaultPass6
@@ -294,6 +300,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN7();
     }
 
@@ -304,6 +311,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         SetDepthStencilState(DSS_None, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN8();
     }
 

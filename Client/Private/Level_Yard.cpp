@@ -103,7 +103,6 @@ HRESULT CLevel_Yard::Initialize()
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Coin"));
 	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_CircleUI"));
 	pItem = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Item"));
-	// pTruck = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_MissileTruck"));
 
 
 	
@@ -123,8 +122,6 @@ void CLevel_Yard::Update(_float fTimeDelta)
 		pTrap_Shield = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Trap_Shield"));
 	if (pBuild == nullptr)
 		pBuild = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_PlayerBuild"));
-	//if (pTruck == nullptr)
-	//	pTruck = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_MissileTruck"));
 	if (pExplosion == nullptr)
 		pExplosion = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
 	if(pExplosion_Player == nullptr)
@@ -167,22 +164,15 @@ void CLevel_Yard::Update(_float fTimeDelta)
 		if (!XMVector3IsInfinite(RayPos) && !XMVector3IsNaN(RayPos) &&
 			!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
 		{
-			if (WeaponState != CPlayer::WEAPON_LOCKETLAUNCHER)
-			{
-				
 				_bool* bShot = m_pPlayer->Get_ShotStart();
+				
 				m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // 총과 근거리 몬스터
 				m_pGameInstance->Collision_Bullet(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());  // 총과 장거리 몬스터
-			}
 		}
 	}
 #pragma endregion 총알충돌검사
 
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
-	{
-		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO)));
-		
-	}
+
 }
 
 HRESULT CLevel_Yard::Render()
@@ -193,7 +183,11 @@ HRESULT CLevel_Yard::Render()
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("Yard레벨입니다."));
 #endif
-	
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	{
+		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO)));
+
+	}
 	return S_OK;
 }
 
@@ -850,16 +844,13 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 HRESULT CLevel_Yard::Ready_Lights()
 {
 	LIGHT_DESC	LightDesc{};
-
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDirection = _float4(-0.5f, -1.f, -0.5f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
-
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
-
 	return S_OK;
 }
 

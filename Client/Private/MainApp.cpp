@@ -13,26 +13,13 @@
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
-	D3D11_RASTERIZER_DESC		RSDesc{};
-	D3D11_BLEND_DESC			BSDesc{};
-	D3D11_DEPTH_STENCIL_DESC	DSSDesc{};
-
-
-	/*m_pDevice->CreateRasterizerState(&RSDesc, &pRSState);
-	m_pContext->RSSetState(pRSState);
-	m_pContext->OMSetDepthStencilState();
-	m_pContext->OMSetBlendState();*/
 
 	Safe_AddRef(m_pGameInstance);
 }
 
 HRESULT CMainApp::Initialize()
 {
-	/* 내 게임에 필요한 필수 기능들에 대한 초기화과정을 수행한다. */
-	/* 그래픽 카드를 초기화하낟. */
-	/* 입력 장치를 초기화한다. */
-	/* 오브젝트, 컴포넌트 매니져를 사용할 준비를 한다. */
-	/* 등등등등 */
+
 	ENGINE_DESC			EngineDesc{};
 	EngineDesc.hInstance = g_hInst;
 	EngineDesc.hWnd = g_hWnd;
@@ -172,6 +159,11 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	/* For.Prototype_Component_Shader_VtxMesh */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxMesh */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh_No_Deffered"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh_NoDeferred.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
 	/* 트랩 셰이더 */

@@ -34,6 +34,18 @@ public:
 		return &m_vCamPosition;
 	}
 
+
+	const _float4x4* Get_TransformFloat4x4_Inverse(TRANSFORMSTATE eState)
+	{
+		return &m_TransformationMatrixInverse[eState];
+	}
+
+	_matrix Get_TransformMatrix_Inverse(TRANSFORMSTATE eState)
+	{
+		return XMLoadFloat4x4(&m_TransformationMatrixInverse[eState]);
+	}
+
+
 public:
 	// Setter
 	void Set_TransformMatrix(TRANSFORMSTATE eState, _fmatrix TransformMatrix)

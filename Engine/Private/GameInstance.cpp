@@ -9,6 +9,8 @@
 #include "Renderer.h"
 #include "Light_Manager.h"
 #include "font_Manager.h"
+#include "Target_Manager.h"
+
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -43,23 +45,29 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
+	m_pLight_Manager = CLight_Manager::Create();
+	if (nullptr == m_pLight_Manager)
+		return E_FAIL;
 
 	/* 등등등등 */
 	m_pLevel_Manager = CLevel_Manager::Create();
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
-	m_pPipeLine = CPipeLine::Create();
-	if (nullptr == m_pPipeLine)
+
+	m_pTarget_Manager = CTarget_Manager::Create(*ppDevice, *ppContext);
+	if (nullptr == m_pTarget_Manager)
 		return E_FAIL;
 
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
 
-	m_pLight_Manager = CLight_Manager::Create();
-	if (nullptr == m_pLight_Manager)
+	m_pPipeLine = CPipeLine::Create();
+	if (nullptr == m_pPipeLine)
 		return E_FAIL;
+
+
 
 	m_pPicking_Manager = CPicking_Manager::Create();
 	if (nullptr == m_pPicking_Manager)
@@ -97,8 +105,8 @@ void CGameInstance::Update(_float fTimeDelta)
 
 void CGameInstance::Draw()
 {
+
 	/* 게임내에 필요한 대다수의 객체들을 모두 그려낸다. */
-	
 	m_pRenderer->Draw();
 	/* 할일이 없어. 디버그모드에서만 디버그내용만 출력하는 용도 .*/
 	m_pLevel_Manager->Render();
@@ -108,7 +116,7 @@ void CGameInstance::Clear(_uint iClearLevelID)
 {
 	m_pObject_Manager->Clear(iClearLevelID);
 	m_pComponent_Manager->Clear(iClearLevelID);
-	m_pRenderer->RenderList_Clear();
+//	m_pRenderer->RenderList_Clear();
 	/*iClearLevelID에 해당하는 자원들을 정리한다.*/
 }
 
@@ -340,6 +348,14 @@ void CGameInstance::RenderList_Clear()
 	m_pRenderer->RenderList_Clear();
 }
 
+HRESULT CGameInstance::Add_DebugComponents(CComponent* pComponent)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Add_DebugComponents(pComponent);
+}
+
 const _float4x4* CGameInstance::Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState)
 {
 	return m_pPipeLine->Get_TransformFloat4x4(eState);
@@ -366,6 +382,16 @@ void CGameInstance::Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatr
 
 }
 
+const _float4x4* CGameInstance::Get_TransformFloat4x4_Inverse(CPipeLine::TRANSFORMSTATE eState)
+{
+	return m_pPipeLine->Get_TransformFloat4x4_Inverse(eState);
+}
+
+_matrix CGameInstance::Get_TransformMatrix_Inverse(CPipeLine::TRANSFORMSTATE eState)
+{
+	return m_pPipeLine->Get_TransformMatrix_Inverse(eState);
+}
+
 const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)
 {
 	return m_pLight_Manager->Get_LightDesc(iIndex);
@@ -374,6 +400,11 @@ const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)
 HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 {
 	return m_pLight_Manager->Add_Light(LightDesc);
+}
+
+HRESULT CGameInstance::Render_Lights(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+	return m_pLight_Manager->Render(pShader, pVIBuffer);
 }
 
 _float3 CGameInstance::Get_MousePos_NDC(HWND hWnd, const unsigned int g_iWinSizeX, const unsigned int g_iWinSizeY)
@@ -471,6 +502,42 @@ void CGameInstance::CircleGauge_Interaction(CLayer* Item, CLayer* UI)
 	m_pUI_Manager->CircleGauge_Interaction(Item, UI);
 }
 
+HRESULT CGameInstance::Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
+{
+	return m_pTarget_Manager->Add_RenderTarget(strTargetTag, iWidth, iHeight, ePixelFormat, vClearColor);
+}
+
+HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag)
+{
+	return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
+}
+
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+{
+	return m_pTarget_Manager->Begin_MRT(strMRTTag);
+}
+
+HRESULT CGameInstance::End_MRT(const _wstring& strMRTTag)
+{
+	return m_pTarget_Manager->End_MRT(strMRTTag);
+}
+
+HRESULT CGameInstance::Bind_RT_SRV(CShader* pShader, const _char* pConstantName, const _wstring& strTargetTag)
+{
+
+	return m_pTarget_Manager->Bind_SRV(pShader, pConstantName, strTargetTag);
+}
+
+#ifdef _DEBUG
+HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+{
+	return m_pTarget_Manager->Ready_Debug(strTargetTag, fX, fY, fSizeX, fSizeY);
+}
+HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer)
+{
+	return m_pTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
+}
+#endif
 
 void CGameInstance::Release_Engine()
 {
@@ -497,6 +564,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pFont_Manager				   );
 	Safe_Release(m_pRound_Manager				   );
 	Safe_Release(m_pUI_Manager					   );
-
+	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pGraphic_Device);
 }

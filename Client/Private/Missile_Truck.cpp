@@ -114,7 +114,10 @@ void CMissile_Truck::Late_Update(_float fTimeDelta)
 
 HRESULT CMissile_Truck::Render()
 {
+  
 #ifdef _DEBUG
+    if (m_bDead)
+        return S_OK;
     m_pColliderCom->Render();
 #endif
     return S_OK;

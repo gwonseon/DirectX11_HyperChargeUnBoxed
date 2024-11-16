@@ -162,10 +162,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 
 	}
 #pragma endregion 총알충돌검사
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
-	{
-		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
-	}
+
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -177,6 +174,10 @@ HRESULT CLevel_GamePlay::Render()
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 #endif
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	{
+		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
+	}
 	return S_OK;
 }
 
@@ -619,9 +620,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
-
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 

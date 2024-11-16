@@ -122,7 +122,6 @@ void CObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (size_t i = 0; i < m_iNumLevels; i++)
 	{
-
 		for (auto& Pair : m_pLayers[i])
 		{
 			if (nullptr != Pair.second)
@@ -131,7 +130,6 @@ void CObject_Manager::Priority_Update(_float fTimeDelta)
 			}
 		}
 	}
-
 }
 
 void CObject_Manager::Update(_float fTimeDelta)
@@ -165,7 +163,7 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 		return;
 	for (auto& Pair : m_pLayers[iLevelIndex])
 	{
-		
+		Pair.second->Set_Dead();
 		Safe_Release(Pair.second);
 	}
 	m_pLayers[iLevelIndex].clear();

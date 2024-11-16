@@ -1,4 +1,6 @@
 #include "..\Public\Light.h"
+#include "VIBuffer_Rect.h"
+#include "Shader.h"
 
 CLight::CLight()
 {
@@ -8,6 +10,30 @@ HRESULT CLight::Initialize(const LIGHT_DESC& LightDesc)
 {
     m_LightDesc = LightDesc;
     return S_OK;
+}
+
+HRESULT CLight::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+	if (FAILED(pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vLightAmbient", &m_LightDesc.vAmbient, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(pShader->Bind_RawValue("g_vLightSpecular", &m_LightDesc.vSpecular, sizeof(_float4))))
+		return E_FAIL;
+
+
+	if (FAILED(pShader->Begin(1)))
+		return E_FAIL;
+
+	if (FAILED(pVIBuffer->Bind_Buffers()))
+		return E_FAIL;
+
+	if (FAILED(pVIBuffer->Render()))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 CLight* CLight::Create(const LIGHT_DESC& LightDesc)

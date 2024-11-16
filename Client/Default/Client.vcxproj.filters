@@ -118,23 +118,14 @@
     <Filter Include="02. GameObjects\Monster\Alien">
       <UniqueIdentifier>{81843730-7028-46c8-9190-8f42ca3bdf57}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Monster\Pony">
-      <UniqueIdentifier>{da0e7df8-edb2-4fab-949a-81cdf498bef8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels\91. MonsterPath">
       <UniqueIdentifier>{1ef96131-5657-435e-911a-f642d4adc65d}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Levels\92. NavigationTool">
       <UniqueIdentifier>{03d94424-1d3e-4e45-8388-3413907937c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Monster\Pony\PonyState">
-      <UniqueIdentifier>{6789da16-12d8-452b-9edb-f89660d4faa1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Player\Weapon\Player_Bullet">
       <UniqueIdentifier>{393b5cff-3b49-41b0-942c-4a6c843ed3b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Monster\Monster_Bullet">
-      <UniqueIdentifier>{292609d5-f940-46cf-93b7-6d9cb5612a5a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObjects\UI\GamePlay_UI\NumberUI">
       <UniqueIdentifier>{8d1a15f3-2bc0-49f4-9a22-05c1cf059963}</UniqueIdentifier>
@@ -160,26 +151,8 @@
     <Filter Include="02. GameObjects\Player_Build\Trap\Trap_Bricks\Broken_Bricks">
       <UniqueIdentifier>{ec074762-d2bc-4b28-82f7-5cd0e7688685}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Player_Build\Energy_Machine">
-      <UniqueIdentifier>{d6b47026-cd40-4ed7-a930-60cafb4d676f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Lader">
-      <UniqueIdentifier>{348452e4-8081-435c-b4a5-0db2a71ebe4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Cap">
-      <UniqueIdentifier>{2cbf4936-949e-4887-bdef-976114fd388d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Environment\Battery">
       <UniqueIdentifier>{fdde6bc9-c926-4c03-8b3f-b0b3250e37e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Trot">
-      <UniqueIdentifier>{beb832c6-04c0-4e63-8864-74c1264a421b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Attack">
-      <UniqueIdentifier>{600d30e4-46ac-4565-9461-ee2a7313ea54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Run">
-      <UniqueIdentifier>{32a41391-cbed-427b-b65c-cd96d989808f}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObjects\Monster\RifleMan">
       <UniqueIdentifier>{05a84495-cb99-4a4e-b626-dff4901b9de2}</UniqueIdentifier>
@@ -214,26 +187,11 @@
     <Filter Include="02. GameObjects\Effect">
       <UniqueIdentifier>{6da46bf3-5ec2-4d58-a4f9-043b48015039}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Effect\Particle">
-      <UniqueIdentifier>{3aac91b1-1474-4019-954c-f17400b181f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Effect\Particle\Rect">
-      <UniqueIdentifier>{c5cafe1e-3af3-4af9-9dd9-2e664f8ffb28}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Effect\Particle\Point">
-      <UniqueIdentifier>{68868494-6ff3-4ac1-8d3e-b8b53162969b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Effect\Particle\Grass">
-      <UniqueIdentifier>{de992f9e-da48-43c0-b601-58dd40f04962}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Monster\Missile_Truck">
       <UniqueIdentifier>{217e1ef8-cb66-4cff-b262-fc9bb210e244}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObjects\Monster\Missile_Truck\TruckBody">
       <UniqueIdentifier>{246e61e4-a0b0-49b1-aa65-5e7f2516039e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Shooter">
-      <UniqueIdentifier>{021238db-56f7-4d4c-a3d1-11cf57418491}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObjects\Monster\Missile_Truck\Tracker">
       <UniqueIdentifier>{02a2422e-71f5-4e25-9627-339faa96fafb}</UniqueIdentifier>
@@ -255,6 +213,48 @@
     </Filter>
     <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Missile">
       <UniqueIdentifier>{f782c1a1-e83b-4b0d-83ee-d56b1e5c3d32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Explosion\Particle">
+      <UniqueIdentifier>{3aac91b1-1474-4019-954c-f17400b181f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Explosion\Particle\Rect">
+      <UniqueIdentifier>{c5cafe1e-3af3-4af9-9dd9-2e664f8ffb28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Explosion\Particle\Point">
+      <UniqueIdentifier>{68868494-6ff3-4ac1-8d3e-b8b53162969b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Explosion\Particle\Grass">
+      <UniqueIdentifier>{de992f9e-da48-43c0-b601-58dd40f04962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Shooter">
+      <UniqueIdentifier>{021238db-56f7-4d4c-a3d1-11cf57418491}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Monster_Bullet">
+      <UniqueIdentifier>{292609d5-f940-46cf-93b7-6d9cb5612a5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony">
+      <UniqueIdentifier>{da0e7df8-edb2-4fab-949a-81cdf498bef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState">
+      <UniqueIdentifier>{6789da16-12d8-452b-9edb-f89660d4faa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Trot">
+      <UniqueIdentifier>{beb832c6-04c0-4e63-8864-74c1264a421b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Attack">
+      <UniqueIdentifier>{600d30e4-46ac-4565-9461-ee2a7313ea54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Monster\Pony\PonyState\Run">
+      <UniqueIdentifier>{32a41391-cbed-427b-b65c-cd96d989808f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine">
+      <UniqueIdentifier>{d6b47026-cd40-4ed7-a930-60cafb4d676f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Lader">
+      <UniqueIdentifier>{348452e4-8081-435c-b4a5-0db2a71ebe4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Cap">
+      <UniqueIdentifier>{2cbf4936-949e-4887-bdef-976114fd388d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -466,13 +466,13 @@
       <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle_Snow.h">
-      <Filter>02. GameObjects\Effect\Particle\Rect</Filter>
+      <Filter>02. GameObjects\Effect\Explosion\Particle\Rect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle_Explosion.h">
-      <Filter>02. GameObjects\Effect\Particle\Point</Filter>
+      <Filter>02. GameObjects\Effect\Explosion\Particle\Point</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Grass_Instancing.h">
-      <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
+      <Filter>02. GameObjects\Effect\Explosion\Particle\Grass</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Missile_Truck.h">
       <Filter>02. GameObjects\Monster\Missile_Truck</Filter>
@@ -690,13 +690,13 @@
       <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Particle_Snow.cpp">
-      <Filter>02. GameObjects\Effect\Particle\Rect</Filter>
+      <Filter>02. GameObjects\Effect\Explosion\Particle\Rect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Particle_Explosion.cpp">
-      <Filter>02. GameObjects\Effect\Particle\Point</Filter>
+      <Filter>02. GameObjects\Effect\Explosion\Particle\Point</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Grass_Instancing.cpp">
-      <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
+      <Filter>02. GameObjects\Effect\Explosion\Particle\Grass</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Missile_Truck.cpp">
       <Filter>02. GameObjects\Monster\Missile_Truck</Filter>
@@ -777,6 +777,12 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxParticlePoint.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_NoDeferred.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

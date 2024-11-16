@@ -38,7 +38,6 @@ public:
 public: /* For.Graphic_Device */
 	HRESULT Render_Begin(_float4 vClearColor);
 	HRESULT Render_End();
-	// HRESULT Set_BlendState(const CGraphic_Device::BLEND_STATE& BS);
 
 
 public: /* for.Timer_Manager */
@@ -85,6 +84,7 @@ public: /* For.Component_Manager */
 public: /* For.Renderer	*/
 	HRESULT Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
 	void	RenderList_Clear();
+	HRESULT Add_DebugComponents(class CComponent* pComponent);
 
 public:// For PipeLine
 	const _float4x4* Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState);
@@ -94,9 +94,13 @@ public:// For PipeLine
 	const _float4* Get_CamPosition();
 	void Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
 
+	const _float4x4* Get_TransformFloat4x4_Inverse(CPipeLine::TRANSFORMSTATE eState);
+	_matrix Get_TransformMatrix_Inverse(CPipeLine::TRANSFORMSTATE eState);
+
 public: // Light 매니저
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 
 
 public:  // 피킹 매니저
@@ -128,6 +132,17 @@ public: // UI_Manager
 	void CircleGauge_Interaction(CLayer* Item, CLayer* UI);
 
 
+public: /* For.Target_Manager */
+	HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT End_MRT(const _wstring& strMRTTag);
+	HRESULT Bind_RT_SRV(class CShader* pShader, const _char* pConstantName, const _wstring& strTargetTag);
+
+#ifdef _DEBUG
+	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif
 
 private:
 	class CGraphic_Device*		m_pGraphic_Device	 = { nullptr };
@@ -144,6 +159,7 @@ private:
 	class CFont_Manager*		m_pFont_Manager			= { nullptr };
 	class CRound_Manager*		m_pRound_Manager		= { nullptr };
 	class CUIManager*			m_pUI_Manager			= { nullptr };
+	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
 
 public:
 	static void Release_Engine();

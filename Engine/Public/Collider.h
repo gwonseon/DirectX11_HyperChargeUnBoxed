@@ -28,7 +28,7 @@ public:
 	_bool Intersect_Mouse(_vector rayOrigin, _vector rayDirection, float& fDistance);
 #ifdef _DEBUG
 public:
-	HRESULT Render();
+	virtual HRESULT Render() override;
 #endif
 
 #ifdef _DEBUG
