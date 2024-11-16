@@ -132,6 +132,7 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
 
 
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
 
     }

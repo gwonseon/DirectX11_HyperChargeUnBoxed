@@ -49,7 +49,7 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 	HANDLE hFile = CreateFile(StartingPosPath.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL, L"Load TrackerPos File Failed", L"Error", MB_OK);
 		return E_FAIL;
 	}
 	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
@@ -294,7 +294,7 @@ HRESULT CTruck_Missile::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 		return E_FAIL;
 
 	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
@@ -308,7 +308,7 @@ HRESULT CTruck_Missile::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	return S_OK;
 }

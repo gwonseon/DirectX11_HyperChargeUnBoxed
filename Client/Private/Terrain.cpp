@@ -64,11 +64,11 @@ void CTerrain::Priority_Update(_float fTimeDelta)
 
 void CTerrain::Update(_float fTimeDelta)
 {
-	if (GetAsyncKeyState(VK_F9) & 0x01)
-	{
-		// 맵 그리드로 바꾸기
-		m_pVIBufferCom->Chang_Topology();
-	}
+	//if (GetAsyncKeyState(VK_F9) & 0x01)
+	//{
+	//	// 맵 그리드로 바꾸기
+	//	m_pVIBufferCom->Chang_Topology();
+	//}
 
 	m_pVIBufferCom->Update(fTimeDelta);
 }
@@ -77,6 +77,11 @@ void CTerrain::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
+
+#ifdef _DEBUG
+	m_pGameInstance->Add_DebugComponents(m_pNavigationCom);
+#endif
+
 }
 
 HRESULT CTerrain::Render()
@@ -94,9 +99,6 @@ HRESULT CTerrain::Render()
 		return E_FAIL;
 
 
-#ifdef _DEBUG
-	m_pNavigationCom->Render();
-#endif
 
 
 	return S_OK;
@@ -104,29 +106,6 @@ HRESULT CTerrain::Render()
 
 void CTerrain::Picking()
 {
-	//if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
-	//{
-	//	// 피킹
-	//	_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
-	//	XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
-	//	XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-	//	XMVECTOR RayPos, RayDir;
-
-	//	m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
-
-	//	// RayDir을 정규화하고 결과를 다시 RayDir에 저장
-	//	RayDir = XMVector3Normalize(RayDir);
-	//	
-	//	const _float3* VtxPos = m_pVIBufferCom->Get_VtxPos();  // _float3 배열의 시작 주소 반환
-	//	_uint VtxCountX = m_pVIBufferCom->Get_VtxCountX();
-	//	_uint VtxCountZ = m_pVIBufferCom->Get_VtxCountZ();
-
-	//	// Picking_Terrain 함수 호출에 정규화된 RayDir 사용
-	//	m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
-
-	////	cout << "final X : " << m_fPickingPos.x << "Z : " << m_fPickingPos.z << "Y : " << m_fPickingPos.y << endl;
-
-	//}
 }
 
  
@@ -236,21 +215,16 @@ HRESULT CTerrain::Add_Components()
 				return E_FAIL;
 			break;
 		}
-
 		default:
 			break;
 		}
-
 		break;
 	}
 	default:
 		break;
 	}
 
-	/* For.Com_Texture_Mask */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain_Mask"),
-		TEXT("Com_Texture_Mask"), reinterpret_cast<CComponent**>(&m_pMaskTextureCom))))
-		return E_FAIL;
+
 
 
 	return S_OK;
@@ -267,25 +241,10 @@ HRESULT CTerrain::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 2)))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 1)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
-
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
+	
 	return S_OK;
 }
 
@@ -319,7 +278,6 @@ void CTerrain::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pMaskTextureCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pNavigationCom);

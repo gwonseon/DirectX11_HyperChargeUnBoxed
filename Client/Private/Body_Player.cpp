@@ -57,7 +57,8 @@ void CBody_Player::Priority_Update(_float fTimeDelta)
 	{
 		m_fCurrentDelay += fTimeDelta;
 	}
-
+	UpperBody_Anim(fTimeDelta);
+	LowerBody_Anim(fTimeDelta);
 
 }
 
@@ -83,7 +84,6 @@ void CBody_Player::Update(_float fTimeDelta)
 			{
 				m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bTemp);
 			}
-			
 		}
 		else
 		{
@@ -109,7 +109,6 @@ void CBody_Player::Update(_float fTimeDelta)
 					m_bUpperAnimState = m_pModelCom->Play_Animation_UpperBody(fTimeDelta, m_fArmAngle, m_iUpperMotion, m_bShotNow);
 				}
 			}
-			
 		}
 		if (*m_bAttackState == true && m_bUpperAnimState == true)
 		{
@@ -122,11 +121,8 @@ void CBody_Player::Update(_float fTimeDelta)
 		else
 			m_bAnimState = m_pModelCom->Play_Animation_LowerBody(fTimeDelta * 1.5f);
 
-		UpperBody_Anim(fTimeDelta);
-		LowerBody_Anim(fTimeDelta);
+
 		
-
-
 		if (*m_iViewState == PLAYER_FPS_VIEW)
 		{
 			m_iShaderPassNum = 1;
@@ -151,6 +147,7 @@ void CBody_Player::Late_Update(_float fTimeDelta)
 
 HRESULT CBody_Player::Render()
 {
+	
 	//if(m_bTPSState == true)
 	{
 		if (FAILED(Bind_ShaderResources()))
@@ -172,6 +169,7 @@ HRESULT CBody_Player::Render()
 			m_pModelCom->Render(i);
 		}
 	}
+
 #ifdef _DEBUG
 	m_pColliderCom->Render();
 #endif
@@ -822,21 +820,21 @@ HRESULT CBody_Player::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	//	return E_FAIL;
 
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
+	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+	//if (nullptr == pLightDesc)
+	//	return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+	//	return E_FAIL;
 
 
 	return S_OK;

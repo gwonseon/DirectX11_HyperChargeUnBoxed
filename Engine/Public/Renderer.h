@@ -30,6 +30,7 @@ private:
 public:
 	HRESULT Initialize();
 	HRESULT Add_RenderGameObject(RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
+	HRESULT Add_DebugComponents(class CComponent* pComponent);
 	HRESULT Draw();
 	void	RenderList_Clear();
 private:
@@ -38,18 +39,33 @@ private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
+	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
+	class CShader* m_pShader = { nullptr };
+
+
+	_float4x4					m_WorldMatrix, m_ViewMatrix{}, m_ProjMatrix{};
+
+
 private:
 	list<class CGameObject*>	m_RenderGameObjects[RG_END];
+	list<class CComponent*>		m_DebugComponents;
 
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
-	HRESULT Render_NonBlend();
+	HRESULT Render_NonBlend(); 
+	HRESULT Render_Lights();
+	HRESULT Render_Final();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_Last();
 	HRESULT Render_UI();
 	HRESULT Render_UI_Last();
+
+#ifdef _DEBUG
+private:
+	HRESULT Render_Debug();
+#endif
 
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

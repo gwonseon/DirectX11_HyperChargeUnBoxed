@@ -264,9 +264,7 @@ HRESULT CPlayer::Add_PartObjects()
 	BodyDesc.m_eLevelID = m_eLevelID;
 	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"), TPS_PART_BODY, &BodyDesc)))
 		return E_FAIL;
-
 	m_pBody = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY]);
-
 	/* For.Body */
 	CHead_Player::HEADPLAYER_DESC HeadDesc{};
 	HeadDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
