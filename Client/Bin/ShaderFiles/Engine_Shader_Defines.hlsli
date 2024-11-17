@@ -71,3 +71,14 @@ BlendState BS_AlphaBlend
 	//DescBlend[1] = One;
 	//BlendOp[1] = Add;
 };
+
+BlendState BS_OneByOne
+{
+    BlendEnable[0] = true;
+    BlendEnable[1] = true;
+
+    SrcBlend = one;
+    DestBlend = one;
+    BlendOp = Add;
+};
+

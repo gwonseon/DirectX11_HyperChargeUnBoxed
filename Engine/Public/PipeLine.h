@@ -45,21 +45,27 @@ public:
 		return XMLoadFloat4x4(&m_TransformationMatrixInverse[eState]);
 	}
 
-
+	_float Get_CameraFar()
+	{
+		return m_fFar;
+	}
 public:
 	// Setter
 	void Set_TransformMatrix(TRANSFORMSTATE eState, _fmatrix TransformMatrix)
 	{
 		XMStoreFloat4x4(&m_TransformationMatrix[eState], TransformMatrix);
 	}
-
+	void Set_CameraFar(_float fFar)
+	{
+		m_fFar = fFar;
+	}
 public:
 	HRESULT Update();
 private:
 	_float4x4	m_TransformationMatrix[D3DTS_END];
 	_float4x4	m_TransformationMatrixInverse[D3DTS_END];
 	_float4		m_vCamPosition;
-
+	_float		m_fFar = 500.f;
 public:
 	static CPipeLine* Create();
 	virtual void Free() override;

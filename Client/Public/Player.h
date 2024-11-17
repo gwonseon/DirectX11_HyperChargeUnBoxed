@@ -155,7 +155,7 @@ private:
 	float					m_fRun_FourDirection{};
 	float					m_fRun_EightDirection{};
 	_float					m_fReload_Charging = 0.f;
-
+	_float3					m_vecTargetPos{};
 #pragma region  ºôµå ¸ðµå 
 private:
 	_bool					m_bBuildMode = false;		// ºôµå ¸ðµå

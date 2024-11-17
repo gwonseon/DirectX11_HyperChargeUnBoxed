@@ -15,7 +15,7 @@ float4			g_vCamPosition;
 
 float4x4		g_BoneMatrices[512];
 
-
+float g_fFar;
 
 
 struct VS_IN
@@ -84,6 +84,7 @@ struct PS_OUT
     vector vDiffuse : SV_TARGET0;
     vector vNormal : SV_TARGET1;
     vector vDepth : SV_TARGET2;
+    vector vPickDepth : SV_TARGET3;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -99,9 +100,30 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	/* -1.f ~ 1.f -> 0.f ~ 1.f */
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
     return Out;
 }
+
+
+PS_OUT PS_MAIN_PICKDEPTH(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a <= 0.3f)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+
+	/* -1.f ~ 1.f -> 0.f ~ 1.f */
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+    return Out;
+}
+
+
 
 technique11 DefaultTechnique
 {
@@ -127,4 +149,28 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
+    pass DefaultPass2 // player
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+
+    pass PickDepthPass
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_PICKDEPTH();
+    }
+
 }

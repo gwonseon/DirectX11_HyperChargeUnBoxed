@@ -10,7 +10,7 @@
 #include "Light_Manager.h"
 #include "font_Manager.h"
 #include "Target_Manager.h"
-
+#include "Picking.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -25,6 +25,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd, EngineDesc.isWindowed, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY, ppDevice, ppContext);
 	if (nullptr == m_pGraphic_Device)
 		return E_FAIL;
+
+	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
+	if (nullptr == m_pPicking)
+		return E_FAIL;
+
 
 	m_pInput_Device = CInput_Device::Create(EngineDesc.hInstance, EngineDesc.hWnd);
 	if (nullptr == m_pGraphic_Device)
@@ -66,8 +71,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pPipeLine = CPipeLine::Create();
 	if (nullptr == m_pPipeLine)
 		return E_FAIL;
-
-
 
 	m_pPicking_Manager = CPicking_Manager::Create();
 	if (nullptr == m_pPicking_Manager)
@@ -376,6 +379,16 @@ const _float4* CGameInstance::Get_CamPosition()
 	return m_pPipeLine->Get_CamPosition();
 }
 
+_float CGameInstance::Get_CameraFar()
+{
+	return m_pPipeLine->Get_CameraFar();
+}
+
+void CGameInstance::Set_CameraFar(_float fFar)
+{
+	m_pPipeLine->Set_CameraFar(fFar);
+}
+
 void CGameInstance::Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix)
 {
 	return m_pPipeLine->Set_TransformMatrix(eState, TransformMatrix);
@@ -528,6 +541,11 @@ HRESULT CGameInstance::Bind_RT_SRV(CShader* pShader, const _char* pConstantName,
 	return m_pTarget_Manager->Bind_SRV(pShader, pConstantName, strTargetTag);
 }
 
+HRESULT CGameInstance::Copy_RT_Resource(const _wstring& strTargetTag, ID3D11Texture2D* pOut)
+{
+	return m_pTarget_Manager->Copy_Resource(strTargetTag, pOut);
+}
+
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
@@ -538,6 +556,16 @@ HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader*
 	return m_pTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
 }
 #endif
+
+_bool CGameInstance::isPicked(_float3* pOut)
+{
+	return m_pPicking->isPicked(pOut);
+}
+_bool CGameInstance::isComputeHeight(_fvector vTargetPos, _float3* pOut)
+{
+	return m_pPicking->isComputeHeight(vTargetPos, pOut);
+}
+
 
 void CGameInstance::Release_Engine()
 {
@@ -551,19 +579,24 @@ void CGameInstance::Free()
 	__super::Free();
 
 
-	Safe_Release(m_pInput_Device				   );
-	Safe_Release(m_pTimer_Manager				   );
-	Safe_Release(m_pLevel_Manager				   );
-	Safe_Release(m_pObject_Manager				   );
-	Safe_Release(m_pComponent_Manager			   );
-	Safe_Release(m_pRenderer					   );
-	Safe_Release(m_pPipeLine					   );
-	Safe_Release(m_pLight_Manager				   );
-	Safe_Release(m_pPicking_Manager				   );
-	Safe_Release(m_pCollision_Manager			   );
-	Safe_Release(m_pFont_Manager				   );
-	Safe_Release(m_pRound_Manager				   );
-	Safe_Release(m_pUI_Manager					   );
-	Safe_Release(m_pTarget_Manager);
+	Safe_Release(	m_pInput_Device			);
+	Safe_Release(	m_pTimer_Manager		);
+	Safe_Release(	m_pLevel_Manager		);
+	Safe_Release(	m_pObject_Manager		);
+	Safe_Release(	m_pComponent_Manager	);
+	Safe_Release(	m_pRenderer				);
+	Safe_Release(	m_pPipeLine				);
+	Safe_Release(	m_pLight_Manager		);
+	Safe_Release(	m_pPicking_Manager		);
+	Safe_Release(	m_pCollision_Manager	);
+	Safe_Release(	m_pFont_Manager			);
+	Safe_Release(	m_pRound_Manager		);
+	Safe_Release(	m_pUI_Manager			);
+	Safe_Release(	m_pTarget_Manager		);
+	Safe_Release(	m_pPicking				);
+
+
+
 	Safe_Release(m_pGraphic_Device);
+
 }

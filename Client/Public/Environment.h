@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "VIBuffer_Box.h"
 #include "CollisionBox.h"
+#include "Player.h"
 
 BEGIN(Engine)
 class CShader;
@@ -22,6 +23,7 @@ public:
 		_int	iModelComponentIndex{};
 		_uint	iImGuiMode{};
 		_float3 CollisionBoxScale{}, CollisionBoxPos{};
+		CPlayer* pPlayer = { nullptr };
 	}ENVIRONMENT_DESC;
 
 private:
@@ -37,6 +39,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Height() override;
 
 public:
 	void		Picking();
@@ -90,7 +93,8 @@ public:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	
+	CPlayer* m_pPlayer = { nullptr };
+
 private:
 	LEVELID	m_eLevel = {};
 	_int	m_iModelIndex = {};

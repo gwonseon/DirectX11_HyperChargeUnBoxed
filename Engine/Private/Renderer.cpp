@@ -32,13 +32,22 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Normal"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_Depth */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Depth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Depth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
+	/* For.Target_PickDepth */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_PickDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
+
 	/* For.Target_Shade */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_Specular */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
+	/* For.Target_Height */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Height"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
 	/* For.MRT_GameObjects */
@@ -48,11 +57,17 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_PickDepth"))))
+		return E_FAIL;
 
 	/* For.MRT_LightAcc */
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
+		return E_FAIL;
+
+	/* For.MRT_Height */
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Height"), TEXT("Target_Height"))))
 		return E_FAIL;
 
 
@@ -79,7 +94,9 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 100.f, 500.f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 100.f, 700.f, 300.f, 300.f)))
+	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 300.f, 100.f, 200.f, 200.f)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Height"), 300.f, 300.f, 200.f, 200.f)))
 		return E_FAIL;
 
 #endif
@@ -114,6 +131,8 @@ HRESULT CRenderer::Draw()
 	if (FAILED(Render_Priority()))
 		return E_FAIL;
 	if (FAILED(Render_Shadow()))
+		return E_FAIL;
+	if (FAILED(Render_Height()))
 		return E_FAIL;
 	if (FAILED(Render_NonBlend()))
 		return E_FAIL;
@@ -154,13 +173,10 @@ HRESULT CRenderer::Render_Priority()
 {
 	for (auto& pRenderGameObject : m_RenderGameObjects[RG_PRIORITY])
 	{
-
 		if (nullptr != pRenderGameObject)
 			pRenderGameObject->Render();
-
 		Safe_Release(pRenderGameObject);
 	}
-
 	m_RenderGameObjects[RG_PRIORITY].clear();
 
 	return S_OK;
@@ -177,6 +193,24 @@ HRESULT CRenderer::Render_Shadow()
 	}
 
 	m_RenderGameObjects[RG_SHADOW].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_Height()
+{
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Height"))))
+		return E_FAIL;
+
+	for (auto& pRenderGameObject : m_RenderGameObjects[RG_HEIGHT])
+	{
+		if (nullptr != pRenderGameObject)
+			pRenderGameObject->Render_Height();
+		Safe_Release(pRenderGameObject);
+	}
+	m_RenderGameObjects[RG_HEIGHT].clear();
+	if (FAILED(m_pGameInstance->End_MRT(TEXT("MRT_Height"))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -347,6 +381,7 @@ HRESULT CRenderer::Render_Debug()
 
 	m_pGameInstance->Render_RT_Debug(TEXT("MRT_GameObjects"), m_pShader, m_pVIBuffer);
 	m_pGameInstance->Render_RT_Debug(TEXT("MRT_LightAcc"), m_pShader, m_pVIBuffer);
+	m_pGameInstance->Render_RT_Debug(TEXT("MRT_Height"), m_pShader, m_pVIBuffer);
 
 
 	return S_OK;

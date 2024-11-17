@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "CollisionBox.h"
+#include "Player.h"
 
 BEGIN(Engine)
 class CShader;
@@ -20,6 +21,7 @@ public:
 	{
 		LEVELID eTargetID = {}; // ImGUI 모드에서 이걸로 Navi결정
 		LEVELID eID = {};
+		CPlayer* pPlayer = { nullptr };
 	}TERRAIN_DESC;
 
 private:
@@ -38,13 +40,14 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Height() override;
 
 public:
 	CNavigation* Get_NaviCom() { return m_pNavigationCom; }
 
 	vector<CCollisionBox*> Get_Collision_Center() { return m_vecCollisionBox; }
 public:
-	void	Picking();
+
 
 
 private:
@@ -53,7 +56,7 @@ private:
 
 	CNavigation* m_pNavigationCom = { nullptr };
 	CVIBuffer_Terrain* m_pVIBufferCom = { nullptr };
-
+	CPlayer* m_pPlayer = { nullptr };
 private:
 	LEVELID		m_eLevel = {};
 	LEVELID		m_eTargetID = {}; // ImGUI 모드에서 이걸로 Navi결정
