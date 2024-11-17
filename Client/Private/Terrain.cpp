@@ -26,6 +26,7 @@ HRESULT CTerrain::Initialize(void* pArg)
 {
 	TERRAIN_DESC* pDesc = static_cast<TERRAIN_DESC*>(pArg);
 	m_eLevel = pDesc->eID;
+	m_pPlayer = pDesc->pPlayer;
 	if(m_eLevel == LEVEL_IMGUI || m_eLevel == LEVEL_NAVIGATION || m_eLevel == LEVEL_MONSTERSPAWN)
 	{
 		m_eTargetID = pDesc->eTargetID;
@@ -77,11 +78,12 @@ void CTerrain::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
+	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+		return;
 
 #ifdef _DEBUG
 	m_pGameInstance->Add_DebugComponents(m_pNavigationCom);
 #endif
-
 }
 
 HRESULT CTerrain::Render()
@@ -98,14 +100,43 @@ HRESULT CTerrain::Render()
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
-
-
-
 	return S_OK;
 }
 
-void CTerrain::Picking()
+HRESULT CTerrain::Render_Height()
 {
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	_float4x4			ViewMatrix, ProjMatrix;
+
+	_vector PlayerPos = m_pPlayer->Get_Position();
+
+	_matrix			matView = XMMatrixIdentity();
+	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), 20.f, XMVectorGetZ(PlayerPos), 1.f);
+
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Begin(1)))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
+
+	return S_OK;
 }
 
  
@@ -244,6 +275,10 @@ HRESULT CTerrain::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 1)))
 		return E_FAIL;
 
+
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
 	
 	return S_OK;
 }

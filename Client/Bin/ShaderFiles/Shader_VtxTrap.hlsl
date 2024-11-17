@@ -12,7 +12,7 @@ float4 g_vMtrlAmbient = float4(0.4f, 0.4f, 0.4f, 1.f);
 float4 g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 
 float4 g_vCamPosition;
-
+float g_fFar;
 
 
 struct VS_IN
@@ -29,6 +29,7 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 VS_OUT VS_MAIN( /* 내가 그릴려고 했던 정점을 받아오는거다*/VS_IN In)
@@ -40,9 +41,10 @@ VS_OUT VS_MAIN( /* 내가 그릴려고 했던 정점을 받아오는거다*/VS_IN In)
     vPosition = mul(vPosition, g_ProjMatrix);
 
     Out.vPosition = vPosition;
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vProjPos = vPosition;
 
     return Out;
 }
@@ -53,96 +55,131 @@ struct PS_IN
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 
 struct PS_OUT
 {
-	/* 변수에 대한 시멘틱을 정의한다. */
-    vector vColor : SV_TARGET0;
+    vector vDiffuse : SV_TARGET0;
+    vector vNormal : SV_TARGET1;
+    vector vDepth : SV_TARGET2;
 
 };
 
 PS_OUT PS_MAIN(PS_IN In)
 {
+  //  PS_OUT Out = (PS_OUT) 0;
+	
+  //  vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+  //  //if (vMtrlDiffuse.a <= 0.0f)
+  //  //    discard;
+
+
+  //  float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
+
+  //  float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+  //  float4 vLook = In.vWorldPos - g_vCamPosition;
+
+  //  float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+
+  //  Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) +
+		//(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+   
+  //    Out.vColor.b = 1.f;
+  //    Out.vColor.r = 0.2f;
+  //    Out.vColor.g = 1.f;
+  //    Out.vColor.a = 0.8f;
+
     PS_OUT Out = (PS_OUT) 0;
 	
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-
-    //if (vMtrlDiffuse.a <= 0.0f)
-    //    discard;
-
-
-    float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
-
-    float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    float4 vLook = In.vWorldPos - g_vCamPosition;
-
-    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
-
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) +
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-   
-      Out.vColor.b = 1.f;
-      Out.vColor.r = 0.2f;
-      Out.vColor.g = 1.f;
-      Out.vColor.a = 0.8f;
-
+    if (vMtrlDiffuse.a <= 0.0f)
+        discard;
+    
+    vMtrlDiffuse.b = 1.f;
+    vMtrlDiffuse.r = 0.2f;
+    vMtrlDiffuse.g = 1.f;
+    vMtrlDiffuse.a = 0.7f;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    
+    
     return Out;
 }
 
 PS_OUT PS_MAIN2(PS_IN In)
 {
+  //  PS_OUT Out = (PS_OUT) 0;
+	
+  //  vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+  //  //if (vMtrlDiffuse.a <= 0.0f)
+  //  //    discard;
+
+
+  //  float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
+
+  //  float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+  //  float4 vLook = In.vWorldPos - g_vCamPosition;
+
+  //  float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+
+  //  Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) +
+		//(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+   
+
     PS_OUT Out = (PS_OUT) 0;
 	
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vMtrlDiffuse.a <= 0.0f)
+        discard;
 
-    //if (vMtrlDiffuse.a <= 0.0f)
-    //    discard;
-
-
-    float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
-
-    float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    float4 vLook = In.vWorldPos - g_vCamPosition;
-
-    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
-
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) +
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-   
-
-
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
     return Out;
 }
 
 
 PS_OUT PS_MAIN3(PS_IN In)
 {
+  //  PS_OUT Out = (PS_OUT) 0;
+  //  vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+  //  //if (vMtrlDiffuse.a <= 0.0f)
+  //  //    discard;
+  //  float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
+  //  float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+  //  float4 vLook = In.vWorldPos - g_vCamPosition;
+  //  float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+  //  Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) +
+//      (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+  //  Out.vColor.b = 0.1f;
+  //  Out.vColor.r = 1.f;
+  //  Out.vColor.g = 0.1f;
+  //  Out.vColor.a = 0.8f;
+
+
     PS_OUT Out = (PS_OUT) 0;
 	
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-
-    //if (vMtrlDiffuse.a <= 0.0f)
-    //    discard;
-
-
-    float4 vShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f) + (g_vLightAmbient * g_vMtrlAmbient);
-
-    float4 vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    float4 vLook = In.vWorldPos - g_vCamPosition;
-
-    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
-
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(vShade) +
-		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-   
-    Out.vColor.b = 0.1f;
-    Out.vColor.r = 1.f;
-    Out.vColor.g = 0.1f;
-    Out.vColor.a = 0.8f;
-
+    if (vMtrlDiffuse.a <= 0.0f)
+        discard;
+    
+    vMtrlDiffuse.b =  0.1;
+    vMtrlDiffuse.r =  1.f;
+    vMtrlDiffuse.g =  0.1;
+    vMtrlDiffuse.a =  0.7;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    
     return Out;
+    
 }
 
 

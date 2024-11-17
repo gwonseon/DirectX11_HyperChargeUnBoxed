@@ -92,6 +92,9 @@ public:// For PipeLine
 	_matrix Get_TransformMatrixInverse(CPipeLine::TRANSFORMSTATE eState);
 
 	const _float4* Get_CamPosition();
+	_float Get_CameraFar();
+	void Set_CameraFar(_float fFar);
+
 	void Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
 
 	const _float4x4* Get_TransformFloat4x4_Inverse(CPipeLine::TRANSFORMSTATE eState);
@@ -138,28 +141,35 @@ public: /* For.Target_Manager */
 	HRESULT Begin_MRT(const _wstring& strMRTTag);
 	HRESULT End_MRT(const _wstring& strMRTTag);
 	HRESULT Bind_RT_SRV(class CShader* pShader, const _char* pConstantName, const _wstring& strTargetTag);
+	HRESULT Copy_RT_Resource(const _wstring& strTargetTag, ID3D11Texture2D* pOut);
 
 #ifdef _DEBUG
 	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif
 
+public: /* For.Picking */
+		_bool isPicked(_float3* pOut);
+		_bool isComputeHeight(_fvector vTargetPos, _float3* pOut);
+
+
 private:
-	class CGraphic_Device*		m_pGraphic_Device	 = { nullptr };
-	class CInput_Device*		m_pInput_Device			= { nullptr };
-	class CTimer_Manager*		m_pTimer_Manager		= { nullptr };
-	class CLevel_Manager*		m_pLevel_Manager	 = { nullptr };
-	class CObject_Manager*		m_pObject_Manager		= { nullptr };
-	class CComponent_Manager*	m_pComponent_Manager	 = { nullptr };
-	class CRenderer*			m_pRenderer				 = { nullptr };
-	class CPipeLine*			m_pPipeLine				 = { nullptr };
-	class CLight_Manager*		m_pLight_Manager				= { nullptr };
+	class CGraphic_Device*		m_pGraphic_Device			= { nullptr };
+	class CInput_Device*		m_pInput_Device				= { nullptr };
+	class CTimer_Manager*		m_pTimer_Manager			= { nullptr };
+	class CLevel_Manager*		m_pLevel_Manager			= { nullptr };
+	class CObject_Manager*		m_pObject_Manager			= { nullptr };
+	class CComponent_Manager*	m_pComponent_Manager		= { nullptr };
+	class CRenderer*			m_pRenderer					= { nullptr };
+	class CPipeLine*			m_pPipeLine					= { nullptr };
+	class CLight_Manager*		m_pLight_Manager			= { nullptr };
 	class CPicking_Manager*		m_pPicking_Manager			= { nullptr };
-	class CCollisionMgr*		m_pCollision_Manager			 = { nullptr };
-	class CFont_Manager*		m_pFont_Manager			= { nullptr };
-	class CRound_Manager*		m_pRound_Manager		= { nullptr };
-	class CUIManager*			m_pUI_Manager			= { nullptr };
-	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
+	class CCollisionMgr*		m_pCollision_Manager		= { nullptr };
+	class CFont_Manager*		m_pFont_Manager				= { nullptr };
+	class CRound_Manager*		m_pRound_Manager			= { nullptr };
+	class CUIManager*			m_pUI_Manager				= { nullptr };
+	class CTarget_Manager*		m_pTarget_Manager			= { nullptr };
+	class CPicking*				m_pPicking					= { nullptr };
 
 public:
 	static void Release_Engine();

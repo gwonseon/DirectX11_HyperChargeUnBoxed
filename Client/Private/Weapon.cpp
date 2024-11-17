@@ -34,6 +34,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_bReloading = pDesc->bReload;
 	m_pReloading_Time = pDesc->fReloadingTime;
 	m_iViewState = pDesc->m_iViewState;
+	m_vecTargetPos = pDesc->vTargetPos;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -118,10 +119,10 @@ void CWeapon::Update(_float fTimeDelta)
 {
 	if (*m_iViewState == PLAYER_FPS_VIEW)
 	{
-		m_iShaderPassNum = 1;
+		m_iShaderPassNum = 4;
 	}
 	else
-		m_iShaderPassNum = 0;
+		m_iShaderPassNum = 5;
 	
 
 
@@ -152,7 +153,9 @@ void CWeapon::Late_Update(_float fTimeDelta)
 		{
 			--m_iCurrent_Bullet;
 			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
-			Desc.m_vecWeaponDir = (*m_vecCameraAt - Desc.m_vecWeaponPos);	// At까지의 방향, 총구 방향과 다름 주의
+		
+			_vector vTarget =	vTarget = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
+			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// 목표까지의 방향, 총구 방향과 다름 주의
 			Desc.m_vecCameraPos = *m_vecCameraPos;
 			Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
 			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
@@ -173,7 +176,8 @@ void CWeapon::Late_Update(_float fTimeDelta)
 		{
 			--m_iCurrent_Bullet;
 			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
-			Desc.m_vecWeaponDir = (*m_vecCameraAt - Desc.m_vecWeaponPos);	// At까지의 방향, 총구 방향과 다름 주의
+			_vector vTarget = vTarget = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
+			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// 목표까지의 방향, 총구 방향과 다름 주의			
 			Desc.m_vecCameraPos = *m_vecCameraPos;
 			Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
 			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
@@ -250,6 +254,9 @@ HRESULT CWeapon::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 	//	return E_FAIL;
 

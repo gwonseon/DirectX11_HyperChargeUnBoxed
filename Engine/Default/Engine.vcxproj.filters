@@ -130,9 +130,6 @@
     <Filter Include="01. Utility\04. Component\VIBuffer\Cell">
       <UniqueIdentifier>{075a99e7-a2d3-4775-af31-6e9fd7509b4b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="08. ShaderFiles">
-      <UniqueIdentifier>{d7effe59-07a6-450b-a3e9-e5c9b884ba43}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Utility\04. Component\Collider">
       <UniqueIdentifier>{40bf8348-172c-4bf6-91b3-c60607757761}</UniqueIdentifier>
     </Filter>
@@ -190,11 +187,17 @@
     <Filter Include="01. Utility\98. Manager\05. UIMgr">
       <UniqueIdentifier>{cd517d86-da2c-469a-b484-d53c3adbcdbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="09. RenderTarget">
+    <Filter Include="01. Utility\09. RenderTarget">
       <UniqueIdentifier>{b2b8f06f-2f9d-424b-9827-5bec63cad786}</UniqueIdentifier>
     </Filter>
-    <Filter Include="09. RenderTarget\Manager">
+    <Filter Include="01. Utility\09. RenderTarget\Manager">
       <UniqueIdentifier>{da520033-f69a-43ca-aeed-236f423b9043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\08. ShaderFiles">
+      <UniqueIdentifier>{d7effe59-07a6-450b-a3e9-e5c9b884ba43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\10. Picking">
+      <UniqueIdentifier>{0d6eea82-0984-4ff9-af2c-107ff9db63a6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -370,10 +373,13 @@
       <Filter>01. Utility\04. Component\VIBuffer\Instancing\Grass</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Target_Manager.cpp">
-      <Filter>09. RenderTarget\Manager</Filter>
+      <Filter>01. Utility\09. RenderTarget\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RenderTarget.cpp">
-      <Filter>09. RenderTarget</Filter>
+      <Filter>01. Utility\09. RenderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Picking.cpp">
+      <Filter>01. Utility\10. Picking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -561,23 +567,26 @@
       <Filter>01. Utility\04. Component\VIBuffer\Instancing\Grass</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RenderTarget.h">
-      <Filter>09. RenderTarget</Filter>
+      <Filter>01. Utility\09. RenderTarget</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Target_Manager.h">
-      <Filter>09. RenderTarget\Manager</Filter>
+      <Filter>01. Utility\09. RenderTarget\Manager</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_Cell.hlsl">
-      <Filter>08. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
-      <Filter>08. ShaderFiles</Filter>
-    </FxCompile>
+    <ClInclude Include="..\Public\Picking.h">
+      <Filter>01. Utility\10. Picking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
-      <Filter>08. ShaderFiles</Filter>
+      <Filter>01. Utility\08. ShaderFiles</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Cell.hlsl">
+      <Filter>01. Utility\08. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>01. Utility\08. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

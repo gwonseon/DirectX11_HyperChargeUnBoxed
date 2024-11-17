@@ -23,6 +23,7 @@ public:
 		_bool* bShotStart{}; // 사격 시작 타이밍
 		_bool* bReload{}; // 장전
 		_float* fReloadingTime{};
+		_float3* vTargetPos{};
 	}WEAPON_DESC;
 
 
@@ -155,7 +156,8 @@ private:
 	_uint* m_iViewState{};
 	_vector* m_vecCameraAt{};
 	_vector* m_vecCameraPos{};
-	
+	_float3* m_vecTargetPos{};
+
 	_bool* m_bShotStart = {nullptr};
 	_bool* m_bReloading = { nullptr };
 

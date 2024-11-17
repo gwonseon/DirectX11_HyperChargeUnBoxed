@@ -796,7 +796,7 @@ HRESULT CLevel_Yard::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_YARD;
-	
+	pDesc.pPlayer = m_pPlayer;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc)))
 		return E_FAIL;
 
@@ -851,6 +851,17 @@ HRESULT CLevel_Yard::Ready_Lights()
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
+
+	ZeroMemory(&LightDesc, sizeof LightDesc);
+	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+	LightDesc.vPosition = _float4(500.f, 5.f, 500.f, 1.f);
+	LightDesc.fRange = 10.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.3f, 0.3f, 1.f);
+	LightDesc.vAmbient = _float4(0.2f, 0.0f, 0.0f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 0.3f, 0.3f, 1.f);
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -1303,6 +1314,7 @@ void CLevel_Yard::Load_Map()
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
+		Desc.pPlayer = m_pPlayer;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
 		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, TEXT("Layer_Environment"),
 			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
@@ -1341,6 +1353,7 @@ void CLevel_Yard::Load_Map()
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
+		Desc.pPlayer = m_pPlayer;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
 		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, TEXT("Layer_Environment"),
 			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));

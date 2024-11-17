@@ -12,6 +12,7 @@ float4 g_vMtrlAmbient = float4(0.4f, 0.4f, 0.4f, 1.f);
 float4 g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 
 float4 g_vCamPosition;
+float  g_fFar;
 
 struct VS_IN
 {
@@ -79,7 +80,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
     Out.vDiffuse = vMtrlDiffuse;;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
 
     return Out;
 }

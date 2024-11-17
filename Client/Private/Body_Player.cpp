@@ -737,65 +737,51 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			default:
 				break;
 			}
-
 		}
-
-
 	}
 
+	////점프
+	//if (*m_pParentState_Lower & CPlayer::JUMP_START && m_iJumpState == 0)
+	//{
+	//	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Start, false);
+	//	m_iJumpState = 1;
+	//	m_bAnimInit = false;
+	//}
+	//if (m_bAnimState == true && m_iJumpState == 3 && m_fHeight <= 0.f)
+	//{
+	//	m_bAnimInit = false;
+	//	m_iJumpState = 0;
+	//}
+	//if (m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= 0.f)
+	//{
+	//	m_bAnimInit = false;
+	//	m_iJumpState = 2;
+	//}
+	//else if (m_bAnimState == false && m_iJumpState == 2 && m_fHeight <= 2.8f && m_fPower <= 0)
+	//{
+	//	m_bAnimInit = false;
+	//	m_iJumpState = 3;
+	//}
 
+	//if (*m_pParentState_Lower & CPlayer::JUMP_LOOP)
+	//	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Loop, true);
 
-
-	//점프
-	if (*m_pParentState_Lower & CPlayer::JUMP_START && m_iJumpState == 0)
-	{
-		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Start, false);
-		m_iJumpState = 1;
-		m_bAnimInit = false;
-	}
-	if (m_bAnimState == true && m_iJumpState == 3 && m_fHeight <= 0.f)
-	{
-		m_bAnimInit = false;
-		m_iJumpState = 0;
-
-	}
-	if (m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= 0.f)
-	{
-		m_bAnimInit = false;
-		m_iJumpState = 2;
-
-	}
-	else if (m_bAnimState == false && m_iJumpState == 2 && m_fHeight <= 2.8f && m_fPower <= 0)
-	{
-		m_bAnimInit = false;
-		m_iJumpState = 3;
-	}
-
-	if (*m_pParentState_Lower & CPlayer::JUMP_LOOP)
-		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Loop, true);
-
-	if (*m_pParentState_Lower & CPlayer::JUMP_END)
-		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_End, false);
+	//if (*m_pParentState_Lower & CPlayer::JUMP_END)
+	//	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_End, false);
 
 
 }
 
 HRESULT CBody_Player::Add_Components()
 {
-	/* 멤버변수로 직접 참조를 하게되면 */
-	/* 1. 내가 내 컴포넌트를 이용하고자할 때 굳이 검색이 필요없이 특정 멤버변수로 바로 기능을 이용하면 된다. */
-	/* 2. 다른 객체가 내 컴포넌트를 검색하고자 할때 스위치케이스가 겁나 늘어나는 상황. */
-
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Model_Anim7"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
-
 	/* For.Com_Collider_AABB */
 	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
 	AABBDesc.vExtents = _float3(0.5f, 1.f, 0.5f);
@@ -803,7 +789,6 @@ HRESULT CBody_Player::Add_Components()
 	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Collider_AABB"),
 		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -819,7 +804,9 @@ HRESULT CBody_Player::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 	//	return E_FAIL;
 

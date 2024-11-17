@@ -36,6 +36,7 @@ protected:
 	_float	m_fNearZ = { 0.f };
 	_float	m_fFar = { 0.f };
 	_float4 m_vEye{}, m_vAt{};
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free();
