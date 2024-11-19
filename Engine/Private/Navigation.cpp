@@ -83,7 +83,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 			{
 				vPoints[2].y = 0.1f;
 			}
-			CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+			CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size(),CCell::GROUND_TYPE);
 			if (nullptr == pCell)
 				return E_FAIL;
 			pCell->Set_G(INFINITY); // G 값 무한대로 초기화( Astar 알고리즘에서 이웃셀의 비교를 위함)
@@ -116,9 +116,14 @@ HRESULT CNavigation::Initialize(void* pArg)
 }
 
 
-void CNavigation::Create_Cell(_float3 vPoints[3])
+void CNavigation::Create_Cell(_float3 vPoints[3], _uint CellType)
 {
-	CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+	CCell* pCell = { nullptr };
+	if(CellType == 0)
+		pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size(), CCell::CELL_TYPE::GROUND_TYPE);
+	else
+		pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size(), CCell::CELL_TYPE::HEIGHT_TYPE);
+
 	m_Cells.push_back(pCell);
 	SetUp_Neighbor();
 
@@ -224,7 +229,7 @@ _bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSli
 {
 	_vector vLocalPos = XMVector3Transform(vWorldPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 	_int iNeighborIndex = { -1 };
-
+	
 	// 현재 셀 내에 위치 확인, 현재 셀 안에 있음
 	if (false == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex, vSlidingPos, true))
 	{
@@ -236,7 +241,6 @@ _bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSli
 		_uint iInfinite_Check{};
 		while (true)
 		{
-			
 			if (m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex, vSlidingPos, false))
 			{
 				// 이미 슬라이드가 확정 된 상황에서, 오버한 지점에 대해 검사했더니 true인 경우
@@ -265,10 +269,8 @@ _bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSli
 		// 현재 셀을 이웃 셀로 업데이트
 		m_iCurrentCellIndex = iNeighborIndex;
 		//cout << m_iCurrentCellIndex << endl;
-		
 		return true;
 	}
-	
 	return true;  // 현재 셀 내에 있을 경우
 }
 vector<_float3> CNavigation::Find_Path_AStar(_int iStartIndex, _int iTargetIndex)

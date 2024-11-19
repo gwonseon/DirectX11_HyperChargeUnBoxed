@@ -85,7 +85,7 @@ HRESULT CExplosion::Render()
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(0))) 
             return E_FAIL;
 
         m_pModelCom->Render(i);

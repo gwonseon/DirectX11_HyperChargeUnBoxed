@@ -67,6 +67,8 @@ public:
 	virtual void Update(_float fTimeDelta) ;
 	virtual void Late_Update(_float fTimeDelta) ;
 	virtual HRESULT Render();
+	virtual HRESULT Render_Height() override;
+
 
 	void Set_TargetPos(_vector* pPos) { m_vecTargetPos = pPos; }
 

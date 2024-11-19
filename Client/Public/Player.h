@@ -190,8 +190,9 @@ private:
 private:
 	_float	m_fHeight{};		// 점프 높이
 	_float m_fPower{};			// 점프 힘
+	_float	m_fHeight_Store{};
 	_float	m_fInvincibleTime{}; // 무적시간
-
+	
 	_vector	m_vecPos{}, m_vecDir{}, m_vecDir2{};
 
 private:

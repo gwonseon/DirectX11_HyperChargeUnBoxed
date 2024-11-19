@@ -142,6 +142,8 @@ void CBody_Player::Late_Update(_float fTimeDelta)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
 			return;
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+			return;
 	}
 }
 
@@ -176,7 +178,39 @@ HRESULT CBody_Player::Render()
 	return S_OK;
 }
 
+HRESULT CBody_Player::Render_Shadow()
+{
+	_float4x4			ViewMatrix, ProjMatrix;
 
+	_float fFar = m_pGameInstance->Get_CameraFar();
+
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(0.f, 10.f, -8.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)g_iWinSizeX / g_iWinSizeY, 0.1f, 9000));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(5)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
 void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 {
 	if (*m_pParentState_Upper & CPlayer::FIRE)
@@ -476,7 +510,6 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			default:
 				break;
 			}
-
 		}
 
 		if (*m_pParentState_Lower & CPlayer::WALKSTATE_NORTHEAST)
@@ -550,7 +583,6 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			default:
 				break;
 			}
-
 		}
 
 		if (*m_pParentState_Lower & CPlayer::WALKSTATE_SOUTHEAST)
@@ -588,6 +620,7 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 				break;
 			}
 		}
+
 		if (*m_pParentState_Lower & CPlayer::STATE_IDLE)
 		{
 			switch (m_iWeaponState)
@@ -622,8 +655,8 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			default:
 				break;
 			}
-
 		}
+
 		m_bRunState = false;
 		if (*m_pParentState_Lower & CPlayer::RUNSTATE_NORTH)
 		{
@@ -660,9 +693,7 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			default:
 				break;
 			}
-
 		}
-
 
 		if (*m_pParentState_Lower & CPlayer::RUNSTATE_NORTHWEST)
 		{
@@ -699,7 +730,6 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 			default:
 				break;
 			}
-
 		}
 
 		if (*m_pParentState_Lower & CPlayer::RUNSTATE_NORTHEAST)
@@ -740,35 +770,34 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 		}
 	}
 
-	////점프
-	//if (*m_pParentState_Lower & CPlayer::JUMP_START && m_iJumpState == 0)
-	//{
-	//	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Start, false);
-	//	m_iJumpState = 1;
-	//	m_bAnimInit = false;
-	//}
-	//if (m_bAnimState == true && m_iJumpState == 3 && m_fHeight <= 0.f)
-	//{
-	//	m_bAnimInit = false;
-	//	m_iJumpState = 0;
-	//}
-	//if (m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= 0.f)
-	//{
-	//	m_bAnimInit = false;
-	//	m_iJumpState = 2;
-	//}
-	//else if (m_bAnimState == false && m_iJumpState == 2 && m_fHeight <= 2.8f && m_fPower <= 0)
-	//{
-	//	m_bAnimInit = false;
-	//	m_iJumpState = 3;
-	//}
+	//점프  
+	if (*m_pParentState_Lower & CPlayer::JUMP_START && m_iJumpState == 0)
+	{
+		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Start, false);
+		m_iJumpState = 1;
+		m_bAnimInit = false;
+	}
+	if (m_bAnimState == false && m_iJumpState == 3 && m_fHeight <= m_fMinHeight + 4.f)
+	{
+		m_bAnimInit = false;
+		m_iJumpState = 0;
+	}
+	if (m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= m_fMinHeight + 2.5f)
+	{
+		m_bAnimInit = false;
+		m_iJumpState = 2;
+	}
+	else if (m_bAnimState == false && m_iJumpState == 2 && m_fHeight <= m_fMinHeight + 3.f && m_fPower <= 0.5)
+	{
+		m_bAnimInit = false;
+		m_iJumpState = 3;
+	}
+	
+	if (*m_pParentState_Lower & CPlayer::JUMP_LOOP)
+		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Loop, true);
 
-	//if (*m_pParentState_Lower & CPlayer::JUMP_LOOP)
-	//	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Loop, true);
-
-	//if (*m_pParentState_Lower & CPlayer::JUMP_END)
-	//	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_End, false);
-
+	if (*m_pParentState_Lower & CPlayer::JUMP_END)
+		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Loop, false);
 
 }
 

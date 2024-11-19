@@ -10,7 +10,7 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex)
+HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex, CELL_TYPE eType)
 {
 	m_iIndex = iIndex; // ¼¿ÀÇ ÀÎµ¦½º
 	_float fCenterX{}, fCenterY{}, fCenterZ{};
@@ -24,7 +24,7 @@ HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex)
 	}
 	m_vCenterPoints = {fCenterX/3, fCenterY/3, fCenterZ/3}; // ÁßÁ¡ ÁÂÇ¥ , 3Á¡À» ´õÇØ¼­ 3À¸·Î ³ª´²ÁÜ
 	// m_iNeighbors ÀÌ ÀÌ¿ô¼¿
-
+	m_eCellType = eType;
 #ifdef _DEBUG
 	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
 	if (nullptr == m_pVIBuffer)
@@ -48,6 +48,9 @@ _bool CCell::isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosit
 		{
 			if(pNeighborIndex)
 				*pNeighborIndex = m_iNeighbors[i];
+
+
+
 			if (m_iNeighbors[i] == -1)
 			{
 				_vector vSlidePos = XMLoadFloat3(&m_vPoints[i]) + vDir + -1.f * XMVectorGetX(vDot) * XMVector3Normalize(vNormal);
@@ -72,6 +75,7 @@ _bool CCell::isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosit
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -151,11 +155,11 @@ HRESULT CCell::Render()
 
 }
 #endif
-CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex)
+CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex, CELL_TYPE eType)
 {
 	CCell* pInstance = new CCell(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(pPoints, iIndex)))
+	if (FAILED(pInstance->Initialize(pPoints, iIndex, eType)))
 	{
 		MSG_BOX("Failed To Created : CCell");
 		Safe_Release(pInstance);

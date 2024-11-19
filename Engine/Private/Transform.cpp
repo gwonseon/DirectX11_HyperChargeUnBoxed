@@ -1,6 +1,7 @@
 #include "..\Public\Transform.h"
 #include "Shader.h"
 #include "Navigation.h"
+#include "GameInstance.h"
 
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -52,65 +53,6 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 
 }
-void CTransform::Go_Straight(_float fTimeDelta)
-{
-	_vector		vLook = Get_State(CTransform::STATE_LOOK);
-	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-
-	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
-	Set_State(CTransform::STATE_POSITION, vPosition);
-
-}
-void CTransform::Go_Straight(_float fTimeDelta, _float AddfSpeed)
-{
-	_vector		vLook = Get_State(CTransform::STATE_LOOK);
-	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-
-	vPosition += XMVector3Normalize(vLook) * (m_fSpeedPerSec * AddfSpeed) * fTimeDelta;
-	Set_State(CTransform::STATE_POSITION, vPosition);
-
-}
-
-//void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
-//{
-//	_vector vLook = Get_State(CTransform::STATE_LOOK);
-//	_vector vPosition = Get_State(CTransform::STATE_POSITION);
-//
-//	if (m_iCurrent_JumpState == 0 || m_iCurrent_JumpState == 3)
-//	{
-//		if (m_fJumpSpeed < 1.0f)
-//		{
-//			m_fJumpSpeed += fTimeDelta;
-//		}
-//	}
-//	else
-//	{
-//		if (m_fJumpSpeed > 0.1f)
-//			m_fJumpSpeed -= (fTimeDelta * 0.2f);
-//	}
-//
-//	// 이동할 목표 위치 계산
-//	_vector vTargetPosition = vPosition + XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
-//	_vector vSlidePos;  // 슬라이딩 위치를 저장할 변수
-//
-//	// 슬라이드 이동 처리
-//	if (nullptr != pNavigation)
-//	{
-//		if (!pNavigation->isMove_Slide(vTargetPosition, &vSlidePos))
-//		{
-//			// 슬라이드가 실패할 경우, 슬라이드 위치로 업데이트
-//			vPosition = vSlidePos;
-//		}
-//		else
-//		{
-//			// 슬라이드가 성공하면 목표 위치로 업데이트
-//			vPosition = vTargetPosition;
-//		}
-//	}
-//
-//	// 상태 업데이트
-//	Set_State(CTransform::STATE_POSITION, vPosition);
-//}
 
 void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
@@ -132,13 +74,14 @@ void CTransform::Go_Straight_Nav(_float fTimeDelta, CNavigation* pNavigation)
 	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
 	_vector vecSlidingPos{};
+
 	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
 	{
 		vPosition = vecSlidingPos;
 	}
+	
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
-
 void CTransform::Go_Backward_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -158,7 +101,6 @@ void CTransform::Go_Backward_Nav(_float fTimeDelta, CNavigation* pNavigation)
 				m_fJumpSpeed -= (fTimeDelta * 0.2f);
 		}
 	}
-	
 	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
 	_vector vecSlidingPos{};
@@ -168,7 +110,6 @@ void CTransform::Go_Backward_Nav(_float fTimeDelta, CNavigation* pNavigation)
 	}
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
-
 void CTransform::Go_Straight_Nav_Type2(_float fTimeDelta, _vector vPos, CNavigation* pNavigation)
 {
 	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
@@ -179,6 +120,8 @@ void CTransform::Go_Straight_Nav_Type2(_float fTimeDelta, _vector vPos, CNavigat
 	}
 	Set_State(CTransform::STATE_POSITION, vPos);
 }
+
+
 
 void CTransform::Go_Right_Nav(_float fTimeDelta, CNavigation* pNavigation)
 {
@@ -203,6 +146,8 @@ void CTransform::Go_Right_Nav(_float fTimeDelta, CNavigation* pNavigation)
 	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
 	_vector vecSlidingPos{};
+
+
 	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
 	{
 		vPosition = vecSlidingPos;
@@ -233,10 +178,34 @@ void CTransform::Go_Left_Nav(_float fTimeDelta, CNavigation* pNavigation)
 	_vector vCurrentPos = Get_State(CTransform::STATE_POSITION);
 	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta * m_fJumpSpeed;
 	_vector vecSlidingPos{};
+
 	if (nullptr != pNavigation && false == pNavigation->isMove(vPosition, vCurrentPos, vecSlidingPos))
 	{
 		vPosition = vecSlidingPos;
 	}
+	Set_State(CTransform::STATE_POSITION, vPosition);
+
+}
+
+
+/*
+	
+*/
+void CTransform::Go_Straight(_float fTimeDelta)
+{
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+
+	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+
+}
+void CTransform::Go_Straight(_float fTimeDelta, _float AddfSpeed)
+{
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+
+	vPosition += XMVector3Normalize(vLook) * (m_fSpeedPerSec * AddfSpeed) * fTimeDelta;
 	Set_State(CTransform::STATE_POSITION, vPosition);
 
 }
@@ -270,71 +239,169 @@ void CTransform::Go_Backward(_float fTimeDelta)
 
 }
 
-void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
+void CTransform::Go_Straight_Player(_float fTimeDelta)
 {
-	_vector	vRight = Get_State(STATE_RIGHT);
-	_vector	vUp = Get_State(STATE_UP);
-	_vector	vLook = Get_State(STATE_LOOK);
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector		vCurrentPos = Get_State(CTransform::STATE_POSITION);
 
-	_matrix		RotationMatrix = XMMatrixRotationAxis(vAxis, m_fRotationPerSec * fTimeDelta);
+	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 
-	Set_State(STATE_RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
-	Set_State(STATE_UP, XMVector3TransformNormal(vUp, RotationMatrix));
-	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
+	_float3 vHeight{};
+	m_pGameInstance->isComputeHeight(vPosition, &vHeight);
+	_float fPlayerHeight = XMVectorGetY(vPosition);
+	_float fGroundHeight = vHeight.y;
+	// 플레이어 높이가 더 높을 때( 둘의 차이가 많이 날 때)
+	if (fPlayerHeight > fGroundHeight && (fPlayerHeight - fGroundHeight) > 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), fPlayerHeight, XMVectorGetZ(vPosition), 1.f);
+	}
+	// 장애물 높이가 많이 더 높을 때 슬라이딩
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) > 1.f)
+	{
+		vPosition = vCurrentPos;
+	}
+	// 플레이어랑 장애물의 높이 차이가 얼마 안날 때
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) <= 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), vHeight.y, XMVectorGetZ(vPosition), 1.f);
+	}
+
+	Set_State(CTransform::STATE_POSITION, vPosition);
+
+}
+void CTransform::Go_Straight_Player(_float fTimeDelta, _float AddfSpeed)
+{
+
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector		vCurrentPos = Get_State(CTransform::STATE_POSITION);
+
+	vPosition += XMVector3Normalize(vLook) * (m_fSpeedPerSec * AddfSpeed) * fTimeDelta;
+
+	_float3 vHeight{};
+	m_pGameInstance->isComputeHeight(vPosition, &vHeight);
+	_float fPlayerHeight = XMVectorGetY(vPosition);
+	_float fGroundHeight = vHeight.y;
+	// 플레이어 높이가 더 높을 때( 둘의 차이가 많이 날 때)
+	if (fPlayerHeight > fGroundHeight && (fPlayerHeight - fGroundHeight) > 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), fPlayerHeight, XMVectorGetZ(vPosition), 1.f);
+	}
+	// 장애물 높이가 많이 더 높을 때 
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) > 1.f)
+	{
+		vPosition = vCurrentPos;
+	}
+	// 플레이어랑 장애물의 높이 차이가 얼마 안날 때
+	else if ((fGroundHeight > fPlayerHeight) && ((fGroundHeight - fPlayerHeight) <= 1.f))
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), vHeight.y, XMVectorGetZ(vPosition), 1.f);
+	}
+
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
-void CTransform::Turn(_bool bX, _bool bY, _bool bZ, _float fTimeDelta)
+void CTransform::Go_Left_Player(_float fTimeDelta)
 {
-	_vector		vRight = Get_State(STATE_RIGHT);
-	_vector		vUp = Get_State(STATE_UP);
-	_vector		vLook = Get_State(STATE_LOOK);
+	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector		vCurrentPos = Get_State(CTransform::STATE_POSITION);
 
-	_float		fRotationSpeed = m_fRotationPerSec * fTimeDelta;
+	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	_vector		vQuaternion = XMQuaternionRotationRollPitchYaw(bX * fRotationSpeed, bY * fRotationSpeed, bZ * fRotationSpeed);
-
-	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vQuaternion);
-
-	Set_State(STATE_RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
-	Set_State(STATE_UP, XMVector3TransformNormal(vUp, RotationMatrix));
-	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
+	_float3 vHeight{};
+	m_pGameInstance->isComputeHeight(vPosition, &vHeight);
+	_float fPlayerHeight = XMVectorGetY(vPosition);
+	_float fGroundHeight = vHeight.y;
+	// 플레이어 높이가 더 높을 때( 둘의 차이가 많이 날 때)
+	if (fPlayerHeight > fGroundHeight && (fPlayerHeight - fGroundHeight) > 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), fPlayerHeight, XMVectorGetZ(vPosition), 1.f);
+	}
+	// 장애물 높이가 많이 더 높을 때 슬라이딩
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) > 1.f)
+	{
+		vPosition = vCurrentPos;
+	}
+	// 플레이어랑 장애물의 높이 차이가 얼마 안날 때
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) <= 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), vHeight.y, XMVectorGetZ(vPosition), 1.f);
+	}
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
-void CTransform::Rotation(_float fX, _float fY, _float fZ)
+void CTransform::Go_Right_Player(_float fTimeDelta)
 {
-	_float3		vScaled = Get_Scaled();
-
-	_vector		vRight = XMVectorSet(1.f, 0.f, 0.f, 0.f) * vScaled.x;
-	_vector		vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f) * vScaled.y;
-	_vector		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z;
-
-	_vector		vQuaternion = XMQuaternionRotationRollPitchYaw(fX, fY, fZ);
-
-	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vQuaternion);
-
-	Set_State(STATE_RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
-	Set_State(STATE_UP, XMVector3TransformNormal(vUp, RotationMatrix));
-	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
+	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector		vCurrentPos = Get_State(CTransform::STATE_POSITION);
+	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
+	_float3 vHeight{};
+	m_pGameInstance->isComputeHeight(vPosition, &vHeight);
+	_float fPlayerHeight = XMVectorGetY(vPosition);
+	_float fGroundHeight = vHeight.y;
+	// 플레이어 높이가 더 높을 때( 둘의 차이가 많이 날 때)
+	if (fPlayerHeight > fGroundHeight && (fPlayerHeight - fGroundHeight) > 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), fPlayerHeight, XMVectorGetZ(vPosition), 1.f);
+	}
+	// 장애물 높이가 많이 더 높을 때 슬라이딩
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) > 1.f)
+	{
+		vPosition = vCurrentPos;
+	}
+	// 플레이어랑 장애물의 높이 차이가 얼마 안날 때
+	else if (fGroundHeight > fPlayerHeight && (fGroundHeight - fPlayerHeight) <= 1.f)
+	{
+		vPosition = XMVectorSet(XMVectorGetX(vPosition), vHeight.y, XMVectorGetZ(vPosition), 1.f);
+	}
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
-void CTransform::Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount)
+void CTransform::Go_Backward_Player(_float fTimeDelta)
 {
-	
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Gravity(_vector vPos, _float fTimeDelta, _float fMinHeight)
+{
+	_vector		vUp = Get_State(CTransform::STATE_UP);
+	if (XMVectorGetY(vPos) > fMinHeight)
+	{
+		vPos += vUp * -9.8f * fTimeDelta * 2.f;
+		if(XMVectorGetY(vPos) >= fMinHeight)
+			Set_State(CTransform::STATE_POSITION, vPos);
+		else
+		{
+			vPos = XMVectorSetY(vPos, fMinHeight);
+			Set_State(CTransform::STATE_POSITION, vPos);
+		}
+	}
+}
+
+void CTransform::Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount, _float fMinHeight)
+{
 	_vector		vLook = Get_State(CTransform::STATE_UP);
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	m_iCurrent_JumpState = iJumpCount;
 	float fHeight_ = XMVectorGetY(vPosition);
-	if(fHeight_ >= 0.f )
+	
+ 	if(fHeight_ >= fMinHeight)
 	{
 		if(iJumpCount == 1)
 		{
 			if (iJumpState == 2)
-				fPower -= 0.4f;
+				fPower -= 0.8f;
 		}
 		if (iJumpCount == 2)
 		{
 			if (iJumpState == 2)
-				fPower -= 0.5f;
+				fPower -= 1.f;
 		}
 		
 		vPosition += XMVector3Normalize(vLook) * fPower * fTimeDelta;
@@ -351,12 +418,59 @@ void CTransform::Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint 
 	fHeight = fHeight_;
 	
 }
-
 void CTransform::Set_Min_Height()
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-	vPosition = XMVectorSetY(vPosition, 0.f);
-	Set_State(CTransform::STATE_POSITION, vPosition);
+	if(XMVectorGetY(vPosition) < 0.f)
+	{
+		vPosition = XMVectorSetY(vPosition, 0.f);
+		Set_State(CTransform::STATE_POSITION, vPosition);
+	}
+}
+
+void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
+{
+	_vector	vRight = Get_State(STATE_RIGHT);
+	_vector	vUp = Get_State(STATE_UP);
+	_vector	vLook = Get_State(STATE_LOOK);
+
+	_matrix		RotationMatrix = XMMatrixRotationAxis(vAxis, m_fRotationPerSec * fTimeDelta);
+
+	Set_State(STATE_RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
+	Set_State(STATE_UP, XMVector3TransformNormal(vUp, RotationMatrix));
+	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
+}
+void CTransform::Turn(_bool bX, _bool bY, _bool bZ, _float fTimeDelta)
+{
+	_vector		vRight = Get_State(STATE_RIGHT);
+	_vector		vUp = Get_State(STATE_UP);
+	_vector		vLook = Get_State(STATE_LOOK);
+
+	_float		fRotationSpeed = m_fRotationPerSec * fTimeDelta;
+
+	_vector		vQuaternion = XMQuaternionRotationRollPitchYaw(bX * fRotationSpeed, bY * fRotationSpeed, bZ * fRotationSpeed);
+
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vQuaternion);
+
+	Set_State(STATE_RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
+	Set_State(STATE_UP, XMVector3TransformNormal(vUp, RotationMatrix));
+	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
+}
+void CTransform::Rotation(_float fX, _float fY, _float fZ)
+{
+	_float3		vScaled = Get_Scaled();
+
+	_vector		vRight = XMVectorSet(1.f, 0.f, 0.f, 0.f) * vScaled.x;
+	_vector		vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f) * vScaled.y;
+	_vector		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z;
+
+	_vector		vQuaternion = XMQuaternionRotationRollPitchYaw(fX, fY, fZ);
+
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vQuaternion);
+
+	Set_State(STATE_RIGHT, XMVector3TransformNormal(vRight, RotationMatrix));
+	Set_State(STATE_UP, XMVector3TransformNormal(vUp, RotationMatrix));
+	Set_State(STATE_LOOK, XMVector3TransformNormal(vLook, RotationMatrix));
 }
 
 _bool CTransform::KnockBack(_float fTimeDelta, _vector vKnockBackDir, _float& fPower, _float StartHeight)
@@ -380,7 +494,6 @@ _bool CTransform::KnockBack(_float fTimeDelta, _vector vKnockBackDir, _float& fP
 	Set_State(CTransform::STATE_POSITION, vPosition);
 	return false;
 }
-
 _float CTransform::Cal_Distance(_float3 fObj, _float3 fTarget)
 {
 	_float fDistance = ((fObj.x - fTarget.x) * (fObj.x - fTarget.x)) +
@@ -388,7 +501,6 @@ _float CTransform::Cal_Distance(_float3 fObj, _float3 fTarget)
 		((fObj.z - fTarget.z) * (fObj.z - fTarget.z));
 	return fDistance;
 }
-
 _float CTransform::Cal_Distance_vec(_vector vObj, _vector vTarget)
 {
 	_float3 fObj{}, fTarget{};
@@ -400,14 +512,12 @@ _float CTransform::Cal_Distance_vec(_vector vObj, _vector vTarget)
 	
 	return fDistance;
 }
-
 _float CTransform::Cal_Distance_No_Height(_float3 fObj, _float3 fTarget)
 {
 	_float fDistance = ((fObj.x - fTarget.x) * (fObj.x - fTarget.x)) +
 		((fObj.z - fTarget.z) * (fObj.z - fTarget.z));
 	return fDistance;
 }
-
 _float CTransform::Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget)
 {
 	_float3 fObj{}, fTarget{};
@@ -418,6 +528,7 @@ _float CTransform::Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget)
 
 	return fDistance;
 }
+
 
 
 _bool CTransform::IsPass_TargetPosition(_vector prevPos, _vector currentPos, _vector targetPos)

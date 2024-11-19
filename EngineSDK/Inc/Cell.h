@@ -9,6 +9,7 @@ class CCell final : public CBase
 public: // 셀은 삼각형 단위이기 때문에 점도 선도 각각 3개 씩이다.
 	enum POINT { POINT_A, POINT_B, POINT_C, POINT_END };
 	enum LINE { LINE_AB, LINE_BC, LINE_CA, LINE_END };
+	enum CELL_TYPE {GROUND_TYPE, HEIGHT_TYPE, TYPE_END};
 
 private:
 	CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -26,7 +27,7 @@ public:
 	}
 
 public:
-	HRESULT Initialize(const _float3* pPoints, _uint iIndex);
+	HRESULT Initialize(const _float3* pPoints, _uint iIndex, CELL_TYPE eType = GROUND_TYPE);
 	_bool isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosition, const _bool& bCalcSlide);
 	_bool Compare_Points(_fvector vSour, _fvector vDest);
 
@@ -47,7 +48,7 @@ private:
 	_uint					m_iIndex = {};
 	_int					m_iNeighbors[LINE_END] = { -1, -1, -1 }; // 이웃셀의 인덱스 넘버 3개를 보관한다. 이웃이 없으면 -1로 두고 나중에 처리한다.
 
-    
+	CELL_TYPE				m_eCellType  = GROUND_TYPE;
 
 	// 길찾기
 private:
@@ -83,7 +84,7 @@ private:
 	class CVIBuffer_Cell* m_pVIBuffer = { nullptr };
 #endif
 public:
-	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex);
+	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex, CELL_TYPE eType = GROUND_TYPE);
 	virtual void Free() override;
 };
 

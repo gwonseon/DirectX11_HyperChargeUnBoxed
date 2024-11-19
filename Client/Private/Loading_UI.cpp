@@ -64,7 +64,7 @@ void CLoading_UI::Update(_float fTimeDelta)
         {
             m_iIndex += 1;
         }
-        if (m_iIndex == 36)
+        if (m_iIndex == 35)
         {
             m_iIndex = 0;
         }

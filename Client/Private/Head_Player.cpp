@@ -93,7 +93,7 @@ void CHead_Player::Update(_float fTimeDelta)
 
 void CHead_Player::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
 		return;
 }
 

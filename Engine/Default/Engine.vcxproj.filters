@@ -199,6 +199,12 @@
     <Filter Include="01. Utility\10. Picking">
       <UniqueIdentifier>{0d6eea82-0984-4ff9-af2c-107ff9db63a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\02. GameObjects\BlendObject">
+      <UniqueIdentifier>{e5a27aeb-c632-455a-b600-646c5722c9dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\98. Manager\06. EffectMgr">
+      <UniqueIdentifier>{282cb0c8-b37c-454a-9a8f-cdbf6fa59ad9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -380,6 +386,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Picking.cpp">
       <Filter>01. Utility\10. Picking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BlendObject.cpp">
+      <Filter>01. Utility\02. GameObjects\BlendObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -574,6 +583,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Picking.h">
       <Filter>01. Utility\10. Picking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BlendObject.h">
+      <Filter>01. Utility\02. GameObjects\BlendObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

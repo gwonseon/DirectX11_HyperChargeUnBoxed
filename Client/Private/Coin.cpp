@@ -112,7 +112,7 @@ HRESULT CCoin::Add_Components()
 
     /* For.Com_Collider_Sphere*/
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-    SphereDesc.fRadius = 0.15f;
+    SphereDesc.fRadius = 0.3f;
     SphereDesc.vCenter = _float3(0.f, 0.f , 0.f);
 
     if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
@@ -139,22 +139,6 @@ HRESULT CCoin::Bind_ShaderResources()
     _float fFar = m_pGameInstance->Get_CameraFar();
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
         return E_FAIL;
-
-   /* if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
 
     return S_OK;
 

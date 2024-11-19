@@ -63,6 +63,9 @@ HRESULT CNavigation_Leve::Initialize()
 	
 		// 삼각형의 각 꼭짓점에 콜리전 박스 생성
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
+		CollisionDesc.iCellType = 0; // 
+
+
 		CollisionDesc.iImGuiMode = NAVIGATION;
 		CollisionDesc.eLevel = LEVEL_NAVIGATION;
 		CollisionDesc.iPoint_Number = 0;		// 배열의 뒷자리 숫자
@@ -202,6 +205,7 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 					m_fPickingPos = fBoxPos;
 					if (eNaviMode == SELECT_NAVIPOINT)
 					{
+						m_iCellType = pCollisionBox->Get_CellType();
 						m_iSelected_index = pCollisionBox->Get_IndexNumber();				
 					}
 
@@ -249,7 +253,7 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 					vPoints[i].y = 0.2f;
 			}
 			// 셀 생성 해줌
-			m_pTerrain->Get_NaviCom()->Create_Cell(vPoints);
+			m_pTerrain->Get_NaviCom()->Create_Cell(vPoints,m_iCellType);
 			for (int i = 0; i < 3; i++)
 			{
 				// 생성후 포인트 배열 초기화 해주기
@@ -392,7 +396,10 @@ HRESULT CNavigation_Leve::Render()
 	}
 	ImGui::Text("Position");
 	ImGui::DragFloat3("Position", fPoints, 0.1f, 0.f, 3000.f);
-
+	ImGui::Text(" ");		ImGui::Text(" ");
+	ImGui::Text("CellType");
+	ImGui::InputInt("CellType", &m_iCellType, 1);
+	ImGui::Text(" ");		ImGui::Text(" ");
 	if (ImGui::BeginListBox("Positions"))
 	{
 		_uint i = 0;
@@ -459,6 +466,7 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.iPoint_Number = 0;		// 배열의 뒷자리 숫자
 		CollisionDesc.fPosition = fPointPos;   // 점 위치 
 		CollisionDesc.iIndexNumber = m_iIndex; // 전체 포인트의 숫자
+		CollisionDesc.iCellType = m_iCellType;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		vPoints[0] = { fPointPos.x,fPointPos.y,fPointPos.z };
 		fPoints[0] = fPointPos.x;
@@ -476,6 +484,7 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.iPoint_Number = 1;
 		CollisionDesc.fPosition = fPointPos;
 		CollisionDesc.iIndexNumber = m_iIndex;
+		CollisionDesc.iCellType = m_iCellType;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		vPoints[1] = { fPointPos.x,fPointPos.y,fPointPos.z };
 		fPoints[0] = fPointPos.x;
@@ -493,6 +502,7 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.iPoint_Number = 2;
 		CollisionDesc.fPosition = fPointPos;
 		CollisionDesc.iIndexNumber = m_iIndex;
+		CollisionDesc.iCellType = m_iCellType;
 		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
 		vPoints[2] = { fPointPos.x,fPointPos.y,fPointPos.z };
 		fPoints[0] = fPointPos.x;
@@ -521,14 +531,17 @@ HRESULT CNavigation_Leve::Save_Navigation(_float fTimeDelta)
 		return E_FAIL;
 
 	_float3		vPoints[3];
-	
+	_uint iCellType{};
 	for (auto& pCol : m_vecCollision)
 	{
 		_uint iArray_index = pCol->Get_ArrayNumber();
 		vPoints[iArray_index] = pCol->Get_PickingPos();
+		iCellType = pCol->Get_CellType();
 		if (iArray_index == 2)
 		{
 			WriteFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
+			WriteFile(hFile, &iCellType, sizeof(_uint), &dwByte, nullptr);
+
 		}
 	}
 	CloseHandle(hFile);

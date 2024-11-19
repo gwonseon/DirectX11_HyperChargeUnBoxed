@@ -48,7 +48,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pPlayer->fPosition.x, pPlayer->fPosition.y, pPlayer->fPosition.z, 1.f));
-	m_pTransformCom->Set_Scaling(2.f, 2.f, 2.f);
+	m_pTransformCom->Set_Scaling(1.5f, 1.5f, 1.5f);
 	m_iWeaponState = WEAPON_RIFLE;
 	m_iPrevWeaponState = WEAPON_END;
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
@@ -119,16 +119,14 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
 
-	_float3 pos{};	XMStoreFloat3(&pos, m_vecPos);
-	// 높이 타기
-	_float3 vHeightPos{};
-	if (true == m_pGameInstance->isComputeHeight(m_pTransformCom->Get_State(CTransform::STATE_POSITION), &vHeightPos))
-	{
-		cout << vHeightPos.y << endl;
-		m_vecPos = XMVectorSetW(XMLoadFloat3(&vHeightPos), 1.f);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPos);
-	}
+	
+	
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float3 pos{};	
+	XMStoreFloat3(&pos, m_vecPos);
+
+	Player_Movement(fTimeDelta);					// 플레이어 동작
+
 #pragma endregion 카메라회전
 
 #pragma region 지워
@@ -184,7 +182,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	else
 		m_pKatana->Set_KatanaState(false);
 
-	Player_Movement(fTimeDelta);					// 플레이어 동작
+
 
 
 
@@ -239,14 +237,14 @@ HRESULT CPlayer::Add_Components()
 	case Client::LEVEL_GAMEPLAY:
 	{
 		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			TEXT("Com_Playerigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
 			return E_FAIL;
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
 		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+			TEXT("Com_Playerigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
 			return E_FAIL;
 		break;
 	}
@@ -347,18 +345,19 @@ HRESULT CPlayer::Bind_ShaderResources()
 void CPlayer::Player_Movement(_float fTimeDelta)
 {
 	_uint iJumpState = m_pBody->Get_JumpState();	// 점프 상태 가져오기
-	//if (iJumpState == LANDING_STATE) // 점프중엔 IDLE 상태 안되어야함
-	//{
-	//	m_iState_Lower = STATE_IDLE;
-	//	m_pTransformCom->Set_Min_Height();
-	//}
+	m_pTransformCom->Set_Min_Height();
+	if (iJumpState == LANDING_STATE) // 점프중엔 IDLE 상태 안되어야함
+	{
+
+		m_iState_Lower = STATE_IDLE;
+	}
 	if (m_pBody->Get_UpperBody_AnimState() == true)
 	{
 		m_iState_Upper = STATE_IDLE;
 	}
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_R))
 	{
-		if(m_iWeaponState != WEAPON_KATANA)
+		if (m_iWeaponState != WEAPON_KATANA)
 		{
 			m_fReload_Charging = 0.f;
 			m_bReloading = true;
@@ -400,7 +399,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		if (m_iWeaponState == WEAPON_KATANA)
 			m_bAttackState = true;
 		// 목표 위치
-		
+
 		m_pGameInstance->isPicked(&m_vecTargetPos);
 
 		if (!(m_iState_Upper & FIRE))
@@ -416,7 +415,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	{
 		m_iState_Upper = STATE_IDLE;
 	}
-	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB)) 
+	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB))
 	{
 		if (m_iWeaponState != WEAPON_KATANA)
 		{
@@ -434,7 +433,6 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 	}
 
-
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V) && m_iViewState == PLAYER_TPS_VIEW)
 	{
 		if (!(m_iState_Upper & MELEE))
@@ -445,18 +443,16 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 	}
 
-
-
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_S))
 	{
 		// 뒤 왼쪽으로 걷기 
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
-			
+
 			if (iJumpState == LANDING_STATE)
 			{
-				m_pTransformCom->Go_Left(fTimeDelta );
-				m_pTransformCom->Go_Backward(fTimeDelta );
+				m_pTransformCom->Go_Left(fTimeDelta);
+				m_pTransformCom->Go_Backward(fTimeDelta);
 				if (!(m_iState_Lower & WALKSTATE_SOUTHWEST))
 				{
 					if (m_iState_Lower & STATE_IDLE)
@@ -469,8 +465,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		// 뒤 오른쪽 으로 걷기
 		else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
-			m_pTransformCom->Go_Right(fTimeDelta );
-			m_pTransformCom->Go_Backward(fTimeDelta );
+			m_pTransformCom->Go_Right(fTimeDelta);
+			m_pTransformCom->Go_Backward(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_SOUTHEAST))
@@ -497,15 +493,14 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 	}
 
-
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_LSHIFT))
 	{
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_W))
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
-				m_pTransformCom->Go_Left(fTimeDelta * m_fRun_EightDirection);
-				m_pTransformCom->Go_Straight(fTimeDelta * m_fRun_EightDirection);
+				m_pTransformCom->Go_Left_Player(fTimeDelta * m_fRun_EightDirection);
+				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHWEST))
@@ -518,9 +513,9 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
-				m_pTransformCom->Go_Right(fTimeDelta * m_fRun_EightDirection);
-			//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
-				m_pTransformCom->Go_Straight(fTimeDelta * m_fRun_EightDirection);
+				m_pTransformCom->Go_Right_Player(fTimeDelta * m_fRun_EightDirection);
+				//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
+				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTHEAST))
@@ -533,8 +528,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else
 			{
-			//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
-				m_pTransformCom->Go_Straight(fTimeDelta * m_fRun_FourDirection);
+				//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
+				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_FourDirection);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & RUNSTATE_NORTH))
@@ -549,7 +544,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
-			m_pTransformCom->Go_Left(fTimeDelta);
+			m_pTransformCom->Go_Left_Player(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_WEST))
@@ -562,7 +557,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
-			m_pTransformCom->Go_Right(fTimeDelta);
+			m_pTransformCom->Go_Right_Player(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
 			{
 				if (!(m_iState_Lower & WALKSTATE_EAST))
@@ -580,12 +575,12 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
-				m_pTransformCom->Go_Straight(fTimeDelta);
-				m_pTransformCom->Go_Left(fTimeDelta * m_fRun_EightDirection);
+				m_pTransformCom->Go_Straight_Player(fTimeDelta);
+				m_pTransformCom->Go_Left_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
 				{
-				//	m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
-					
+					//	m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
+
 					if (!(m_iState_Lower & WALKSTATE_NORTHWEST))
 					{
 						if (m_iState_Lower & STATE_IDLE)
@@ -596,12 +591,12 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
-				m_pTransformCom->Go_Straight(fTimeDelta);
-				m_pTransformCom->Go_Right(fTimeDelta * m_fRun_EightDirection);
+				m_pTransformCom->Go_Straight_Player(fTimeDelta);
+				m_pTransformCom->Go_Right_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
 				{
-			//		m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
-					
+					//		m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
+
 					if (!(m_iState_Lower & WALKSTATE_NORTHEAST))
 					{
 						if (m_iState_Lower & STATE_IDLE)
@@ -612,8 +607,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else
 			{
-		//		m_pTransformCom->Go_Straight(fTimeDelta);
-				m_pTransformCom->Go_Straight(fTimeDelta);
+				//		m_pTransformCom->Go_Straight(fTimeDelta);
+				m_pTransformCom->Go_Straight_Player(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & WALKSTATE_NORTH))
@@ -629,7 +624,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
-				m_pTransformCom->Go_Left(fTimeDelta);
+				m_pTransformCom->Go_Left_Player(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & WALKSTATE_WEST))
@@ -642,7 +637,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
-				m_pTransformCom->Go_Right(fTimeDelta);
+				m_pTransformCom->Go_Right_Player(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
 				{
 					if (!(m_iState_Lower & WALKSTATE_EAST))
@@ -658,57 +653,78 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 
 
-	//if ((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE && m_iJumpCount == 0)  // 점프 시작
-	//{
-	//	iJumpState = JUMPING_START_STATE;
 
-	//	m_bJumpStart = false;
-	//	m_fPower = 0.f;
-	//	m_iJumpCount = 1;
-	//	if (!(m_iState_Lower & JUMP_START))
-	//	{
-	//		{
-	//			if (m_iState_Lower & STATE_IDLE)
-	//				m_iState_Lower ^= STATE_IDLE;
-	//			m_iState_Lower |= JUMP_START;
-	//		}
-	//	}
-	//}
-	//else if (iJumpState == JUMPING_LOOP_STATE)  // 점프 루프 시작
-	//{
-	//	if (m_bJumpStart == false)
-	//	{
-	//		m_fPower = 18.f;
-	//		m_bJumpStart = true;
-	//	}
-	//	if (!(m_iState_Lower & JUMP_LOOP))
-	//	{
-	//		if (m_iState_Lower & STATE_IDLE)
-	//			m_iState_Lower ^= STATE_IDLE;
-	//		m_iState_Lower |= JUMP_LOOP;
-	//	}
-	//}
-	//else if (iJumpState == JUMPING_END_STATE)  // 점프 마무리
-	//{
-	//	if (!(m_iState_Lower & JUMP_END))
-	//	{
-	//		if (m_iState_Lower & STATE_IDLE)
-	//			m_iState_Lower ^= STATE_IDLE;
-	//		m_iState_Lower |= JUMP_END;
-	//	}
-	//	m_iJumpCount = 0;
+	if ((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE && m_iJumpCount == 0)  // 점프 시작
+	{
+		iJumpState = JUMPING_START_STATE;
 
-	//}
-	//if (iJumpState >= JUMPING_LOOP_STATE)
-	//{
-	//	if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE) && m_iJumpCount == 1)
-	//	{
-	//		m_fPower = 18.f;
-	//		m_iJumpCount = 2;
-	//	}
-	//	m_pTransformCom->Jump(fTimeDelta, m_fHeight, m_fPower, iJumpState, m_iJumpCount);
-	//	m_pBody->Set_JumpState(m_fHeight, m_fPower);
-	//}
+		m_bJumpStart = false;
+		m_fPower = 0.f;
+		m_iJumpCount = 1;
+		if (!(m_iState_Lower & JUMP_START))
+		{
+			{
+				if (m_iState_Lower & STATE_IDLE)
+					m_iState_Lower ^= STATE_IDLE;
+				m_iState_Lower |= JUMP_START;
+			}
+		}
+	}
+	else if (iJumpState == JUMPING_LOOP_STATE)  // 점프 루프 시작
+	{
+		if (m_bJumpStart == false)
+		{
+			m_fPower = 50.f;
+			m_bJumpStart = true;
+		}
+		if (!(m_iState_Lower & JUMP_LOOP))
+		{
+			if (m_iState_Lower & STATE_IDLE)
+				m_iState_Lower ^= STATE_IDLE;
+			m_iState_Lower |= JUMP_LOOP;
+		}
+	}
+	else if (iJumpState == JUMPING_END_STATE)  // 점프 마무리
+	{
+		if (!(m_iState_Lower & JUMP_END))
+		{
+			if (m_iState_Lower & STATE_IDLE)
+				m_iState_Lower ^= STATE_IDLE;
+			m_iState_Lower |= JUMP_END;
+		}
+		m_iJumpCount = 0;
+
+	}
+
+	// 높이 타기 
+	_float3 vHeightPos{};
+	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	if (true == m_pGameInstance->isComputeHeight(m_vecPos, &vHeightPos))
+	{
+		m_fHeight_Store = vHeightPos.y;
+	}
+	else
+		m_fHeight_Store = 0.f;
+
+	if (XMVectorGetY(m_vecPos) < m_fHeight_Store && (m_fHeight_Store - XMVectorGetY(m_vecPos) <= 10.f))
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(vHeightPos.x, vHeightPos.y, vHeightPos.z,1.f));
+	}
+
+	// 중력
+	m_pTransformCom->Gravity(m_vecPos, fTimeDelta, m_fHeight_Store);
+
+	if (iJumpState >= JUMPING_LOOP_STATE)
+	{
+		if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE) && m_iJumpCount == 1)
+		{
+			m_fPower = 50.f;
+			m_iJumpCount = 2;
+		}
+
+		m_pTransformCom->Jump(fTimeDelta, m_fHeight, m_fPower, iJumpState, m_iJumpCount, m_fHeight_Store);
+		m_pBody->Set_JumpState(m_fHeight, m_fPower, m_fHeight_Store);
+	}
 }
 
 CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

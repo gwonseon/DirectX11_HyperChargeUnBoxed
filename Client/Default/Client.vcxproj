@@ -177,6 +177,13 @@
     <ClInclude Include="..\Public\Collector.h" />
     <ClInclude Include="..\Public\CollisionBox.h" />
     <ClInclude Include="..\Public\CrossLine.h" />
+    <ClInclude Include="..\Public\Effect.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Explosion.h" />
+    <ClInclude Include="..\Public\Effect_Flare_Rifle.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\Energy_Cap.h" />
     <ClInclude Include="..\Public\Energy_Lader.h" />
     <ClInclude Include="..\Public\Energy_Machine.h" />
@@ -266,6 +273,13 @@
     <ClCompile Include="..\Private\Collector.cpp" />
     <ClCompile Include="..\Private\CollisionBox.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
+    <ClCompile Include="..\Private\Effect.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Explosion.cpp" />
+    <ClCompile Include="..\Private\Effect_Flare_Rifle.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Private\Energy_Cap.cpp" />
     <ClCompile Include="..\Private\Energy_Lader.cpp" />
     <ClCompile Include="..\Private\Energy_Machine.cpp" />
@@ -349,6 +363,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCircle_Gauge.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCoin.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffect.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxItem.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_NoDeferred.hlsl" />

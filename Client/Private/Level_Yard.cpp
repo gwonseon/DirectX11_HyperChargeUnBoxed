@@ -27,6 +27,7 @@
 #include <Hp_Item.h>
 #include <UI_3D.h>
 #include <Collector.h>
+#include "Effect_Explosion.h"
 
 
 CLevel_Yard::CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1273,6 +1274,15 @@ HRESULT CLevel_Yard::Ready_Layer_Effect(const _tchar* pLayerTag)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
 		TEXT("Prototype_GameObject_Grass"))))
 		return E_FAIL;
+
+	CEffect_Explosion::EFFECT_EXPLOSION_DESC EffectDesc{};
+	EffectDesc.pCamera = m_pCamera;
+	for (size_t i = 0; i < 20; i++)
+	{
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+			TEXT("Prototype_GameObject_Effect_Explosion"), &EffectDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;;
 }
