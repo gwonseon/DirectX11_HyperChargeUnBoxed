@@ -3,6 +3,9 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix g_ViewMatrixInv, g_ProjMatrixInv;
+matrix g_LightViewMatrix, g_LightProjMatrix;
+
+
 texture2D g_Texture;
 
 vector g_vLightDir;
@@ -18,11 +21,38 @@ texture2D g_SpecularTexture;
 
 texture2D g_ShadeTexture;
 texture2D g_DiffuseTexture;
+texture2D g_LightDepthTexture;
+texture2D g_FinalTexture;
+texture2D g_BlurTexture;
+
 
 vector g_vMtrlAmbient = { 1.f, 1.f, 1.f, 1.f };
 vector g_vMtrlSpecular = { 1.f, 1.f, 1.f, 1.f };
-
 vector g_vCamPosition;
+
+
+
+float4 Compute_WorldPos(float2 vTexcoord)
+{
+    float4 vWorldPos = 0.f;
+
+    vector vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fViewZ = vDepthDesc.y * 500.f;
+	
+    vWorldPos.x = vTexcoord.x * 2.f - 1.f;
+    vWorldPos.y = vTexcoord.y * -2.f + 1.f;
+    vWorldPos.z = vDepthDesc.x;
+    vWorldPos.w = 1.f;
+
+    vWorldPos = vWorldPos * fViewZ;
+    vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
+
+    vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+
+    return vWorldPos;
+}
+
+
 
 struct VS_IN
 {
@@ -183,10 +213,89 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     if (vDiffuse.a == 0.f)
         discard;
 
+
+    vector vPosition = Compute_WorldPos(In.vTexcoord);
+
+    vPosition = mul(vPosition, g_LightViewMatrix);
+    vPosition = mul(vPosition, g_LightProjMatrix);
+	
+
+    float2 vTexcoord = 0.f;
+
+    vTexcoord.x = (vPosition.x / vPosition.w) * 0.5f + 0.5f;
+    vTexcoord.y = (vPosition.y / vPosition.w) * -0.5f + 0.5f;
+
+    vector vOldDepth = g_LightDepthTexture.Sample(LinearSampler, vTexcoord);
+
     Out.vColor = vDiffuse * vShade + vSpecular;
+
+    if (vPosition.w - 0.15f > vOldDepth.y * 500.f)
+    {
+        Out.vColor.rgb *= 0.7f;
+		
+    }
+    return Out;
+}
+
+
+struct PS_OUT_BLUR
+{
+    vector vBlur : SV_TARGET0;
+};
+
+float g_fWeights[13] =
+{
+    0.0561, 0.1353, 0.278, 0.4868, 0.7261, 0.9231, 1.f, 0.9231, 0.7261, 0.4868, 0.278, 0.1353, 0.0561
+};
+
+PS_OUT_BLUR PS_MAIN_BLUR_X(PS_IN In)
+{
+    PS_OUT_BLUR Out = (PS_OUT_BLUR) 0;
+
+    float2 vBlurUV = (float2) 0.f;
+
+    for (int i = -6; i < 7; i++)
+    {
+        vBlurUV = In.vTexcoord + float2(1.f / 1280.f * i, 0.f);
+        Out.vBlur += g_fWeights[i + 6] * g_FinalTexture.Sample(LinearSampler, vBlurUV);
+    }
+
+    Out.vBlur /= 12.f;
 
     return Out;
 }
+
+PS_OUT_BLUR PS_MAIN_BLUR_Y(PS_IN In)
+{
+    PS_OUT_BLUR Out = (PS_OUT_BLUR) 0;
+
+    float2 vBlurUV = (float2) 0.f;
+
+    for (int i = -6; i < 7; i++)
+    {
+        vBlurUV = In.vTexcoord + float2(0.f, 1.f / 720.f * i);
+        Out.vBlur += g_fWeights[i + 6] * g_FinalTexture.Sample(LinearSampler, vBlurUV);
+    }
+
+    Out.vBlur /= 12.f;
+
+    return Out;
+}
+
+
+PS_OUT PS_MAIN_BLUR_FINAL(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vBlur = g_BlurTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vFinal = g_FinalTexture.Sample(LinearSampler, In.vTexcoord);
+
+    Out.vColor = vBlur + vFinal;
+
+    return Out;
+}
+
+
 
 technique11 DefaultTechnique
 {
@@ -232,5 +341,38 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_FINAL();
+    }
+
+    pass BlurX
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_X();
+    }
+
+    pass BlurY
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_Y();
+    }
+
+    pass Blur_Final
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_FINAL();
     }
 }

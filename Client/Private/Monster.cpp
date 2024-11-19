@@ -54,10 +54,16 @@ void CMonster::Late_Update(_float fTimeDelta)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;
+
 	}
 }
 
 HRESULT CMonster::Render()
+{
+	return S_OK;
+}
+
+HRESULT CMonster::Render_Height()
 {
 	return S_OK;
 }

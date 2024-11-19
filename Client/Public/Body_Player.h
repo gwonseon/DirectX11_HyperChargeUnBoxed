@@ -176,7 +176,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_Shadow() override;
 	
 public:
 	void UpperBody_Anim(_float fTimeDelta);
@@ -211,6 +211,7 @@ private:
 private:		
 	_uint   m_iJumpState = 0;	// 점프 상태
 	_float	m_fHeight{};		// 점프 높이
+	_float  m_fMinHeight = 0.f;
 	_float	m_fPower{};			// 점프 힘
 
 private:
@@ -221,9 +222,10 @@ private:
 
 public:// 점프
 	_uint Get_JumpState() { return m_iJumpState; }
-	void  Set_JumpState(_float& fHeight, _float& fPowr) {
+	void  Set_JumpState(_float& fHeight, _float& fPowr, _float& minHeight) {
 		m_fHeight = fHeight;
 		m_fPower = fPowr;
+		m_fMinHeight = minHeight;
 	}
 
 

@@ -22,6 +22,7 @@ public:
 		_uint iImGuiMode{};
 		_uint iIndexNumber{};
 		_uint iCell_Idx{};
+		_uint iCellType = 0;
 	}COLLISIONBOX_DESC;
 
 
@@ -69,7 +70,7 @@ public:
 	
 	DirectX::BoundingBox Get_BoundingBox() { return BoundingBox; }
 	_uint	Get_CellIdx() { return m_iCellIdx; }
-
+	_uint   Get_CellType() { return m_iCellType; }
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
@@ -86,6 +87,7 @@ private:
 
 	_uint m_iImGuiMode = 0;
 	_uint m_iCurrentImGuiMode{};
+	_uint m_iCellType{};
 
 
 	_uint m_iCellIdx{};

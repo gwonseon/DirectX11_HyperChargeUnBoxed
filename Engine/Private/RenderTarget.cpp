@@ -82,13 +82,11 @@ HRESULT CRenderTarget::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 CRenderTarget* CRenderTarget::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
 {
 	CRenderTarget* pInstance = new CRenderTarget(pDevice, pContext);
-
 	if (FAILED(pInstance->Initialize(iWidth, iHeight, ePixelFormat, vClearColor)))
 	{
 		MSG_BOX("Failed to Created : CRenderTarget");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

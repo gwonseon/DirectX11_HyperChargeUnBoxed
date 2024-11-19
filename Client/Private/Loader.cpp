@@ -64,7 +64,7 @@
 
 
 #include "Explosion.h"
-
+#include "Effect_Explosion.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -698,6 +698,10 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png")))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Texture_Explosion */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Explosion"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"), 90))))
+		return E_FAIL;
 
 #pragma region UI텍스처 생성
 	// Nuclear
@@ -928,6 +932,15 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
 	
+	/* Prototype_GameObject_Effect_Explosion */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Explosion")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Explosion"),
+			CEffect_Explosion::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
 	// Collector Item
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collect_Item")) == nullptr)
 	{

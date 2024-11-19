@@ -79,7 +79,7 @@ public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Turn(_bool bX, _bool bY, _bool bZ, _float fTimeDelta);
 	void Rotation(_float fX, _float fY, _float fZ);
-	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount);
+	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount,_float fMinHeight = 0.f);
 	void Set_Min_Height();
 	_bool KnockBack(_float fTimeDelta, _vector vKnockBackDir, _float& fPower, _float StartHeight);
 
@@ -87,8 +87,13 @@ public:
 	void Go_Right_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Straight_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Backward_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-
 	void Go_Straight_Nav_Type2(_float fTimeDelta,_vector vPos, class CNavigation* pNavigation = nullptr);
+
+	void Go_Straight_Player(_float fTimeDelta);
+	void Go_Straight_Player(_float fTimeDelta, _float AddfSpeed);
+	void Go_Left_Player(_float fTimeDelta);
+	void Go_Right_Player(_float fTimeDelta);
+	void Go_Backward_Player(_float fTimeDelta);
 
 	_float Cal_Distance(_float3 fObj, _float3 fTarget);
 	_float Cal_Distance_vec(_vector vObj, _vector vTarget);
@@ -96,7 +101,7 @@ public:
 	_float Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget);
 
 
-
+	void Gravity(_vector vPos, _float fTimeDelta, _float fMinHeight);
 	_bool  IsPass_TargetPosition(_vector prevPos, _vector currentPos, _vector targetPos);
 	// A스타 이동
 public:

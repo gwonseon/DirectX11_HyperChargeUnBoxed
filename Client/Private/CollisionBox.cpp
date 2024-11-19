@@ -23,7 +23,8 @@ HRESULT CCollisionBox::Initialize(void* pArg)
 	COLLISIONBOX_DESC* pDesc = static_cast<COLLISIONBOX_DESC*>(pArg);
 	m_iImGuiMode = pDesc->iImGuiMode;
 	m_eLevel = pDesc->eLevel;
-
+	
+	m_iCellType = 0;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -34,6 +35,7 @@ HRESULT CCollisionBox::Initialize(void* pArg)
 	{
 		m_fScale = { 0.3f, 0.3f, 0.3f };
 		m_iPointNumber = pDesc->iPoint_Number; // ¹è¿­ ÀÎµ¦½º
+		m_iCellType = pDesc->iCellType;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
 		m_pTransformCom->Set_Scaling(0.3f, 0.3f, 0.3f);
 		m_vecPosition = { pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f };

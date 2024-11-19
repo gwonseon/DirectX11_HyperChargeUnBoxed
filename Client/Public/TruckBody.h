@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "PartObject.h"
+#include "Player.h"
 
 BEGIN(Engine)
 class CShader;
@@ -17,6 +18,8 @@ public:
 	typedef struct : CPartObject::PARTOBJECT_DESC
 	{
 		LEVELID m_eLevelID{};
+		CPlayer* pPlayer = { nullptr };
+
 	}TRUCKBODY_DESC;
 
 private:
@@ -35,6 +38,8 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Height() override;
+
 
 
 private:
@@ -44,6 +49,7 @@ private:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CPlayer* m_pPlayer = { nullptr };
 
 
 private:

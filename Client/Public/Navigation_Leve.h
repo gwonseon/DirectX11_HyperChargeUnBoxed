@@ -49,6 +49,7 @@ private:
 private:
 	XMFLOAT3		vPoints[3];
 	float			fPoints[3];
+	int			m_iCellType = 0;
 	vector<CCollisionBox*> m_vecCollision{};  // 콜리전 박스 담아두기
 
 	NAVIGATION_MODE		eNaviMode = CREATE_NAVIPOINT;

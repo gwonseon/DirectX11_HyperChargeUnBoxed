@@ -37,6 +37,7 @@ protected:
 	_uint					m_iDepth = {};
 	_int					m_iCount = {};
 	_float					m_fDepth = 0.0f;
+
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

@@ -9,6 +9,7 @@ float2              g_Index;
 float               g_Percent, g_ImgSize, g_fGageAmount;
 matrix              g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D           g_Texture;
+texture2D           g_DepthTexture;
 
 //m_pGraphic_Device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
@@ -231,9 +232,7 @@ PS_OUT PS_MAIN8(PS_IN In)
     return Out;
 
 }
-// 같은 픽셀에 대한 쉐이딩 방식을 여러 개 두기 위해 Pass를 여러 개 둔다.
 
-//  compile vs_5_0 은 셰이더 모델 5.0을 사용하여 셰이더를 컴파일하도록 하는 명령어
 technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
 {
     pass DefaultPass

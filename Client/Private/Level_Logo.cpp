@@ -82,8 +82,6 @@ void CLevel_Logo::Update(_float fTimeDelta)
 			return;
 		}
 	}
-
-	
 }
 
 HRESULT CLevel_Logo::Render()
@@ -93,7 +91,6 @@ HRESULT CLevel_Logo::Render()
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
 #endif
-
 	return S_OK;
 }
 

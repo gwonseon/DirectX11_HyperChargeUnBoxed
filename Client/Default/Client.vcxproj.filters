@@ -214,18 +214,6 @@
     <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Missile">
       <UniqueIdentifier>{f782c1a1-e83b-4b0d-83ee-d56b1e5c3d32}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObjects\Effect\Explosion\Particle">
-      <UniqueIdentifier>{3aac91b1-1474-4019-954c-f17400b181f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Effect\Explosion\Particle\Rect">
-      <UniqueIdentifier>{c5cafe1e-3af3-4af9-9dd9-2e664f8ffb28}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Effect\Explosion\Particle\Point">
-      <UniqueIdentifier>{68868494-6ff3-4ac1-8d3e-b8b53162969b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObjects\Effect\Explosion\Particle\Grass">
-      <UniqueIdentifier>{de992f9e-da48-43c0-b601-58dd40f04962}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObjects\Monster\Missile_Truck\Truck_Shooter">
       <UniqueIdentifier>{021238db-56f7-4d4c-a3d1-11cf57418491}</UniqueIdentifier>
     </Filter>
@@ -255,6 +243,24 @@
     </Filter>
     <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Energy_Cap">
       <UniqueIdentifier>{2cbf4936-949e-4887-bdef-976114fd388d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle">
+      <UniqueIdentifier>{3aac91b1-1474-4019-954c-f17400b181f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle\Rect">
+      <UniqueIdentifier>{c5cafe1e-3af3-4af9-9dd9-2e664f8ffb28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle\Point">
+      <UniqueIdentifier>{68868494-6ff3-4ac1-8d3e-b8b53162969b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Particle\Grass">
+      <UniqueIdentifier>{de992f9e-da48-43c0-b601-58dd40f04962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Attack">
+      <UniqueIdentifier>{9cda048e-ef13-4ebe-a879-905f63e79ad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Flare_Rifle">
+      <UniqueIdentifier>{6c2a35bf-4a32-4848-a9cb-7db3efba07e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -466,13 +472,13 @@
       <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle_Snow.h">
-      <Filter>02. GameObjects\Effect\Explosion\Particle\Rect</Filter>
+      <Filter>02. GameObjects\Effect\Particle\Rect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle_Explosion.h">
-      <Filter>02. GameObjects\Effect\Explosion\Particle\Point</Filter>
+      <Filter>02. GameObjects\Effect\Particle\Point</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Grass_Instancing.h">
-      <Filter>02. GameObjects\Effect\Explosion\Particle\Grass</Filter>
+      <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Missile_Truck.h">
       <Filter>02. GameObjects\Monster\Missile_Truck</Filter>
@@ -489,9 +495,6 @@
     <ClInclude Include="..\Public\Tracker.h">
       <Filter>02. GameObjects\Monster\Missile_Truck\Tracker</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Explosion.h">
-      <Filter>02. GameObjects\Effect\Explosion</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\RifleMan_Idle.h">
       <Filter>02. GameObjects\Monster\RifleMan\RifleState\Idle</Filter>
     </ClInclude>
@@ -500,6 +503,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Collector.h">
       <Filter>02. GameObjects\Environment\CollectItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Flare_Rifle.h">
+      <Filter>02. GameObjects\Effect\Flare_Rifle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Explosion.h">
+      <Filter>02. GameObjects\Effect\Explosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Explosion.h">
+      <Filter>02. GameObjects\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect.h">
+      <Filter>02. GameObjects\Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -690,13 +705,13 @@
       <Filter>01. Levels\02. Game_Yard\Round</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Particle_Snow.cpp">
-      <Filter>02. GameObjects\Effect\Explosion\Particle\Rect</Filter>
+      <Filter>02. GameObjects\Effect\Particle\Rect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Particle_Explosion.cpp">
-      <Filter>02. GameObjects\Effect\Explosion\Particle\Point</Filter>
+      <Filter>02. GameObjects\Effect\Particle\Point</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Grass_Instancing.cpp">
-      <Filter>02. GameObjects\Effect\Explosion\Particle\Grass</Filter>
+      <Filter>02. GameObjects\Effect\Particle\Grass</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Missile_Truck.cpp">
       <Filter>02. GameObjects\Monster\Missile_Truck</Filter>
@@ -713,9 +728,6 @@
     <ClCompile Include="..\Private\Tracker.cpp">
       <Filter>02. GameObjects\Monster\Missile_Truck\Tracker</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Explosion.cpp">
-      <Filter>02. GameObjects\Effect\Explosion</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RifleMan_Idle.cpp">
       <Filter>02. GameObjects\Monster\RifleMan\RifleState\Idle</Filter>
     </ClCompile>
@@ -724,6 +736,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Collector.cpp">
       <Filter>02. GameObjects\Environment\CollectItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Flare_Rifle.cpp">
+      <Filter>02. GameObjects\Effect\Flare_Rifle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Explosion.cpp">
+      <Filter>02. GameObjects\Effect\Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Explosion.cpp">
+      <Filter>02. GameObjects\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect.cpp">
+      <Filter>02. GameObjects\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -783,6 +807,9 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffect.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

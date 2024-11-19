@@ -245,6 +245,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 {
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_GAMEPLAY;
+	pDesc.pPlayer = m_pPlayer;
 	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"),&pDesc)))
 		return E_FAIL;
 

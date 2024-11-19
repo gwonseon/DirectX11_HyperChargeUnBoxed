@@ -30,7 +30,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 	virtual HRESULT Render_Height();
-
+	virtual HRESULT Render_Shadow();
 public:
 	bool IsValid() const { return !m_bDead; }
 	bool Get_Dead() { return m_bDead; }

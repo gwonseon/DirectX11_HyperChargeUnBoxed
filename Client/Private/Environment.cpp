@@ -84,9 +84,19 @@ void CEnvironment::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
+	if (m_eLevel == LEVEL_YARD || m_eLevel == LEVEL_GAMEPLAY)
+	{
 
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
-		return;
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+			return;
+	/*	if(
+			m_iModelIndex == 128 + ENVIRONMENT_EA
+			)
+		{
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+				return;
+		}*/
+	}
 }
 
 HRESULT CEnvironment::Render()
@@ -142,6 +152,59 @@ HRESULT CEnvironment::Render()
 
 HRESULT CEnvironment::Render_Height()
 {
+
+	if (
+		m_iModelIndex == 93 + ENVIRONMENT_EA ||
+		m_iModelIndex == 94 + ENVIRONMENT_EA ||
+		m_iModelIndex == 98 + ENVIRONMENT_EA ||
+		m_iModelIndex == 99 + ENVIRONMENT_EA ||
+		m_iModelIndex == 100 + ENVIRONMENT_EA ||
+		m_iModelIndex == 101 + ENVIRONMENT_EA ||
+		m_iModelIndex == 102 + ENVIRONMENT_EA ||
+		m_iModelIndex == 103 + ENVIRONMENT_EA ||
+		m_iModelIndex == 104 + ENVIRONMENT_EA ||
+		m_iModelIndex == 105 + ENVIRONMENT_EA ||
+		m_iModelIndex == 106 + ENVIRONMENT_EA ||
+		m_iModelIndex == 107 + ENVIRONMENT_EA ||
+		m_iModelIndex == 108 + ENVIRONMENT_EA ||
+		m_iModelIndex == 109 + ENVIRONMENT_EA ||
+		m_iModelIndex == 110 + ENVIRONMENT_EA ||
+		m_iModelIndex == 111 + ENVIRONMENT_EA ||
+		m_iModelIndex == 112 + ENVIRONMENT_EA ||
+		m_iModelIndex == 113 + ENVIRONMENT_EA ||
+		m_iModelIndex == 114 + ENVIRONMENT_EA ||
+		m_iModelIndex == 115 + ENVIRONMENT_EA ||
+		//m_iModelIndex == 116 + ENVIRONMENT_EA || 텐트
+		m_iModelIndex == 128 + ENVIRONMENT_EA ||
+		m_iModelIndex == 123 + ENVIRONMENT_EA ||
+		m_iModelIndex == 129 + ENVIRONMENT_EA ||
+		m_iModelIndex == 130 + ENVIRONMENT_EA ||
+		m_iModelIndex == 131 + ENVIRONMENT_EA ||
+
+		m_iModelIndex == 132 + ENVIRONMENT_EA ||
+		m_iModelIndex == 39 + ENVIRONMENT_EA ||
+		m_iModelIndex == 38 + ENVIRONMENT_EA ||
+		m_iModelIndex == 37 + ENVIRONMENT_EA ||
+		m_iModelIndex == 63 + ENVIRONMENT_EA ||
+		m_iModelIndex == 66 + ENVIRONMENT_EA ||
+		m_iModelIndex == 68 + ENVIRONMENT_EA ||
+
+
+
+		m_iModelIndex == 46 + ENVIRONMENT_EA ||
+		m_iModelIndex == 47 + ENVIRONMENT_EA ||
+		m_iModelIndex == 48 + ENVIRONMENT_EA ||
+		m_iModelIndex == 49 + ENVIRONMENT_EA ||
+		m_iModelIndex == 50 + ENVIRONMENT_EA ||
+		m_iModelIndex == 51 + ENVIRONMENT_EA ||
+		m_iModelIndex == 52 + ENVIRONMENT_EA ||
+		m_iModelIndex == 58 + ENVIRONMENT_EA ||
+		m_iModelIndex == 59 + ENVIRONMENT_EA ||
+		m_iModelIndex == 64 + ENVIRONMENT_EA 
+	//	m_iModelIndex == 92 + ENVIRONMENT_EA 파라솔
+		)
+		return S_OK;
+
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
@@ -153,7 +216,7 @@ HRESULT CEnvironment::Render_Height()
 	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), 20.f, XMVectorGetZ(PlayerPos), 1.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), XMVectorGetY(PlayerPos) + 6.f, XMVectorGetZ(PlayerPos), 1.f);
 
 	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
 	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
@@ -169,12 +232,36 @@ HRESULT CEnvironment::Render_Height()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		
-		/*
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-			return E_FAIL;
-			*/
 		if (FAILED(m_pShaderCom->Begin(6))) // 무조건 그림
+			return E_FAIL;
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
+
+
+HRESULT CEnvironment::Render_Shadow()
+{
+	_float4x4			ViewMatrix, ProjMatrix;
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	_vector PlayerPos = m_pPlayer->Get_Position();
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(749.432f, 30.f, 746.296f, 1.f), XMVectorSet(652.751f, 0.f, 669.074f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)g_iWinSizeX / g_iWinSizeY, 0.1f, fFar));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pShaderCom->Begin(7))) // 무조건 그림
 			return E_FAIL;
 		m_pModelCom->Render(i);
 	}

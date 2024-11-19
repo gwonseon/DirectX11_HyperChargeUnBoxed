@@ -78,10 +78,9 @@ void CTerrain::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
-		return;
 
 #ifdef _DEBUG
+
 	m_pGameInstance->Add_DebugComponents(m_pNavigationCom);
 #endif
 }
@@ -98,43 +97,45 @@ HRESULT CTerrain::Render()
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Render()))
-		return E_FAIL;
+		return E_FAIL;			
 
 	return S_OK;
 }
 
 HRESULT CTerrain::Render_Height()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
 
-	_float4x4			ViewMatrix, ProjMatrix;
+		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
 
-	_vector PlayerPos = m_pPlayer->Get_Position();
+		_float4x4			ViewMatrix, ProjMatrix;
 
-	_matrix			matView = XMMatrixIdentity();
-	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
-	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), 20.f, XMVectorGetZ(PlayerPos), 1.f);
+		_vector PlayerPos = m_pPlayer->Get_Position();
 
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+		_matrix			matView = XMMatrixIdentity();
+		matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+		matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+		matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
+		matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), 20.f, XMVectorGetZ(PlayerPos), 1.f);
+
+		XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
+		XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
 
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-		return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+			return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(1)))
-		return E_FAIL;
+		if (FAILED(m_pShaderCom->Begin(1)))
+			return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
-		return E_FAIL;
+		if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+			return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Render()))
-		return E_FAIL;
+		if (FAILED(m_pVIBufferCom->Render()))
+			return E_FAIL;
+	
 
 	return S_OK;
 }

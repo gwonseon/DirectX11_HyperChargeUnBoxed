@@ -72,6 +72,11 @@ HRESULT CGameObject::Render_Height()
 	return S_OK;
 }
 
+HRESULT CGameObject::Render_Shadow()
+{
+	return S_OK;
+}
+
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg)
 {

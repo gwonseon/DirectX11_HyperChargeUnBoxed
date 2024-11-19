@@ -42,11 +42,8 @@ HRESULT CTarget_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strT
 	if (nullptr == pMRTs)
 	{
 		vector<CRenderTarget*>		RenderTargets;
-
 		RenderTargets.reserve(8);
-
 		RenderTargets.push_back(pRenderTarget);
-
 		m_MRTs.emplace(strMRTTag, RenderTargets);
 	}
 	else
@@ -57,7 +54,7 @@ HRESULT CTarget_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strT
 	return S_OK;
 }
 
-HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag)
+HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSView, _bool isClear)
 {
 	m_pContext->OMGetRenderTargets(1, &m_pBackBufferView, &m_pDSV);
 
@@ -71,11 +68,12 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag)
 
 	for (size_t i = 0; i < iNumRenderTargets; i++)
 	{
-		(*pMRTs)[i]->Clear();
+		if (true == isClear)
+			(*pMRTs)[i]->Clear();
 		RTVs[i] = (*pMRTs)[i]->Get_RTV();
 	}
 
-	m_pContext->OMSetRenderTargets(iNumRenderTargets, RTVs, m_pDSV);
+	m_pContext->OMSetRenderTargets(iNumRenderTargets, RTVs, nullptr != pDSView ? pDSView : m_pDSV);
 
 	return S_OK;
 }

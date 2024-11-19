@@ -142,6 +142,7 @@ HRESULT CMissile_Truck::Add_PartObjects()
     CTruckBody::TRUCKBODY_DESC pTruckBodyDesc{};
     pTruckBodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     pTruckBodyDesc.fRotationPerSec = 30.f;
+    pTruckBodyDesc.pPlayer = m_pPlayer;
     pTruckBodyDesc.m_eLevelID = m_eLevelID;
     if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_MissileTruck_Body"), MISSILETRUCK_BODY, &pTruckBodyDesc)))
         return E_FAIL;

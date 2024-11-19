@@ -100,28 +100,27 @@ PS_OUT PS_MAIN2(PS_IN In)
 
 struct PS_OUT_HEIGHT
 {
-    /*
-    vector vDiffuse : SV_TARGET0;
-    vector vNormal : SV_TARGET1;
-    vector vDepth : SV_TARGET2;
-    vector vPickDepth : SV_TARGET3;
-    */
-    vector vHeight : SV_TARGET4;
+    vector vHeight : SV_TARGET0;
 };
 
 PS_OUT_HEIGHT PS_MAIN_HEIGHT(PS_IN In)
 {
     PS_OUT_HEIGHT Out = (PS_OUT_HEIGHT) 0;
-    
-    /*
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    vMtrlDiffuse.a = 1.f;
-    Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
-    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
-    */
     Out.vHeight = vector(In.vWorldPos.y, 0.f, 0.f, 1.f);
+    return Out;
+}
+
+struct PS_OUT_LIGHTDEPTH
+{
+    vector vLightDepth : SV_TARGET0;
+};
+
+PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
+{
+    PS_OUT_LIGHTDEPTH Out = (PS_OUT_LIGHTDEPTH) 0;
+	
+    Out.vLightDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+
     return Out;
 }
 
@@ -189,7 +188,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass HeightPass
+    pass HeightPass  // 6
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -199,4 +198,16 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_HEIGHT();
     }
+
+    pass LightDepth // 7
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
+    }
+
 }
