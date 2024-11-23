@@ -22,7 +22,7 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public:
-	enum RENDERGROUP { RG_PRIORITY, RG_SHADOW, RG_HEIGHT_TERRAIN, RG_HEIGHT, RG_NONBLEND, RG_NONLIGHT,  RG_LAST, RG_BLEND, RG_UI,RG_UI_LAST, RG_END };
+	enum RENDERGROUP { RG_PRIORITY, RG_SHADOW, RG_HEIGHT_TERRAIN, RG_HEIGHT, RG_NONBLEND, RG_BLOOM, RG_NONLIGHT,  RG_LAST, RG_BLEND, RG_UI,RG_UI_LAST, RG_END };
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -59,6 +59,10 @@ private:
 	HRESULT Render_NonBlend(); 
 	HRESULT Render_Lights();
 	HRESULT Render_Final();
+	HRESULT Render_BrightExtraction();
+	HRESULT Render_Bloom_Object();
+	HRESULT Render_Bloom();
+	HRESULT Render_BloomFinal();
 	HRESULT Render_Blur();
 	HRESULT Render_BlurFinal();
 	HRESULT Render_NonLight();

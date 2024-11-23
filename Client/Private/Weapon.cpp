@@ -4,6 +4,7 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include <Bullet.h>
+#include <Effect_Flare_Rifle.h>
 
 CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
@@ -60,6 +61,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
 
+
 	if (m_bBulletIn == true) // 장전 완료
 	{
 		m_iCurrent_Bullet = m_iFull_Bullet; // 나중에 총에 따라 나누기
@@ -111,7 +113,73 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 	//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
 	}
 	}
+	
 
+	CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
+	CBullet::BULLET_DESC Desc{};
+	switch (m_iWeaponState)
+	{
+	case Client::CWeapon::WEAPON_UNARMED:
+		break;
+	case Client::CWeapon::WEAPON_RIFLE:
+		// 총알 발사
+		if (*m_bShotStart == true && *m_bReloading == false)
+		{
+			--m_iCurrent_Bullet;
+			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
+			_vector vTarget =  XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
+			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// 목표까지의 방향, 총구 방향과 다름 주의
+			Desc.m_vecCameraPos = *m_vecCameraPos;
+			Desc.m_vecCameraAt = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z,1.f);							// 총알 궤적을 위함
+			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+			Desc.eID = m_eLevelID;
+			Desc.eType = CBullet::BULLET_RIFLE;
+			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+
+			pFlare.eLevel = m_eLevelID;
+			pFlare.eType = CEffect_Flare_Rifle::FLARE_PLAYER;
+			pFlare.vecCamPos = m_vecCameraPos;
+			pFlare.fScale = { 0.6f,0.6f,0.6f };
+			pFlare.vecWeaponPos = &m_vecFlarePos;
+			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Effect"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+
+		}
+		break;
+	case Client::CWeapon::WEAPON_SHOTGUN:
+		break;
+	case Client::CWeapon::WEAPON_PULSECANNON:
+
+		break;
+	case Client::CWeapon::WEAPON_TELEPORT:
+		break;
+	case Client::CWeapon::WEAPON_LOCKETLAUNCHER:
+		if (*m_bShotStart == true && *m_bReloading == false)
+		{
+			--m_iCurrent_Bullet;
+			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
+			_vector vTarget = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
+			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// 목표까지의 방향, 총구 방향과 다름 주의
+			Desc.m_vecCameraPos = *m_vecCameraPos;
+			Desc.m_vecCameraAt = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);								// 총알 궤적을 위함
+			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+			Desc.eID = m_eLevelID;
+			Desc.eType = CBullet::BULLET_LOCKET;
+			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+			break;
+		}
+	case Client::CWeapon::WEAPON_RIFLE_SECOND:
+		break;
+	case Client::CWeapon::WEAPON_KATANA:
+		break;
+	case Client::CWeapon::BATTERY:
+		break;
+	case Client::CWeapon::TRACKER:
+		break;
+	case Client::CWeapon::WEAPON_END:
+		break;
+	default:
+		break;
+	}
 
 }
 
@@ -136,70 +204,14 @@ void CWeapon::Update(_float fTimeDelta)
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
 	m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1.f);
 	m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31, m_WorldMatrix._32, m_WorldMatrix._33, 0.f);
-
+	// 총구 위치
+	m_vecFlarePos = m_vecWeaponPos + (m_vecWeaponDir * 0.38f);
+	m_vecFlarePos = XMVectorSetY(m_vecFlarePos, XMVectorGetY(m_vecFlarePos) + 0.23f);
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
 {
-
-	CBullet::BULLET_DESC Desc{};
-	switch (m_iWeaponState)
-	{
-	case Client::CWeapon::WEAPON_UNARMED:
-		break;
-	case Client::CWeapon::WEAPON_RIFLE:
-		// 총알 발사
-		if (*m_bShotStart == true && *m_bReloading == false)
-		{
-			--m_iCurrent_Bullet;
-			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
-		
-			_vector vTarget =	vTarget = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
-			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// 목표까지의 방향, 총구 방향과 다름 주의
-			Desc.m_vecCameraPos = *m_vecCameraPos;
-			Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
-			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-			Desc.eID = m_eLevelID;
-			Desc.eType = CBullet::BULLET_RIFLE;
-			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
-		}
-		break;
-	case Client::CWeapon::WEAPON_SHOTGUN:
-		break;
-	case Client::CWeapon::WEAPON_PULSECANNON:
-
-		break;
-	case Client::CWeapon::WEAPON_TELEPORT:
-		break;
-	case Client::CWeapon::WEAPON_LOCKETLAUNCHER:
-		if (*m_bShotStart == true && *m_bReloading == false)
-		{
-			--m_iCurrent_Bullet;
-			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
-			_vector vTarget = vTarget = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
-			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// 목표까지의 방향, 총구 방향과 다름 주의			
-			Desc.m_vecCameraPos = *m_vecCameraPos;
-			Desc.m_vecCameraAt = *m_vecCameraAt;							// 총알 궤적을 위함
-			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-			Desc.eID = m_eLevelID;
-			Desc.eType = CBullet::BULLET_LOCKET;
-			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
-			break;
-		}
-	case Client::CWeapon::WEAPON_RIFLE_SECOND:
-		break;
-	case Client::CWeapon::WEAPON_KATANA:
-		break;
-	case Client::CWeapon::BATTERY:
-		break;
-	case Client::CWeapon::TRACKER:
-		break;
-	case Client::CWeapon::WEAPON_END:
-		break;
-	default:
-		break;
-	}
-
+	
 
 
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
@@ -257,21 +269,7 @@ HRESULT CWeapon::Bind_ShaderResources()
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-	//	return E_FAIL;
 
-	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	//if (nullptr == pLightDesc)
-	//	return E_FAIL;
-
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-	//	return E_FAIL;
 
 	return S_OK;
 }

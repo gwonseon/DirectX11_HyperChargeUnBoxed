@@ -1,33 +1,40 @@
 #pragma once
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "BlendObject.h"
+#include "Camera_Free.h"
 
 BEGIN(Client)
-class CEffect : public CGameObject
+
+class CEffect abstract : public CBlendObject
 {
 public:
-	typedef struct : public CGameObject::GAMEOBJ_DESC
+	typedef struct : public CBlendObject::BLEND_DESC
 	{
-		enum LEVELID eLevel {};
+		class	CCamera_Free* pCamera = { nullptr };
+		enum	LEVELID eLevel{};
 	}EFFECT_DESC;
 
-private:
+protected:
 	CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CEffect(const CEffect& Prototype);
 	virtual ~CEffect() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
-	virtual void Priority_Update(_float fTimeDelta);
-	virtual void Update(_float fTimeDelta);
-	virtual void Late_Update(_float fTimeDelta);
-	virtual HRESULT Render();
+	virtual HRESULT Initialize_Prototype()override ;
+	virtual HRESULT Initialize(void* pArg) override;
+	virtual void Priority_Update(_float fTimeDelta) override;
+	virtual void Update(_float fTimeDelta) override;
+	virtual void Late_Update(_float fTimeDelta) override;
+	virtual HRESULT Render() override;
 
-private:
+protected:
 	_float3		m_fPosition{};
 	_float3		m_fScale{};
-	LEVELID		m_eLevel{};
+	_float		m_fLifeTime{};
+
+	LEVELID					m_eLevel{};
+	class CCamera_Free*		m_pCamera = { nullptr };
+
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

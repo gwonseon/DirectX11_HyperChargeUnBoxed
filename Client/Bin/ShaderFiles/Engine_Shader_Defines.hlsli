@@ -6,6 +6,13 @@ sampler LinearSampler = sampler_state
     AddressV = WRAP;
 };
 
+sampler LinearSampler_Clamp = sampler_state
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = clamp;
+    AddressV = clamp;
+};
+
 sampler PointSampler = sampler_state
 {
     filter = MIN_MAG_MIP_POINT;
@@ -13,11 +20,13 @@ sampler PointSampler = sampler_state
     AddressV = WRAP;
 };
 
+
+
 RasterizerState RS_Default
 {
-	FillMode = Solid;
-	CullMode = Back;
-	FrontCounterClockwise = false;
+    FillMode = Solid;
+    CullMode = Back;
+    FrontCounterClockwise = false;
 };
 
 RasterizerState RS_CULLNONE
@@ -29,49 +38,48 @@ RasterizerState RS_CULLNONE
 
 RasterizerState RS_Sky
 {
-	FillMode = Solid;
-	CullMode = front;
-	FrontCounterClockwise = false;
+    FillMode = Solid;
+    CullMode = front;
+    FrontCounterClockwise = false;
 };
 
 RasterizerState RS_Debug
 {
-	FillMode = WireFrame;
-	FrontCounterClockwise = false;
+    FillMode = WireFrame;
+    FrontCounterClockwise = false;
 };
 
 DepthStencilState DSS_Default
 {
-	DepthEnable = true;
-	DepthWriteMask = all;
-	DepthFunc = less_equal;
+    DepthEnable = true;
+    DepthWriteMask = all;
+    DepthFunc = less_equal;
 };
 
 DepthStencilState DSS_None
 {
-	DepthEnable = false;
-	DepthWriteMask = zero;
+    DepthEnable = false;
+    DepthWriteMask = zero;
 };
 
 BlendState BS_Default
 {
-	BlendEnable[0] = false;
+    BlendEnable[0] = false;
 };
 
 BlendState BS_AlphaBlend
 {
-	BlendEnable[0] = true;
+    BlendEnable[0] = true;
 	//BlendEnable[1] = true;
 
-	SrcBlend[0] = Src_Alpha;
-	DestBlend[0] = Inv_Src_Alpha;
-	BlendOp[0] = Add;
+    SrcBlend[0] = Src_Alpha;
+    DestBlend[0] = Inv_Src_Alpha;
+    BlendOp[0] = Add;
 
 	//SrcBlend[1] = One;
 	//DescBlend[1] = One;
 	//BlendOp[1] = Add;
 };
-
 BlendState BS_OneByOne
 {
     BlendEnable[0] = true;

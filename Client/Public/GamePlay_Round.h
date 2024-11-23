@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "Level_GamePlay.h"
 #include "Player.h"
+#include "Camera_Free.h"
 
 BEGIN(Client)
 
@@ -35,6 +36,9 @@ public:
 	void Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
 	void Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 	_uint	Get_MonsterCount() { return m_iMonsterCount; }
+	void	Set_Camera(CCamera_Free* pCamera) { m_pCamera = pCamera; }
+
+
 	void	MonsterCreate(_float fTimeDelta);
 
 
@@ -55,6 +59,9 @@ private:
 	CPlayer_Build* m_pBuild = { nullptr };
 	CBrainCore* m_pBrain = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };
+	CCamera_Free* m_pCamera = { nullptr };
+
+
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };

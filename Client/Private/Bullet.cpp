@@ -36,7 +36,8 @@ HRESULT CBullet::Initialize(void* pArg)
     {
     case Client::CBullet::BULLET_RIFLE:
         iRand = 2;
-        m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
+        m_fSize = 0.1f;
+        m_pTransformCom->Set_Scaling(m_fSize, m_fSize, m_fSize);
         break;
     case Client::CBullet::BULLET_LOCKET:
         iRand = 3; 
@@ -56,13 +57,30 @@ HRESULT CBullet::Initialize(void* pArg)
 
 void CBullet::Priority_Update(_float fTimeDelta)
 {
-    m_fBullet_Move += (fTimeDelta * 150.f); // 총알 날아가기
+   
+}
+
+void CBullet::Update(_float fTimeDelta)
+{
+    if (m_eType == BULLET_RIFLE)
+    {
+        m_pTransformCom->Set_Scaling(m_fSize, m_fSize, m_fSize);
+        if (m_fSpeed >= 150.5f)
+            m_fSize += fTimeDelta ;
+        
+    }
+}
+
+void CBullet::Late_Update(_float fTimeDelta)
+{
+    m_fSpeed = 150.f;
+    m_fBullet_Move += (fTimeDelta * m_fSpeed); // 총알 날아가기
     if (m_bChange_Root == false)
     {
         // At 위치와 총알의 위치가 비슷해 졌을 때 날아가는 방향 변경
         vTargetPos = m_vecWeaponPos + XMVector3Normalize(m_vecWeaponDir) * m_fBullet_Move;
-        distance = XMVectorGetX(XMVector3Length(vTargetPos - m_vecCameraAt)); 
-        if (distance <= 1.5f)  
+        distance = XMVectorGetX(XMVector3Length(vTargetPos - m_vecCameraAt));
+        if (distance <= 1.5f)
         {
             m_fBullet_Move = 0.f;
             m_bChange_Root = true;
@@ -70,18 +88,12 @@ void CBullet::Priority_Update(_float fTimeDelta)
     }
     else
     {
+        m_bDead = true;
         // At위치 도달 전까지는 그냥 날아가라
-        vTargetPos = vTargetPos + XMVector3Normalize(m_vecCameraAt -m_vecCameraPos) * m_fBullet_Move;
+        vTargetPos = vTargetPos + XMVector3Normalize(m_vecCameraAt - m_vecCameraPos) * m_fBullet_Move;
     }
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTargetPos);
-}
 
-void CBullet::Update(_float fTimeDelta)
-{
-}
-
-void CBullet::Late_Update(_float fTimeDelta)
-{
     if (m_eType == BULLET_LOCKET && m_bDead == true)
     {
         CExplosion::EXPLOSION_DESC pExplosion{};
@@ -92,8 +104,18 @@ void CBullet::Late_Update(_float fTimeDelta)
         m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion_Player"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
 
     }
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-        return;
+    if(m_eType == BULLET_RIFLE)
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+            return;
+    }
+    if (m_eType == BULLET_LOCKET)
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+            return;
+    }
+
+    m_fSpeed += fTimeDelta;
 }
 
 HRESULT CBullet::Render()
@@ -108,8 +130,16 @@ HRESULT CBullet::Render()
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
+        if (m_eType == BULLET_RIFLE)
+        {
+            if (FAILED(m_pShaderCom->Begin(8)))
+                return E_FAIL;
+        }
+        else if (m_eType == BULLET_LOCKET)
+        {
+            if (FAILED(m_pShaderCom->Begin(0)))
+                return E_FAIL;
+        }
 
         m_pModelCom->Render(i);
     }
@@ -146,21 +176,10 @@ HRESULT CBullet::Bind_ShaderResources()
     _float fFar = m_pGameInstance->Get_CameraFar();
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
         return E_FAIL;
-    /*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
 
     return S_OK;
 }

@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "Monster.h"
 #include "Player_Build.h"
+#include "Camera_Free.h"
 
 BEGIN(Engine)
 class CShader;
@@ -18,6 +19,7 @@ class CTank final : public CMonster
 public:
 	typedef struct : CMonster::MONSTER_DESC
 	{
+		CCamera_Free* pCamera = { nullptr };
 		CPlayer_Build* m_pBuild = { nullptr };
 	}TANK_DESC;
 
@@ -61,6 +63,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
 	CNavigation* m_pNavigationCom = nullptr;
+	CCamera_Free* m_pCamera = { nullptr };
 
 private:
 	

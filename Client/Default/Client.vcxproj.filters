@@ -262,6 +262,9 @@
     <Filter Include="02. GameObjects\Effect\Flare_Rifle">
       <UniqueIdentifier>{6c2a35bf-4a32-4848-a9cb-7db3efba07e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Effect\Explosion_Tank">
+      <UniqueIdentifier>{be15ed70-55bb-48d4-b26e-7f355e798222}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -516,6 +519,9 @@
     <ClInclude Include="..\Public\Effect.h">
       <Filter>02. GameObjects\Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_Explosion_Tank.h">
+      <Filter>02. GameObjects\Effect\Explosion_Tank</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -748,6 +754,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect.cpp">
       <Filter>02. GameObjects\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Explosion_Tank.cpp">
+      <Filter>02. GameObjects\Effect\Explosion_Tank</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

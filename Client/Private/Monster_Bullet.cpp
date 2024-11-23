@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include <Explosion.h>
+#include <Effect_Explosion_Tank.h>
 CMonster_Bullet::CMonster_Bullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -43,7 +44,7 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
         vPos = vPos + XMVector3Normalize(m_vecTargetPos - vPos) * 6.8f;
         vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-       
+        m_pCamera = pDesc->pCamera;
         break;
     }
     case Client::CMonster_Bullet::HELICOPTER_BULLET:
@@ -117,7 +118,7 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
     // 건물에 데미지 주기
     if (m_pTargetCollider != nullptr)
     {
-
+        
         bCollision = m_pColliderCom->Intersect(m_pTargetCollider); // 브레인 코어와 충돌체크 
         if (bCollision == true && m_bDead == false)
         {
@@ -130,6 +131,15 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
                 pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
                 pExplosion.fScale = _float3{ 3.f, 3.f, 3.f };
                 m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+              
+                CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
+                Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK;
+                Effect.eLevel = m_eLevel;
+                Effect.fScale = _float3{ 15.f, 15.f, 15.f };
+                Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+                //Effect.pCamera = m_pCamera;
+                m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
+
                 m_bDead = true;
             }
             else
@@ -156,6 +166,13 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
             pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
             pExplosion.fScale = _float3{ 3.f, 3.f, 3.f };
             m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+            
+            CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
+            Effect.eLevel = m_eLevel;
+            Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK;
+            Effect.fScale = _float3{ 15.f, 15.f, 15.f };
+            Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+            m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
             m_bDead = true;
             break;
         }

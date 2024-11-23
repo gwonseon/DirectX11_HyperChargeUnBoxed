@@ -2,7 +2,7 @@
 #include "Client_Defines.h"
 #include "Level_Yard.h"
 #include "Player.h"
-
+#include "Camera_Free.h"
 BEGIN(Client)
 
 class CYard_Round : public CLevel_Yard
@@ -35,7 +35,7 @@ public:
 	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
 	void	Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
 	void	Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
-
+	void	Set_Camera(CCamera_Free* pCamera) { m_pCamera = pCamera; }
 	_uint	Get_MonsterCount() { return m_iMonsterCount; }
 	void	MonsterCreate(_float fTimeDelta);
 
@@ -63,6 +63,8 @@ private:
 	CPlayer_Build* m_pBuild = { nullptr };
 	CBrainCore* m_pBrain = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };
+	CCamera_Free* m_pCamera = { nullptr };
+
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };

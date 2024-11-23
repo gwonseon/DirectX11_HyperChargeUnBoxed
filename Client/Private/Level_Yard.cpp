@@ -94,7 +94,7 @@ HRESULT CLevel_Yard::Initialize()
 		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
 		m_pRound[i]->Set_BrainCoreWorld_matrix(m_pBrain->Get_Transform()->Get_WorldMatrixPtr());
 		m_pRound[i]->Set_PlayerWorld_matrix(m_pPlayer->Get_Transform()->Get_WorldMatrixPtr());
-
+		m_pRound[i]->Set_Camera(m_pCamera);
 	}
 #pragma endregion ¶ó¿îµå
 
@@ -820,7 +820,7 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
-	Desc.fFar = 2000.f;
+	Desc.fFar = 9000.f;
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -858,8 +858,8 @@ HRESULT CLevel_Yard::Ready_Lights()
 	LightDesc.vPosition = _float4(500.f, 5.f, 500.f, 1.f);
 	LightDesc.fRange = 10.f;
 	LightDesc.vDiffuse = _float4(1.f, 0.3f, 0.3f, 1.f);
-	LightDesc.vAmbient = _float4(0.2f, 0.0f, 0.0f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 0.3f, 0.3f, 1.f);
+	LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
@@ -1263,28 +1263,29 @@ HRESULT CLevel_Yard::Ready_Layer_MissileTruck(const _tchar* pLayerTag)
 
 HRESULT CLevel_Yard::Ready_Layer_Effect(const _tchar* pLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
-		TEXT("Prototype_GameObject_Particle_Snow"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+	//	TEXT("Prototype_GameObject_Particle_Snow"))))
+	//	return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
-		TEXT("Prototype_GameObject_Particle_Explosion"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+	//	TEXT("Prototype_GameObject_Particle_Explosion"))))
+	//	return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
 		TEXT("Prototype_GameObject_Grass"))))
 		return E_FAIL;
 
-	CEffect_Explosion::EFFECT_EXPLOSION_DESC EffectDesc{};
-	EffectDesc.pCamera = m_pCamera;
-	for (size_t i = 0; i < 20; i++)
-	{
-		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
-			TEXT("Prototype_GameObject_Effect_Explosion"), &EffectDesc)))
-			return E_FAIL;
-	}
+	//CEffect_Explosion::EFFECT_EXPLOSION_DESC EffectDesc{};
+	//EffectDesc.fScale = { 10.f,10.f,10.f };
+	//EffectDesc.pCamera = m_pCamera;
+	//for (size_t i = 0; i < 20; i++)
+	//{
+	//	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+	//		TEXT("Prototype_GameObject_Effect_Explosion"), &EffectDesc)))
+	//		return E_FAIL;
+	//}
 
-	return S_OK;;
+	return S_OK;
 }
 
 void CLevel_Yard::Load_Map()

@@ -55,12 +55,11 @@ _bool CPicking::isPicked(_float3* pOut)
 	m_pGameInstance->Copy_RT_Resource(TEXT("Target_Depth"), m_pTexture2D);
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
-
+	
 	m_pContext->Map(m_pTexture2D, 0, D3D11_MAP_READ_WRITE, 0, &SubResource);
 
 	_float4* pPixel = static_cast<_float4*>(SubResource.pData) + iIndex;
-	if (pPixel == nullptr)
-		return false;
+	
 	_float3			vWorldPos = {};
 
 	/* 투영공간상의 위치를 구한다. */

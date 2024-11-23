@@ -4,6 +4,7 @@
 #include "GameInstance.h"
 #include <Monster_Bullet.h>
 #include <Trap_Marks.h>
+#include <Effect_Flare_Rifle.h>
 
 
 CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -26,7 +27,7 @@ HRESULT CTank::Initialize(void* pArg)
 {
 	TANK_DESC* pDesc = static_cast<TANK_DESC*>(pArg);
 
-	pDesc->fSpeedPerSec = 5.f;
+	pDesc->fSpeedPerSec = 25.f;
 	pDesc->fScale = _float3(3.f, 3.f, 3.f);
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_vecStoreTargetPos = *m_vecTargetPos;
@@ -37,6 +38,7 @@ HRESULT CTank::Initialize(void* pArg)
 	m_iCell_Idx = pDesc->iCell_Idx;
 	m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
 	m_pPlayer = pDesc->pPlayer;
+	m_pCamera = pDesc->pCamera;
 	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
@@ -119,7 +121,7 @@ void CTank::Update(_float fTimeDelta)
 		}
 		// Path 따라 갈 때는 Path 목표 바라보기
 		m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
-		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f);
+		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f  );
 		fAnimSpeed = 1.f;
 		
 		m_pModelCom->Set_Animation(MONSTER_Tank_Drive, true);
@@ -141,6 +143,18 @@ void CTank::Update(_float fTimeDelta)
 			Desc.vTargetPos = *m_vecTargetPos;
 			Desc.m_pBuild =  m_pBuild;
 			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+			
+			// 발사 불꽃
+			CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
+			pFlare.eLevel = m_eLevel;
+			pFlare.eType = CEffect_Flare_Rifle::FLARE_TANK;
+			pFlare.fScale = { 3.f,3.f,3.f };
+			pFlare.vecWeaponPos = &m_vecPosition;
+			pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
+			pFlare.vecTargetPos = m_vecTargetPos;
+			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+
+		
 		}
 		m_pTransformCom->LookAt(*m_vecTargetPos);
 		fAnimSpeed = 0.7f;
@@ -202,7 +216,7 @@ HRESULT CTank::Render_Height()
 	_float4x4			ViewMatrix, ProjMatrix;
 
 	// XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(64.5f, 20.f, 64.5f, 1.f), XMVectorSet(64.5f, 0.f, 64.5f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	_vector PlayerPos = m_pPlayer->Get_Position();
+ 	_vector PlayerPos = m_pPlayer->Get_Position();
 	_matrix			matView = XMMatrixIdentity();
 	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);

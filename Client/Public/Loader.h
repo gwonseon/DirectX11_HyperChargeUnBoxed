@@ -74,7 +74,7 @@ private:
 	HRESULT Loading_DataFile_For_NavigationLevel();
 	HRESULT Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID);
 
-
+	HRESULT Loading_Effect(LEVELID eLevelID);
 	HRESULT Loading_DataFile_For_Instancing_YardLevel();
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);

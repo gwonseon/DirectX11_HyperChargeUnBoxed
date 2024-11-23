@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "BlendObject.h"
-#include <Camera_Free.h>
+#include "Effect.h"
+
 BEGIN(Engine)
 class CShader;
 class CTexture;
@@ -10,12 +10,16 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CEffect_Flare_Rifle final : public CBlendObject
+class CEffect_Flare_Rifle  : public CEffect
 { 
 public:
-	typedef struct : public CBlendObject::BLEND_DESC
+	enum FLARE_TYPE { FLARE_PLAYER, FLARE_RIFLEMAN, FLARE_HELICOPTER,FLARE_TANK, FLARE_END};
+	typedef struct : public CEffect::EFFECT_DESC
 	{
-		CCamera_Free* pCamera = { nullptr };
+		FLARE_TYPE	eType{};
+		_vector* vecCamPos = { nullptr };
+		_vector* vecWeaponPos = { nullptr };
+		_vector* vecTargetPos = { nullptr };
 	}EFFECT_RIFLE_FLARE_DESC;
 private:
 	CEffect_Flare_Rifle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -42,9 +46,13 @@ private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
 private:
-	_float						m_fFrame = { 0.f };
+	FLARE_TYPE					m_eType{};
+
+	_float2						m_fFrame{};
 	_float3						m_fScale{};
-	CCamera_Free* m_pCamera = { nullptr };
+	_vector*					m_vecCamPos		= { nullptr };
+	_vector*					m_vecWeaponPos	= {nullptr};
+	_vector*					m_vecTargetPos	= { nullptr };
 
 public:
 	static CEffect_Flare_Rifle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
