@@ -17,7 +17,6 @@ class CNavigation;
 END
 
 BEGIN(Client)
-
 class CPlayer final : public CContainerObject
 {
 public:

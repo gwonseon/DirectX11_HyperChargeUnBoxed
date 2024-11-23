@@ -9,7 +9,7 @@
 #define OBJ_DEAD 1
 #define TRAP_EA 17
 #define	BULLET_EA 6
-#define MISSILEROUND 2
+#define MISSILEROUND 1
 
 namespace Client
 {

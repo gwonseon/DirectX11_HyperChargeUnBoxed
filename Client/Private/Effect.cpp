@@ -2,12 +2,12 @@
 #include "..\Public\Effect.h"
 
 CEffect::CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
+    : CBlendObject{ pDevice, pContext }
 {
 }
 
 CEffect::CEffect(const CEffect& Prototype)
-    : CGameObject{ Prototype }
+    : CBlendObject{ Prototype }
 {
 }
 
@@ -24,6 +24,7 @@ HRESULT CEffect::Initialize(void* pArg)
         m_fPosition = pDesc->fPosition;
         m_fScale    = pDesc->fScale;
         m_eLevel    = pDesc->eLevel;
+        
     }
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -31,12 +32,12 @@ HRESULT CEffect::Initialize(void* pArg)
     m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosition.x, m_fPosition.y, m_fPosition.z, 1.f));
 
-
     return S_OK;
 }
 
 void CEffect::Priority_Update(_float fTimeDelta)
 {
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CEffect::Update(_float fTimeDelta)

@@ -56,6 +56,7 @@ private:
 	_uint iRand{};
 	_bool m_bChange_Root = false;
 	_float  m_fBullet_Move{};
+	float m_fSpeed{}, m_fSize{};
 	float distance{};
 private:
 	LEVELID m_eLevel{};

@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "Player_Build.h"
+#include "Camera_Free.h"
 
 BEGIN(Engine)
 class CShader;
@@ -26,6 +27,7 @@ public:
 		_vector vDir{}, vTargetPos{};
 		CPlayer_Build* m_pBuild = { nullptr };
 		CPlayer* pPlayer = { nullptr };
+		CCamera* pCamera = { nullptr };
 	}MONSTER_BULLET_DESC;
 
 	
@@ -55,6 +57,7 @@ private:
 	CCollider* m_pPlayerCollider = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };
+	CCamera* m_pCamera = { nullptr };
 
 private:
 	LEVELID m_eLevel{};

@@ -2,6 +2,7 @@
 #include "..\Public\Truck_Missile.h"
 
 #include "GameInstance.h"
+#include <Effect_Explosion_Tank.h>
 
 CTruck_Missile::CTruck_Missile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -132,6 +133,14 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
 			pExplosion.fScale = _float3{ 10.f, 10.f, 10.f };
 			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+		
+			CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
+			Effect.eLevel = m_eLevel;
+			Effect.fScale = _float3{ 80.f, 80.f, 80.f };
+			Effect.eType = CEffect_Explosion_Tank::EXPLOSION_MISSILE;
+			Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) + 15.f, XMVectorGetZ(m_vecPosition) };
+			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
+
 		}
 		_vector vUP = { 0.f, 1.f, 0.f,0.f };
 		m_vecPosition += vUP * fTimeDelta * m_fPower;

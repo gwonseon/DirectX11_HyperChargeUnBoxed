@@ -65,6 +65,8 @@
 
 #include "Explosion.h"
 #include "Effect_Explosion.h"
+#include "Effect_Flare_Rifle.h"
+#include "Effect_Explosion_Tank.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -221,7 +223,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Sky"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 		return E_FAIL;
-
+	Loading_Effect(LEVEL_GAMEPLAY);
 
 #pragma region UI텍스처 생성
 	// 크로스 라인
@@ -688,6 +690,7 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 {
 	m_strLoadingText = TEXT("텍스쳐 로딩중입니다.");
 
+
 	/* For.Prototype_Component_Texture_Sky */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Sky"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
@@ -698,11 +701,8 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png")))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Texture_Explosion */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Explosion"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"), 90))))
-		return E_FAIL;
 
+	Loading_Effect(LEVEL_YARD);
 #pragma region UI텍스처 생성
 	// Nuclear
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Nuclear"),
@@ -932,13 +932,7 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
 	
-	/* Prototype_GameObject_Effect_Explosion */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Explosion")) == nullptr)
-	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Explosion"),
-			CEffect_Explosion::Create(m_pDevice, m_pContext))))
-			return E_FAIL;
-	}
+
 
 
 	// Collector Item
@@ -982,7 +976,7 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 			return E_FAIL;
 	}
 
-	/* Explosion */
+	/* Explosion 포탄 폭발 콜라이더  */ 
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Explosion")) == nullptr)
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Explosion"),
@@ -2768,6 +2762,57 @@ HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID)
 }
 
 
+
+HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
+{
+	/* For.Prototype_Component_Texture_Explosion */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Explosion"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"), 90))))
+		return E_FAIL;
+
+	/*플레어 총 */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Flare"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.png"), 6))))
+		return E_FAIL;
+		
+	/*플레어 총 */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Flare_DDS"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.dds"), 1))))
+		return E_FAIL;
+
+	/*탱크 폭발 */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Tank_Explosion"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"), 3))))
+		return E_FAIL;
+
+
+	/* Prototype_GameObject_Effect_Explosion */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Explosion")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Explosion"),
+			CEffect_Explosion::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
+	/* Prototype_GameObject_Effect_Explosion */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Tank_Explosion")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Tank_Explosion"),
+			CEffect_Explosion_Tank::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+	/* Rifle Flare */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Rifle_Flare")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Rifle_Flare"),
+			CEffect_Flare_Rifle::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
+	return S_OK;
+}
 
 HRESULT CLoader::Loading_DataFile_For_Instancing_YardLevel()
 {

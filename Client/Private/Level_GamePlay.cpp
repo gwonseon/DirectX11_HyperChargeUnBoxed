@@ -84,7 +84,7 @@ HRESULT CLevel_GamePlay::Initialize()
 		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
 		m_pRound[i]->Set_BrainCoreWorld_matrix(m_pBrain->Get_Transform()->Get_WorldMatrixPtr());
 		m_pRound[i]->Set_PlayerWorld_matrix(m_pPlayer->Get_Transform()->Get_WorldMatrixPtr());
-
+		m_pRound[i]->Set_Camera(m_pCamera); 
 	}
 #pragma endregion ¶ó¿îµå
 
@@ -666,6 +666,7 @@ void CLevel_GamePlay::Load_Map()
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
+		Desc.pPlayer = m_pPlayer;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
 		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Environment"),
 			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
@@ -704,6 +705,7 @@ void CLevel_GamePlay::Load_Map()
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
+		Desc.pPlayer = m_pPlayer;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
 		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Environment"),
 			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));

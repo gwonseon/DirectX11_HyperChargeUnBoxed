@@ -144,7 +144,7 @@ private:
 
 	_vector	m_vecWeaponPos{};
 	_vector	m_vecWeaponDir{};
-	
+	_vector m_vecFlarePos{};
 	_uint m_iShaderPassNum{};  // 무기가 벽에 겹쳐도 보이게
 	_uint m_iWeaponState{};
 	WEAPONSTATE m_eWeaponState = WEAPON_END;

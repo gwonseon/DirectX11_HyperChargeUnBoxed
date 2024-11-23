@@ -32,6 +32,7 @@ HRESULT CBrainCore::Initialize(void* pArg)
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
 	m_bAffected = true;
+	m_bDontDestroy = true;
 	return S_OK;
 }
 

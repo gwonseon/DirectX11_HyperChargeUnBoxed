@@ -12,6 +12,7 @@ float4 g_vMtrlAmbient = float4(0.4f, 0.4f, 0.4f, 1.f);
 float4 g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 
 float4 g_vCamPosition;
+float4 g_vCamDirection;
 float g_fFar;
 
 struct VS_IN
@@ -96,7 +97,24 @@ PS_OUT PS_MAIN2(PS_IN In)
     return Out;
 
 }
+PS_OUT PS_MAIN3(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
 
+    
+    float E = normalize(g_vCamPosition - In.vPosition);
+    float value = saturate(dot(E, In.vNormal));
+    float emissive = 1.f - value;
+    emissive = smoothstep(0.f, 1.f, emissive);
+    emissive = pow(emissive, 1);
+    vector vEmissiveColor = float4(1.0f, 0.5f, 0.f, 1.0f);
+   
+    Out.vDiffuse = vEmissiveColor * emissive;
+    return Out;
+}
 
 struct PS_OUT_HEIGHT
 {
@@ -209,5 +227,14 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
     }
+    pass DefaultPass8 // 8 ÃÑ¾Ë
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN3();
+    }
 }

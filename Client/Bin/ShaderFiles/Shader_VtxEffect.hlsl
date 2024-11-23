@@ -7,7 +7,8 @@ matrix              g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D           g_Texture;
 texture2D           g_DepthTexture;
 float               g_fFar;
-
+float2              g_Index;
+float2              g_ImageEA;
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -88,11 +89,91 @@ PS_OUT PS_MAIN_SOFT(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN_SOFT2(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrl = g_Texture.Sample(PointSampler, In.vTexcoord);
+
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // 각 프레임의 UV 크기
+    float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
+    float2 UV = fStart + fSize * In.vTexcoord;
+
+    vMtrl = g_Texture.Sample(PointSampler, UV);
+    if (vMtrl.a == vMtrl.b == vMtrl.g == vMtrl.r) 
+        vMtrl.a = vMtrl.r;
+    
+    Out.vColor = g_Texture.Sample(LinearSampler, UV);
+    float2 vTexcoord;
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepth = g_DepthTexture.Sample(LinearSampler, vTexcoord);
+    float fOldZ = vDepth.y * g_fFar;
+    float fViewZ = In.vProjPos.w;
+    if (fOldZ < fViewZ)
+        return Out;
+    float newAlpha = Out.vColor.a * (fOldZ - fViewZ);
+    if (Out.vColor.a > newAlpha)
+        Out.vColor.a = newAlpha;
+    
+    
+    
+    
+    //if (vMtrl.a == vMtrl.b == vMtrl.g == vMtrl.r) 
+    //    vMtrl.a = vMtrl.r;
+    //Out.vColor = vMtrl;
+
+    return Out;
+}
+
+
+PS_OUT PS_MAIN3(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrl = g_Texture.Sample(LinearSampler, In.vTexcoord);
+
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // 각 프레임의 UV 크기
+    float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
+    float2 UV = fStart + fSize * In.vTexcoord;
+
+    vMtrl = g_Texture.Sample(LinearSampler, UV);
+
+    if (vMtrl.a == 0.f) 
+        discard;
+    if (vMtrl.r == 0.f)
+        discard;
+    Out.vColor = vMtrl;
+
+    return Out;
+}
+
+
+PS_OUT PS_MAIN_SOFT4(PS_IN In)
+{
+   PS_OUT         Out = (PS_OUT)0;
+   Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+   float2      vTexcoord;
+   vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+   vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+   float4      vDepth = g_DepthTexture.Sample(LinearSampler, vTexcoord);
+   float      fOldZ = vDepth.y * 500.f;
+   float      fViewZ = In.vProjPos.w;
+    if (fOldZ < fViewZ)
+        return Out;
+    float newAlpha = Out.vColor.a * (fOldZ - fViewZ);
+    if (Out.vColor.a > newAlpha)
+        Out.vColor.a = newAlpha;
+   return Out;
+}
+
 
 
 technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
 {
-    pass AlphaBlend
+    pass AlphaBlend // 0
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -101,6 +182,39 @@ technique11 DefaultTechnique // Technique : 어떤 버전으로 적혔는지 구분한다.
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_SOFT();
+    }
+
+    pass AlphaBlend1 // 1
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_SOFT2();
+    }
+
+    pass AlphaBlend2 // 2
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN3();
+    }
+
+    pass AlphaBlend3 // 3
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_SOFT4();
     }
 
 }

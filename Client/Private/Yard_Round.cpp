@@ -109,6 +109,7 @@ void CYard_Round::MonsterCreate(_float fTimeDelta)
 		Tank_Desc.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
 		Tank_Desc.pTrapLayer = m_pTrapLeyer;
 		Tank_Desc.pPlayer = m_pPlayer;
+		Tank_Desc.pCamera = m_pCamera;
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Tank"), &Tank_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 		break;

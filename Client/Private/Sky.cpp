@@ -29,6 +29,7 @@ HRESULT CSky::Initialize(void* pArg)
 
     if (FAILED(Add_Components()))
         return E_FAIL;
+    m_pTransformCom->Rotation(0.f, 180.f, 0.f);
     return S_OK;
 }
 
@@ -92,7 +93,7 @@ HRESULT CSky::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
-    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 2)))
+    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
    

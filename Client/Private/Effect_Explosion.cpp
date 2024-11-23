@@ -4,12 +4,12 @@
 #include "GameInstance.h"
 
 CEffect_Explosion::CEffect_Explosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CBlendObject{ pDevice, pContext } 
+	: CEffect{ pDevice, pContext }
 {
 }
 
 CEffect_Explosion::CEffect_Explosion(const CEffect_Explosion& Prototype)
-	: CBlendObject{ Prototype }
+	: CEffect{ Prototype }
 {
 }
 
@@ -37,6 +37,7 @@ HRESULT CEffect_Explosion::Initialize(void* pArg)
 
 void CEffect_Explosion::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
 	_vector vCam = *m_pCamera->Get_Camera_Pos();
 	m_pTransformCom->LookAt(vCam);
 
@@ -128,13 +129,11 @@ CEffect_Explosion* CEffect_Explosion::Create(ID3D11Device* pDevice, ID3D11Device
 CGameObject* CEffect_Explosion::Clone(void* pArg)
 {
 	CEffect_Explosion* pInstance = new CEffect_Explosion(*this);
-
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CEffect_Explosion");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 
