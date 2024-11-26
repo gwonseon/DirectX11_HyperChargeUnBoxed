@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "PartObject.h"
+#include <Katana_Effect.h>
 
 BEGIN(Engine)
 class CCollider;
@@ -46,11 +47,14 @@ private:
 	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-
+	CKatana_Effect* m_pKatana_Effect[6] = { nullptr };
 
 	const _float4x4* m_pSocketMatrix = { nullptr };
 	const _uint* m_pParentState = { nullptr };
 
+
+	_float4x4						m_PrevWorldMatrix[6] = {};
+	_uint							m_iStorePrevTiming{};
 
 
 private:
