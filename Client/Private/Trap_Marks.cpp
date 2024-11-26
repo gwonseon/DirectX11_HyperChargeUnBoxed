@@ -29,22 +29,23 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 		return E_FAIL;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-	
-	CTrap_Bricks::TRAP_BRICKS_DESC Bricks_Desc{};
-	Bricks_Desc.eID = m_eLevel;
-	Bricks_Desc.fScale = { 5.f,5.f,5.f };
-	Bricks_Desc.pPlayer = m_pPlayer;
-	Bricks_Desc.m_bBuild = &m_bBuild;
-	Bricks_Desc.fPosition = pDesc->fPosition;
-	Bricks_Desc.m_bBuild_PreView = &m_bBuild_PreView;
+	if (m_eLevel != LEVEL_IMGUI)
+	{
 
-	if (m_eType == BRICKS_TRAP)
-		Bricks_Desc.iModel_Idx = 1; // ·¹°í Æ®·¦
-	if (m_eType == TANK_TRAP)
-		Bricks_Desc.iModel_Idx = 9; // ÅÊÅ© Æ®·¦
+		CTrap_Bricks::TRAP_BRICKS_DESC Bricks_Desc{};
+		Bricks_Desc.eID = m_eLevel;
+		Bricks_Desc.fScale = { 5.f,5.f,5.f };
+		Bricks_Desc.pPlayer = m_pPlayer;
+		Bricks_Desc.m_bBuild = &m_bBuild;
+		Bricks_Desc.fPosition = pDesc->fPosition;
+		Bricks_Desc.m_bBuild_PreView = &m_bBuild_PreView;
 
-
-	m_pBricks = static_cast<CTrap_Bricks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Trap_Shield"), TEXT("Prototype_GameObject_TrapBricks"), &Bricks_Desc));
+		if (m_eType == BRICKS_TRAP)
+			Bricks_Desc.iModel_Idx = 1; // ·¹°í Æ®·¦
+		if (m_eType == TANK_TRAP)
+			Bricks_Desc.iModel_Idx = 9; // ÅÊÅ© Æ®·¦
+		m_pBricks = static_cast<CTrap_Bricks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Trap_Shield"), TEXT("Prototype_GameObject_TrapBricks"), &Bricks_Desc));
+	}
 	m_bAffected = false;
 	m_bDraw = true;
 	return S_OK;
@@ -52,6 +53,8 @@ HRESULT CTrap_Marks::Initialize(void* pArg)
 
 void CTrap_Marks::Priority_Update(_float fTimeDelta)
 {
+	if (m_eLevel == LEVEL_IMGUI)
+		return;
 	if(m_bBuild == false)
 	{
 		// À§Ä¡ ºñ±³ÇØ¼­ Æ®·¦ ¼³Ä¡°¡ °¡´ÉÇÑÁö È®ÀÎ

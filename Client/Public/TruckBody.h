@@ -38,7 +38,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-	virtual HRESULT Render_Height() override;
+	virtual HRESULT Render_Height();
 
 
 

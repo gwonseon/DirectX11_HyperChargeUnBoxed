@@ -350,13 +350,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	
 	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
 
-	// 에너지 머신 레이더
-	CEnergy_Lader::ENERGYLADER_DESC pEnergyLader{};
-	pEnergyLader.eID = LEVEL_GAMEPLAY;
-	pEnergyLader.fScale = { 5.f,5.f,5.f };
-	pEnergyLader.fPosition = _float3{ 477.267f, 0.1f,532.115f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyLader"), &pEnergyLader));
-
+	
 	// 에너지 머신 캡
 	CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
 	pEnergyCap.eID = LEVEL_GAMEPLAY;
@@ -620,9 +614,9 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 

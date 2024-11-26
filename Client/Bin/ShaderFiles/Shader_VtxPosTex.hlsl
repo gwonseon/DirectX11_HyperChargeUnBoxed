@@ -21,7 +21,6 @@ struct VS_IN
 {
     float3 vPosition : POSITION;
     float2 vTexcoord : TEXCOORD0;
-    
 };
 
 struct VS_OUT
@@ -70,6 +69,7 @@ struct PS_IN
 };
 
 
+
 struct PS_OUT
 {
 	/* 변수에 대한 시멘틱을 정의한다. */
@@ -97,23 +97,14 @@ PS_OUT PS_MAIN(PS_IN In)
 PS_OUT PS_MAIN2(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
- //   Out.vColor = vector(1.f, 1.f, 1.f, 1.f);
-    // 색으로 채우는 것이 이미지를 가져와서 색을 채워줌
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
- //   Out.vColor.gb = Out.vColor.r; // 같으면 회색, 죽었을 때를 표현하면 좋을듯
     
-    
-    // 알파테스트 : 알파값을 기준으로 그린다 안그린다를 고려한다. Dx11 에선 알파테스트가 사라지고 셰이파파일에서 비교하는 방식으로 바뀜
-    // 깊이 테스트를 통과하여 레스터라이즈를 거쳤으나 알파 테스트 통과 못한 값은 파괴한다. 따라서 깊이 값 기록 안한다!
     if (Out.vColor.a == 0.f) 
         discard; // 파괴한다. 
  
     if (Out.vColor.r == 1.f && Out.vColor.g == 1.f && Out.vColor.b == 1.f)
         Out.vColor.gb = 0.f;
-    
-    // 투영변환은 x,y를 변환전의 z값인 w로 나눔으로써 완성된다.
-//    float2 vProjPos = In.vProjPos.xy / In.vProjPos.w;
-    
+
     return Out;
 
 }

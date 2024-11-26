@@ -24,19 +24,6 @@ CAnimation::CAnimation(const CAnimation& Prototype)
  
 _bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bPlay)
 {
-	//if (m_fCurrentPosition <= 0.f && bChangeAnim == true)
-	//{
-	//	m_fLerptime += fTimeDelta;
-	//	for (size_t i = 0; i < m_iNumChannels; i++)
-	//	{
-	//		m_Channels[i]->Update_LinearInterPolation2(Bones, m_fLerptime, bChangeAnim);
-	//	}
-	//} 
-	//else
-	//{
-	//	m_fLerptime = 0.f;
-	//	
-	//}
 
 	if (m_fCurrentPosition == 0)
 	{
@@ -58,12 +45,8 @@ _bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones,
 		return true;
 	}
 
-	/* 이 애니메이션이 사용하는 모든 뼈의 상태를 시간에 맞게 변경하낟.*/
 	for (size_t i = 0; i < m_iNumChannels; i++)
 	{
-		/* 채널이 가지고 있는 재생위치당 상태(KeyFrame)를 활용하여 현재 재생위치에 맞는 뼈(채널)의 상태를 만들어준다.  */
-		/* 상태행렬을 현재 채널과 이름이 같은 뼈에게 전달하여 뼈의 상태를 갱신할 수 있도록 하낟. */
-
 		m_Channels[i]->Update_TransformationMatrix(Bones, &m_iChannelKeyFrameIndices[i], m_fCurrentPosition);
 		LastKeyFrame = &m_Channels[i]->Get_LastKeyFrame();
 		m_vecName[i] = m_Channels[i]->Get_strName();

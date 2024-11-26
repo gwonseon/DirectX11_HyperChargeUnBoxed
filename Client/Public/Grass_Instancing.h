@@ -12,6 +12,13 @@ BEGIN(Client)
 
 class CGrass_Instancing final : public CGameObject
 {
+public:
+	typedef struct : public CGameObject::GAMEOBJ_DESC
+	{
+		LEVELID eLevel{};
+		_uint iType{};
+	}INSTANCIN_MESH_DESC;
+
 private:
 	CGrass_Instancing(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGrass_Instancing(const CGrass_Instancing& Prototype);
@@ -38,6 +45,8 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
+	_uint m_iType{ };
+	LEVELID m_eLevel{};
 
 public:
 	static CGrass_Instancing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

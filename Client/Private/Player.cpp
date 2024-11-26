@@ -4,6 +4,7 @@
 
 #include <Camera_Free.h>
 #include <FPS_Pivot.h>
+#include <Slash_Mesh.h>
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject{ pDevice, pContext }
@@ -66,7 +67,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
-	m_fAttack = 10.f;
+	m_fAttack = 1.f;
 	m_iCoin = 0;
 	m_bDontDestroy = true;
 	m_bKnockdown = false;
@@ -178,9 +179,13 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	{
 		m_iViewState = PLAYER_TPS_VIEW;				// 카타나는 무조건 3인칭 
 		m_pKatana->Set_KatanaState(true);
+		m_pGameInstance->Set_KatanaState(true);
 	}
 	else
+	{
 		m_pKatana->Set_KatanaState(false);
+		m_pGameInstance->Set_KatanaState(false);
+	}
 
 
 
@@ -324,10 +329,10 @@ HRESULT CPlayer::Add_PartObjects()
 		return E_FAIL;
 
 	CFPS_Pivot::FPSPIVOT_DESC	FPSPivotDesc{};
-	FPSPivotDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	FPSPivotDesc.fSpeedPerSec = 0.f;
 	FPSPivotDesc.fRotationPerSec = 0.f;
 	FPSPivotDesc.pParentState = &m_iState_Upper;
+	FPSPivotDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	FPSPivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	FPSPivotDesc.m_iViewState = &m_iViewState;
 
@@ -397,10 +402,14 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
 	{
 		if (m_iWeaponState == WEAPON_KATANA)
+		{
 			m_bAttackState = true;
-		// 목표 위치
+		
+		}
 
+	
 		m_pGameInstance->isPicked(&m_vecTargetPos);
+		
 
 		if (!(m_iState_Upper & FIRE))
 		{
@@ -408,13 +417,26 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 				m_iState_Upper ^= STATE_IDLE;
 			m_iState_Upper |= FIRE;
 		}
-
 		// 여기서 건전지 떨구자 
 	}
 	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == true && m_iViewState == PLAYER_FPS_VIEW)
 	{
 		m_iState_Upper = STATE_IDLE;
 	}
+	
+	if (m_pGameInstance->Get_DIMouseState_Down(DIM_LB) && m_bReloading == false && m_iWeaponState == WEAPON_KATANA)
+	{
+		//// 여기
+		//CSlash_Mesh::SLASH_DESC pSlash{};
+		//pSlash.vecPlayerPos = &m_vecPos;
+		//pSlash.fScale = _float3(50.f, 50.f, 50.f);
+		//pSlash.fRotationPerSec = 5.f;
+		//pSlash.eID = m_eLevelID;
+		//pSlash.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+		//pSlash.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("chest_SKEL");
+		//m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Slash"), &pSlash);
+	}
+	
 	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB))
 	{
 		if (m_iWeaponState != WEAPON_KATANA)

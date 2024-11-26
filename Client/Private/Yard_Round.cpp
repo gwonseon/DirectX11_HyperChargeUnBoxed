@@ -155,6 +155,7 @@ void CYard_Round::MonsterCreate(_float fTimeDelta)
 		pRifleMan.matPlayerWorld = matPlayerWorld;
 		pRifleMan.matBrainCoreWorld = matBrainCoreWorld;
 		pRifleMan.m_pBuild = m_pBrain;
+		pRifleMan.pCamera = m_pCamera;
 		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_RifleMan"), &pRifleMan);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 

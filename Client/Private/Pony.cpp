@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "Pony_Defines.h"
+#include <Effect_Electricity.h>
 
 
 CPony::CPony(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -47,7 +48,7 @@ HRESULT CPony::Initialize(void* pArg)
 		return E_FAIL;
 
 
-	m_fHp = 100.f;
+	m_fPrevHp = m_fHp = 100.f;
 	m_fEnergy = 0.f;
 	m_fAttack = 10.f;
 
@@ -78,6 +79,9 @@ void CPony::Priority_Update(_float fTimeDelta)
 		}
 		m_fAttackTime += fTimeDelta;
 	}
+
+	
+
 }
 
 void CPony::Update(_float fTimeDelta)
@@ -279,6 +283,21 @@ void CPony::Late_Update(_float fTimeDelta)
 			m_bKnockBacking = false;
 		}
 
+	}
+	_bool bKatanaCheck = m_pGameInstance->Get_KatanaState();
+	if (m_fPrevHp != m_fHp && bKatanaCheck == true)
+	{
+		CEffect_Electricity::EFFECT_ELECTRICITY_DESC pElectricity{};
+		pElectricity.eLevel = m_eLevel;
+		pElectricity.fScale = _float3{ 10.f, 10.f,10.f };
+		pElectricity.iTexNum = 3;
+		pElectricity.vecPos = &m_vecPosition;
+		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Effect_Lightning"), &pElectricity);
+		m_fPrevHp = m_fHp;
+	}
+	else if(bKatanaCheck == false)
+	{
+		m_fPrevHp = m_fHp;
 	}
 }
 

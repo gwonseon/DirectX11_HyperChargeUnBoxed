@@ -20,6 +20,9 @@ HRESULT CGrass_Instancing::Initialize_Prototype()
 
 HRESULT CGrass_Instancing::Initialize(void* pArg)
 {
+    INSTANCIN_MESH_DESC* pDesc = static_cast<INSTANCIN_MESH_DESC*>(pArg);
+    m_iType = pDesc->iType;
+    m_eLevel = pDesc->eLevel;
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -36,13 +39,13 @@ void CGrass_Instancing::Priority_Update(_float fTimeDelta)
 void CGrass_Instancing::Update(_float fTimeDelta)
 {
     _float3 aa =  m_pTransformCom->Get_Scaled();
-    aa;
+ 
 
 }
 
 void CGrass_Instancing::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
         return;
 }
 
@@ -69,14 +72,17 @@ HRESULT CGrass_Instancing::Render()
 HRESULT CGrass_Instancing::Add_Components()
 {
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticleMesh"),
+    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Shader_VtxParticleMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
 
+    const _wstring Component = TEXT("Prototype_Component_VIBuffer_Grass");
+    const _wstring Component_Result = Component + to_wstring(m_iType);
     /* For.Com_VIBuffer */
-    if (FAILED(__super::Add_Component(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass"),
+    if (FAILED(__super::Add_Component(m_eLevel, Component_Result,
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
         return E_FAIL;
+
 
     return S_OK;
 }
@@ -89,20 +95,7 @@ HRESULT CGrass_Instancing::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
- /*   if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
-
+ 
     return S_OK;
 }
 

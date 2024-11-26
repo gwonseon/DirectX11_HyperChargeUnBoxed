@@ -5,6 +5,9 @@
 #include "RifleMan_Defines.h"
 #include <Trap_Marks.h>
 #include <Monster_Bullet.h>
+#include <Effect_Flare_Rifle.h>
+#include "Effect_Electricity.h"
+
 
 CRifleMan::CRifleMan(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{ pDevice, pContext }
@@ -37,7 +40,7 @@ HRESULT CRifleMan::Initialize(void* pArg)
     m_pBuild = pDesc->m_pBuild;
     m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
     m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
-
+    m_pCamera = pDesc->pCamera;
     pDesc->fScale = _float3(2.f, 2.f, 2.f);
     pDesc->fSpeedPerSec = 5.f;
 
@@ -47,7 +50,7 @@ HRESULT CRifleMan::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_fHp = 50.f;
+    m_fPrevHp= m_fHp = 50.f;
     m_fEnergy = 0.f;
     m_fAttack = 0.f;
 
@@ -66,8 +69,6 @@ void CRifleMan::Priority_Update(_float fTimeDelta)
     vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
 
 
-
-
 }
 
 void CRifleMan::Update(_float fTimeDelta)
@@ -77,7 +78,8 @@ void CRifleMan::Update(_float fTimeDelta)
     m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
     // 상태패턴 업데이트
     m_pCurrentState->Update(this, fTimeDelta);
-
+    
+    vPlayerPos = XMVectorSetY(vPlayerPos, XMVectorGetY(vPlayerPos) + 3.f);
     _float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
     // 사정거리 안에 플레이어가 없으면 
     if (fDistance > 1500.f)
@@ -137,7 +139,7 @@ void CRifleMan::Update(_float fTimeDelta)
                         CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
                         Desc.eID = m_eLevel;
                         _float3 fBulletPos = m_fPos;
-                        fBulletPos.y = 2.f;
+                        fBulletPos.y = 3.f;
                         Desc.fPosition = fBulletPos;
                         Desc.m_iModelNumber = 1;
                         Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
@@ -145,6 +147,18 @@ void CRifleMan::Update(_float fTimeDelta)
                         Desc.m_pBuild = m_pBuild;
                         Desc.pPlayer = m_pPlayer;
                         static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+                       
+                        // 발사 불꽃
+                        CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
+                        pFlare.eLevel = m_eLevel;
+                        pFlare.eType = CEffect_Flare_Rifle::FLARE_RIFLEMAN;
+                        pFlare.fScale = { 1.f,1.f,1.f };
+                        pFlare.vecWeaponPos = &m_vecPosition;
+                        pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
+                        pFlare.vecTargetPos = m_vecTargetPos;
+                        static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+
+                        
                         m_iShot_Count++;
                     }
                 }
@@ -234,7 +248,7 @@ void CRifleMan::Update(_float fTimeDelta)
                         CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
                         Desc.eID = m_eLevel;
                         _float3 fBulletPos = m_fPos;
-                        fBulletPos.y = 2.f;
+                        fBulletPos.y = 3.f;
                         Desc.fPosition = fBulletPos;
                         Desc.m_iModelNumber = 1;
                         Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
@@ -242,6 +256,18 @@ void CRifleMan::Update(_float fTimeDelta)
                         Desc.m_pBuild = m_pBuild;
                         Desc.pPlayer = m_pPlayer;
                         static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
+                        
+                        // 발사 불꽃
+                        CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
+                        pFlare.eLevel = m_eLevel;
+                        pFlare.eType = CEffect_Flare_Rifle::FLARE_RIFLEMAN;
+                        pFlare.fScale = { 1.f,1.f,1.f };
+                        pFlare.vecWeaponPos = &m_vecPosition;
+                        pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
+                        pFlare.vecTargetPos = &vPlayerPos;
+                        static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+
+                        
                         m_iShot_Count++;
                     }
                 }

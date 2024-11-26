@@ -265,6 +265,18 @@
     <Filter Include="02. GameObjects\Effect\Explosion_Tank">
       <UniqueIdentifier>{be15ed70-55bb-48d4-b26e-7f355e798222}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Effect\Terrain_Crushed">
+      <UniqueIdentifier>{999b01dc-d67b-4ce6-b805-494935a348c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player_Build\Energy_Machine\Rader">
+      <UniqueIdentifier>{5b0a85c4-26a7-4a47-b557-661edec1ac85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Slash_Mesh">
+      <UniqueIdentifier>{ea70190d-432f-4b57-8b2e-a3526aa3e14f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\Electricity">
+      <UniqueIdentifier>{cbc26eba-7a1f-4d99-92bd-5da4b8ba22e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -522,6 +534,18 @@
     <ClInclude Include="..\Public\Effect_Explosion_Tank.h">
       <Filter>02. GameObjects\Effect\Explosion_Tank</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Terrain_Crushed.h">
+      <Filter>02. GameObjects\Effect\Terrain_Crushed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Slash_Mesh.h">
+      <Filter>02. GameObjects\Player\Slash_Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rader_Effect.h">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine\Rader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Electricity.h">
+      <Filter>02. GameObjects\Effect\Electricity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -758,6 +782,18 @@
     <ClCompile Include="..\Private\Effect_Explosion_Tank.cpp">
       <Filter>02. GameObjects\Effect\Explosion_Tank</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Terrain_Crushed.cpp">
+      <Filter>02. GameObjects\Effect\Terrain_Crushed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Slash_Mesh.cpp">
+      <Filter>02. GameObjects\Player\Slash_Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rader_Effect.cpp">
+      <Filter>02. GameObjects\Player_Build\Energy_Machine\Rader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Electricity.cpp">
+      <Filter>02. GameObjects\Effect\Electricity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -819,6 +855,9 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffect.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxFog.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

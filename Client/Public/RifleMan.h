@@ -4,6 +4,7 @@
 #include "Monster.h"
 #include "Player_Build.h"
 #include "RifleMan_State.h"
+#include "Camera_Free.h"
 
 BEGIN(Engine)
 class CShader;
@@ -22,6 +23,7 @@ private:
 public:
 	typedef struct : CMonster::MONSTER_DESC
 	{
+		CCamera_Free* pCamera = { nullptr };
 		CPlayer_Build* m_pBuild = { nullptr };
 	}RIFLEMAN_DESC;
 
@@ -98,6 +100,7 @@ private:
 	CNavigation* m_pNavigationCom = { nullptr };
 	CCollider* m_pTargetCollider = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
+	CCamera_Free* m_pCamera = { nullptr };
 
 public:
 	static CRifleMan* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -47,13 +47,14 @@ private:
 
 private:
 	FLARE_TYPE					m_eType{};
+	_uint						m_iTexNum{};
 
+	_float2						m_fMaxFrame{};
 	_float2						m_fFrame{};
 	_float3						m_fScale{};
 	_vector*					m_vecCamPos		= { nullptr };
 	_vector*					m_vecWeaponPos	= {nullptr};
 	_vector*					m_vecTargetPos	= { nullptr };
-
 public:
 	static CEffect_Flare_Rifle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

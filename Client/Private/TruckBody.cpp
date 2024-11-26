@@ -53,13 +53,9 @@ void CTruckBody::Late_Update(_float fTimeDelta)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;
-		if (m_eLevelID == LEVEL_YARD || m_eLevelID == LEVEL_GAMEPLAY)
-		{
-
-			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
-				return;
-		}
-
+		
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+			return;
 
 	}
 }
@@ -87,18 +83,21 @@ HRESULT CTruckBody::Render()
 
 HRESULT CTruckBody::Render_Height()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+
+	//if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	//	return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
-
+	
 	_float4x4			ViewMatrix, ProjMatrix;
-
-	// XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(64.5f, 20.f, 64.5f, 1.f), XMVectorSet(64.5f, 0.f, 64.5f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	_vector PlayerPos = m_pPlayer->Get_Position();
+	CLayer* pPlayerLayer = (m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Player")));
+	CPlayer* pPlayer = static_cast<CPlayer*>(pPlayerLayer->Get_GameObject_List().front());
+	_vector PlayerPos = pPlayer->Get_Position();
 	_matrix			matView = XMMatrixIdentity();
 	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), XMVectorGetY(PlayerPos) + 20.f, XMVectorGetZ(PlayerPos), 1.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), XMVectorGetY(PlayerPos) + 6.f, XMVectorGetZ(PlayerPos), 1.f);
 
 	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
 	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
@@ -114,10 +113,6 @@ HRESULT CTruckBody::Render_Height()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		/*
-			if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-		*/
 		if (FAILED(m_pShaderCom->Begin(6))) // 무조건 그림
 			return E_FAIL;
 		m_pModelCom->Render(i);
@@ -125,7 +120,6 @@ HRESULT CTruckBody::Render_Height()
 
 	return S_OK;
 }
-
 HRESULT CTruckBody::Add_Components()
 {
 	/* For.Com_Shader */

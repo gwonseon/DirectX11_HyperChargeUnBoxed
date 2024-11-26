@@ -234,7 +234,7 @@ HRESULT CMonster_Bullet::Add_Components()
 
     // Sphere
     CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-    SphereDesc.fRadius = 0.2f;
+    SphereDesc.fRadius = 0.5f;
     SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
 
     if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),

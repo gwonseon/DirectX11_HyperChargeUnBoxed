@@ -86,7 +86,7 @@ protected:
 	_bool		m_bKnockBacking = false;
 	_float		m_fKnockBack_Power = 0.f;
 	_float		m_fKnockBack_Height = 0.f;
-
+	_float		m_fPrevHp{};
 	//  ±æ Ã£±â
 	vector<_float3> Path{};
 	_uint		m_iCell_Idx{};

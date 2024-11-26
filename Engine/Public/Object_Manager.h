@@ -42,6 +42,14 @@ private:
 	map<const _wstring, class CLayer*>*					m_pLayers = { nullptr };
 
 public:
+	void Set_KatanaState(_bool bKatana)	{ m_bPlayer_Katana = bKatana; }
+	_bool Get_KatanaState()				{ return m_bPlayer_Katana; }
+
+
+private:
+	_bool  m_bPlayer_Katana{};
+
+public:
 	class CGameObject* Find_Prototype(const _wstring& strPrototypeTag);
 	class CLayer* Find_Layer(_uint iLevelIndex, const _wstring& strLayerTag);
 

@@ -22,6 +22,16 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public:
+	enum SIZE
+	{
+		SIZE_ORIGINAL,
+		SIZE_DOWN_4,
+		SIZE_DOWN_44,
+		SIZE_DOWN_444,
+		SIZE_SHADOW,
+		SIZE_END,
+	};
+
 	enum RENDERGROUP { RG_PRIORITY, RG_SHADOW, RG_HEIGHT_TERRAIN, RG_HEIGHT, RG_NONBLEND, RG_BLOOM, RG_NONLIGHT,  RG_LAST, RG_BLEND, RG_UI,RG_UI_LAST, RG_END };
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -51,6 +61,24 @@ private:
 	list<class CGameObject*>	m_RenderGameObjects[RG_END];
 	list<class CComponent*>		m_DebugComponents;
 
+public:
+	RENDERGROUP Get_RenderGroup() { return m_eNowRenderGroup; }
+	D3D11_VIEWPORT m_ViewPortDescs[SIZE_END]{};
+
+	void Set_Fog(_bool bFog, float fEnd)
+	{
+		m_bFog = bFog; 
+		m_fEnd = fEnd;
+	}
+
+
+private:
+	_float m_fdX[SIZE_END]{};
+	_float m_fdY[SIZE_END]{};
+	RENDERGROUP m_eNowRenderGroup{};
+
+	void Initialize_SizeDesc();
+
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
@@ -62,11 +90,13 @@ private:
 	HRESULT Render_BrightExtraction();
 	HRESULT Render_Bloom_Object();
 	HRESULT Render_Bloom();
+	HRESULT Render_Bloom_DownSample();
 	HRESULT Render_BloomFinal();
 	HRESULT Render_Blur();
 	HRESULT Render_BlurFinal();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
+	HRESULT Render_Fog();
 	HRESULT Render_Last();
 	HRESULT Render_UI();
 	HRESULT Render_UI_Last();
@@ -75,6 +105,11 @@ private:
 private:
 	HRESULT Render_Debug();
 #endif
+
+
+private:
+	_bool m_bFog = false;
+	float m_fEnd = 1.2f;
 
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -49,6 +49,11 @@ public:
 	{
 		return m_fFar;
 	}
+	_vector Get_CameraDir()
+	{
+		return m_vecCamDir;
+	}
+
 public:
 	// Setter
 	void Set_TransformMatrix(TRANSFORMSTATE eState, _fmatrix TransformMatrix)
@@ -59,6 +64,11 @@ public:
 	{
 		m_fFar = fFar;
 	}
+
+	void Set_CameraDir(_vector vDir)
+	{
+		m_vecCamDir = vDir;
+	}
 public:
 	HRESULT Update();
 private:
@@ -66,6 +76,7 @@ private:
 	_float4x4	m_TransformationMatrixInverse[D3DTS_END];
 	_float4		m_vCamPosition;
 	_float		m_fFar = 500.f;
+	_vector		m_vecCamDir{ };
 public:
 	static CPipeLine* Create();
 	virtual void Free() override;

@@ -250,7 +250,7 @@ void CCollisionMgr::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttack
 
 void CCollisionMgr::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
 {
-	if (pSrcLayer == nullptr && pDstLayer == nullptr)
+	if (pSrcLayer == nullptr || pDstLayer == nullptr)
 		return;
 	for (auto& pSrc : pSrcLayer->Get_GameObject_List())
 	{

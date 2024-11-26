@@ -32,30 +32,22 @@ HRESULT CHead_Player::Initialize(void* pArg)
 	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
 	Position = { 0.9, 0.f, 0.f };
 	Rotation = { 65.3996f, 34.5f, -45.2999f };
 	m_pTransformCom->Set_Scaling(3.f, 3.f, 3.f);
 	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
-
 	return S_OK;
 }
 
 void CHead_Player::Priority_Update(_float fTimeDelta)
 {
 	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
-
 	for (size_t i = 0; i < 3; i++)
 		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
-
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-
-
-
 }
 
 void CHead_Player::Update(_float fTimeDelta)
@@ -148,21 +140,7 @@ HRESULT CHead_Player::Bind_ShaderResources()
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-	//	return E_FAIL;
 
-	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	//if (nullptr == pLightDesc)
-	//	return E_FAIL;
-
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-	//	return E_FAIL;
 
 	return S_OK;
 }

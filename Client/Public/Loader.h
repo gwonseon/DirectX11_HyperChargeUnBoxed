@@ -51,8 +51,8 @@ private:
 
 
 private:
-	_uint m_iGrass_Count[1];
-	vector<_float3> m_vecGrassPos[1];
+	_uint m_iGrass_Count[4];
+	vector<_float3> m_vecGrassPos[4];
 	
 
 private:
@@ -71,11 +71,15 @@ private:
 	HRESULT Loading_DataFile(LEVELID eLevelID);
 	HRESULT Loading_DataFile_For_GameLevel();
 	HRESULT Loading_DataFile_For_YardLevel();
+
+
 	HRESULT Loading_DataFile_For_NavigationLevel();
 	HRESULT Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID);
 
 	HRESULT Loading_Effect(LEVELID eLevelID);
 	HRESULT Loading_DataFile_For_Instancing_YardLevel();
+	HRESULT Loading_DataFile_For_Instancing_ImGuiLevel();
+
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);
 	virtual void Free() override;

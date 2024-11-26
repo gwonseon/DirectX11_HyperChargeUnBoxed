@@ -175,6 +175,7 @@ HRESULT CMissile_Truck::Add_PartObjects()
     pMissile.fScale = m_fScale;
     pMissile.fSpeedPerSec = 10.f;
     pMissile.fRotationPerSec = 30.f;
+    pMissile.pPlayer = m_pPlayer;
     pMissile.ShooterModelIdx = m_pShooter->Get_ModelIdx();
     pMissile.m_pTracker = m_pTracker;
     m_pMissile = static_cast<CTruck_Missile*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, TEXT("Layer_Missile"), TEXT("Prototype_GameObject_Missile"), &pMissile));

@@ -3,6 +3,7 @@
 
 
 #include "GameInstance.h"
+#include <Effect_Electricity.h>
 CAlien::CAlien(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
 {
@@ -42,7 +43,7 @@ HRESULT CAlien::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(0, true);
 	m_fAttack = 10.f;
 	m_fEnergy = 0.f;
-	m_fHp = 60.f;
+	m_fPrevHp = m_fHp = 60.f;
 	
 	m_bAttackState = true;
 	return S_OK;
@@ -52,13 +53,29 @@ void CAlien::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
-
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	m_pModelCom->Set_Animation(0, true);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
 	if (XMVectorGetY(vPlayerPos) <= (XMVectorGetY(m_vecPosition) + 2.f))
 		m_pTransformCom->LookAt(vPlayerPos);
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
+	
+	
+	_bool bKatanaCheck = m_pGameInstance->Get_KatanaState();
+	if (m_fPrevHp != m_fHp && bKatanaCheck == true)
+	{
+		CEffect_Electricity::EFFECT_ELECTRICITY_DESC pElectricity{};
+		pElectricity.eLevel = m_eLevel;
+		pElectricity.fScale = _float3{ 10.f, 10.f,10.f };
+		pElectricity.iTexNum = 3;
+		pElectricity.vecPos = &m_vecPosition;
+		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Effect_Lightning"), &pElectricity);
+		m_fPrevHp = m_fHp;
+	}
+	else if (bKatanaCheck == false)
+	{
+		m_fPrevHp = m_fHp;
+	}
 
 }
 

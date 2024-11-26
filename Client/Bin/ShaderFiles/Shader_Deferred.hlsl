@@ -25,11 +25,18 @@ texture2D g_LightDepthTexture;
 texture2D g_FinalTexture;
 texture2D g_BlurTexture;
 Texture2D g_BrightPassTexture;
-
+bool g_bFog;
 vector g_vMtrlAmbient = { 1.f, 1.f, 1.f, 1.f };
 vector g_vMtrlSpecular = { 1.f, 1.f, 1.f, 1.f };
 vector g_vCamPosition;
+float g_fCamFar;
+// 텍스쳐에서 한 픽셀의 간격
+float dX;
+float dY;
 
+// 안개
+float g_FogStart;
+float g_FogEnd;
 
 
 float4 Compute_WorldPos(float2 vTexcoord)
@@ -37,7 +44,7 @@ float4 Compute_WorldPos(float2 vTexcoord)
     float4 vWorldPos = 0.f;
 
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-    float fViewZ = vDepthDesc.y * 500.f;
+    float fViewZ = vDepthDesc.y * g_fCamFar;
 	
     vWorldPos.x = vTexcoord.x * 2.f - 1.f;
     vWorldPos.y = vTexcoord.y * -2.f + 1.f;
@@ -114,7 +121,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_DIRECTIONAL(PS_IN In)
 	/* 빛 정보와 노말 정보를 이용해서 명암을 계산하여 리턴하낟. */
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 500.f;
+    float fViewZ = vDepthDesc.y * g_fCamFar;
 	/* 0 ~ 1 -> -1 ~ 1 */
     vector vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
@@ -158,7 +165,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_POINT(PS_IN In)
 	/* 빛 정보와 노말 정보를 이용해서 명암을 계산하여 리턴하낟. */
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 500.f;
+    float fViewZ = vDepthDesc.y * g_fCamFar;
 	/* 0 ~ 1 -> -1 ~ 1 */
     vector vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
 
@@ -228,7 +235,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     Out.vColor = vDiffuse * vShade + vSpecular;
 
-    if (vPosition.w - 0.15f > vOldDepth.y * 500.f)
+    if (vPosition.w - 0.15f > vOldDepth.y * g_fCamFar)
     {
         Out.vColor.rgb *= 0.7f;
 		
@@ -279,6 +286,11 @@ float g_fWeights2[5] =
 {
      0.7261, 0.9231, 1.f, 0.9231, 0.7261
 };
+float Bloom_Weights[5] =
+{ 
+    0.0545, 0.2442, 1.f, 0.2442, 0.0545 
+};
+
 
 PS_OUT_BLUR PS_MAIN_BLUR_X_BLOOM(PS_IN In)
 {
@@ -292,7 +304,7 @@ PS_OUT_BLUR PS_MAIN_BLUR_X_BLOOM(PS_IN In)
         Out.vBlur += g_fWeights2[i +2] * g_FinalTexture.Sample(PointSampler, vBlurUV);
     }
  
-    Out.vBlur;
+    Out.vBlur /= 2.f;
 
     return Out;
 }
@@ -308,11 +320,10 @@ PS_OUT_BLUR PS_MAIN_BLUR_Y_BLOOM(PS_IN In)
         Out.vBlur += g_fWeights2[i + 2] * g_FinalTexture.Sample(PointSampler, vBlurUV);
     }
 
-    Out.vBlur;
+    Out.vBlur /= 2.f;
 
     return Out;
 }
-
 PS_OUT PS_MAIN_BLOOM_FINAL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -321,7 +332,7 @@ PS_OUT PS_MAIN_BLOOM_FINAL(PS_IN In)
     vector vFinal = g_FinalTexture.Sample(PointSampler, clampedUV);
 
     float redFactor = vFinal.g > vFinal.b && vFinal.r > vFinal.b ? 1.5f : 1.f;
-    Out.vColor = vBlur * redFactor + vFinal;
+    Out.vColor = vBlur /** redFactor*/ + vFinal;
 
     return Out;
 }
@@ -331,7 +342,7 @@ PS_OUT_BLUR PS_MAIN_BLUR_X(PS_IN In)
     PS_OUT_BLUR Out = (PS_OUT_BLUR) 0;
 
     float2 vBlurUV = (float2) 0.f;
-
+    return Out;
     for (int i = -6; i < 7; i++)
     {
         vBlurUV = In.vTexcoord + float2(1.f / 1280.f * i, 0.f);
@@ -347,7 +358,7 @@ PS_OUT_BLUR PS_MAIN_BLUR_Y(PS_IN In)
     PS_OUT_BLUR Out = (PS_OUT_BLUR) 0;
 
     float2 vBlurUV = (float2) 0.f;
-
+    return Out;
     for (int i = -6; i < 7; i++)
     {
         vBlurUV = In.vTexcoord + float2(0.f, 1.f / 720.f * i);
@@ -370,6 +381,105 @@ PS_OUT PS_MAIN_BLUR_FINAL(PS_IN In)
     return Out;
 }
 
+
+
+// 그대로 출력 (다운 샘플링 용도로 사용)
+PS_OUT PS_MAIN_DownSample(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler_Clamp, In.vTexcoord);
+    
+    Out.vColor = vDiffuse;
+    
+    return Out;
+}
+// 블러 X
+PS_OUT PS_MAIN_BLUR_X_DownSample(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float4 vDiffuse = float4(0.f, 0.f, 0.f, 0.f);
+    
+    int i;
+    for (i = 0; i < 5; i++)
+    {
+        vDiffuse += Bloom_Weights[i] * g_DiffuseTexture.Sample(LinearSampler_Clamp, In.vTexcoord + float2(dX, 0.0) * float(i - 2));
+    }
+    
+    Out.vColor = vDiffuse;
+
+    return Out;
+}
+// 블러 Y%
+PS_OUT PS_MAIN_BLUR_Y_DownSample(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float4 vDiffuse = float4(0.f, 0.f, 0.f, 0.f);
+    
+    int i;
+    for (i = 0; i < 5; i++)
+    {
+        vDiffuse += Bloom_Weights[i] * g_DiffuseTexture.Sample(LinearSampler_Clamp, In.vTexcoord + float2(0.0, dY) * float(i - 2));
+    }
+    
+    Out.vColor = vDiffuse;
+
+    return Out;
+}
+
+PS_OUT PS_MAIN_FOG(PS_IN In)
+{
+    // 지수 안개
+    //PS_OUT Out = (PS_OUT) 0;
+    //float4 pixelColor = g_FinalTexture.Sample(LinearSampler_Clamp, In.vTexcoord);
+    //float pixelDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord).y;
+    //float fogFactor = 1.f / 2.7182 * (pixelDepth * 0.8f);
+    //float4 FogColor = { 0.7f, 0.5f, 0.f ,1.f};
+    //float4 finalColor = fogFactor * pixelColor + (1 - fogFactor) * FogColor;
+    //Out.vColor = finalColor;
+    //return Out;
+    
+    // 지수 안개2
+    //float g_FogDensity = 1.f; 
+    //float fogFactor = exp2(pow((g_FogDensity * pixelDepth), 2));
+    //fogFactor = 1.f / 2.7182 * saturate(fogFactor);
+    
+
+    //PS_OUT Out = (PS_OUT) 0;
+    
+    //float4 pixelColor = g_FinalTexture.Sample(LinearSampler_Clamp, In.vTexcoord);
+    //float pixelDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord).y;
+    
+    //float fogStart = g_FogStart / g_FogEnd;
+    //float fogEnd = g_FogEnd / g_FogEnd;
+    //float fogFactor = saturate(( pixelDepth) / (fogEnd - fogStart));
+    
+    //float4 FogColor = float4(1.f, 0.7f, 0.0f, 1.0f);
+    //float4 finalColor = (1 - fogFactor )* pixelColor + (fogFactor) * FogColor;
+
+    //Out.vColor = finalColor;
+    //if (g_bFog == true)
+    //    Out.vColor = finalColor;
+    //else
+    //    Out.vColor = pixelColor;
+    
+    
+    
+    PS_OUT Out = (PS_OUT) 0;
+    float4 pixelColor = g_FinalTexture.Sample(LinearSampler_Clamp, In.vTexcoord);
+    float pixelDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord).y;
+    float fogFactor = saturate((pixelDepth) / (g_FogEnd - g_FogStart));
+    float4 FogColor = float4(1.f, 0.7f, 0.4f, 1.0f);
+    float4 finalColor = lerp(pixelColor, FogColor, fogFactor);
+    if (g_bFog == true)
+        Out.vColor = finalColor;
+    else
+        Out.vColor = pixelColor;
+    
+    return Out;
+}
 
 
 technique11 DefaultTechnique
@@ -493,6 +603,50 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLOOM_FINAL();
+    }
+// ------------------------------------------------------------------
+    pass Bloom_Season2 // 11
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DownSample();
+    }
+
+    pass Bloom_Season2_X // 12
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_X_DownSample();
+    }
+
+    pass Bloom_Season2_Y // 13
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_Y_DownSample();
+    }
+
+    pass Pass_Fog // 14
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FOG();
     }
 
 }

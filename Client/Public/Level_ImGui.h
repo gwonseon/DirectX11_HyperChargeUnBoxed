@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Coin.h"
 #include "Grass_Instancing.h"
+#include <Trap_Marks.h>
 
 BEGIN(Client)
 
@@ -58,7 +59,11 @@ public:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Grass(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
 
+	
 	
 public:
 	void Object_NonAnim_Update(_float fTimeDelta);
@@ -121,7 +126,7 @@ private:
 
 	vector<_int> m_vecModelIndex; // Environment Index 저장용
 	vector<_int> m_vecBuildIndex; // Build Index 저장용
-
+	vector<CTrap_Marks*> m_vecTrapMark;
 	INSTANCING_DESC m_Instance = {  };
 	LEVELID m_eID = LEVEL_YARD;   // 이거 바꿔서 어떤 레벨을 수정할지 설정
 

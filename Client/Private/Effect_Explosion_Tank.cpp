@@ -33,19 +33,45 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-	m_vecPosition = XMVectorSetY(m_vecPosition, XMVectorGetY(m_vecPosition) + 2.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
-
+	CamPos = *m_pGameInstance->Get_CamPosition();
+	_vector vCamPos{};
+	_vector vLookDir{};
+	_vector vFinalPos{};
+	_vector vRight{};
 	switch (m_eType)
 	{
 	case Client::CEffect_Explosion_Tank::EXPLOSION_TANK:
-		m_fMaxFrame = 7.f;
+		m_fMaxFrame.x = m_fMaxFrame.y = 7.f;
 		m_iTextureNum = 0;
+		vFinalPos = m_vecPosition;
+		vFinalPos = XMVectorSetY(vFinalPos, XMVectorGetY(vFinalPos) + 2.f);
 		break;
 	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE:
-		m_fMaxFrame = 6.f;
+		m_fMaxFrame.x = m_fMaxFrame.y = 6.f;
 		m_iTextureNum = 2;
+		vFinalPos = m_vecPosition;
+		break;
+	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE2:
+		m_fMaxFrame.x = m_fMaxFrame.y = 3.f;
+		m_iTextureNum = 3;
+		vCamPos = XMVectorSet(CamPos.x, CamPos.y, CamPos.z, 1.f);
+		vLookDir = vCamPos - m_vecPosition;
+		vLookDir = XMVector3Normalize(vLookDir);
+		m_vecPosition += vLookDir * 0.8f;
+		 vRight =  m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		m_vecPosition += vRight * 1.f;
+		vFinalPos = m_vecPosition;
+		break;
+	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE3:
+		m_fMaxFrame.x = m_fMaxFrame.y = 3.f;
+		m_iTextureNum = 3;
+		 vCamPos = XMVectorSet(CamPos.x , CamPos.y, CamPos.z, 1.f);
+		 vLookDir = vCamPos - m_vecPosition;
+		vLookDir = XMVector3Normalize(vLookDir);
+		m_vecPosition += vLookDir * 1.3f;
+		 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		m_vecPosition -= vRight * 0.6f;
+		vFinalPos = m_vecPosition;
 		break;
 	case Client::CEffect_Explosion_Tank::EXPLOSION_END:
 		break;
@@ -53,22 +79,23 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 		break;
 	}
 	
-
+	m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vFinalPos);
 	return S_OK;
 
 }
 
 void CEffect_Explosion_Tank::Priority_Update(_float fTimeDelta)
 {
-	__super::Priority_Update(fTimeDelta);
 
 }
 
 void CEffect_Explosion_Tank::Update(_float fTimeDelta)
 {
 	__super::Compute_Depth();
-
-	if (m_fFrame.x < m_fMaxFrame)
+	
+	m_fDelay = 0.f;
+	if (m_fFrame.x < m_fMaxFrame.x)
 	{
 		m_fFrame.x += 1.f;
 	}
@@ -77,17 +104,18 @@ void CEffect_Explosion_Tank::Update(_float fTimeDelta)
 		m_fFrame.y += 1.f;
 		m_fFrame.x = 0.f;
 	}
-	if (m_fFrame.y > m_fMaxFrame)
+	if (m_fFrame.y > m_fMaxFrame.y)
 	{
 		m_bDead = true;
 	}
-
+	
+		m_fDelay += fTimeDelta;
 }
 
 void CEffect_Explosion_Tank::Late_Update(_float fTimeDelta)
 {
 
-	_float4 CamPos = *m_pGameInstance->Get_CamPosition();
+	CamPos = *m_pGameInstance->Get_CamPosition();
 	m_pTransformCom->LookAt(XMVectorSet(CamPos.x, CamPos.y, CamPos.z,1.f));
 	switch (m_eType)
 	{
@@ -95,12 +123,31 @@ void CEffect_Explosion_Tank::Late_Update(_float fTimeDelta)
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
 			return;
 		break;
+
 	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE:
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
 			return;
 		break;
+
+	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE2:
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+			return;
+		break;
+
+	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE3:
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+			return;
+		break;
+
 	case Client::CEffect_Explosion_Tank::EXPLOSION_END:
 		break;
+
 	default:
 		break;
 	}
@@ -111,9 +158,16 @@ HRESULT CEffect_Explosion_Tank::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Begin(1)))
-		return E_FAIL;
+	if (m_eType == EXPLOSION_TANK || m_eType == EXPLOSION_MISSILE)
+	{
+		if (FAILED(m_pShaderCom->Begin(1)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+	}
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -161,7 +215,7 @@ HRESULT CEffect_Explosion_Tank::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_Index", &m_fFrame, sizeof(_float2))))
 		return E_FAIL;
-	_float2		ImageEa = { m_fMaxFrame + 1.f,m_fMaxFrame + 1.f};
+	_float2		ImageEa = { m_fMaxFrame.x + 1.f,m_fMaxFrame.y + 1.f};
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_ImageEA", &ImageEa, sizeof(_float2))))
 		return E_FAIL;
 

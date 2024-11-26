@@ -28,6 +28,7 @@
 #include <UI_3D.h>
 #include <Collector.h>
 #include "Effect_Explosion.h"
+#include <Grass_Instancing.h>
 
 
 CLevel_Yard::CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -820,7 +821,7 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
-	Desc.fFar = 9000.f;
+	Desc.fFar = 900.f;
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -985,12 +986,6 @@ HRESULT CLevel_Yard::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 
 	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
 
-	// 에너지 머신 레이더
-	CEnergy_Lader::ENERGYLADER_DESC pEnergyLader{};
-	pEnergyLader.eID = LEVEL_YARD;
-	pEnergyLader.fScale = { 5.f,5.f,5.f };
-	pEnergyLader.fPosition = _float3{ 477.267f, 0.1f,532.115f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_EnergyLader"), &pEnergyLader));
 
 	// 에너지 머신 캡
 	CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
@@ -1271,10 +1266,6 @@ HRESULT CLevel_Yard::Ready_Layer_Effect(const _tchar* pLayerTag)
 	//	TEXT("Prototype_GameObject_Particle_Explosion"))))
 	//	return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
-		TEXT("Prototype_GameObject_Grass"))))
-		return E_FAIL;
-
 	//CEffect_Explosion::EFFECT_EXPLOSION_DESC EffectDesc{};
 	//EffectDesc.fScale = { 10.f,10.f,10.f };
 	//EffectDesc.pCamera = m_pCamera;
@@ -1285,6 +1276,28 @@ HRESULT CLevel_Yard::Ready_Layer_Effect(const _tchar* pLayerTag)
 	//		return E_FAIL;
 	//}
 
+	CGrass_Instancing::INSTANCIN_MESH_DESC pGrass{};
+	pGrass.eLevel = LEVEL_YARD;
+
+	pGrass.iType = 108;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Grass"),&pGrass)))
+		return E_FAIL;
+
+	pGrass.iType = 109;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		return E_FAIL;
+
+	pGrass.iType = 110;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		return E_FAIL;
+	
+	pGrass.iType = 111;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_YARD, pLayerTag,
+		TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		return E_FAIL;
 	return S_OK;
 }
 
