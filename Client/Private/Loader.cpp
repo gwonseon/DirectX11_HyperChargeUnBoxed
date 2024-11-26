@@ -2983,6 +2983,14 @@ HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Lightning/Electricity%d.dds"), 6))))
 		return E_FAIL;
 
+	/* Prototype_GameObject_Effect_Katana */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana_Effect")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana_Effect"),
+			CKatana_Effect::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
 	/* Prototype_GameObject_Effect_Explosion */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Explosion")) == nullptr)
 	{

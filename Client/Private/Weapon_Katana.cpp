@@ -43,6 +43,18 @@ HRESULT CWeapon_Katana::Initialize(void* pArg)
 	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
 
+	// 이펙트 생성
+	for(int i = 0; i < 6; i++)
+	{
+		CKatana_Effect::EFFECT_KATANA_DESC pEffect{};
+		pEffect.eLevel = m_eLevelID;
+		pEffect.iEffectNumber = i;
+		pEffect.bKatanaState = &m_bKatanaState;
+		pEffect.pParentState = m_pParentState;
+		m_pKatana_Effect[i] = static_cast<CKatana_Effect*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Katana_Effect"), &pEffect));
+		
+	}
+	
 
 	return S_OK;
 }
@@ -60,12 +72,22 @@ void CWeapon_Katana::Update(_float fTimeDelta)
 {
 	if (m_bKatanaState == true)
 	{
+		// 이전 월드 매트릭스 저장(3개 전까지 저장)
+	/*m_PrevWorldMatrix[m_iStorePrevTiming] = m_WorldMatrix;*/
+		m_pKatana_Effect[m_iStorePrevTiming]->Set_WorldMatrix(m_WorldMatrix);
+		m_pKatana_Effect[m_iStorePrevTiming]->Set_BlendValue(0.8f);
+		m_iStorePrevTiming++;
+		if (m_iStorePrevTiming >= 6)
+			m_iStorePrevTiming = 0;
+
 		_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
 		for (size_t i = 0; i < 3; i++)
 			SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
 		XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
 
+	
+	
 		m_pColliderCom->Update(XMLoadFloat4x4(&m_WorldMatrix));
 	}
 }
@@ -116,7 +138,8 @@ HRESULT CWeapon_Katana::Add_Components()
 		return E_FAIL;
 
 
-	if (FAILED(__super::Add_Component(m_eLevelID ,TEXT("Prototype_Component_Model_Weapon8"), TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if (FAILED(__super::Add_Component(m_eLevelID ,TEXT("Prototype_Component_Model_Weapon8"),
+		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	/* For.Com_Collider_Sphere */

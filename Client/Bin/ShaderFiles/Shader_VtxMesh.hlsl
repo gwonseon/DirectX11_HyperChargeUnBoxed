@@ -15,7 +15,7 @@ float4 g_vCamPosition;
 float4 g_vCamDirection;
 float g_fFar;
 float g_fTex_Move;
-
+float g_fAlpha;
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -140,6 +140,7 @@ PS_OUT PS_MAIN4(PS_IN In)
 
 }
 
+
 PS_OUT PS_MAIN_Weapon(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -181,6 +182,19 @@ PS_OUT PS_Rader(PS_IN In)
 
     return Out;
 
+}
+
+PS_OUT PS_EFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT)0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vDiffuse.a = g_fAlpha;
+    Out.vDiffuse.rgb = vMtrlDiffuse.rgb * float3(0.f,0.5f, g_fAlpha + 0.2f);
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+    return Out;
 }
 
 struct PS_OUT_HEIGHT
@@ -325,4 +339,16 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_Rader();
     }
+    pass DefaultPass11 // 11 ¿Ã∆Â∆Æ
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_EFFECT();
+    }
+
+    
 }

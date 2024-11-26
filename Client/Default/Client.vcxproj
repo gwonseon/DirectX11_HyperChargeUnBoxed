@@ -200,6 +200,7 @@
     <ClInclude Include="..\Public\Helicopter.h" />
     <ClInclude Include="..\Public\Hp_Item.h" />
     <ClInclude Include="..\Public\InGameUI.h" />
+    <ClInclude Include="..\Public\Katana_Effect.h" />
     <ClInclude Include="..\Public\Level_Yard.h" />
     <ClInclude Include="..\Public\Level_ImGui.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -301,6 +302,7 @@
     <ClCompile Include="..\Private\Helicopter.cpp" />
     <ClCompile Include="..\Private\Hp_Item.cpp" />
     <ClCompile Include="..\Private\InGameUI.cpp" />
+    <ClCompile Include="..\Private\Katana_Effect.cpp" />
     <ClCompile Include="..\Private\Level_Yard.cpp" />
     <ClCompile Include="..\Private\Level_ImGui.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
