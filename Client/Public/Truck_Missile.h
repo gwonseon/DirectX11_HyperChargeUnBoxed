@@ -5,6 +5,7 @@
 #include <TruckShooter.h>
 #include "Tracker.h"
 #include "Explosion.h"
+#include "Player.h"
 
 BEGIN(Engine)
 class CShader;
@@ -22,6 +23,7 @@ public:
 		_bool* bShotStart = { nullptr };
 		_uint* ShooterModelIdx = { nullptr };
 		CTracker* m_pTracker = { nullptr };
+		CPlayer* pPlayer = { nullptr };
 	}MISSILE_DESC;
 
 	enum MISSILE_STATE { MISSILE_IDLE, MISSILE_SHOT_START, MISSILE_SHOT_ACCEL, MISSILE_SHOT_FALL, MISSILE_BOMB, MISSILE_END };
@@ -37,7 +39,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_Height();
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
@@ -61,9 +63,13 @@ private:
 	_bool m_bStart_Shoot = false;
 	_bool m_bMoving = false;
 	_bool m_bMidArrived = false;
+	_bool m_bFog = false;
+	_float m_fFogEnd = 1.2f;
+
 	_uint* m_pShooterModelIdx = { nullptr };
 	_bool* m_bShotStart = { nullptr };
 	CTracker* m_pTracker = { nullptr };
+	CPlayer* m_pPlayer = { nullptr };
 
 	_vector PrevPos{};
 	_vector MidPos{};

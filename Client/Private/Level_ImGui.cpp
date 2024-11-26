@@ -6,6 +6,10 @@
 #include "Monster.h"
 #include "Level_Loading.h"
 #include <Terrain.h>
+#include <BrainCore.h>
+#include <Energy_Machine.h>
+#include <Energy_Cap.h>
+
 
 
 CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -21,16 +25,20 @@ HRESULT CLevel_ImGui::Initialize()
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// 지형 생성
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))			return E_FAIL;	// 몬스터
 //	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;	// 플레이어
+	if (FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))				return E_FAIL;
+	if (FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_Trap"))))				return E_FAIL;
 
+	
+	if (FAILED(Ready_Layer_Grass(TEXT("Layer_Grass"))))				return E_FAIL;
 	if (FAILED(Ready_Lights()))										return E_FAIL;	// 빛
 	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// 로딩 닫기
-
+	
 	// 터레인 피킹을 위해 터레인 컴포넌트 가져오기
 	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_IMGUI, TEXT("Layer_Terrain"), TEXT("Com_VIBuffer")));
 
 	// 저장 로드 버튼(이미지 버튼)
 	Create_ImageButton();
-
+	
     return S_OK;
 }
 
@@ -2281,3 +2289,143 @@ HRESULT CLevel_ImGui::Ready_Layer_Player(const _tchar* pLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_ImGui::Ready_Layer_Grass(const _tchar* pLayerTag)
+{
+	if(m_eID == LEVEL_YARD)
+	{
+		CGrass_Instancing::INSTANCIN_MESH_DESC pGrass{};
+		pGrass.eLevel = LEVEL_IMGUI;
+
+		pGrass.iType = 108;
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+			return E_FAIL;
+
+		pGrass.iType = 109;
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+			return E_FAIL;
+
+		pGrass.iType = 110;
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+			return E_FAIL;
+
+
+		pGrass.iType = 111;
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
+			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+
+}
+
+
+HRESULT CLevel_ImGui::Ready_Layer_Trap(const _tchar* pLayerTag)
+{
+	CTrap_Marks::TRAP_MARKS_DESC Mark_Desc{};
+	Mark_Desc.eID = LEVEL_IMGUI;
+	Mark_Desc.fScale = { 4.f,4.f,4.f };
+
+
+#pragma region 레고트랩
+	Mark_Desc.eType = CTrap_Marks::BRICKS_TRAP;
+
+	Mark_Desc.fPosition = _float3(502.f, 0.11f, 505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(478.f, 0.11f, 505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(490.f, 0.11f, 493.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(490.f, 0.11f, 517.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+#pragma endregion 레고트랩
+
+#pragma region 탱크트랩
+	Mark_Desc.eType = CTrap_Marks::TANK_TRAP;
+
+	Mark_Desc.fPosition = _float3(620.293f, 0.f, 526.778f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(575.161f, 0.f, 598.337f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(586.718f, 0.f, 518.17f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(496.737f, 0.f, 594.82f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(399.722f, 0.f, 576.963f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(399.895f, 0.f, 428.506f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(453.112f, 0.f, 374.234f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(550.279f, 0.f, 405.683f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(600.133f, 0.f, 439.33f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(482.854f, 0.f, 379.527f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(434.03f, 0.f, 400.054f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(370.759f, 0.f, 484.017f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+	Mark_Desc.fPosition = _float3(356.141f, 0.f, 516.032f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+
+
+#pragma endregion 탱크트랩
+
+
+
+
+
+
+	return S_OK;
+}
+
+
+
+HRESULT CLevel_ImGui::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
+{
+	// 브레인 코어
+	CBrainCore::BRAIN_CORE_DESC pDesc{};
+	pDesc.eID = LEVEL_IMGUI;
+	pDesc.fPosition = _float3(490.f, 0.1f, 505.f);
+	pDesc.fScale = { 4.f,4.f,4.f };
+	pDesc.iModelComponentIndex = 205;
+	static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
+	// 563
+	// 에너지 머신
+	CEnergy_Machine::ENERGYMACHINE_DESC pEnergyMachine{};
+	pEnergyMachine.eID = LEVEL_IMGUI;
+	pEnergyMachine.fScale = { 5.f,5.f,5.f };
+	pEnergyMachine.fPosition = _float3{ 477.267f, 0.1f,532.115f };
+	static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
+
+
+	// 에너지 머신 캡
+	CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
+	pEnergyCap.eID = LEVEL_IMGUI;
+	pEnergyCap.fScale = { 5.f,5.f,5.f };
+	pEnergyCap.fPosition = _float3{ 476.075f, 5.82203f,532.203f };
+	static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
+
+	return S_OK;
+}

@@ -68,6 +68,7 @@ void CCoin::Late_Update(_float fTimeDelta)
     {
         if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
             return;
+ 
     }
  
 }
@@ -154,7 +155,6 @@ CCoin* CCoin::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
         MSG_BOX("Failed to Created : CCoin");
         Safe_Release(pInstance);
     }
-
     return pInstance;
 }
 

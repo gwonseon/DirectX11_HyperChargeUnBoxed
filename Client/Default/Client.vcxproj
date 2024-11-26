@@ -185,6 +185,7 @@
     <ClInclude Include="..\Public\Effect_Flare_Rifle.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_Electricity.h" />
     <ClInclude Include="..\Public\Energy_Cap.h" />
     <ClInclude Include="..\Public\Energy_Lader.h" />
     <ClInclude Include="..\Public\Energy_Machine.h" />
@@ -228,14 +229,17 @@
     <ClInclude Include="..\Public\Player_FPS.h" />
     <ClInclude Include="..\Public\Pony.h" />
     <ClInclude Include="..\Public\Pony_State.h" />
+    <ClInclude Include="..\Public\Rader_Effect.h" />
     <ClInclude Include="..\Public\RifleMan.h" />
     <ClInclude Include="..\Public\RifleMan_Fire.h" />
     <ClInclude Include="..\Public\RifleMan_Idle.h" />
     <ClInclude Include="..\Public\RifleMan_Move.h" />
     <ClInclude Include="..\Public\RunState_Pony.h" />
     <ClInclude Include="..\Public\Sky.h" />
+    <ClInclude Include="..\Public\Slash_Mesh.h" />
     <ClInclude Include="..\Public\Tank.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\Terrain_Crushed.h" />
     <ClInclude Include="..\Public\Tracker.h" />
     <ClInclude Include="..\Public\Trap_Bricks.h" />
     <ClInclude Include="..\Public\Trap_Marks.h" />
@@ -282,6 +286,7 @@
     <ClCompile Include="..\Private\Effect_Flare_Rifle.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect_Electricity.cpp" />
     <ClCompile Include="..\Private\Energy_Cap.cpp" />
     <ClCompile Include="..\Private\Energy_Lader.cpp" />
     <ClCompile Include="..\Private\Energy_Machine.cpp" />
@@ -324,14 +329,17 @@
     <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />
     <ClCompile Include="..\Private\Pony.cpp" />
+    <ClCompile Include="..\Private\Rader_Effect.cpp" />
     <ClCompile Include="..\Private\RifleMan.cpp" />
     <ClCompile Include="..\Private\RifleMan_Fire.cpp" />
     <ClCompile Include="..\Private\RifleMan_Idle.cpp" />
     <ClCompile Include="..\Private\RifleMan_Move.cpp" />
     <ClCompile Include="..\Private\RunState_Pony.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
+    <ClCompile Include="..\Private\Slash_Mesh.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\Terrain_Crushed.cpp" />
     <ClCompile Include="..\Private\Tracker.cpp" />
     <ClCompile Include="..\Private\Trap_Bricks.cpp" />
     <ClCompile Include="..\Private\Trap_Marks.cpp" />
@@ -366,6 +374,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCoin.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffect.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxFog.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxItem.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_NoDeferred.hlsl" />

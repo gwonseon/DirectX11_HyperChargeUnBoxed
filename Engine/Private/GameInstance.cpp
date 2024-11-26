@@ -316,6 +316,16 @@ CGameObject* CGameInstance::Clone_Prototype(const _wstring& strPrototypeTag, voi
 	return m_pObject_Manager->Clone_Prototype(strPrototypeTag, pArg);
 }
 
+void CGameInstance::Set_KatanaState(_bool bFPS)
+{
+	m_pObject_Manager->Set_KatanaState(bFPS);
+}
+
+_bool CGameInstance::Get_KatanaState()
+{
+	return 	m_pObject_Manager->Get_KatanaState();
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, CComponent* pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)
@@ -359,6 +369,11 @@ HRESULT CGameInstance::Add_DebugComponents(CComponent* pComponent)
 	return m_pRenderer->Add_DebugComponents(pComponent);
 }
 
+void CGameInstance::Set_Fog(_bool bFog, float fEnd)
+{ 
+	m_pRenderer->Set_Fog(bFog, fEnd);
+}
+
 const _float4x4* CGameInstance::Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState)
 {
 	return m_pPipeLine->Get_TransformFloat4x4(eState);
@@ -384,9 +399,20 @@ _float CGameInstance::Get_CameraFar()
 	return m_pPipeLine->Get_CameraFar();
 }
 
+_vector CGameInstance::Get_CameraDir()
+{
+	return m_pPipeLine->Get_CameraDir();
+}
+
 void CGameInstance::Set_CameraFar(_float fFar)
 {
 	m_pPipeLine->Set_CameraFar(fFar);
+}
+
+void CGameInstance::Set_CameraDir(_vector vDir)
+{
+	m_pPipeLine->Set_CameraDir(vDir);
+
 }
 
 void CGameInstance::Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix)
@@ -593,7 +619,7 @@ void CGameInstance::Free()
 	Safe_Release(	m_pRound_Manager		);
 	Safe_Release(	m_pUI_Manager			);
 	Safe_Release(	m_pTarget_Manager		);
-	Safe_Release(	m_pPicking				);
+		Safe_Release(	m_pPicking				);
 
 
 

@@ -152,7 +152,7 @@ void CTank::Update(_float fTimeDelta)
 			pFlare.vecWeaponPos = &m_vecPosition;
 			pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
 			pFlare.vecTargetPos = m_vecTargetPos;
-			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
 
 		
 		}

@@ -813,8 +813,8 @@ HRESULT CBody_Player::Add_Components()
 		return E_FAIL;
 	/* For.Com_Collider_AABB */
 	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
-	AABBDesc.vExtents = _float3(0.5f, 1.f, 0.5f);
-	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y + 1.f, 0.f);
+	AABBDesc.vExtents = _float3(0.5f, 1.5f, 0.5f);
+	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y + 1.25f, 0.f);
 	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Collider_AABB"),
 		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
 		return E_FAIL;
@@ -836,21 +836,6 @@ HRESULT CBody_Player::Bind_ShaderResources()
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-	//	return E_FAIL;
-
-	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	//if (nullptr == pLightDesc)
-	//	return E_FAIL;
-
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-	//	return E_FAIL;
 
 
 	return S_OK;

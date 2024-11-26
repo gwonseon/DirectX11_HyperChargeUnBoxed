@@ -30,7 +30,9 @@ HRESULT CEffect_Flare_Rifle::Initialize(void* pArg)
 	m_eLevel = pDesc->eLevel;
 	m_fScale = pDesc->fScale;
 	m_eType = pDesc->eType;
-
+	_vector vPos{};
+	_vector vDir{};
+	_vector vTarget{};
 	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
@@ -40,19 +42,38 @@ HRESULT CEffect_Flare_Rifle::Initialize(void* pArg)
 	switch (m_eType)
 	{
 	case Client::CEffect_Flare_Rifle::FLARE_PLAYER:
+		m_fMaxFrame = { 4.f, 4.f };
+		m_iTexNum = 0;
+		vPos = *m_vecWeaponPos;
 		break;
 	case Client::CEffect_Flare_Rifle::FLARE_RIFLEMAN:
+		m_fMaxFrame = { 5.f, 5.f };
+		m_iTexNum = 2;
+		m_vecTargetPos = pDesc->vecTargetPos;
+		vTarget = *m_vecTargetPos;
+		vPos = *m_vecWeaponPos;
+		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 3.2f);
+		vTarget = XMVectorSetY(vTarget, XMVectorGetY(vPos) + 3.2f);
+		vDir = vTarget - vPos;
+		vDir = XMVector3Normalize(vDir);
+		vPos += vDir * 2.3f;
 		break;
 	case Client::CEffect_Flare_Rifle::FLARE_HELICOPTER:
 		break;
 	case Client::CEffect_Flare_Rifle::FLARE_TANK:
+		m_fMaxFrame = { 5.f, 5.f };
+		m_iTexNum = 2;
 		m_vecTargetPos = pDesc->vecTargetPos;
+		vPos = *m_vecWeaponPos;
+		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 5.5f);
+		vDir = *m_vecTargetPos - vPos;
+		vPos += XMVector3Normalize(vDir) * 9.2f;
 		break;
 	default:
 		break;
 	}
 	m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, *m_vecWeaponPos);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 	return S_OK;
 }
 
@@ -65,11 +86,14 @@ void CEffect_Flare_Rifle::Priority_Update(_float fTimeDelta)
 void CEffect_Flare_Rifle::Update(_float fTimeDelta)
 {
 	__super::Compute_Depth();
-	m_fLifeTime += fTimeDelta;
-	if (m_fLifeTime >= 0.1f)
-		m_bDead = true;
-	
-	if(m_fFrame.x < 6)
+	if(m_eType == FLARE_PLAYER)
+	{
+		m_fLifeTime += fTimeDelta;
+		if (m_fLifeTime >= 0.1f)
+			m_bDead = true;
+	}
+
+	if(m_fFrame.x < m_fMaxFrame.x )
 	{
 		m_fFrame.x += 1;
 	}
@@ -78,10 +102,11 @@ void CEffect_Flare_Rifle::Update(_float fTimeDelta)
 		m_fFrame.y += 1;
 		m_fFrame.x = 0;
 	}
-	if (m_fFrame.y > 6)
+	if (m_fFrame.y > m_fMaxFrame.y )
 	{
 		m_bDead = true;
 	}
+
 
 
 }
@@ -97,18 +122,36 @@ void CEffect_Flare_Rifle::Late_Update(_float fTimeDelta)
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, *m_vecWeaponPos);
 		m_pTransformCom->LookAt(*m_vecCamPos);
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
 	}
 	else if (m_eType == FLARE_TANK)
 	{
 		_vector vPos = *m_vecWeaponPos;
-		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 5.f);
+		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 5.5f);
 		_vector vDir = *m_vecTargetPos - vPos;
-		vPos += XMVector3Normalize(vDir) * 10.f;
+		vPos += XMVector3Normalize(vDir) * 9.2f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		m_pTransformCom->LookAt(*m_vecCamPos);
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+			return;
 	}
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
-		return;
+	else if (m_eType == FLARE_RIFLEMAN)
+	{
+		_vector vTarget = *m_vecTargetPos;
+		_vector vPos = *m_vecWeaponPos;
+		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 3.2f);
+		vTarget = XMVectorSetY(vTarget, XMVectorGetY(vPos) + 3.2f);
+		_vector vDir = vTarget - vPos;
+		vDir = XMVector3Normalize(vDir);
+		vPos += vDir * 2.3f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		m_pTransformCom->LookAt(*m_vecCamPos);
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+			return;
+
+	}
+
 }
 
 HRESULT CEffect_Flare_Rifle::Render()
@@ -155,14 +198,14 @@ HRESULT CEffect_Flare_Rifle::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", static_cast<_uint>(0))))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", static_cast<_uint>(m_iTexNum))))
 		return E_FAIL;
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_Index", &m_fFrame, sizeof(_float2))))
 		return E_FAIL;
-	_float2		ImageEa = { 5.f,5.f };
+	_float2		ImageEa = { m_fMaxFrame.x + 1.f,m_fMaxFrame.y + 1.f };
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_ImageEA", &ImageEa, sizeof(_float2))))
 		return E_FAIL;
 

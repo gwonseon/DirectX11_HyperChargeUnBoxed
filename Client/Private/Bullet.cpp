@@ -100,13 +100,14 @@ void CBullet::Late_Update(_float fTimeDelta)
         pExplosion.eID = m_eLevel;
         pExplosion.eType = CExplosion::EXPLOSION_LOCKET;
         pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
-        pExplosion.fScale = _float3{ 10.f, 10.f, 10.f };
+        pExplosion.fScale = _float3{ 8.f, 8.f, 8.f };
         m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion_Player"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
 
     }
     if(m_eType == BULLET_RIFLE)
     {
-        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+       
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
             return;
     }
     if (m_eType == BULLET_LOCKET)

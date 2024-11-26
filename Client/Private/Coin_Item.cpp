@@ -128,6 +128,7 @@ void CCoin_Item::Late_Update(_float fTimeDelta)
     {
         if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
             return;
+
     }
 
 }

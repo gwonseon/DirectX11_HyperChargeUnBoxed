@@ -2,6 +2,8 @@
 #include "..\Public\Energy_Machine.h"
 
 #include "GameInstance.h"
+#include <Energy_Lader.h>
+#include <Rader_Effect.h>
 
 CEnergy_Machine::CEnergy_Machine(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPlayer_Build{ pDevice, pContext }
@@ -30,6 +32,19 @@ HRESULT CEnergy_Machine::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	// 에너지 머신 레이더
+	CEnergy_Lader::ENERGYLADER_DESC pEnergyLader{};
+	pEnergyLader.eID = m_eLevel;
+	pEnergyLader.fScale = { 5.f,5.f,5.f };
+	pEnergyLader.fPosition = _float3{ 477.267f, 0.1f,532.115f };
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Prototype_GameObject_EnergyLader"), &pEnergyLader));
+
+	CRader_Effect::RADER_DESC pRader{};
+	pRader.eID = m_eLevel;
+	pRader.fScale = { 6.f, 6.f, 6.f };
+	pRader.fPosition = _float3{ 477.267f, -2.5f,532.115f };
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Prototype_GameObject_Rader_Effect"), &pRader));
+
 	return S_OK;
 }
 
@@ -53,6 +68,7 @@ void CEnergy_Machine::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 		return;
+
 }
 
 HRESULT CEnergy_Machine::Render()
@@ -84,7 +100,6 @@ HRESULT CEnergy_Machine::Add_Components()
 
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(209);
-	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
@@ -100,22 +115,7 @@ HRESULT CEnergy_Machine::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;*/
-
+	
 	return S_OK;
 }
 

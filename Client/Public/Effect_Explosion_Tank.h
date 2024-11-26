@@ -14,7 +14,7 @@ BEGIN(Client)
 class CEffect_Explosion_Tank : public CEffect
 {
 public:
-	enum EXPLOSION_TYPE{EXPLOSION_TANK, EXPLOSION_MISSILE, EXPLOSION_END};
+	enum EXPLOSION_TYPE{EXPLOSION_TANK, EXPLOSION_MISSILE, EXPLOSION_MISSILE2, EXPLOSION_MISSILE3, EXPLOSION_END};
 	typedef struct : public CEffect::EFFECT_DESC
 	{
 		EXPLOSION_TYPE eType{};
@@ -46,12 +46,12 @@ private:
 private:
 	_float2						m_fFrame{};
 	_float3						m_fScale{};
-
+	_float4 CamPos{};
 	_float						m_fDelay{};
 	EXPLOSION_TYPE m_eType{};
 
 	_uint						m_iTextureNum{};
-	_float						m_fMaxFrame{};
+	_float2						m_fMaxFrame{};
 public:
 	static CEffect_Explosion_Tank* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

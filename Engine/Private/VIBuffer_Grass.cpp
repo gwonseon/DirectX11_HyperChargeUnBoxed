@@ -153,7 +153,7 @@ HRESULT CVIBuffer_Grass::Initialize_Prototype(const wstring pDataFilePath, _fmat
            
 
             m_pInstanceVertices[j].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-            m_pInstanceVertices[j].vUp = _float4(0.f, 4.f, 0.f, 0.f);
+            m_pInstanceVertices[j].vUp = _float4(0.f, fScale, 0.f, 0.f);
             m_pInstanceVertices[j].vLook = _float4(0.f, 0.f, fScale, 0.f);
 
             m_pInstanceVertices[j].vTranslation = _float4(fPos.back().x, fPos.back().y, fPos.back().z, 1.f);

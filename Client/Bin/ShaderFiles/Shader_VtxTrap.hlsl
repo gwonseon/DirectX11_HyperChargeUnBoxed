@@ -183,10 +183,21 @@ PS_OUT PS_MAIN3(PS_IN In)
 }
 
 
+struct PS_OUT_HEIGHT
+{
+    vector vHeight : SV_TARGET0;
+};
+
+PS_OUT_HEIGHT PS_MAIN_HEIGHT(PS_IN In)
+{
+    PS_OUT_HEIGHT Out = (PS_OUT_HEIGHT) 0;
+    Out.vHeight = vector(In.vWorldPos.y, 0.f, 0.f, 1.f);
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass
+    pass DefaultPass // 0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -196,7 +207,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-    pass DefaultPass1
+    pass DefaultPass1 // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -206,7 +217,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN2();
     }
-    pass DefaultPass2
+    pass DefaultPass2 // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -216,5 +227,14 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN3();
     }
+    pass HeightPass // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_HEIGHT();
+    }
 }

@@ -74,7 +74,8 @@ public: /* For.Object_Manager*/
 	class CGameObject* Find_Prototype(const _wstring& strPrototypeTag);
 	class CLayer* Find_Layer(_uint iLevelIndex, const _wstring& strLayerTag);
 	class CGameObject* Clone_Prototype(const _wstring& strPrototypeTag, void* pArg = nullptr);
-
+	void Set_KatanaState(_bool bFPS);
+	_bool Get_KatanaState();
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -85,6 +86,8 @@ public: /* For.Renderer	*/
 	HRESULT Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
 	void	RenderList_Clear();
 	HRESULT Add_DebugComponents(class CComponent* pComponent);
+	void Set_Fog(_bool bFog, float fEnd);
+
 
 public:// For PipeLine
 	const _float4x4* Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState);
@@ -93,7 +96,11 @@ public:// For PipeLine
 
 	const _float4* Get_CamPosition();
 	_float Get_CameraFar();
+	_vector Get_CameraDir();
+
+
 	void Set_CameraFar(_float fFar);
+	void Set_CameraDir(_vector vDir);
 
 	void Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
 

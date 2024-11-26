@@ -11,6 +11,8 @@ texture2D		g_DiffuseTexture;
 float4			g_vMtrlAmbient = float4(0.4f, 0.4f, 0.4f, 1.f);
 float4			g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
 
+
+
 float4			g_vCamPosition;
 
 float4x4		g_BoneMatrices[512];

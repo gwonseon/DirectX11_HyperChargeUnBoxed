@@ -52,6 +52,8 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
     m_pGameInstance->Set_CameraFar(m_fFar);
+    m_vecDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+    m_pGameInstance->Set_CameraDir(m_vecDir);
     m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     // 편집툴에서 카메라 조정
     if (m_eLevelID == LEVEL_IMGUI || m_eLevelID == LEVEL_NAVIGATION || m_eLevelID == LEVEL_MONSTERSPAWN)

@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include <Effect_Explosion_Tank.h>
+#include <Terrain_Crushed.h>
 
 CTruck_Missile::CTruck_Missile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -24,7 +25,7 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 	MISSILE_DESC* pDesc = static_cast<MISSILE_DESC*>(pArg);
 	m_eLevel = pDesc->eID;
 	m_pShooterModelIdx = pDesc->ShooterModelIdx;
-	
+	m_pPlayer = pDesc->pPlayer;
 	m_pTracker = pDesc->m_pTracker;
 	m_bShotStart = m_pTracker->Get_Shot();
 	if (FAILED(__super::Initialize(pArg)))
@@ -141,6 +142,15 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) + 15.f, XMVectorGetZ(m_vecPosition) };
 			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
 
+			CTerrain_Crushed::TERRAIN_CRUSHED_DESC pCrushed{};
+			pCrushed.eLevel = m_eLevel;
+			pCrushed.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+			pCrushed.fScale = _float3{ 20.f, 20.f, 20.f };
+			pCrushed.pPlayer = m_pPlayer;
+			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Terrain_Crushed"), &pCrushed);
+
+			m_bFog = true;
+			m_fFogEnd = 1.01f;
 		}
 		_vector vUP = { 0.f, 1.f, 0.f,0.f };
 		m_vecPosition += vUP * fTimeDelta * m_fPower;
@@ -240,6 +250,16 @@ void CTruck_Missile::Update(_float fTimeDelta)
 
 void CTruck_Missile::Late_Update(_float fTimeDelta)
 {
+	// 안개 조절 
+	m_pGameInstance->Set_Fog(m_bFog, m_fFogEnd);
+	if(m_bFog== true)
+	{
+		m_fFogEnd += fTimeDelta * 0.5f;
+		if (m_fFogEnd >= 10.f)
+			m_bFog = false;
+	}
+	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+		return;
 	if (m_bKnockdown == true)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
@@ -276,6 +296,43 @@ HRESULT CTruck_Missile::Render()
 	return S_OK;
 }
 
+HRESULT CTruck_Missile::Render_Height()
+{
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	_float4x4			ViewMatrix, ProjMatrix;
+	CLayer* pPlayerLayer = (m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Player")));
+	CPlayer* pPlayer = static_cast<CPlayer*>(pPlayerLayer->Get_GameObject_List().front());
+	_vector PlayerPos = pPlayer->Get_Position();
+	_matrix			matView = XMMatrixIdentity();
+	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), XMVectorGetY(PlayerPos) + 6.f, XMVectorGetZ(PlayerPos), 1.f);
+
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pShaderCom->Begin(1))) // 무조건 그림
+			return E_FAIL;
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
+
 HRESULT CTruck_Missile::Add_Components()
 {
 	/* For.Com_Shader */
@@ -302,28 +359,9 @@ HRESULT CTruck_Missile::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-
-
-	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;*/
-
 	return S_OK;
 }
 
