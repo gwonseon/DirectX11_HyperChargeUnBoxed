@@ -44,7 +44,7 @@ private:
 private:
 	LEVELID	m_eLevel = {};
 	_uint	m_iModelIndex = 0;
-
+	_float  m_fUV{};
 public:
 	static CRader_Effect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

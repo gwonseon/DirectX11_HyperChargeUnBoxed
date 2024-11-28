@@ -71,6 +71,7 @@ public:
 public:
 	void Set_Scaling(_float fScaleX, _float fScaleY, _float fScaleZ);
 	void LookAt(_fvector vAt);
+
 	void Go_Straight(_float fTimeDelta); 
 	void Go_Straight(_float fTimeDelta, _float AddfSpeed);
 	void Go_Left(_float fTimeDelta);

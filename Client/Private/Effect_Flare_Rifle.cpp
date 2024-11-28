@@ -69,6 +69,7 @@ HRESULT CEffect_Flare_Rifle::Initialize(void* pArg)
 		vDir = *m_vecTargetPos - vPos;
 		vPos += XMVector3Normalize(vDir) * 9.2f;
 		break;
+	
 	default:
 		break;
 	}

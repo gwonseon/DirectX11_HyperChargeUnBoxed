@@ -8,7 +8,7 @@
 #define MONSTER_EA		6
 #define OBJ_DEAD 1
 #define TRAP_EA 17
-#define EFFECT_EA 4
+#define EFFECT_EA 6
 #define	BULLET_EA 6
 #define MISSILEROUND 1
 

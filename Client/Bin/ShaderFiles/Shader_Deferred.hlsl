@@ -19,6 +19,7 @@ texture2D g_NormalTexture;
 texture2D g_DepthTexture;
 texture2D g_SpecularTexture;
 
+
 texture2D g_ShadeTexture;
 texture2D g_DiffuseTexture;
 texture2D g_LightDepthTexture;
@@ -27,7 +28,7 @@ texture2D g_BlurTexture;
 Texture2D g_BrightPassTexture;
 bool g_bFog;
 vector g_vMtrlAmbient = { 1.f, 1.f, 1.f, 1.f };
-vector g_vMtrlSpecular = { 1.f, 1.f, 1.f, 1.f };
+vector g_vMtrlSpecular = { 0.6f, 0.6f, 0.6f, 1.f };
 vector g_vCamPosition;
 float g_fCamFar;
 // 텍스쳐에서 한 픽셀의 간격

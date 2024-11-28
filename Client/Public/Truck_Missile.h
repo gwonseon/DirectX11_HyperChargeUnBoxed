@@ -6,7 +6,7 @@
 #include "Tracker.h"
 #include "Explosion.h"
 #include "Player.h"
-
+#include <Missile_Flame.h>
 BEGIN(Engine)
 class CShader;
 class CModel;
@@ -48,6 +48,7 @@ private:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CMissile_Flame* m_pMissile_Flame = { nullptr };
 
 
 private:
@@ -65,7 +66,7 @@ private:
 	_bool m_bMidArrived = false;
 	_bool m_bFog = false;
 	_float m_fFogEnd = 1.2f;
-
+	_bool m_bDraw = false;
 	_uint* m_pShooterModelIdx = { nullptr };
 	_bool* m_bShotStart = { nullptr };
 	CTracker* m_pTracker = { nullptr };
@@ -75,7 +76,6 @@ private:
 	_vector MidPos{};
 	_vector StartPos{};
 	_vector StartPos_Store{};
-
 	vector<_float3> m_vecStartingPos;
 
 public:

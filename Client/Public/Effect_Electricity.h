@@ -48,9 +48,9 @@ private:
 private:
 	_float2						m_fFrame{};
 	_float3						m_fScale{};
-	_float4 CamPos{};
+	_float4						CamPos{};
 	_float						m_fDelay{};
-	_vector* m_vecPos = { nullptr };
+	_vector*					m_vecPos = { nullptr };
 
 	_float						m_fMoveUV{};
 	_uint						m_iTextureNum{};

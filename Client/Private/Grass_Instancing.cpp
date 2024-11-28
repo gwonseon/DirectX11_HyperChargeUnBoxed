@@ -45,7 +45,7 @@ void CGrass_Instancing::Update(_float fTimeDelta)
 
 void CGrass_Instancing::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
         return;
 }
 

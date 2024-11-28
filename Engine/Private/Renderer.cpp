@@ -275,14 +275,16 @@ HRESULT CRenderer::Draw()
 		return E_FAIL;
 	if (FAILED(Render_Shadow()))
 		return E_FAIL;
-	if (FAILED(Render_TerrainHeight()))
-		return E_FAIL;
+
 	if (FAILED(Render_Height()))
 		return E_FAIL;
+
 	if (FAILED(Render_NonBlend()))
 		return E_FAIL;
+
 	if (FAILED(Render_Lights()))
 		return E_FAIL;
+
 	// ºí·ë ´Ù¿î »ùÇÃ¸µ
 	if (FAILED(Render_Bloom_DownSample()))
 		return E_FAIL;
@@ -311,9 +313,9 @@ HRESULT CRenderer::Draw()
 		return E_FAIL;
 	if (FAILED(Render_NonLight()))
 		return E_FAIL;
-	if (FAILED(Render_Last()))
-		return E_FAIL;
 	if (FAILED(Render_Blend()))
+		return E_FAIL;
+	if (FAILED(Render_Last()))
 		return E_FAIL;
 	if (FAILED(Render_UI()))
 		return E_FAIL;
@@ -439,24 +441,6 @@ HRESULT CRenderer::Render_Shadow()
 	return S_OK;
 }
 
-HRESULT CRenderer::Render_TerrainHeight()
-{
-	//if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Height"))))
-	//	return E_FAIL;
-
-	//for (auto& pRenderGameObject : m_RenderGameObjects[RG_HEIGHT_TERRAIN])
-	//{
-	//	if (nullptr != pRenderGameObject)
-	//		pRenderGameObject->Render_Height();
-	//	Safe_Release(pRenderGameObject);
-	//}
-	//m_RenderGameObjects[RG_HEIGHT_TERRAIN].clear();
-	//if (FAILED(m_pGameInstance->End_MRT(TEXT("MRT_Height"))))
-	//	return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CRenderer::Render_Height()
 {
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Height"))))
@@ -497,6 +481,8 @@ HRESULT CRenderer::Render_NonBlend()
 
 	return S_OK;
 }
+
+
 
 HRESULT CRenderer::Render_Lights()
 {
@@ -547,8 +533,9 @@ HRESULT CRenderer::Render_Final()
 		return E_FAIL;
 	_float4x4			ViewMatrix, ProjMatrix;
 
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(300.f, 10.f, 300.f, 1.f), XMVectorSet(300.f, 0.f, 300.f - 8.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 3.f, fPlayerPos.y + 10.f, fPlayerPos.z - 3.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.z, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
 
 	if (FAILED(m_pShader->Bind_Matrix("g_LightViewMatrix", &ViewMatrix)))
@@ -810,6 +797,7 @@ HRESULT CRenderer::Render_BloomFinal()
 
 	if (FAILED(m_pGameInstance->End_MRT(TEXT("MRT_Final_After_Bloom"))))
 		return E_FAIL;
+
 
 	return S_OK;
 }

@@ -76,6 +76,9 @@ public: /* For.Object_Manager*/
 	class CGameObject* Clone_Prototype(const _wstring& strPrototypeTag, void* pArg = nullptr);
 	void Set_KatanaState(_bool bFPS);
 	_bool Get_KatanaState();
+	void Set_PlayerPos(_float4 fPos);
+	_float4 Get_PlayerPos();
+
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, class CComponent* pPrototype);
