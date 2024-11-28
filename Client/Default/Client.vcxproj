@@ -214,6 +214,7 @@
     <ClInclude Include="..\Public\Loading_UI.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MenuUI.h" />
+    <ClInclude Include="..\Public\Missile_Flame.h" />
     <ClInclude Include="..\Public\Missile_Truck.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Monster_Bullet.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="..\Private\Loading_UI.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MenuUI.cpp" />
+    <ClCompile Include="..\Private\Missile_Flame.cpp" />
     <ClCompile Include="..\Private\Missile_Truck.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Monster_Bullet.cpp" />

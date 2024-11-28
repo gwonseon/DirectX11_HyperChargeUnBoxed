@@ -108,7 +108,7 @@ PS_OUT PS_MAIN3(PS_IN In)
     
     float E = normalize(g_vCamPosition - In.vPosition);
     float value = saturate(dot(E, In.vNormal));
-    float emissive = 1.f - value;
+    float emissive = 1.f;
     emissive = smoothstep(0.f, 1.f, emissive);
     emissive = pow(emissive, 1);
     vector vEmissiveColor = float4(1.0f, 0.5f, 0.f, 1.0f);
@@ -122,15 +122,15 @@ PS_OUT PS_MAIN4(PS_IN In)
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler_Clamp, In.vTexcoord);
 
-    float2 UV;
-    UV.x = g_fTex_Move + In.vTexcoord.x;
-    UV.y = In.vTexcoord.y;
-    vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler_Clamp, UV);
+    //float2 UV;
+    //UV.x = g_fTex_Move + In.vTexcoord.x;
+    //UV.y = In.vTexcoord.y;
+    //vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler_Clamp, UV);
 
-    vMtrlDiffuse.a = vMtrlDiffuse.r;
-    vMtrlDiffuse.a *= 0.8f;
-    vMtrlDiffuse.r += 1.f * 2.f; 
-    vMtrlDiffuse = saturate(vMtrlDiffuse.r);
+    //vMtrlDiffuse.a = vMtrlDiffuse.r;
+    //vMtrlDiffuse.a *= 0.8f;
+    //vMtrlDiffuse.r += 1.f * 2.f; 
+    //vMtrlDiffuse = saturate(vMtrlDiffuse.r);
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
@@ -165,8 +165,10 @@ PS_OUT PS_MAIN_Weapon(PS_IN In)
 PS_OUT PS_Rader(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-	
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    float2 UV;
+    UV = g_fTex_Move + In.vTexcoord;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, UV);
    
     float gradientAlpha = saturate(In.vTexcoord.y); 
     vMtrlDiffuse.a = gradientAlpha * 0.6f; 
@@ -196,6 +198,24 @@ PS_OUT PS_EFFECT(PS_IN In)
     Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
     return Out;
 }
+
+PS_OUT PS_EFFECT2(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT)0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.r == 0)
+        discard;
+
+    Out.vDiffuse.a = 0.7f;
+    Out.vDiffuse.rgb = vMtrlDiffuse.rgb * float3(0.f, 0.5f, 0.2f);
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+    return Out;
+}
+
 
 struct PS_OUT_HEIGHT
 {
@@ -301,13 +321,15 @@ technique11 DefaultTechnique
     pass LightDepth // 7
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_None, 0);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
     }
+
+
     pass DefaultPass8 // 8 총알
     {
         SetRasterizerState(RS_Default);
@@ -320,7 +342,7 @@ technique11 DefaultTechnique
     }
     pass DefaultPass9 // 알파값에 따라 discard
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -349,6 +371,15 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_EFFECT();
     }
+    pass DefaultPass12 // 12 이펙트
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_EFFECT2();
+    }
     
 }

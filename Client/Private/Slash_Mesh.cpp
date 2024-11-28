@@ -31,9 +31,9 @@ HRESULT CSlash_Mesh::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
     m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y + 5.f, pDesc->fScale.z);
-    //m_vecPos = *m_vecPlayerPos;
-    //m_vecPos = XMVectorSetY(m_vecPos, XMVectorGetY(m_vecPos) + 5.f);
-    //m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPos);
+    m_vecPos = *m_vecPlayerPos;
+    m_vecPos = XMVectorSetY(m_vecPos, XMVectorGetY(m_vecPos) + 5.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPos);
 
 
     return S_OK;
@@ -41,22 +41,22 @@ HRESULT CSlash_Mesh::Initialize(void* pArg)
 
 void CSlash_Mesh::Priority_Update(_float fTimeDelta)
 {
-    if (m_fLifeTime >= 1.f)
-    {
-        m_bDead = true;
-    }
-    m_fLifeTime += fTimeDelta;
+    //if (m_fLifeTime >= 1.f)
+    //{
+    //    m_bDead = true;
+    //}
+    //m_fLifeTime += fTimeDelta;
 }
 
 void CSlash_Mesh::Update(_float fTimeDelta)
 {
-   m_fUValue += fTimeDelta * 2.f;
+   //m_fUValue += fTimeDelta * 2.f;
 
-   _matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
-   for (size_t i = 0; i < 3; i++)
-       SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
-   XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-   
+   //_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
+   //for (size_t i = 0; i < 3; i++)
+   //    SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
+   //XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
+   //
 }
 
 void CSlash_Mesh::Late_Update(_float fTimeDelta)
@@ -64,9 +64,9 @@ void CSlash_Mesh::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
         return;
 
-    //m_vecPos = *m_vecPlayerPos;
-    //m_vecPos = XMVectorSetY(m_vecPos, XMVectorGetY(m_vecPos) + 5.f);
-    //m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPos);
+    m_vecPos = *m_vecPlayerPos;
+    m_vecPos = XMVectorSetY(m_vecPos, XMVectorGetY(m_vecPos) + 5.f);
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPos);
 
 }
 
@@ -82,7 +82,7 @@ HRESULT CSlash_Mesh::Render()
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(9)))
+        if (FAILED(m_pShaderCom->Begin(12)))
             return E_FAIL;
 
         m_pModelCom->Render(i);
@@ -98,7 +98,7 @@ HRESULT CSlash_Mesh::Add_Components()
         return E_FAIL;
 
     const _wstring Model_Component = TEXT("Prototype_Component_Model_Effect");
-    const _wstring Model_Component_Result = Model_Component + to_wstring(3);
+    const _wstring Model_Component_Result = Model_Component + to_wstring(5);
     /* For.Com_Model */
     if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
@@ -110,7 +110,7 @@ HRESULT CSlash_Mesh::Add_Components()
 
 HRESULT CSlash_Mesh::Bind_ShaderResources()
 {
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))

@@ -36,6 +36,7 @@ HRESULT CRader_Effect::Initialize(void* pArg)
 void CRader_Effect::Priority_Update(_float fTimeDelta)
 {
     m_pTransformCom->Turn(0.f, 1.f, 0.f, fTimeDelta);
+    m_fUV += fTimeDelta * 2.f;
 }
 
 void CRader_Effect::Update(_float fTimeDelta)
@@ -99,7 +100,9 @@ HRESULT CRader_Effect::Bind_ShaderResources()
     _float fFar = m_pGameInstance->Get_CameraFar();
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
         return E_FAIL;
-
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTex_Move", &m_fUV, sizeof(float))))
+        return E_FAIL;
+    
     return S_OK;
 }
 

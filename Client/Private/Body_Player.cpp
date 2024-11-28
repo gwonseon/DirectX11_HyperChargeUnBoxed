@@ -183,9 +183,9 @@ HRESULT CBody_Player::Render_Shadow()
 	_float4x4			ViewMatrix, ProjMatrix;
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
-
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(708.894f, 10.f, 715.925f, 1.f), XMVectorSet(708.884f, 0.f, 715.915f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)g_iWinSizeX / g_iWinSizeY, 0.1f, 9000.f));
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 3.f, fPlayerPos.y + 10.f, fPlayerPos.z - 3.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.z, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;

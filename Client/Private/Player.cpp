@@ -81,7 +81,6 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
-
 	// 빌드 모드 ( 건축)
 	if (m_bBuildMode == true && m_bBuild_Able == true)
 	{
@@ -166,6 +165,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	}
 	m_pWaepon->Set_CameraPos(m_vecCameraPos);			// 카메라 At 보내주기
 	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// 카메라 At 보내주기
+	m_pGameInstance->Set_PlayerPos(_float4(pos.x, pos.y, pos.z, 1.f)); // 플레이어 위치 저장
 	if(m_iPrevWeaponState != m_iWeaponState)
 	{
 		m_pBody->Set_WeaponState(m_iWeaponState);		// 몸에게 무기 상태 보내주기   TPS	
@@ -186,10 +186,6 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		m_pKatana->Set_KatanaState(false);
 		m_pGameInstance->Set_KatanaState(false);
 	}
-
-
-
-
 
 	__super::Priority_Update(fTimeDelta);
 }

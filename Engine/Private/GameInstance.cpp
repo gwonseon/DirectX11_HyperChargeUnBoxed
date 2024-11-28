@@ -326,6 +326,17 @@ _bool CGameInstance::Get_KatanaState()
 	return 	m_pObject_Manager->Get_KatanaState();
 }
 
+void CGameInstance::Set_PlayerPos(_float4 fPos)
+{
+	m_pObject_Manager->Set_PlayerPos(fPos);
+
+}
+
+_float4 CGameInstance::Get_PlayerPos()
+{
+	return 	m_pObject_Manager->Get_PlayerPos();
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, CComponent* pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)

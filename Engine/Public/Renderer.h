@@ -32,7 +32,7 @@ public:
 		SIZE_END,
 	};
 
-	enum RENDERGROUP { RG_PRIORITY, RG_SHADOW, RG_HEIGHT_TERRAIN, RG_HEIGHT, RG_NONBLEND, RG_BLOOM, RG_NONLIGHT,  RG_LAST, RG_BLEND, RG_UI,RG_UI_LAST, RG_END };
+	enum RENDERGROUP { RG_PRIORITY, RG_SHADOW, RG_HEIGHT,RG_NONBLEND, RG_BLOOM, RG_NONLIGHT,  RG_LAST, RG_BLEND, RG_UI,RG_UI_LAST, RG_END };
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -82,9 +82,9 @@ private:
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
-	HRESULT Render_TerrainHeight();
 	HRESULT Render_Height();
 	HRESULT Render_NonBlend(); 
+	
 	HRESULT Render_Lights();
 	HRESULT Render_Final();
 	HRESULT Render_BrightExtraction();

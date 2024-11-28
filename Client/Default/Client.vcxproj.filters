@@ -280,6 +280,9 @@
     <Filter Include="02. GameObjects\Effect\Katana_Effect">
       <UniqueIdentifier>{878f5bf1-66a1-42e1-a092-d0b7ad982353}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Effect\Missile_Flame">
+      <UniqueIdentifier>{430e8763-659b-4940-bf55-c7a9ec3ee1ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -552,6 +555,9 @@
     <ClInclude Include="..\Public\Katana_Effect.h">
       <Filter>02. GameObjects\Effect\Katana_Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Missile_Flame.h">
+      <Filter>02. GameObjects\Effect\Missile_Flame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -802,6 +808,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Katana_Effect.cpp">
       <Filter>02. GameObjects\Effect\Katana_Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Missile_Flame.cpp">
+      <Filter>02. GameObjects\Effect\Missile_Flame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

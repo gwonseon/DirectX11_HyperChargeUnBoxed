@@ -294,7 +294,6 @@ CEffect_Electricity* CEffect_Electricity::Create(ID3D11Device* pDevice, ID3D11De
 		MSG_BOX("Failed to Created : CEffect_Electricity");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

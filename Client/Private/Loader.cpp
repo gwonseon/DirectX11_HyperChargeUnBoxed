@@ -71,7 +71,7 @@
 #include "Slash_Mesh.h"
 #include "Rader_Effect.h"
 #include "Effect_Electricity.h"
-
+#include "Missile_Flame.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -2965,7 +2965,7 @@ HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 
 	/*ÇÃ·¹¾î ÃÑ */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Flare"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.png"), 6))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.png"), 9))))
 		return E_FAIL;
 		
 	/*ÇÃ·¹¾î ÃÑ */
@@ -2975,13 +2975,22 @@ HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 
 	/*ÅÊÅ© Æø¹ß */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Tank_Explosion"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"), 5))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"),7))))
 		return E_FAIL;
 
 	/* Àü±â */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Lightning"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Lightning/Electricity%d.dds"), 6))))
 		return E_FAIL;
+
+	/* Prototype_GameObject_Missile_Flare */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile_Flare")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile_Flare"),
+			CMissile_Flame::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
 
 	/* Prototype_GameObject_Effect_Katana */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana_Effect")) == nullptr)

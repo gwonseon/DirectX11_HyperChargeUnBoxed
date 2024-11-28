@@ -33,7 +33,7 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	StartPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
+	m_vecPosition = StartPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
 	StartPos_Store = StartPos;
 	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, StartPos);
@@ -61,13 +61,23 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 	}
 	CloseHandle(hFile);
 
+
+	CMissile_Flame::MISSILE_FLAME_DESC pFlame{};
+	pFlame.eLevel = LEVEL_YARD;
+	pFlame.fScale = { 20.f,20.f,20.f };
+	pFlame.vecPos = &m_vecPosition;
+	pFlame.bDraw  = &m_bDraw;
+	pFlame.iTexNum = 5;
+	pFlame.matWorld = m_pTransformCom->Get_WorldMatrixPtr();
+	m_pMissile_Flame = static_cast<CMissile_Flame*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Missile_Flare"), &pFlame));
+
 	return S_OK;
 }
 
 void CTruck_Missile::Priority_Update(_float fTimeDelta)
 {
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
+	 
 	if (m_bKnockdown == true)
 	{
 		if (XMVectorGetY(m_vecPosition) >= 0.05f)
@@ -121,6 +131,7 @@ void CTruck_Missile::Update(_float fTimeDelta)
 	{
 		m_fSpeed = 40.f;
 		m_eMissile_State = MISSILE_SHOT_START;
+		m_bDraw = true;
 	}
 	if (m_eMissile_State == MISSILE_SHOT_ACCEL)
 	{
@@ -149,6 +160,7 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			pCrushed.pPlayer = m_pPlayer;
 			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Terrain_Crushed"), &pCrushed);
 
+			m_bDraw = false;
 			m_bFog = true;
 			m_fFogEnd = 1.01f;
 		}
@@ -262,6 +274,7 @@ void CTruck_Missile::Late_Update(_float fTimeDelta)
 		return;
 	if (m_bKnockdown == true)
 	{
+		m_bDraw = false; 
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;
 	}
