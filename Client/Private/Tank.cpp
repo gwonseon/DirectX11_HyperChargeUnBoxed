@@ -5,6 +5,8 @@
 #include <Monster_Bullet.h>
 #include <Trap_Marks.h>
 #include <Effect_Flare_Rifle.h>
+#include <Dead_Model.h>
+#include <Effect_Explosion_Tank.h>
 
 
 CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -72,14 +74,35 @@ void CTank::Update(_float fTimeDelta)
 {	
 	if (m_bDead == true)
 		return;
+	if (m_bDeadState == true)
+	{
+		CDead_Model::DEADMODEL_DESC pDead{};
+		pDead.eLevel = m_eLevel;
+		pDead.eModelType = CDead_Model::DEAD_TANK_BODY;
+		pDead.vecPos = m_vecPosition;
+		pDead.fScale = { 3.f,3.f,3.f };
+		pDead.matWorld = *m_pTransformCom->Get_WorldMatrixPtr();
+		(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Dead"), TEXT("Prototype_GameObject_DeadModel"), &pDead));
+
+		pDead.eModelType = CDead_Model::DEAD_TANK_TURRET;
+		(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Dead"), TEXT("Prototype_GameObject_DeadModel"), &pDead));
+
+		CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
+		Effect.eLevel = m_eLevel;
+		Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD;
+		Effect.fScale = _float3{ 20.f, 20.f, 20.f };
+		Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
+
+		m_bDead = true;
+		return;
+	}
 	// 데미지 입는 타이밍 딜레이로 맞춤
 	if(m_fCurrentTime >= m_fDamaged_DelayTime)
 	{
 		m_bCanAttacked = true;
 		m_fCurrentTime = 0.f;
 	}
-
-
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
@@ -263,22 +286,6 @@ HRESULT CTank::Bind_ShaderResources()
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;*/
-
 
 	return S_OK;
 }

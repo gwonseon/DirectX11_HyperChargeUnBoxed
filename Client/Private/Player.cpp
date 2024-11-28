@@ -67,7 +67,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
-	m_fAttack = 1.f;
+	m_fAttack = 20.f;
 	m_iCoin = 0;
 	m_bDontDestroy = true;
 	m_bKnockdown = false;

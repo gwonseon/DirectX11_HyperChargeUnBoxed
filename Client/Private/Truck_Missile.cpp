@@ -32,7 +32,7 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 		return E_FAIL;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-
+	
 	m_vecPosition = StartPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
 	StartPos_Store = StartPos;
 	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
@@ -64,11 +64,11 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 
 	CMissile_Flame::MISSILE_FLAME_DESC pFlame{};
 	pFlame.eLevel = LEVEL_YARD;
-	pFlame.fScale = { 20.f,20.f,20.f };
+	pFlame.fScale = pDesc->fScale ;
 	pFlame.vecPos = &m_vecPosition;
 	pFlame.bDraw  = &m_bDraw;
 	pFlame.iTexNum = 5;
-	pFlame.matWorld = m_pTransformCom->Get_WorldMatrixPtr();
+//	pFlame.matWorld = m_pTransformCom->Get_WorldMatrixPtr();
 	m_pMissile_Flame = static_cast<CMissile_Flame*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Missile_Flare"), &pFlame));
 
 	return S_OK;
@@ -219,6 +219,7 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			// 위치 도달시 움직임 평행 이동 X
 			if (m_pTransformCom->IsPass_TargetPosition(PrevPos, m_vecPosition, vTrackerPos) == true) 
 			{
+				m_bDraw = false;
 				m_fPower -= 40.f;
 				m_vecPosition = PrevPos;
 				m_bMoving = false;
@@ -226,6 +227,7 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			// 대각선 거리가 30안으로 들어왔을 때 떨어져랏
 			if (fDistance <= 30.f)
 			{
+				m_bDraw = false;
 				m_fPower -= 40.f;
 				m_vecPosition = PrevPos;
 				m_bMoving = false;

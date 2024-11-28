@@ -75,21 +75,7 @@ void CExplosion::Late_Update(_float fTimeDelta)
 
 HRESULT CExplosion::Render()
 {
-   /* if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
-    for (size_t i = 0; i < iNumMeshes; i++)
-    {
-        if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-            return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Begin(0))) 
-            return E_FAIL;
-
-        m_pModelCom->Render(i);
-    }*/
 
 #ifdef _DEBUG
     if (m_bDead == false)

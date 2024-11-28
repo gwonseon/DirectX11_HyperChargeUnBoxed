@@ -52,7 +52,8 @@ HRESULT CAlien::Initialize(void* pArg)
 void CAlien::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
-
+	if (m_bDeadState == true)
+		return;
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	m_pModelCom->Set_Animation(0, true);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
@@ -81,7 +82,16 @@ void CAlien::Priority_Update(_float fTimeDelta)
 
 void CAlien::Update(_float fTimeDelta)
 {
-	
+	if (m_bDead == true)
+		return;
+	if (m_bDeadState == true)
+	{
+		if (m_fDissolve >= 1.f)
+			m_bDead = true;
+		m_fDissolve += fTimeDelta;
+
+		return;
+	}
 	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
 	if (fDistance > 4.f)
 	{
@@ -102,6 +112,8 @@ void CAlien::Update(_float fTimeDelta)
 void CAlien::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
+	if (m_bDeadState == true)
+		return;
 	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
 	{
 		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
@@ -137,9 +149,16 @@ HRESULT CAlien::Render()
 		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
-
+		if (m_bDeadState == true)
+		{
+			if (FAILED(m_pShaderCom->Begin(6)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pShaderCom->Begin(0)))
+				return E_FAIL;
+		}
 		m_pModelCom->Render(i);
 	}
 
@@ -154,6 +173,13 @@ HRESULT CAlien::Render()
 
 HRESULT CAlien::Add_Components()
 {
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Dissolved"),
+		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+		return E_FAIL;
+
+
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
@@ -185,6 +211,14 @@ HRESULT CAlien::Add_Components()
 
 HRESULT CAlien::Bind_ShaderResources()
 {
+	if (m_bDeadState == true)
+	{
+		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(0))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value", &m_fDissolve, sizeof(float))))
+			return E_FAIL;
+	}
+
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
@@ -197,23 +231,7 @@ HRESULT CAlien::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
 
-	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;*/
-
-
+	
 	return S_OK;
 }
 
@@ -248,5 +266,6 @@ void CAlien::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pTextureCom);
 
 }

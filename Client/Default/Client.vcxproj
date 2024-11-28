@@ -240,6 +240,7 @@
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Slash_Mesh.h" />
     <ClInclude Include="..\Public\Tank.h" />
+    <ClInclude Include="..\Public\Dead_Model.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Terrain_Crushed.h" />
     <ClInclude Include="..\Public\Tracker.h" />
@@ -342,6 +343,7 @@
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Slash_Mesh.cpp" />
     <ClCompile Include="..\Private\Tank.cpp" />
+    <ClCompile Include="..\Private\Dead_Model.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Terrain_Crushed.cpp" />
     <ClCompile Include="..\Private\Tracker.cpp" />

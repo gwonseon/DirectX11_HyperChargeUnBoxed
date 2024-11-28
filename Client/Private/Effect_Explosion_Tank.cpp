@@ -73,8 +73,22 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 		m_vecPosition -= vRight * 0.6f;
 		vFinalPos = m_vecPosition;
 		break;
-	case Client::CEffect_Explosion_Tank::EXPLOSION_END:
+	case Client::CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD:
+		m_fMaxFrame.x = m_fMaxFrame.y = 6.f;
+		m_iTextureNum = 2;
+		vFinalPos = m_vecPosition;
 		break;
+
+	case Client::CEffect_Explosion_Tank::EXPLOSION_HELICOPTER_FIRE:
+		m_fMaxFrame.x = 4.f;
+		m_fMaxFrame.y = 9.f;
+		m_iTextureNum = 7;
+		vFinalPos = m_vecPosition;
+		break;
+
+
+		
+
 	default:
 		break;
 	}
@@ -94,7 +108,7 @@ void CEffect_Explosion_Tank::Update(_float fTimeDelta)
 {
 	__super::Compute_Depth();
 	
-	m_fDelay = 0.f;
+
 	if (m_fFrame.x < m_fMaxFrame.x)
 	{
 		m_fFrame.x += 1.f;
@@ -109,7 +123,6 @@ void CEffect_Explosion_Tank::Update(_float fTimeDelta)
 		m_bDead = true;
 	}
 	
-		m_fDelay += fTimeDelta;
 }
 
 void CEffect_Explosion_Tank::Late_Update(_float fTimeDelta)
@@ -145,7 +158,11 @@ void CEffect_Explosion_Tank::Late_Update(_float fTimeDelta)
 			return;
 		break;
 
-	case Client::CEffect_Explosion_Tank::EXPLOSION_END:
+	case Client::CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD:
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+			return;
 		break;
 
 	default:
@@ -158,7 +175,7 @@ HRESULT CEffect_Explosion_Tank::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-	if (m_eType == EXPLOSION_TANK || m_eType == EXPLOSION_MISSILE)
+	if (m_eType == EXPLOSION_TANK || m_eType == EXPLOSION_MISSILE || m_eType == EXPLOSION_TANK_DEAD)
 	{
 		if (FAILED(m_pShaderCom->Begin(1)))
 			return E_FAIL;

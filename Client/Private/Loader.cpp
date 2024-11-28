@@ -24,7 +24,7 @@
 #include "TruckBody.h"
 #include "TruckShooter.h"
 #include "Tracker.h"
-
+#include "Dead_Model.h"
 
 #include "Environment.h"
 #include "BrainCore.h"
@@ -2975,13 +2975,27 @@ HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 
 	/*ÅÊÅ© Æø¹ß */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Tank_Explosion"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"),7))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"),8))))
 		return E_FAIL;
 
 	/* Àü±â */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Lightning"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Lightning/Electricity%d.dds"), 6))))
 		return E_FAIL;
+
+	// µðÁ¹ºê
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Dissolved"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Dissolve/Dissolve%d.dds"), 4))))
+		return E_FAIL;
+
+	
+	/* Prototype_GameObject_DeadModel */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_DeadModel")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DeadModel"),
+			CDead_Model::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
 
 	/* Prototype_GameObject_Missile_Flare */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile_Flare")) == nullptr)

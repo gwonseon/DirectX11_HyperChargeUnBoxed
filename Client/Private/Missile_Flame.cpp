@@ -30,7 +30,7 @@ HRESULT CMissile_Flame::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
+	m_pTransformCom->Set_Scaling(pDesc->fScale.x + 5.f, pDesc->fScale.y + 5.f, pDesc->fScale.z + 5.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, *m_vecPos);
 	
 	return S_OK;
@@ -70,7 +70,7 @@ HRESULT CMissile_Flame::Render()
 		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(12)))
+		if (FAILED(m_pShaderCom->Begin(13)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -87,7 +87,7 @@ HRESULT CMissile_Flame::Add_Components()
 		return E_FAIL;
 
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Effect");
-	const _wstring Model_Component_Result = Model_Component + to_wstring(1);
+	const _wstring Model_Component_Result = Model_Component + to_wstring(6);
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))

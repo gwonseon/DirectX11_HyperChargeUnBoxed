@@ -93,6 +93,10 @@ protected:
 	_uint		m_iPrevPlayer_Cell_Idx{};
 
 
+
+	_bool		m_bDeadState = false;
+	_float		m_fDissolve = 0.f;
+
 protected:
 
 protected:

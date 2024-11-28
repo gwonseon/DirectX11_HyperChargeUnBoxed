@@ -253,12 +253,11 @@ public:
 	_bool*					Get_ShotNow()	{ return &m_bShotNow; }
 	_bool*					Get_ShotStart() { return &m_bShotStart; }
 private:
-	WEAPONSTATE m_eWeapon{}; // 스위치문 편하게 만드려고 임시 생성
+	WEAPONSTATE				m_eWeapon{}; // 스위치문 편하게 만드려고 임시 생성
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
 
 public:
 	static CBody_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -4,9 +4,11 @@
 
 vector              g_vCamPosition;
 matrix              g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+
 texture2D           g_Texture;
 texture2D           g_MaskTexture;
 texture2D           g_DepthTexture;
+
 float               g_fFar;
 float2              g_Index;
 float2              g_ImageEA;

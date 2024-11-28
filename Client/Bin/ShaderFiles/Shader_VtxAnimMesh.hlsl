@@ -7,6 +7,7 @@ float4			g_vLightDiffuse;
 float4			g_vLightAmbient;
 float4			g_vLightSpecular;
 
+texture2D       g_MaskTexture;
 texture2D		g_DiffuseTexture;
 float4			g_vMtrlAmbient = float4(0.4f, 0.4f, 0.4f, 1.f);
 float4			g_vMtrlSpecular = float4(1.f, 1.f, 1.f, 1.f);
@@ -18,6 +19,7 @@ float4			g_vCamPosition;
 float4x4		g_BoneMatrices[512];
 
 float g_fFar;
+float g_fDissolve_Value;
 
 
 struct VS_IN
@@ -94,15 +96,13 @@ PS_OUT PS_MAIN(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 	
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-
     if (vMtrlDiffuse.a <= 0.3f)
         discard;
 
     Out.vDiffuse = vMtrlDiffuse;
-
-	/* -1.f ~ 1.f -> 0.f ~ 1.f */
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    
     return Out;
 }
 
@@ -151,6 +151,37 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN_DISSOLVE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vDissole = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vDissole.r < g_fDissolve_Value * 0.6f)
+        discard;
+    float fNoise = g_MaskTexture.Sample(LinearSampler, In.vTexcoord).r;
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a <= 0.3f)
+        discard;
+    float fDissolveFactor = smoothstep(g_fDissolve_Value - 0.2f, g_fDissolve_Value, fNoise);
+    
+    if (fDissolveFactor > 0.f && fDissolveFactor < 1.f)
+    {
+        vMtrlDiffuse.rgb = float3(1.f, 0.6f, 0.f) * (1.f - fDissolveFactor);
+    }
+    else if (fDissolveFactor <= 0.f)
+    {
+        discard;
+    }
+
+    Out.vDiffuse = vMtrlDiffuse;
+
+	/* -1.f ~ 1.f -> 0.f ~ 1.f */
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -217,6 +248,17 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_LIGHTDEPTH();
+    }
+
+    pass DISSOLVEPASS // 6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DISSOLVE();
     }
 
 }

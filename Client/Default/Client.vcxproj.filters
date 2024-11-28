@@ -283,6 +283,9 @@
     <Filter Include="02. GameObjects\Effect\Missile_Flame">
       <UniqueIdentifier>{430e8763-659b-4940-bf55-c7a9ec3ee1ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Monster\Dead_Model">
+      <UniqueIdentifier>{32d97727-a933-4362-ac66-4d3c54fc217f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -558,6 +561,9 @@
     <ClInclude Include="..\Public\Missile_Flame.h">
       <Filter>02. GameObjects\Effect\Missile_Flame</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Dead_Model.h">
+      <Filter>02. GameObjects\Monster\Dead_Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -811,6 +817,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Missile_Flame.cpp">
       <Filter>02. GameObjects\Effect\Missile_Flame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dead_Model.cpp">
+      <Filter>02. GameObjects\Monster\Dead_Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include <Monster_Bullet.h>
+#include <Effect_Explosion_Tank.h>
 
 CHelicopter::CHelicopter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -22,7 +23,6 @@ HRESULT CHelicopter::Initialize_Prototype()
 HRESULT CHelicopter::Initialize(void* pArg)
 {
 	HELICOPTER_DESC* pDesc = static_cast<HELICOPTER_DESC*>(pArg);
-
 	pDesc->fSpeedPerSec = 10.f;
 	pDesc->fScale = _float3(3.f, 3.f, 3.f);
 
@@ -47,7 +47,8 @@ HRESULT CHelicopter::Initialize(void* pArg)
 void CHelicopter::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
-
+	if (m_bDeadState == true)
+		return;
 
 	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, false);
 	if (m_bCanAttacked == false)
@@ -56,6 +57,16 @@ void CHelicopter::Priority_Update(_float fTimeDelta)
 
 void CHelicopter::Update(_float fTimeDelta)
 {
+
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	if (m_bDead == true)
+		return;
+	if (m_bDeadState == true)
+	{
+		DeadMotion(fTimeDelta);
+		return;
+	}
 	// 데미지 입는 타이밍 딜레이로 맞춤
 	if (m_fCurrentTime >= m_fDamaged_DelayTime)
 	{
@@ -63,7 +74,6 @@ void CHelicopter::Update(_float fTimeDelta)
 		m_fCurrentTime = 0.f;
 	}
 
-	_vector m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float fDistance = m_pTransformCom->Cal_Distance_vec_No_Height(*m_vecTargetPos, m_vecPosition);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition = XMVectorSet(XMVectorGetX(m_vecPosition), 20.f, XMVectorGetZ(m_vecPosition),1.f));
 
@@ -120,13 +130,16 @@ void CHelicopter::Update(_float fTimeDelta)
 
 void CHelicopter::Late_Update(_float fTimeDelta)
 {
-//	m_pColliderCom->Intersect(pTargetCollider);
+	__super::Late_Update(fTimeDelta);
+	if (m_bDeadState == true)
+		return;
+	
 	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
 	{
 		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 	}
-	__super::Late_Update(fTimeDelta);
+
 }
 
 HRESULT CHelicopter::Render()
@@ -192,24 +205,30 @@ HRESULT CHelicopter::Bind_ShaderResources()
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-	//	return E_FAIL;
-
-	//const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	//if (nullptr == pLightDesc)
-	//	return E_FAIL;
-
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-	//	return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-	//	return E_FAIL;
 
 
 	return S_OK;
+}
+
+void CHelicopter::DeadMotion(_float fTimeDelta)
+{
+	if (XMVectorGetY(m_vecPosition) < 0.f)
+	{
+		CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
+		Effect.eLevel = m_eLevel;
+		Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD;
+		Effect.fScale = _float3{ 20.f, 20.f, 20.f };
+		Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
+		m_bDead = true;
+	}
+
+	m_fAcc += fTimeDelta * 2.f;
+
+	m_vecPosition -= XMVectorSet(0.f, 1.f, 0.f, 0.f) * fTimeDelta * (5.f + m_fAcc *3.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+	m_pTransformCom->Turn(0.f, 1.f, 0.f, fTimeDelta * (1.f + m_fAcc * 0.5f));
+
 }
 
 CHelicopter* CHelicopter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

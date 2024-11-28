@@ -89,9 +89,20 @@ private:
 	_bool m_bShot = false;
 	_bool m_bMove_Anim = false;
 	_bool	m_bFind_Path = false;
+
+	_bool  m_bOnce = false;
+	_bool  m_bDissolveStart = false;
+	_float2 m_fDeadPower{};
+	_float  m_fGravity = 2.3f;
+
+	_float4 fPlayerPos{};
+	_vector vUp{};
+	_vector vDir{};
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
+	void    Dead_Motion(_float fTimeDelta);
+
 
 private:
 	CCollider* m_pColliderCom = { nullptr };

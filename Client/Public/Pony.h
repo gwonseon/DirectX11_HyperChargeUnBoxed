@@ -8,6 +8,7 @@ BEGIN(Engine)
 class CShader;
 class CCollider;
 class CModel;
+class CTexture; 
 class CNavigation;
 END
 
@@ -82,7 +83,7 @@ private:
 	CNavigation*	m_pNavigationCom		= { nullptr };
 	CCollider*	m_pTargetCollider = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
-
+	CTexture* m_pTextureCom = { nullptr };
 	_vector* m_vecTargetPos				= { nullptr };
 
 private:
