@@ -34,12 +34,8 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
-
 	if (m_fHp <= 0.f)
-	{
-		m_bDead = true;
-	}
-
+		m_bDeadState = true;
 }
 
 void CMonster::Update(_float fTimeDelta)
@@ -54,7 +50,6 @@ void CMonster::Late_Update(_float fTimeDelta)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;
-
 	}
 }
 

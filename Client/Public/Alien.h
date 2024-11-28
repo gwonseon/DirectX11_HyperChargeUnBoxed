@@ -7,6 +7,7 @@ BEGIN(Engine)
 class CShader;
 class CModel;
 class CCollider;
+class CTexture;
 class CNavigation;
 
 END
@@ -49,6 +50,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CNavigation* m_pNavigationCom = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
 
 	_vector* m_vecTargetPos;
 

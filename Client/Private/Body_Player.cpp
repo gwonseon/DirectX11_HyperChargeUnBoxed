@@ -150,27 +150,27 @@ void CBody_Player::Late_Update(_float fTimeDelta)
 HRESULT CBody_Player::Render()
 {
 	
-	//if(m_bTPSState == true)
+
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(Bind_ShaderResources()))
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 			return E_FAIL;
 
-		_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+			return E_FAIL;
 
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
+		if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
 
-			if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
-
-			m_pModelCom->Render(i);
-		}
+		m_pModelCom->Render(i);
 	}
+
+
 
 #ifdef _DEBUG
 	m_pColliderCom->Render();
@@ -184,7 +184,7 @@ HRESULT CBody_Player::Render_Shadow()
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 3.f, fPlayerPos.y + 10.f, fPlayerPos.z - 3.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.z, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(400.f - 6.f, 60.f, 400.f - 6.f, 1.f), XMVectorSet(400.f, fPlayerPos.y, 400.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -823,8 +823,6 @@ HRESULT CBody_Player::Add_Components()
 
 HRESULT CBody_Player::Bind_ShaderResources()
 {
-	/*if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;*/
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
@@ -836,7 +834,6 @@ HRESULT CBody_Player::Bind_ShaderResources()
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
 		return E_FAIL;
-
 
 	return S_OK;
 }

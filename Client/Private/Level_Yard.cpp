@@ -821,7 +821,7 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
-	Desc.fFar = 900.f;
+	Desc.fFar = 600.f;
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -848,21 +848,11 @@ HRESULT CLevel_Yard::Ready_Lights()
 	LIGHT_DESC	LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(-0.5f, -1.f, -0.5f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
-
-	//ZeroMemory(&LightDesc, sizeof LightDesc);
-	//LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-	//LightDesc.vPosition = _float4(500.f, 5.f, 500.f, 1.f);
-	//LightDesc.fRange = 10.f;
-	//LightDesc.vDiffuse = _float4(1.f, 0.3f, 0.3f, 1.f);
-	//LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
-	//LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-	//if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
-	//	return E_FAIL;
 
 	return S_OK;
 }

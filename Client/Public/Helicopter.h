@@ -39,7 +39,7 @@ public:
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
+	void	DeadMotion(_float fTimeDelta);
 private:
 	CCollider* m_pColliderCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
@@ -58,7 +58,7 @@ private:
 
 	_float		m_iShot_Count = 0; // 3발 쏘기 위해 몇 발 쐈는지 저장
 	_float		m_fShot_Time_Delay = 3.f; // 총알 쏘기용 딜레이 시간
-
+	_float     m_fAcc;
 public:
 	static CHelicopter* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

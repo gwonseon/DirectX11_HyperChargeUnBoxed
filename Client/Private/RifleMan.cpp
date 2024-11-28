@@ -49,7 +49,7 @@ HRESULT CRifleMan::Initialize(void* pArg)
 
     if (FAILED(Add_Components()))
         return E_FAIL;
-
+    m_fDeadPower = { 5.f, 40.f };
     m_fPrevHp= m_fHp = 50.f;
     m_fEnergy = 0.f;
     m_fAttack = 0.f;
@@ -60,7 +60,8 @@ HRESULT CRifleMan::Initialize(void* pArg)
 void CRifleMan::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
-
+    if (m_bDeadState == true)
+        return;
 
     m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     m_vecPosition = XMVectorSetY(m_vecPosition, 0.f);
@@ -74,6 +75,19 @@ void CRifleMan::Priority_Update(_float fTimeDelta)
 void CRifleMan::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+    if (m_bDead == true)
+        return;
+    if (m_bDeadState == true)
+    {
+        Dead_Motion(fTimeDelta);
+        if (m_fDissolve >= 1.f)
+            m_bDead = true;
+        if(m_bDissolveStart == true)
+            m_fDissolve += fTimeDelta;
+
+        return;
+    }
+
     // 콜라이더 업데이트
     m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
     // 상태패턴 업데이트
@@ -283,13 +297,13 @@ void CRifleMan::Update(_float fTimeDelta)
 
     // 전체 진행 시간에서 현재 시간 나눠서 비율 구하기
     // 최고속도 * sin(비율 *Pi)
-   
-
 }
 
 void CRifleMan::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+    if (m_bDeadState == true)
+        return;
     if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
     {
         m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
@@ -389,22 +403,44 @@ HRESULT CRifleMan::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
         return E_FAIL;
 
-    /*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
-
     return S_OK;
+}
+
+void CRifleMan::Dead_Motion(_float fTimeDelta)
+{
+    if(m_bOnce == false)
+    {
+        fPlayerPos = m_pGameInstance->Get_PlayerPos();
+        vPlayerPos = XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.z, 1.f);
+        vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+        vDir = m_vecPosition - vPlayerPos;
+        m_bOnce = true;
+    }
+    m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+    if (XMVectorGetY(m_vecPosition ) <= 0.f)
+    {
+        m_fDeadPower.y = 35.f;
+        m_fGravity = 2.7f;
+        m_bDissolveStart = true;
+    }
+    m_fDeadPower.y -= m_fGravity;
+
+    if (m_fDeadPower.x > 0.f)
+        m_fDeadPower.x -= 0.3f;
+    else
+    {
+        m_fDeadPower.x = 3.f;
+        m_bDissolveStart = true;
+    }
+
+
+
+    m_vecPosition += vDir * fTimeDelta * m_fDeadPower.x;
+    m_vecPosition += vUp * fTimeDelta * m_fDeadPower.y;
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+    m_pTransformCom->Turn(0.f, 0.f, 1.f, fTimeDelta * 0.5f);
+
 }
 
 CRifleMan* CRifleMan::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
