@@ -24,7 +24,7 @@ HRESULT CHelicopter::Initialize(void* pArg)
 {
 	HELICOPTER_DESC* pDesc = static_cast<HELICOPTER_DESC*>(pArg);
 	pDesc->fSpeedPerSec = 10.f;
-	pDesc->fScale = _float3(3.f, 3.f, 3.f);
+	pDesc->fScale = _float3(6.f, 6.f, 6.f);
 
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_pBuild = pDesc->pBuild;
@@ -59,7 +59,7 @@ void CHelicopter::Update(_float fTimeDelta)
 {
 
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
 	if (m_bDead == true)
 		return;
 	if (m_bDeadState == true)
@@ -79,6 +79,9 @@ void CHelicopter::Update(_float fTimeDelta)
 
 	if (fDistance >= 350.f)
 	{
+	
+		m_pGameInstance->PlaySoundW(L"FE_Playground_PropellerAirplane.wav", Engine::CHANNELID::SOUND_HELICOPTER_FLY, m_fSound * 0.4f );
+
 		_vector vLookPos = *m_vecTargetPos;
 		vLookPos = XMVectorSetY(vLookPos, 20.f);
 		m_pTransformCom->LookAt(vLookPos);
@@ -87,20 +90,21 @@ void CHelicopter::Update(_float fTimeDelta)
 	}
 	else
 	{
-		// Turn 함수로 하면 좋을듯, 이동 좌표는 직접 찍을 것이기 때문에 방향 신경쓰지 말자 
-		if (XMConvertToRadians(m_fRotation) <= XMConvertToRadians(90.f))
-		{
-			
-			m_fRotation += fTimeDelta * 20.f;
-		}
-		else // 다 돌았을 때
+		//// Turn 함수로 하면 좋을듯, 이동 좌표는 직접 찍을 것이기 때문에 방향 신경쓰지 말자 
+		//if (XMConvertToRadians(m_fRotation) <= XMConvertToRadians(90.f))
+		//{
+		//	m_fRotation += fTimeDelta * 40.f;
+		//}
+		//else // 다 돌았을 때
 		{
 			// 총알 생성 
-			// 몇 초에 한 번씩 총알이 생성되게 만들면 되지 않을까 
 			if (m_fShot_Time_Delay >= 4.f)
 			{
 				if(m_iShot_Count < 3)
 				{
+					m_pGameInstance->StopSound(SOUND_HELICOPTER_FLARE);
+					m_pGameInstance->PlaySoundW(L"FE_NPC_BH60_MinigunR_Tail.wav", Engine::CHANNELID::SOUND_HELICOPTER_FLARE, m_fSound);
+
 					_float3 fPos{};
 					XMStoreFloat3(&fPos, m_vecPosition);
 					CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
@@ -122,7 +126,9 @@ void CHelicopter::Update(_float fTimeDelta)
 			m_fShot_Time_Delay += fTimeDelta;
 		}
 			
-		m_pTransformCom->Rotation(0.f, XMConvertToRadians(m_fRotation), 0.f);
+		_vector vLookPos = *m_vecTargetPos;
+		vLookPos = XMVectorSetY(vLookPos, 20.f);
+		m_pTransformCom->LookAt(vLookPos);
 		m_pModelCom->Set_Animation(HELICOPTER_DIORAMA, true);
 	}
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
@@ -130,7 +136,7 @@ void CHelicopter::Update(_float fTimeDelta)
 
 void CHelicopter::Late_Update(_float fTimeDelta)
 {
-	__super::Late_Update(fTimeDelta);
+ 	__super::Late_Update(fTimeDelta);
 	if (m_bDeadState == true)
 		return;
 	
@@ -166,6 +172,40 @@ HRESULT CHelicopter::Render()
 
 	m_pColliderCom->Render();
 #endif
+	return S_OK;
+}
+
+HRESULT CHelicopter::Render_Shadow()
+{
+	_float4x4			ViewMatrix, ProjMatrix;
+
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(364.283f - 8.f, 50.f, 120.7572f - 8.f, 1.f), XMVectorSet(364.283f, 0.f, 120.7572f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(5)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
+
 	return S_OK;
 }
 
@@ -214,6 +254,9 @@ void CHelicopter::DeadMotion(_float fTimeDelta)
 {
 	if (XMVectorGetY(m_vecPosition) < 0.f)
 	{
+		m_pGameInstance->StopSound(SOUND_HELICOPTER_DEAD);
+		m_pGameInstance->PlaySoundW(L"FE_NPC_BH60_Metal_Break_04.wav", Engine::CHANNELID::SOUND_HELICOPTER_DEAD, m_fSound * 0.3f);
+
 		CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
 		Effect.eLevel = m_eLevel;
 		Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD;
@@ -222,8 +265,15 @@ void CHelicopter::DeadMotion(_float fTimeDelta)
 		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
 		m_bDead = true;
 	}
+	if (m_fAcc <= 0)
+	{
+		m_pGameInstance->StopSound(SOUND_HELICOPTER_FLY);
+		m_pGameInstance->StopSound(SOUND_HELICOPTER_FALL);
+		m_pGameInstance->PlaySoundW(L"FE_NPC_BH60_PilotSOS_06.wav", Engine::CHANNELID::SOUND_HELICOPTER_FALL, m_fSound * 0.2f);
 
+	}
 	m_fAcc += fTimeDelta * 2.f;
+
 
 	m_vecPosition -= XMVectorSet(0.f, 1.f, 0.f, 0.f) * fTimeDelta * (5.f + m_fAcc *3.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);

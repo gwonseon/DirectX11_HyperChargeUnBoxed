@@ -4,6 +4,12 @@
 // 매크로 들이 정의되어 있는 파일
 namespace Engine
 {
+
+
+#define	VOLUME_BGM  0.3f
+
+
+
 #ifndef			MSG_BOX
 #define			MSG_BOX(_message)			MessageBox(NULL, TEXT(_message), L"System Message", MB_OK)
 #endif
@@ -76,6 +82,11 @@ namespace Engine
 				}													\
 				return iRefCnt;										\
 			}
+
+
+
+
+
 }
 
 #endif // Engine_Macro_h__

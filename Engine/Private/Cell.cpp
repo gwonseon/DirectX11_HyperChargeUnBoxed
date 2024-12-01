@@ -143,7 +143,6 @@ _bool CCell::Compare_Points(_fvector vSour, _fvector vDest)
 		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]), vDest))
 			return true;
 	}
-
 	return false;
 }
 #ifdef _DEBUG
@@ -172,7 +171,7 @@ void CCell::Free()
 	__super::Free();
 
 #ifdef _DEBUG
-                                                                                                         	Safe_Release(m_pVIBuffer);
+    Safe_Release(m_pVIBuffer);
 #endif
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);

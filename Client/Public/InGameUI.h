@@ -22,7 +22,7 @@ public:
 		UI_MACHINE_ENERGY,UI_DAMAGED,UI_PLAYER_HP, UI_PLAYER_ENERGY,
 		UI_ENERGY_ICON, UI_HP_ICON, UI_CREDIT_ICON,UI_RUN_ICON, UI_JUMP_ICON, UI_MODECHANGE_ICON, UI_VIEWCHANGE_ICON,
 		UI_PUNCH_ICON, UI_V, UI_F, UI_C, UI_CENTERICON, UI_SLICE, UI_MISSILE_TIMER, UI_NUCLEAR,
-		UI_END};
+		UI_VICTORY, UI_END};
 
 	typedef struct : public CUIObject::UIOBJECT_DESC
 	{
@@ -118,6 +118,12 @@ private:
 
 	// 라운드
 	_uint*						m_iRound = { nullptr };
+
+	// 라운드 종료
+	_bool						m_bRoundEnd = false;
+
+public:
+	void Set_RoundEnd(_bool bEnd) { m_bRoundEnd = bEnd; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };

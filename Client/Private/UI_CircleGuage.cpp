@@ -59,6 +59,10 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 				// 만들 수 있고, 살 수 있을 때
 				if (pMark->Get_BuildAble() == true && pMark->Get_CanBuy() == true)
 				{
+					// 돈 나가는 소리
+					m_pGameInstance->PlaySoundW(L"FE_BuildCredits_Recieved_Cash_02.wav", Engine::CHANNELID::PLAYER_ACT, 0.8f );
+					m_pGameInstance->PlaySoundW(L"FE_Buildable_Barricades_Build_Complete.wav", Engine::CHANNELID::TRAP_BUILD, 0.8f);
+
 					m_pPlayer->UseCoin(pMark->Get_Privce());
 					pMark->Set_Build_Done(true);
 					break;

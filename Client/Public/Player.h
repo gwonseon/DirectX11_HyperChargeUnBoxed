@@ -93,8 +93,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
-
+private:
+	void Heal(_float fTimeDelta);
+	void Walk_Sound(_float fTimDelta);
 public:
 	void Set_Dir(_vector vDir) { m_pTransformCom->Set_State(CTransform::STATE_LOOK, vDir); }
 	_vector Get_Dir() { return m_pTransformCom->Get_State(CTransform::STATE_LOOK); }
@@ -196,12 +197,18 @@ private:
 
 private:
 	_float					m_fMouseSensor = { 0.f };
+	_float					m_fHpTiem{};
 	_vector					m_vecPivotPos{};
 
 	_uint					m_iWeaponState = WEAPON_RIFLE;
 	_uint					m_iPrevWeaponState = WEAPON_RIFLE;;
 	_uint					m_iCellidx = 0;
-	LEVELID m_eLevelID{};
+	_uint					m_iWalkCount{};
+	_bool					m_bRunState = false;
+	_bool					m_bGrassState = false;
+	_uint					m_iRunCount{};
+	_uint					m_iGrassCount{};
+	LEVELID					m_eLevelID{};
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();

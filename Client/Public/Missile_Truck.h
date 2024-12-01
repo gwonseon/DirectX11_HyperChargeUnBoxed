@@ -73,7 +73,7 @@ private:
 	LEVELID m_eLevelID{};
 	_float3 m_fPos{}, m_fScale{};
 	
-
+	_bool m_bSoundOnce = false;
 
 public:
 	static CMissile_Truck* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

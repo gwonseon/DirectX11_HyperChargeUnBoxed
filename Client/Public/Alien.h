@@ -39,7 +39,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_Shadow() override;
 
 private:
 	HRESULT Add_Components();
@@ -57,7 +57,7 @@ private:
 
 private:
 	_bool		m_bAnimState{};
-
+	_bool		m_bOnce = false;
 	_vector vPlayerPos{};
 
 

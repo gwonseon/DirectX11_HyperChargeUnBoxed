@@ -61,16 +61,36 @@ void CMissile_Truck::Priority_Update(_float fTimeDelta)
         m_pShooter->Set_knockdown(true);
         m_pTruckBody->Set_knockdown(true);
         m_pMissile->Set_knockdown(true);
+        if (m_fHp <= 0.f && *m_iRound == MISSILEROUND)
+        {
+            m_pGameInstance->Set_MissileState(true);
+        }
     }
+    else
+        m_pGameInstance->Set_MissileState(false);
 
+    if (m_bKnockdown == true)
+        return;
     if (m_fHp <= 0.f)
     {
+        m_pTracker->Set_Dead();
+        if (m_bSoundOnce == false)
+        {
+            m_pGameInstance->StopSound(SOUND_MISSILETRUCK_BODY);
+            m_pGameInstance->PlaySoundW(L"FE_Base_Destroyed_Junk_03.wav", Engine::CHANNELID::SOUND_MISSILETRUCK_BODY, 0.6f);
+
+            m_bSoundOnce = true;
+        }
         m_bKnockdown = true;
     }
 
-    // 미사일 맞았을 떄
-    if (m_bKnockdown == true)
-        return;
+       
+    if (*m_iRound == MISSILEROUND && m_fHp > 0.f)
+    {
+        m_fSound = m_pGameInstance->Sound_Cal(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+        m_pGameInstance->PlaySoundW(L"FE_MissileTruck_Idle_Loop_Short.wav", Engine::CHANNELID::SOUND_MISSILETRUCK_BODY, m_fSound * 0.5f);
+
+    }
 
     CLayer* pLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
     if (pLayer == nullptr)

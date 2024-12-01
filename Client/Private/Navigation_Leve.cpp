@@ -151,9 +151,9 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 				if (m_iCount < 0)
 				{
 					m_iCount = 0;
-					fPoints[0] =m_vecCollision.back()->Get_PickingPos().x;
-					fPoints[1] =m_vecCollision.back()->Get_PickingPos().y;
-					fPoints[2] =m_vecCollision.back()->Get_PickingPos().z;
+					fPoints[0] =	m_vecCollision.back()->Get_PickingPos().x;
+					fPoints[1] =	m_vecCollision.back()->Get_PickingPos().y;
+					fPoints[2] =	m_vecCollision.back()->Get_PickingPos().z;
 					m_bAfter_AddPoints = false;
 					m_bDelete = false; // 0번 인덱스 삭제한 뒤에는 삭제하면 안됨
 				}

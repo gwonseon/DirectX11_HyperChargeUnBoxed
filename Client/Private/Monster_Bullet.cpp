@@ -45,6 +45,7 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
         vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
         m_pCamera = pDesc->pCamera;
+        m_fAttack = 10.f;
         break;
     }
     case Client::CMonster_Bullet::HELICOPTER_BULLET:
@@ -52,13 +53,13 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
         m_pTransformCom->LookAt(m_vecTargetPos);
         vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-        m_fAttack = 5.f; 
+        m_fAttack = 3.f; 
         break;
     case Client::CMonster_Bullet::RIFLEMAN_BULLET:
         m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
-        vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
+        vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y + 1.f, pDesc->fPosition.z, 1.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-        m_fAttack = 5.f;
+        m_fAttack = 3.f;
         break;
 
         
@@ -68,7 +69,7 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
     default:
         break;
     }
-
+    m_fHp = 10.f;
 
     m_bCanAttacked = true;
     m_bIsBullet = true;
@@ -111,10 +112,30 @@ void CMonster_Bullet::Update(_float fTimeDelta)
 
 void CMonster_Bullet::Late_Update(_float fTimeDelta)
 {
-
     if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
         return;
-    
+
+    if (m_fHp <= 0.f)
+    {
+        m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+        CExplosion::EXPLOSION_DESC pExplosion{};
+        pExplosion.eType = CExplosion::EXPLOSION_TANK;
+        pExplosion.eID = m_eLevel;
+        pExplosion.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+        pExplosion.fScale = _float3{ 3.f, 3.f, 3.f };
+        m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &pExplosion);
+
+        CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
+        Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK;
+        Effect.eLevel = m_eLevel;
+        Effect.fScale = _float3{ 15.f, 15.f, 15.f };
+        Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
+        //Effect.pCamera = m_pCamera;
+        m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
+
+        m_bDead = true;
+    }
+
     // 건물에 데미지 주기
     if (m_pTargetCollider != nullptr)
     {
@@ -159,6 +180,10 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
         bCollision = m_pColliderCom->Intersect(m_pPlayerCollider); // 플레이어와 충돌체크 
         if (bCollision == true && m_bDead == false)
         {
+            CLayer* pPlayerLayer = (m_pGameInstance->Find_Layer(m_eLevel, TEXT("Layer_Player")));
+            CPlayer* pPlayer = static_cast<CPlayer*>(pPlayerLayer->Get_GameObject_List().front());
+            pPlayer->Set_Damaged(m_fAttack);
+
             m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
             CExplosion::EXPLOSION_DESC pExplosion{};
             pExplosion.eID = m_eLevel;

@@ -62,6 +62,13 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencil
 	if (nullptr == pMRTs)
 		return E_FAIL;
 
+	ID3D11ShaderResourceView* pSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = {
+		nullptr
+	};
+
+	m_pContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, pSRV);
+
+
 	ID3D11RenderTargetView* RTVs[8] = { nullptr };
 
 	_uint			iNumRenderTargets = pMRTs->size();

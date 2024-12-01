@@ -125,6 +125,8 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 		// 총알 발사
 		if (*m_bShotStart == true && *m_bReloading == false)
 		{
+			m_pGameInstance->StopSound(PLAYER_FIRE);
+			m_pGameInstance->PlaySoundW(L"FE_Soldier_ShockTrooper_Xenon_Bullet_Impact_01.wav", Engine::CHANNELID::PLAYER_FIRE, 0.7f);
 			--m_iCurrent_Bullet;
 			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // 총구쪽에서 생성
 			_vector vTarget =  XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
@@ -136,10 +138,15 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 			Desc.eType = CBullet::BULLET_RIFLE;
 			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
 
+			if(m_bTPSState == true)
+				pFlare.fScale = { 1.6f,1.6f,1.6f };
+			else
+				pFlare.fScale = { 0.8f,0.8f,0.8f };
+
+			
 			pFlare.eLevel = m_eLevelID;
 			pFlare.eType = CEffect_Flare_Rifle::FLARE_PLAYER;
 			pFlare.vecCamPos = m_vecCameraPos;
-			pFlare.fScale = { 0.6f,0.6f,0.6f };
 			pFlare.vecWeaponPos = &m_vecFlarePos;
 			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Effect"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
 
@@ -205,12 +212,28 @@ void CWeapon::Update(_float fTimeDelta)
 
 void CWeapon::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
-		return;
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
-		return;
+	if (m_eLevelID == LEVEL_GAMEPLAY)
+	{
+		if (*m_iViewState != PLAYER_FPS_VIEW)
+		{
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+				return;
+		}
+		else
+		{
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+				return;
+		}
+	}
+	else
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+			return;
+	}
+
+
+	//if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+	//	return;
 }
 
 HRESULT CWeapon::Render()
@@ -235,7 +258,6 @@ HRESULT CWeapon::Render_Shadow()
 	m_iShaderPassNum = 7;
 
 	_float4x4			ViewMatrix, ProjMatrix;
-
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
 	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(400.f - 6.f, 60.f, 400.f - 6.f, 1.f), XMVectorSet(400.f, fPlayerPos.y, 400.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));

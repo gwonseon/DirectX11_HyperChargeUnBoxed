@@ -39,7 +39,6 @@ HRESULT CTerrain::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-
 #ifdef _DEBUG
 	if (m_eLevel == LEVEL_MONSTERSPAWN)
 	{
@@ -70,8 +69,6 @@ void CTerrain::Update(_float fTimeDelta)
 	//	// 맵 그리드로 바꾸기
 	//	m_pVIBufferCom->Chang_Topology();
 	//}
-
-	m_pVIBufferCom->Update(fTimeDelta);
 }
 
 void CTerrain::Late_Update(_float fTimeDelta)

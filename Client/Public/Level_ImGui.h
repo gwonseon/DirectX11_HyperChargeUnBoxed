@@ -48,7 +48,6 @@ private:
 
 	_float3 m_fPickingPos{};
 
-
 private:
 	_bool Save = false;
 	_bool bAble_Select = true;
@@ -62,8 +61,6 @@ public:
 	HRESULT Ready_Layer_Grass(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
-
-	
 	
 public:
 	void Object_NonAnim_Update(_float fTimeDelta);
@@ -71,7 +68,6 @@ public:
 	void Build_Update(_float fTimeDelta);
 	void Item_Update(_float fTimeDelta);
 	void Grass_Update(_float fTimeDelta);
-
 
 	void Object_NonAnim();
 	void Object_Anim();
@@ -82,6 +78,7 @@ public:
 public:
 	HRESULT Picking_Create();
 	
+public:
 	HRESULT Environment_Add();
 	HRESULT Environment_DataChange(_float fTimeDelta);
 	void	Environment_Save();
@@ -100,14 +97,11 @@ public:
 	void	Item_Load();
 	HRESULT Item_Select();
 
-
 	HRESULT Grass_Add();
 	HRESULT Grass_DataChange(_float fTimeDelta);
 	void	Grass_Save();
 	void	Grass_Load();
 	HRESULT Grass_Select();
-
-
 
 private:
 	vector<CEnvironment*> m_vecEnvironment;
@@ -128,7 +122,7 @@ private:
 	vector<_int> m_vecBuildIndex; // Build Index 저장용
 	vector<CTrap_Marks*> m_vecTrapMark;
 	INSTANCING_DESC m_Instance = {  };
-	LEVELID m_eID = LEVEL_YARD;   // 이거 바꿔서 어떤 레벨을 수정할지 설정
+	LEVELID m_eID = LEVEL_GAMEPLAY;   // 이거 바꿔서 어떤 레벨을 수정할지 설정
 
 
 private:// 인스턴싱

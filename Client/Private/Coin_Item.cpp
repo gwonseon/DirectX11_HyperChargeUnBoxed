@@ -30,14 +30,14 @@ HRESULT CCoin_Item::Initialize(void* pArg)
     m_fScale = pDesc->fScale;
     m_iModelIndex = pDesc->iModelIndex;
     m_eLevel = pDesc->eID;
-
+    
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
     if (FAILED(Add_Components()))
         return E_FAIL;
-
+    m_vecItemPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
     m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecItemPos);
     m_pTransformCom->Rotation(XMConvertToRadians(90.f), 0.f, 0.f);
     // 중점위치 변경 ( 회전 위치를 바꿔줌)
     _float4x4 matSecondPreTransform{};
@@ -66,7 +66,14 @@ HRESULT CCoin_Item::Initialize(void* pArg)
     }
     
 
-
+    CAura::AURA_DESC pAura{ };
+    pAura.eLevel = m_eLevel;
+    pAura.vecPos = m_vecItemPos;
+    pAura.bInteration = &m_bInteraction_Player;
+    pAura.fScale = m_fScale;
+    pAura.eType = CAura::ITEM_AURA;
+    CGameObject* pAuraObj = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Aura"), TEXT("Prototype_GameObject_Aura"), &pAura);
+    m_pAura = static_cast<CAura*>(pAuraObj);
 
     return S_OK;
 }
@@ -81,17 +88,38 @@ void CCoin_Item::Priority_Update(_float fTimeDelta)
 void CCoin_Item::Update(_float fTimeDelta)
 {
     if (m_bDead)
+    {
+        m_pAura->Set_Dead();
         return;
+    }
 
+    if (m_bKnockdown == true)
+    {
+        if (m_bOnce == false)
+        {
+            m_pGameInstance->StopSound(ITEM);
+            m_pGameInstance->PlaySoundW(L"fx_pickuphealth.wav", Engine::CHANNELID::ITEM, m_fSound * 0.4f);
+            m_bOnce = true;
+        }
+        m_pAura->Set_Dead();
+        m_fDeadTime += fTimeDelta;
+        if (m_fDeadTime >= 1.f)
+        {
+            m_pPlayer->Set_PickUp_Coin(m_iCoin);
+            m_bDead = true;
+        }
+    }
     _vector vecPlayerPos = m_pPlayer->Get_Position();
     m_vecItemPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
     // 플레이어와 아이템 거리가 가까워졌을 때
     if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecItemPos) <= 50.f)
     {
+        if (m_fSizeUp <= 2.f)
+            m_fSizeUp += fTimeDelta * 10.f;
         // 사이즈 커지기
-        m_pTransformCom->Set_Scaling(m_fScale.x + 2.f, m_fScale.y + 2.f, m_fScale.z + 2.f);
-        
+        m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp, m_fScale.y + m_fSizeUp, m_fScale.z + m_fSizeUp);
+        m_bInteraction_Player = true;
         if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
         {
             m_bInteraction = true;
@@ -107,8 +135,11 @@ void CCoin_Item::Update(_float fTimeDelta)
     }
     else
     {
+        m_bInteraction_Player = false;
         m_bInteraction = false;
-        m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+        if (m_fSizeUp >= 0.f)
+            m_fSizeUp -= fTimeDelta * 10.f;
+        m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp, m_fScale.y + m_fSizeUp, m_fScale.z + m_fSizeUp);
         m_fCharging_Time = 0.f;
     }
 
@@ -116,21 +147,21 @@ void CCoin_Item::Update(_float fTimeDelta)
     if (m_fCharging_Time >= 1.f)
     {
         m_bInteraction = false; 
-        m_pPlayer->Set_PickUp_Coin(m_iCoin);
-        m_bDead = true;
+        m_bKnockdown = true;
     }
 
 }
 
 void CCoin_Item::Late_Update(_float fTimeDelta)
 {
-    if (m_bDead == false)
+    if (m_bDead)
     {
-        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-            return;
-
+        m_pAura->Set_Dead();
+        return;
     }
 
+    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+        return;
 }
 
 HRESULT CCoin_Item::Render()
@@ -145,8 +176,16 @@ HRESULT CCoin_Item::Render()
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
+        if (m_bKnockdown == false)
+        {
+            if (FAILED(m_pShaderCom->Begin(0)))
+                return E_FAIL;
+        }
+        else
+        {
+            if (FAILED(m_pShaderCom->Begin(3)))
+                return E_FAIL;
+        }
 
         m_pModelCom->Render(i);
     }
@@ -155,7 +194,12 @@ HRESULT CCoin_Item::Render()
 }
 
 HRESULT CCoin_Item::Add_Components()
-{
+{ 
+    /* For.Com_Texture */
+    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Dissolved"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+        return E_FAIL;
+
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
@@ -172,6 +216,13 @@ HRESULT CCoin_Item::Add_Components()
 
 HRESULT CCoin_Item::Bind_ShaderResources()
 {
+    if (m_bKnockdown == true)
+    {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(6))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value", &m_fDeadTime, sizeof(float))))
+            return E_FAIL;
+    }
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_SecondMatrix", m_pModelCom->Get_SecondPreTransform())))
@@ -185,21 +236,7 @@ HRESULT CCoin_Item::Bind_ShaderResources()
     _float fFar = m_pGameInstance->Get_CameraFar();
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
         return E_FAIL;
-    /*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
-
+   
     return S_OK;
 }
 
@@ -229,7 +266,7 @@ CGameObject* CCoin_Item::Clone(void* pArg)
 void CCoin_Item::Free()
 {
     __super::Free();
-
+    Safe_Release(m_pTextureCom);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

@@ -38,7 +38,8 @@ HRESULT CEnergy_Lader::Initialize(void* pArg)
 
 void CEnergy_Lader::Priority_Update(_float fTimeDelta)
 {
-    m_pTransformCom->Turn(0.f, 1.f, 0.f, fTimeDelta);
+    if(m_bWork == true)
+        m_pTransformCom->Turn(0.f, 1.f, 0.f, fTimeDelta);
 }
 
 void CEnergy_Lader::Update(_float fTimeDelta)

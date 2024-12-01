@@ -23,7 +23,7 @@ HRESULT CLight::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 
 		iPassIndex = 1;
 	}
-	else
+	else if(LIGHT_DESC::TYPE_POINT == m_LightDesc.eType)
 	{
 		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
 			return E_FAIL;
@@ -32,8 +32,20 @@ HRESULT CLight::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 
 		iPassIndex = 2;
 	}
-
-
+	else
+	{
+		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
+			return E_FAIL;
+		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(pShader->Bind_RawValue("g_fAngle", &m_LightDesc.fAngle, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof(_float))))
+			return E_FAIL;
+		
+		
+		iPassIndex = 15;
+	}
 
 
 	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))

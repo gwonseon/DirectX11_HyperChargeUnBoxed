@@ -85,10 +85,25 @@ void CHead_Player::Update(_float fTimeDelta)
 
 void CHead_Player::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
-		return;
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
-		return;
+	if (m_eLevelID == LEVEL_GAMEPLAY)
+	{
+		if (m_bTPSState == true)
+		{
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+				return;
+		}
+		else
+		{
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+				return;
+		}
+	}
+	else
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+			return;
+	}
+
 }
 
 HRESULT CHead_Player::Render()

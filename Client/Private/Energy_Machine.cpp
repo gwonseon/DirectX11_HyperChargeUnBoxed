@@ -2,8 +2,6 @@
 #include "..\Public\Energy_Machine.h"
 
 #include "GameInstance.h"
-#include <Energy_Lader.h>
-#include <Rader_Effect.h>
 
 CEnergy_Machine::CEnergy_Machine(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPlayer_Build{ pDevice, pContext }
@@ -37,13 +35,14 @@ HRESULT CEnergy_Machine::Initialize(void* pArg)
 	pEnergyLader.eID = m_eLevel;
 	pEnergyLader.fScale = { 5.f,5.f,5.f };
 	pEnergyLader.fPosition = _float3{ 477.267f, 0.1f,532.115f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Prototype_GameObject_EnergyLader"), &pEnergyLader));
-
+	CGameObject* pRaderCap = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Prototype_GameObject_EnergyLader"), &pEnergyLader));
+	m_pRader = static_cast<CEnergy_Lader*>(pRaderCap);
 	CRader_Effect::RADER_DESC pRader{};
 	pRader.eID = m_eLevel;
 	pRader.fScale = { 6.f, 6.f, 6.f };
 	pRader.fPosition = _float3{ 477.267f, -2.5f,532.115f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Prototype_GameObject_Rader_Effect"), &pRader));
+	CGameObject* pRaderEffect = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Prototype_GameObject_Rader_Effect"), &pRader));
+	m_pRaderEffect = static_cast<CRader_Effect*>(pRaderEffect);
 
 	return S_OK;
 }
@@ -56,7 +55,25 @@ void CEnergy_Machine::Priority_Update(_float fTimeDelta)
 
 
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPos);
+	// 배터리 넣으면 작동 시작
+	if (m_bBattery_Insert == true && m_bOnce == false)
+	{
+		m_bOnce = true;
+		m_pGameInstance->PlaySoundW(L"FE_Turret_Activate.wav", Engine::CHANNELID::POWERNODE_START, m_fSound);
+	}
+	if (m_bBattery_Insert == true)
+	{
+		m_pRaderEffect->Set_Work(true);
+		m_pRader->Set_Work(true);
+		m_pGameInstance->PlaySoundW(L"FE_Powernode_base_Mono.wav", Engine::CHANNELID::POWERNODE, m_fSound * 0.5f);
+
+	}
+	else
+	{
+		m_pRaderEffect->Set_Work(false);
+		m_pRader->Set_Work(false);
+	}
 
 }
 

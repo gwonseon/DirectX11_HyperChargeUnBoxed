@@ -243,7 +243,7 @@ private:
 	_float					m_fTeleportDelay = 2.f;
 	_float					m_fLocketLauncherDelay = 0.6f;
 	_float					m_fCurrentDelay = 0.f;
-
+	_float					m_fCheck = 0.f;
 	_bool					m_bShotStart = false;  // 쏘는 시작을 알려줌 (이때 총알 발사와 반동)
 	_bool					m_bShotNow = false;		// 애니메이션 작동의 시작과 끝을 알려줌 ( 딜레이 계산)
 	_bool					m_bTemp = false;
@@ -254,7 +254,6 @@ public:
 	_bool*					Get_ShotStart() { return &m_bShotStart; }
 private:
 	WEAPONSTATE				m_eWeapon{}; // 스위치문 편하게 만드려고 임시 생성
-
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

@@ -31,7 +31,20 @@ HRESULT CUI_3D::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_pTracker = m_pMissile_Truck->Get_Tracker();
+    switch (m_eUIType)
+    {
+    case Client::CUI_3D::UI_NUCLEAR:
+        m_pTracker = m_pMissile_Truck->Get_Tracker();
+
+        break;
+    case Client::CUI_3D::UI_HP:
+        break;
+    case Client::CUI_3D::UI_OBJ_END:
+        break;
+    default:
+        break;
+    }
+    
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
     m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
  
@@ -48,12 +61,12 @@ void CUI_3D::Priority_Update(_float fTimeDelta)
     {
     case Client::CUI_3D::UI_NUCLEAR:
     {
-        _vector vecTrackerPos = m_pTracker->Get_Pos();// Tracker 위치 받아서
-        m_vecPosition = vecTrackerPos;
-        m_vecPosition = XMVectorSetY(m_vecPosition, XMVectorGetY(m_vecPosition) + 5.f); // Tracker 위쪽에 배치
-        vCamPos =*m_pCamera->Get_Camera_Pos();
-        m_fDistance = m_pTransformCom->Cal_Distance_vec(m_vecPosition, vCamPos);
-        break;
+            _vector vecTrackerPos = m_pTracker->Get_Pos();// Tracker 위치 받아서
+            m_vecPosition = vecTrackerPos;
+            m_vecPosition = XMVectorSetY(m_vecPosition, XMVectorGetY(m_vecPosition) + 5.f); // Tracker 위쪽에 배치
+            vCamPos = *m_pCamera->Get_Camera_Pos();
+            m_fDistance = m_pTransformCom->Cal_Distance_vec(m_vecPosition, vCamPos);
+            break;
     }
     case Client::CUI_3D::UI_HP:
         break;
@@ -86,8 +99,14 @@ void CUI_3D::Update(_float fTimeDelta)
 
 void CUI_3D::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
-        return;
+    if(m_pTracker->Get_TrackerState() != CTracker::TRACKER_IDLE  && m_eUIType == UI_NUCLEAR && m_pTracker->Get_knockdown() == false)
+    {
+        if(**m_pTracker->Get_PickUp() == false)
+        {
+            if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+                return;
+        }
+    }
 }
 
 HRESULT CUI_3D::Render()

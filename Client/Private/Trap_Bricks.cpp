@@ -54,7 +54,6 @@ HRESULT CTrap_Bricks::Initialize(void* pArg)
 
 void CTrap_Bricks::Priority_Update(_float fTimeDelta)
 {
-	
 	// 파괴되었을 때
 	if (m_bKnockdown == true)
 	{
@@ -64,6 +63,9 @@ void CTrap_Bricks::Priority_Update(_float fTimeDelta)
 
 		if (m_bOnce == false && m_iModel_Idx == 1)
 		{
+			m_fSound = m_pGameInstance->Sound_Cal(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			m_pGameInstance->PlaySoundW(L"FE_Buildable_Trap_Destroy.wav", Engine::CHANNELID::TRAP_BROKEN, m_fSound);
+
 			_float3 fPos{};
 			XMStoreFloat3(&fPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			CBroken_Bricks::PLAYER_BUILD_DESC pDesc{};

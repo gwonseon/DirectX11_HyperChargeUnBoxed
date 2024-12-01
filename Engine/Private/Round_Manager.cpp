@@ -33,7 +33,6 @@ void CRound_Manager::Update(_float fTimeDelta, _uint& iCurrentRound ,_bool& bBui
     else if (iCurrentRound == BREAKTIME_ROUND && bBuildMode == false && bRoundStart == false)
     {
         // cout << "스킵 시작 " << endl;
-        
         m_fBreakTimeSkip_Timer -= fTimeDelta; // 쉬는 시간 스킵 시작
         
         if (m_fBreakTimeSkip_Timer <= 0.f) // 쉬는 시간 스킵
@@ -49,16 +48,29 @@ void CRound_Manager::Update(_float fTimeDelta, _uint& iCurrentRound ,_bool& bBui
     }
     else
     {
-        if (Monster_Far == nullptr || Monster_Near == nullptr)
-            return;
+        _int iMonster_Far{};
+        _int iMonster_Near{};
+  
+        if(Monster_Far != nullptr)
+             iMonster_Far = Monster_Far->Get_GameObjectList_Size();
+        if (Monster_Near != nullptr)
+             iMonster_Near = Monster_Near->Get_GameObjectList_Size();
         m_fBreakTimeSkip_Timer = 5.f; // 쉬는 시간 스킵 타이머 초기화
         m_fBreakTime_Timer = 0.f;       // 쉬는 시간 타이머 초기화
-        _int iMonster_Near =   Monster_Near->Get_GameObjectList_Size();
-        _int iMonster_Far = Monster_Far->Get_GameObjectList_Size();
         m_iMonster_Count = iMonster_Near + iMonster_Far;
-        
-        // 몬스터 수가 0이하면 쉬는 시간 
-        if (m_iMonster_Count <= 0)
+
+
+
+        // 미사일 라운드 종료 ( 전체 종료임 )
+        if (iCurrentRound == 3 && m_iLevel == 4 && m_iMonster_Count <= 0 && m_bMissile_Broken == true)
+        {
+            cout << "미사일 라운드 종료, 쉬는 시간 몬스터 다 잡음 : " << m_iMonster_Count << endl;
+            iCurrentRound = 0;     // 0번 라운드가 쉬는 시간
+            bBuildMode = true;   // 빌드 모드
+            bRoundStart = false; // 라운드 끝남
+
+        }
+        else if(m_iMonster_Count <= 0 ) // 일반 라운드에선 몬스터 수가 0일 때 라운드 넘어감
         {
             cout << "쉬는 시간 몬스터 다 잡음 : " << m_iMonster_Count << endl;
             iCurrentRound = 0;     // 0번 라운드가 쉬는 시간

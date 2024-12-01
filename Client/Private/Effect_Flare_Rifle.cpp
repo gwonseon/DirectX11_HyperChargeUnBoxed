@@ -43,6 +43,7 @@ HRESULT CEffect_Flare_Rifle::Initialize(void* pArg)
 	{
 	case Client::CEffect_Flare_Rifle::FLARE_PLAYER:
 		m_fMaxFrame = { 4.f, 4.f };
+
 		m_iTexNum = 0;
 		vPos = *m_vecWeaponPos;
 		break;
@@ -52,11 +53,11 @@ HRESULT CEffect_Flare_Rifle::Initialize(void* pArg)
 		m_vecTargetPos = pDesc->vecTargetPos;
 		vTarget = *m_vecTargetPos;
 		vPos = *m_vecWeaponPos;
-		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 3.2f);
-		vTarget = XMVectorSetY(vTarget, XMVectorGetY(vPos) + 3.2f);
+		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
+		vTarget = XMVectorSetY(vTarget, XMVectorGetY(vPos) + 3.5f);
 		vDir = vTarget - vPos;
 		vDir = XMVector3Normalize(vDir);
-		vPos += vDir * 2.3f;
+		vPos += vDir * 3.3f;
 		break;
 	case Client::CEffect_Flare_Rifle::FLARE_HELICOPTER:
 		break;
@@ -100,6 +101,8 @@ void CEffect_Flare_Rifle::Update(_float fTimeDelta)
 	}
 	else
 	{
+
+	
 		m_fFrame.y += 1;
 		m_fFrame.x = 0;
 	}
@@ -125,6 +128,7 @@ void CEffect_Flare_Rifle::Late_Update(_float fTimeDelta)
 		m_pTransformCom->LookAt(*m_vecCamPos);
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
 			return;
+
 	}
 	else if (m_eType == FLARE_TANK)
 	{
@@ -141,11 +145,11 @@ void CEffect_Flare_Rifle::Late_Update(_float fTimeDelta)
 	{
 		_vector vTarget = *m_vecTargetPos;
 		_vector vPos = *m_vecWeaponPos;
-		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 3.2f);
-		vTarget = XMVectorSetY(vTarget, XMVectorGetY(vPos) + 3.2f);
+		vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
+		vTarget = XMVectorSetY(vTarget, XMVectorGetY(vPos) + 3.5f);
 		_vector vDir = vTarget - vPos;
 		vDir = XMVector3Normalize(vDir);
-		vPos += vDir * 2.3f;
+		vPos += vDir * 3.3f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		m_pTransformCom->LookAt(*m_vecCamPos);
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
@@ -160,8 +164,16 @@ HRESULT CEffect_Flare_Rifle::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(2)))
-		return E_FAIL;
+	if(m_eType == FLARE_PLAYER)
+	{
+		if (FAILED(m_pShaderCom->Begin(6)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(m_pShaderCom->Begin(2)))
+			return E_FAIL;
+	}
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;

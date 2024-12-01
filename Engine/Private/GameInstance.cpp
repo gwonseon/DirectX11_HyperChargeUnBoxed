@@ -11,6 +11,8 @@
 #include "font_Manager.h"
 #include "Target_Manager.h"
 #include "Picking.h"
+#include "Frustum.h"
+#include "SoundMgr.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -87,6 +89,16 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pUI_Manager = CUIManager::Create();
 	if (nullptr == m_pUI_Manager)
 		return E_FAIL;
+
+	m_pFrustum = CFrustum::Create();
+	if (nullptr == m_pFrustum)
+		return E_FAIL;
+
+	m_pSound_Manager = CSoundMgr::Create(*ppDevice, *ppContext);
+	if (nullptr == m_pSound_Manager)
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -102,6 +114,8 @@ void CGameInstance::Update(_float fTimeDelta)
 	m_pObject_Manager->Late_Update(fTimeDelta);
 
 	m_pPipeLine->Update();
+
+	m_pFrustum->Update();
 
 	m_pLevel_Manager->Update(fTimeDelta);
 }
@@ -457,6 +471,11 @@ HRESULT CGameInstance::Render_Lights(CShader* pShader, CVIBuffer_Rect* pVIBuffer
 	return m_pLight_Manager->Render(pShader, pVIBuffer);
 }
 
+void CGameInstance::Free_Light()
+{
+	m_pLight_Manager->Free();
+}
+
 _float3 CGameInstance::Get_MousePos_NDC(HWND hWnd, const unsigned int g_iWinSizeX, const unsigned int g_iWinSizeY)
 {
 	return m_pPicking_Manager->Get_MousePos_NDC(hWnd, g_iWinSizeX, g_iWinSizeY);
@@ -547,6 +566,21 @@ void CGameInstance::Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool&
 	return m_pRound_Manager->Update(fTimeDelta, iCurrentRound, bBuildMode, Monster_Near, Monster_Far, bRoundStart, SkipTimer);
 }
 
+void CGameInstance::Set_CurrentLevel(_uint iLevel)
+{
+	m_pRound_Manager->Set_CurrentLevel(iLevel);
+}
+
+void CGameInstance::Set_MissileState(_bool bBroken)
+{
+	m_pRound_Manager->Set_MissileState(bBroken);
+}
+
+void CGameInstance::Set_Reset()
+{
+	m_pRound_Manager->Set_Reset();
+}
+
 void CGameInstance::CircleGauge_Interaction(CLayer* Item, CLayer* UI)
 {
 	m_pUI_Manager->CircleGauge_Interaction(Item, UI);
@@ -603,6 +637,99 @@ _bool CGameInstance::isComputeHeight(_fvector vTargetPos, _float3* pOut)
 	return m_pPicking->isComputeHeight(vTargetPos, pOut);
 }
 
+#pragma region FRUSTUM
+
+_bool CGameInstance::isIn_Frustum_WorldSpace(_fvector vTargetPos, _float fRange)
+{
+	return m_pFrustum->isIn_WorldSpace(vTargetPos, fRange);
+}
+
+_bool CGameInstance::isIn_Frustum_LocalSpace(_fvector vTargetPos, _float fRange)
+{
+	return m_pFrustum->isIn_LocalSpace(vTargetPos, fRange);
+}
+
+void CGameInstance::Frustum_Transform_To_LocalSpace(_fmatrix WorldMatrixInv)
+{
+	return m_pFrustum->Transform_To_LocalSpace(WorldMatrixInv);
+}
+
+void CGameInstance::PlaySoundW(const wstring pSoundKey, CHANNELID eID, float fVolume)
+{
+	m_pSound_Manager->PlaySoundW(pSoundKey, eID, fVolume);
+}
+
+void CGameInstance::PlayBGM(const wstring pSoundKey, float fVolume)
+{
+	m_pSound_Manager->PlayBGM(pSoundKey, fVolume);
+}
+
+void CGameInstance::StopSound(CHANNELID eID)
+{
+	m_pSound_Manager->StopSound(eID);
+}
+
+void CGameInstance::StopAll()
+{
+	m_pSound_Manager->StopAll();
+
+}
+
+void CGameInstance::SetChannelVolume(CHANNELID eID, float fVolume)
+{
+	m_pSound_Manager->SetChannelVolume(eID, fVolume);
+
+}
+
+void CGameInstance::VolumeFade(bool _bOnOff, float _fMinusVolume, float _fPlusVolume)
+{
+	m_pSound_Manager->VolumeFade(_bOnOff, _fMinusVolume, _fPlusVolume);
+
+}
+
+void CGameInstance::VolumeFade_boss()
+{
+	m_pSound_Manager->VolumeFade_boss();
+}
+
+void CGameInstance::Set_BGMVolume(float fVolume)
+{
+	m_pSound_Manager->Set_BGMVolume(fVolume);
+}
+
+float CGameInstance::Get_BGMVolume()
+{
+	return 	m_pSound_Manager->Get_BGMVolume();
+}
+
+wstring CGameInstance::Get_NowBGM()
+{
+	return m_pSound_Manager->Get_NowBGM();
+}
+
+_float CGameInstance::Sound_Cal(_vector vPos)
+{
+	_float4 fPlayerPos = Get_PlayerPos();
+	_float3 fObjPos = _float3(XMVectorGetX(vPos), XMVectorGetY(vPos), XMVectorGetZ(vPos));
+	
+	_float fDistance = sqrt(
+		(fPlayerPos.x - fObjPos.x) * (fPlayerPos.x - fObjPos.x) +
+		(fPlayerPos.y - fObjPos.y) * (fPlayerPos.y - fObjPos.y) +
+		(fPlayerPos.z - fObjPos.z) * (fPlayerPos.z - fObjPos.z)
+	);
+
+	if (fDistance >= 400.f)
+		return 0.f; 
+	_float fSound = 1.f - (fDistance / 400.f);
+	if (fSound >= 0.9f)
+		fSound = 0.8f;
+	return fSound;
+}
+
+
+
+#pragma endregion
+
 
 void CGameInstance::Release_Engine()
 {
@@ -615,7 +742,7 @@ void CGameInstance::Free()
 {
 	__super::Free();
 
-
+	Safe_Release(	m_pFrustum				);
 	Safe_Release(	m_pInput_Device			);
 	Safe_Release(	m_pTimer_Manager		);
 	Safe_Release(	m_pLevel_Manager		);
@@ -630,7 +757,7 @@ void CGameInstance::Free()
 	Safe_Release(	m_pRound_Manager		);
 	Safe_Release(	m_pUI_Manager			);
 	Safe_Release(	m_pTarget_Manager		);
-		Safe_Release(	m_pPicking				);
+	Safe_Release(	m_pPicking				);
 
 
 

@@ -26,6 +26,13 @@ private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
+#ifdef _DEBUG
+private:
+	_tchar					m_szFPS[MAX_PATH] = TEXT("");
+	_uint					m_iNumRender = { 0 };
+	_float					m_fTimeAcc = { 0.f };
+#endif
+
 private:
 	HRESULT Open_Level(LEVELID eLevelID);
 	HRESULT Ready_Prototype_Component_For_Static();

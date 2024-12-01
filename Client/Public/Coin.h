@@ -1,7 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include <Aura.h>
 BEGIN(Engine)
 class CShader;
 class CModel;
@@ -65,7 +65,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
-
+	CAura* m_pAura = { nullptr };
 private:
 	LEVELID	m_eLevel = {};
 	_uint	m_iModelIndex = 0;

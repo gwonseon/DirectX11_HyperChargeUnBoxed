@@ -42,6 +42,8 @@
 #include "Coin_Item.h"
 #include "Hp_Item.h"
 #include "Collector.h"
+#include "Bulb.h"
+
 
 #include "Bullet.h"
 #include "Monster_Bullet.h"
@@ -72,6 +74,7 @@
 #include "Rader_Effect.h"
 #include "Effect_Electricity.h"
 #include "Missile_Flame.h"
+#include "Aura.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -387,6 +390,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_strLoadingText = TEXT("객체원형 로딩중입니다.");
 
+
 		// 슬래쉬
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Slash")) == nullptr)
 	{
@@ -396,6 +400,17 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 			return E_FAIL;
 	}
 
+	// 전구
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bulb")) == nullptr)
+	{
+		/* 부서짐 */
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bulb"),
+			CBulb::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
+	
 	/* Prototype_GameObject_Sky */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
 	{
@@ -2280,6 +2295,20 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
 		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 50))))
 		return E_FAIL;
+
+	// 전구
+	Model_Component_Result = Model_Component + to_wstring(157 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(157) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 157))))
+		return E_FAIL;
+
+	// 스포트라이트
+	Model_Component_Result = Model_Component + to_wstring(158 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(158) + Ext;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 158))))
+		return E_FAIL;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	const _wstring Model_Bullet_Path = TEXT("../Bin/Resources/Model/ModelData_Bullet");
@@ -2985,10 +3014,23 @@ HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 
 	// 디졸브
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Dissolved"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Dissolve/Dissolve%d.dds"), 4))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Dissolve/Dissolve%d.dds"), 11))))
 		return E_FAIL;
 
-	
+	/* EndingUI */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Victory"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Victory.dds")))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Aura */
+	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Aura")) == nullptr)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Aura"),
+			CAura::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+	}
+
+
 	/* Prototype_GameObject_DeadModel */
 	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_DeadModel")) == nullptr)
 	{

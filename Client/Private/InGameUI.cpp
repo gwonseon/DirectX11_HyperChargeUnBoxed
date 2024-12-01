@@ -188,6 +188,9 @@ void CInGameUI::Update(_float fTimeDelta)
             m_bDraw = true;
         break;
     case Client::CInGameUI::UI_MISSILE_TIMER:
+        if (*m_fTimer <= 0.f)
+            m_bDead = true;
+
         if(*m_iRound == MISSILEROUND)
         {
             m_bDraw = true;
@@ -197,6 +200,19 @@ void CInGameUI::Update(_float fTimeDelta)
             m_bDraw = false;
         }
         break;
+    case Client::CInGameUI::UI_VICTORY:
+    {
+        if (m_bRoundEnd == true)
+        {
+            m_bDraw = true;
+        }
+        else
+        {
+            m_bDraw = false;
+        }
+        break;
+    }
+        
     case Client::CInGameUI::UI_END:
         break;
     default:
@@ -452,7 +468,12 @@ HRESULT CInGameUI::Add_Components(_int iNum)
             TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
             return E_FAIL;
         break;
-        
+    case Client::CInGameUI::UI_VICTORY:
+        if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Victory"),
+            TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+            return E_FAIL;
+        break;
+
         
     case Client::CInGameUI::UI_END:
         break;

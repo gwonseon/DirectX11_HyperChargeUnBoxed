@@ -3,10 +3,13 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "UI_CircleGuage.h"
+#include "Aura.h"
+
 
 BEGIN(Engine)
 class CShader;
 class CModel;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -46,21 +49,24 @@ private:
 private:
 	CShader*							m_pShaderCom = { nullptr };
 	CModel*								m_pModelCom = { nullptr };
+	CTexture*							m_pTextureCom = { nullptr };
 
 	CPlayer*							m_pPlayer = { nullptr };
 	CUI_CircleGuage*					m_pGuage = { nullptr };
-
-
+	CAura*								m_pAura = { nullptr };
 private:
 	LEVELID	m_eLevel = {};
 	_uint	m_iModelIndex	= 0;
-	_float m_fCharging_Time = 0.f;
+	_float m_fCharging_Time{};
+	_float m_fSizeUp{};
 	_float3 m_fScale{};
 	_vector m_vecItemPos{};
+	_bool					m_bOnce = false;
 
 
+	_float m_fDeadTime{};
 
-
+	_bool m_bInteraction_Player{};
 public:
 	static CCoin_Item* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

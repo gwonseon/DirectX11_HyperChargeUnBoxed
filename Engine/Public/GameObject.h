@@ -99,8 +99,18 @@ public:
 	_bool	Get_Interaction()					{ return m_bInteraction; }
 
 	_vector Get_ObjPosition()					{ return m_vecPosition; }
-
-
+	
+	void	Set_Energy_Plus(_float Energy) 
+	{
+		if(m_fEnergy < 80.f)
+		{
+			m_fEnergy += Energy;
+		}
+		else if (m_fEnergy >= 80.f)
+		{
+			m_fEnergy = 100.f;
+		}
+	}
 	// 에너지가 있으면 에너지 깎고, 에너지 없으면 Hp깎음
 	void	Set_Damaged(_float Attack) 
 	{
@@ -152,7 +162,7 @@ protected:
 	_bool							m_bOverlab_SameLayer = false;
 
 
-
+	_float							m_fSound{};
 public:
 	void Set_OverLap_DifferentLayer(_bool bOverlab) { m_bOverlab_DifferentLayer = bOverlab; }
 	void Set_OverLap_SameLayer(_bool bOverlab) { m_bOverlab_SameLayer = bOverlab; }

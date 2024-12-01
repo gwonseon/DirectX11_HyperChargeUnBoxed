@@ -27,6 +27,9 @@ public:
 	HRESULT Bind_RawValue(const _char* pConstantName, const void* pData, _uint iLength);
 	HRESULT Bind_Matrices(const _char* pConstantName, const _float4x4* pMatrix, _uint iNumMatrices);
 
+
+   
+
 private:
 	ID3DX11Effect* m_pEffect = { nullptr }; // 쉐이더를 관리하는 인터페이스
 	vector<ID3D11InputLayout*>		m_InputLayouts; // GPU로 전달되는 정점 데이터의 형식과 구조를 설명하여 쉐이더의 입력과 정점 버퍼 데이터를 연결하는 역할

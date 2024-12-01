@@ -34,7 +34,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_Shadow() override;
 
 private:
 	HRESULT Add_Components();
@@ -58,7 +58,7 @@ private:
 
 	_float		m_iShot_Count = 0; // 3¹ß ½î±â À§ÇØ ¸î ¹ß ½ú´ÂÁö ÀúÀå
 	_float		m_fShot_Time_Delay = 3.f; // ÃÑ¾Ë ½î±â¿ë µô·¹ÀÌ ½Ã°£
-	_float     m_fAcc;
+	_float     m_fAcc{};
 public:
 	static CHelicopter* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

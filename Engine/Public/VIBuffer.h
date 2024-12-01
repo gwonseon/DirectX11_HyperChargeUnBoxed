@@ -42,7 +42,7 @@ protected:
 	DXGI_FORMAT						m_eIndexFormat = {};		// 인덱스 버퍼에서 사용하는 데이터 형식
 	D3D_PRIMITIVE_TOPOLOGY			m_ePrimitiveTopology = {};	// 정점들이 렌더링 할 기본 도형의 종류를 정의
 
-
+	_float3* m_pVertexPositions = { nullptr };
 public:
 	const _float3* Get_VtxPos() const { return m_fVertexPos; }
 	_float3*	Get_VtxPosition() { return m_fVertexPos; }

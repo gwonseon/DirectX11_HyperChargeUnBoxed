@@ -81,6 +81,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
+	Heal(fTimeDelta);
 	// 빌드 모드 ( 건축)
 	if (m_bBuildMode == true && m_bBuild_Able == true)
 	{
@@ -225,6 +226,31 @@ HRESULT CPlayer::Render()
 #endif
 	return S_OK;
 }
+void CPlayer::Heal(_float fTimeDelta)
+{	
+	if(m_fHpTiem >= 1.f)
+	{
+		// 1초마다 피가 꽉찼는데 쉴드에너지가 만땅 아니면 쉴드 에너지 충전
+		m_fHpTiem = 0.f;
+		if (m_fHp == 100.f)
+		{
+			if (m_fEnergy < 100.f)
+			{
+				m_fEnergy += 1.f;
+			}
+		}
+		else
+		{
+			// 피가 부족하면 피 충전
+			m_fHp += 1.f;
+		}
+	}
+	m_fHpTiem += fTimeDelta;
+}
+
+
+
+
 HRESULT CPlayer::Add_Components()
 {
 	// For.Comigation
@@ -360,6 +386,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	{
 		if (m_iWeaponState != WEAPON_KATANA)
 		{
+			m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Foley_Reload.wav", Engine::CHANNELID::PLAYER_RELOAD, 0.7f);
 			m_fReload_Charging = 0.f;
 			m_bReloading = true;
 			if (m_iViewState == PLAYER_FPS_VIEW)
@@ -399,6 +426,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	{
 		if (m_iWeaponState == WEAPON_KATANA)
 		{
+			m_pGameInstance->StopSound(PLAYER_SWORD);
+			m_pGameInstance->PlaySoundW(L"Sword1.wav", Engine::CHANNELID::PLAYER_SWORD,0.6f);
 			m_bAttackState = true;
 		
 		}
@@ -443,6 +472,9 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_RB))
 	{
 		m_bAttackState = true;
+		m_pGameInstance->StopSound(PLAYER_SWORD);
+		m_pGameInstance->PlaySoundW(L"Sword2.wav", Engine::CHANNELID::PLAYER_SWORD, 0.6f);
+
 		if (!(m_iState_Upper & FIRE_RB))
 		{
 			if (m_iState_Upper & STATE_IDLE)
@@ -453,6 +485,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V) && m_iViewState == PLAYER_TPS_VIEW)
 	{
+		m_pGameInstance->PlaySoundW(L"FE_Player_Melee_Punch_Miss_02_extra.wav", Engine::CHANNELID::PLAYER_MELEE, 0.7f);
 		if (!(m_iState_Upper & MELEE))
 		{
 			if (m_iState_Upper & STATE_IDLE)
@@ -469,6 +502,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 			if (iJumpState == LANDING_STATE)
 			{
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Left(fTimeDelta);
 				m_pTransformCom->Go_Backward(fTimeDelta);
 				if (!(m_iState_Lower & WALKSTATE_SOUTHWEST))
@@ -483,6 +517,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		// 뒤 오른쪽 으로 걷기
 		else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
+			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Right(fTimeDelta);
 			m_pTransformCom->Go_Backward(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
@@ -498,6 +533,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		// 그냥 뒤로 걷기
 		else
 		{
+			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Backward(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
 			{
@@ -517,6 +553,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
+				m_bRunState = true;
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Left_Player(fTimeDelta * m_fRun_EightDirection);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
@@ -531,6 +569,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
+				m_bRunState = true;
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Right_Player(fTimeDelta * m_fRun_EightDirection);
 				//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_EightDirection);
@@ -546,6 +586,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else
 			{
+				m_bRunState = true;
+				Walk_Sound(fTimeDelta);
 				//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_FourDirection);
 				if (iJumpState == LANDING_STATE)
@@ -562,6 +604,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
+			m_bRunState = true;
+			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Left_Player(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
 			{
@@ -575,6 +619,8 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
+			m_bRunState = true;
+			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Right_Player(fTimeDelta);
 			if (iJumpState == LANDING_STATE)
 			{
@@ -589,10 +635,12 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 	else
 	{
+		m_bRunState = false; 
 		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_W))
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta);
 				m_pTransformCom->Go_Left_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
@@ -609,6 +657,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta);
 				m_pTransformCom->Go_Right_Player(fTimeDelta * m_fRun_EightDirection);
 				if (iJumpState == LANDING_STATE)
@@ -625,6 +674,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			else
 			{
+				Walk_Sound(fTimeDelta);
 				//		m_pTransformCom->Go_Straight(fTimeDelta);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
@@ -642,6 +692,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		{
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Left_Player(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
 				{
@@ -655,6 +706,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
+				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Right_Player(fTimeDelta);
 				if (iJumpState == LANDING_STATE)
 				{
@@ -690,8 +742,11 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	}
 	else if (iJumpState == JUMPING_LOOP_STATE)  // 점프 루프 시작
 	{
+
 		if (m_bJumpStart == false)
 		{
+			m_pGameInstance->StopSound(PLAYER_JUMP);
+			m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Jump_01.wav", Engine::CHANNELID::PLAYER_JUMP, 0.7f);
 			m_fPower = 50.f;
 			m_bJumpStart = true;
 		}
@@ -736,6 +791,9 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 	{
 		if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE) && m_iJumpCount == 1)
 		{
+			m_pGameInstance->StopSound(PLAYER_JUMP);
+			m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Doublejump_01.wav", Engine::CHANNELID::PLAYER_JUMP, 0.7f);
+
 			m_fPower = 50.f;
 			m_iJumpCount = 2;
 		}
@@ -776,4 +834,208 @@ void CPlayer::Free()
 	__super::Free();
 
 	Safe_Release(m_pNavigationCom);
+}
+
+
+
+void CPlayer::Walk_Sound(_float fTimDelta)
+{
+	if (XMVectorGetY(m_vecPos) <= m_fHeight_Store + 0.1f)
+	{
+		if (m_bRunState == true && m_eLevelID == LEVEL_GAMEPLAY)
+		{
+			m_iRunCount++;
+			if (m_iRunCount > 20)
+			{
+				m_iRunCount = 0;
+				m_pGameInstance->StopSound(PLAYER_WALK);
+			}
+		}
+		else
+			m_iRunCount = 0;
+
+		if (m_bGrassState == true)
+		{
+			m_iGrassCount++;
+			if(m_bRunState == true)
+			{
+				if (m_iGrassCount > 12)
+				{
+					m_iGrassCount = 0;
+					m_pGameInstance->StopSound(PLAYER_WALK);
+				}
+			}
+			else
+			{
+				if (m_iGrassCount > 18)
+				{
+					m_iGrassCount = 0;
+					m_pGameInstance->StopSound(PLAYER_WALK);
+				}
+			}
+		}
+		else
+			m_iGrassCount = 0;
+		
+		m_iWalkCount++;
+		if (m_iWalkCount > 7)
+			m_iWalkCount = 0;
+		if (m_eLevelID == LEVEL_GAMEPLAY)
+		{
+			switch (m_iWalkCount)
+			{
+			case 0:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_01.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 1:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_02.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 2:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_03.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 3:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_04.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 4:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_05.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 5:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_06.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 6:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_07.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			case 7:
+			{
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_08.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+		if (m_eLevelID == LEVEL_YARD)
+		{
+			if(m_fHeight_Store <= 0.2f)
+			{
+				m_bGrassState = true;
+				switch (m_iWalkCount)
+				{
+				case 0:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_01.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 1:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_02.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 2:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_03.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 3:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_04.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 4:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_05.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 5:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_06.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 6:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_07.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 7:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_08.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				default:
+					break;
+				}
+			}
+			else
+			{
+				m_bGrassState = false;
+				switch (m_iWalkCount)
+				{
+				case 0:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_01.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 1:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_02.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 2:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_03.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 3:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_04.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 4:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_05.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 5:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_06.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 6:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_07.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				case 7:
+				{
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_08.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+
+
+
+
+
+
 }

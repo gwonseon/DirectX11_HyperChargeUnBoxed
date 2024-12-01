@@ -12,6 +12,7 @@
 #include "Energy_Cap.h"
 #include "Battery.h"
 #include "InGameUI.h"
+#include "Bulb.h"
 
 BEGIN(Client)
 class CGamePlay_Round;
@@ -30,7 +31,10 @@ public:
 
 public:
 	void	Interaction();
-	void    Texture_Render();
+	void    Text_Render();
+	void	Conversation_Draw(_bool bDraw);
+
+
 private:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
@@ -59,9 +63,13 @@ private:
 	CBattery*					m_pBattery				= { nullptr };
 	CInGameUI*					m_pBatteryUI			= { nullptr };
 	CInGameUI*					m_pBatteryGaugeUI		= { nullptr };
+	CInGameUI*					m_pConversationBox		= { nullptr };
+	CInGameUI*					m_pCharacter			= { nullptr };
 
-	CWeapon_Item* m_pWeaponItem[2];
+	CInGameUI*					m_pEnding = { nullptr };
 
+	CWeapon_Item*				m_pWeaponItem[2];
+	_bool		m_bVictory = false;
 	_float	m_fDelay{};
 	_bool m_bOnce = false;
 	// Ãæµ¹¿ë
@@ -77,7 +85,7 @@ private:
 	CLayer* pItem = { nullptr };
 	CLayer* pExplosion = { nullptr };
 	CLayer* pBuild = { nullptr };
-
+	
 	_bool* m_pReloading			= { nullptr };
 	_uint	m_iCurrentRound		= 0;
 	_uint	m_iPreviousRound	= 0;

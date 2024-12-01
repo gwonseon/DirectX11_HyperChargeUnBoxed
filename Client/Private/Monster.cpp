@@ -48,9 +48,11 @@ void CMonster::Late_Update(_float fTimeDelta)
 {
 	if (m_bDead == false)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-			return;
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+				return;
 	}
+	//if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+	//	return;
 }
 
 HRESULT CMonster::Render()

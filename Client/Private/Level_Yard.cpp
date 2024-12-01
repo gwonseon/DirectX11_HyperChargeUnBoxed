@@ -78,7 +78,7 @@ HRESULT CLevel_Yard::Initialize()
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 		return E_FAIL;
 
-
+	m_pGameInstance->Set_Reset();
 	Load_Map();
 	pTrap = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Trap"));
 
@@ -105,6 +105,11 @@ HRESULT CLevel_Yard::Initialize()
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Coin"));
 	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_CircleUI"));
 	pItem = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Item"));
+	m_pGameInstance->Set_CurrentLevel(LEVEL_YARD);
+
+
+	m_pGameInstance->StopAll();
+	m_pGameInstance->PlayBGM(L"YardBackGround.wav", 0.1f);
 
 
 	
@@ -114,7 +119,7 @@ HRESULT CLevel_Yard::Initialize()
 void CLevel_Yard::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
-	Texture_Update(fTimeDelta);
+	Text_Update(fTimeDelta);
 	Build_Check(); // 트랩 설치관련 
 	Interaction();
 	RoundMgr_And_MonsterSpawn(fTimeDelta);
@@ -180,15 +185,16 @@ void CLevel_Yard::Update(_float fTimeDelta)
 HRESULT CLevel_Yard::Render()
 {
 	__super::Render();
-	Texture_Render();
+	Text_Render();
 	
 #ifdef _DEBUG
 	SetWindowText(g_hWnd, TEXT("Yard레벨입니다."));
 #endif
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
+		m_pGameInstance->Free_Light();
 		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO)));
-
+		
 	}
 	return S_OK;
 }
@@ -245,50 +251,52 @@ void CLevel_Yard::Interaction()
 	}
 }
 
-void CLevel_Yard::Texture_Render()
+void CLevel_Yard::Text_Render()
 {
-	if (*m_pPlayer->Get_BuildMode() == true)
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("건설 모드 건너뛰기"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+	if(m_bVictory == false)
+	{
+		if (*m_pPlayer->Get_BuildMode() == true)
+			m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("건설 모드 건너뛰기"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
+	}
 
 	if (m_iDrawNumber == 99)
 		return;
 
 	if ((m_eTextState & STATE_HALF_HP) == 0 && m_iDrawNumber == STATE_HALF_HP)
 	{
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("서둘러, 하이퍼코어가 거의 파괴되었어."), _float2(g_iWinSizeX * 0.38f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.5);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("서둘러, 하이퍼코어가 거의 파괴되었어."), _float2(g_iWinSizeX * 0.38f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.5f);
 		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("어서 빨리 적을 무찌르게"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.5);
 	}
 	if ((m_eTextState & STATE_HALF_ENERGY) == 0 && m_iDrawNumber == STATE_HALF_ENERGY)
 	{
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("파워 노드가 계속 작동할 수 있게 주의해,"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.5);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("파워 노드가 계속 작동할 수 있게 주의해,"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.5f);
 		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("얼마 안 남았어!."), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.5);
 		
 	}
 	if ((m_eTextState & STATE_WARNING) == 0 && m_iDrawNumber == STATE_WARNING)
 	{
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("웨이브가 곧 끝날거야"), _float2(g_iWinSizeX * 0.38f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("놈들에게 잊지 못할 기억을 선사해 주자고"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("웨이브가 곧 끝날거야"), _float2(g_iWinSizeX * 0.38f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("놈들에게 잊지 못할 기억을 선사해 주자고"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
 	}
 	if ((m_eTextState & STATE_MISSILE_WARNING) == 0 && m_iDrawNumber == STATE_MISSILE_WARNING)
 	{
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("표적 시스템을 재보장하는 것만이"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("놈들을 막는 유일한 방법이야."), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("표적 시스템을 재보장하는 것만이"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("놈들을 막는 유일한 방법이야."), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
 	}
 	if ((m_eTextState & STATE_GOOD) == 0 && m_iDrawNumber == STATE_GOOD)
 	{
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("아주 잘했어!"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("아주 잘했어!"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
 	}
 	if ((m_eTextState & STATE_PROVOKE) == 0 && m_iDrawNumber == STATE_PROVOKE)
 	{
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("겁쟁이들 같으니!"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("놈들이 ??를 보냈어. 조심해!"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("겁쟁이들 같으니!"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.05f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
+		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("놈들이 포니를 보냈어. 조심해!"), _float2(g_iWinSizeX * 0.4f, g_iWinSizeY * 0.08f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6f);
 	}
+	
 }
 
-void CLevel_Yard::Texture_Update(_float fTimeDelta)
+void CLevel_Yard::Text_Update(_float fTimeDelta)
 {
-
-	
 	// HP경고
 	if (m_pBrain->Get_Hp() <= 50.f && (m_eTextState & STATE_HALF_HP) == 0 && m_iCurrentRound != MISSILEROUND)
 	{
@@ -321,15 +329,19 @@ void CLevel_Yard::Texture_Update(_float fTimeDelta)
 	// 미사일 성공
 	else if (m_pMissile_Truck->Get_knockdown() == true && (m_eTextState & STATE_GOOD) == 0)
 	{
-		m_iDrawNumber = STATE_GOOD;
-		Conversation_Draw(true);
-		m_fConversation_Draw_Timer += fTimeDelta;
-		// 3초 지나면 끄기
-		if (m_fConversation_Draw_Timer >= 3.f)
+		m_fTimerMissile += fTimeDelta;
+		if(m_fTimerMissile >= 1.f)
 		{
-			Conversation_Draw(false);
-			m_eTextState |= STATE_GOOD;
-			m_fConversation_Draw_Timer = 0.f;
+			m_iDrawNumber = STATE_GOOD;
+			Conversation_Draw(true);
+			m_fConversation_Draw_Timer += fTimeDelta;
+			// 3초 지나면 끄기
+			if (m_fConversation_Draw_Timer >= 3.f)
+			{
+				Conversation_Draw(false);
+				m_eTextState |= STATE_GOOD;
+				m_fConversation_Draw_Timer = 0.f;
+			}
 		}
 	}
 	// 미사일 경고, 미사일 라운드 시작전 쉬는 시간의 끝나기전?
@@ -387,6 +399,13 @@ void CLevel_Yard::Texture_Update(_float fTimeDelta)
 	//}
 }
 
+void CLevel_Yard::Conversation_Draw(_bool bDraw)
+{
+	if (bDraw == false)
+		m_iDrawNumber = 99;
+	m_pConversationBox->Set_Draw(bDraw);
+	m_pCharacter->Set_Draw(bDraw);
+}
 
 
 HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
@@ -753,7 +772,16 @@ HRESULT CLevel_Yard::Ready_Layer_UI(const _tchar* pLayerTag)
 
 #pragma endregion 대화상자
 
-
+	CInGameUI::INGAMEUI_DESC	Ending{};
+	Ending.eLevel = LEVEL_YARD;
+	Ending.eUITag = CInGameUI::UI_VICTORY;
+	Ending.fSizeX = g_iWinSizeX;
+	Ending.fSizeY = g_iWinSizeY;
+	Ending.fX = g_iWinSizeX * 0.5f;
+	Ending.fY = g_iWinSizeY * 0.5f;
+	Ending.fDepth = 0.f;
+	CGameObject* pEnd = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &Ending);
+	m_pEnding = static_cast<CInGameUI*>(pEnd);
 
 	// 코인 UI( 숫자 )
 	CNumberUI::NUMBERUI_DESC pCoin{};
@@ -821,7 +849,7 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
-	Desc.fFar = 600.f;
+	Desc.fFar = 900.f;
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -912,34 +940,34 @@ HRESULT CLevel_Yard::Ready_Layer_ITem(const _tchar* pLayerTag)
 	pCollectItem.eID = LEVEL_YARD;
 	pCollectItem.fScale = { 8.f,8.f ,8.f };
 	pCollectItem.iModelIndex = 154;
-	pCollectItem.fPosition = { 644.512f, 3.f, 560.156f };
+	pCollectItem.fPosition = { 439.75f, 3.1f, 576.119f };
 	pCollectItem.pPlayer = m_pPlayer;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_Collect_Item"), &pCollectItem));
 
-
+	          
 	// 코인 아이템
 	CCoin_Item::COINITEM_DESC pCoinItem{};
 	pCoinItem.eID = LEVEL_YARD;
 	pCoinItem.pPlayer = m_pPlayer;
 	pCoinItem.fScale = { 6.f, 6.f,6.f };
-	pCoinItem.fPosition = { 571.985, 3.f, 237.756 };
+	pCoinItem.fPosition = { 571.985f, 3.f, 237.756f };
 	pCoinItem.iModelIndex = 47;
 	pCoinItem.pGuage = m_pGuage;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
 	
-	pCoinItem.fPosition = { 554.751, 3.f, 219.951 };
+	pCoinItem.fPosition = { 554.751f, 3.f, 219.951f };
 	pCoinItem.iModelIndex = 47;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
 
-	pCoinItem.fPosition = { 540.489, 3.f, 614.398 };
+	pCoinItem.fPosition = { 540.489f, 3.f, 614.398f };
 	pCoinItem.iModelIndex = 48;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
 
-	pCoinItem.fPosition = { 305.877, 3.f, 608.576 };
+	pCoinItem.fPosition = { 305.877f, 3.f, 608.576f };
 	pCoinItem.iModelIndex = 48;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
 
-	pCoinItem.fPosition = { 293.493, 3.f, 304.906 };
+	pCoinItem.fPosition = { 293.493f, 3.f, 304.906f };
 	pCoinItem.iModelIndex = 49;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
 
@@ -951,8 +979,6 @@ HRESULT CLevel_Yard::Ready_Layer_ITem(const _tchar* pLayerTag)
 	pHpItem.fPosition = { 644.512f, 3.f, 565.156f };
 	pHpItem.pGuage = m_pGuage;
 	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD, pLayerTag, TEXT("Prototype_GameObject_HpItem"), &pHpItem));
-
-
 
 	return S_OK;
 }
@@ -1428,9 +1454,13 @@ void CLevel_Yard::Build_Check()
 	}
 }
 
-
 void CLevel_Yard::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
 {
+	if (m_iPreviousRound == 3 && m_iCurrentRound == 0)
+	{
+		m_bVictory = true;
+		m_pEnding->Set_RoundEnd(true);
+	}
 	m_iPreviousRound = m_iCurrentRound;
 	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
 	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart, m_fSkipTimer);
@@ -1446,17 +1476,22 @@ void CLevel_Yard::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
 			}
 		}
 	}
-	if (m_bRoundStart == true && m_iCurrentRound < 4)
+	if (m_bRoundStart == true && m_iCurrentRound < 4 && m_iCurrentRound != 0)
 	{		// 배열은 0부터 시작이라 1 빼줌 
 		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
 		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
-		if (m_bOnce == false) // 한 번만 찾으면 된다
-		{
-			// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
+		//if (m_bOnce == false) // 한 번만 찾으면 된다
+		//{
+		//	// 몬스터 레이어 찾기 ( Initialize에서는 아직 몬스터 생성이 안되었기 때문에 여기서 찾아야한다.)
+		//	pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Near"));
+		//	pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Far"));
+		//	m_bOnce = true;
+		//}
+		if(pNearMonsterLayer == nullptr)
 			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Near"));
+		if (pFarMonsterLayer == nullptr)
 			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Monster_Attack_Far"));
-			m_bOnce = true;
-		}
+
 		if (pMonsterBullet == nullptr)
 			pMonsterBullet = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("MonsterBullet_Layer"));
 
@@ -1468,15 +1503,7 @@ void CLevel_Yard::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
 		else
 			m_bOnce = false;
 	}
-
-}
-
-void CLevel_Yard::Conversation_Draw(_bool bDraw)
-{
-	if(bDraw == false)
-		m_iDrawNumber = 99;
-	m_pConversationBox->Set_Draw(bDraw);
-	m_pCharacter->Set_Draw(bDraw);
+	
 }
 
 CLevel_Yard* CLevel_Yard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -26,9 +26,9 @@ HRESULT CAlien::Initialize(void* pArg)
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_matPlayerWorld = pDesc->matPlayerWorld;
 	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
-
-	pDesc->fScale = _float3(2.f, 2.f, 2.f);
-	pDesc->fSpeedPerSec = 10.f;
+	
+	pDesc->fScale = _float3(2.5f, 2.5f, 2.5f);
+	pDesc->fSpeedPerSec = 13.f;
 
 	m_iCell_Idx = pDesc->iCell_Idx;
 	m_iModelIndex = ANIM_ALIEN;
@@ -44,7 +44,7 @@ HRESULT CAlien::Initialize(void* pArg)
 	m_fAttack = 10.f;
 	m_fEnergy = 0.f;
 	m_fPrevHp = m_fHp = 60.f;
-	
+	m_bDontDestroy = true;
 	m_bAttackState = true;
 	return S_OK;
 }
@@ -52,9 +52,10 @@ HRESULT CAlien::Initialize(void* pArg)
 void CAlien::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
-	if (m_bDeadState == true)
+	if (m_bKnockdown == true)
 		return;
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
 	m_pModelCom->Set_Animation(0, true);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
 	if (XMVectorGetY(vPlayerPos) <= (XMVectorGetY(m_vecPosition) + 2.f))
@@ -84,8 +85,16 @@ void CAlien::Update(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return;
-	if (m_bDeadState == true)
+	if (m_bKnockdown == true)
 	{
+		if(m_bOnce == false)
+		{
+			m_pGameInstance->StopSound(SOUND_ALIEN_DEAD);
+			m_pGameInstance->PlaySoundW(L"FE_Mothership_LittleSpinner_Pain_05.wav", Engine::CHANNELID::SOUND_ALIEN_DEAD, m_fSound * 0.6f);
+			m_bOnce = true;
+		}
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
 		if (m_fDissolve >= 1.f)
 			m_bDead = true;
 		m_fDissolve += fTimeDelta;
@@ -101,6 +110,9 @@ void CAlien::Update(_float fTimeDelta)
 	// 넉백이 True일 때 넉백 모션하게 하기
 	if (m_bAttacked == true)
 	{
+		m_pGameInstance->StopSound(SOUND_ALIEN_SPEAK);
+		m_pGameInstance->PlaySoundW(L"FE_Mothership_LittleSpinner_Pain_12.wav", Engine::CHANNELID::SOUND_ALIEN_SPEAK, m_fSound * 0.2f);
+
 		m_fKnockBack_Height = XMVectorGetY(m_vecPosition);
 		m_fKnockBack_Power = 8.f;
 		m_bKnockBacking = true;
@@ -112,7 +124,7 @@ void CAlien::Update(_float fTimeDelta)
 void CAlien::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
-	if (m_bDeadState == true)
+	if (m_bKnockdown == true)
 		return;
 	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
 	{
@@ -149,7 +161,7 @@ HRESULT CAlien::Render()
 		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
 			return E_FAIL;
 
-		if (m_bDeadState == true)
+		if (m_bKnockdown == true)
 		{
 			if (FAILED(m_pShaderCom->Begin(6)))
 				return E_FAIL;
@@ -167,6 +179,40 @@ HRESULT CAlien::Render()
 		return S_OK;
 	m_pColliderCom->Render();
 #endif
+
+	return S_OK;
+}
+
+HRESULT CAlien::Render_Shadow()
+{
+	_float4x4			ViewMatrix, ProjMatrix;
+
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(364.283f - 8.f, 50.f, 120.7572f - 8.f, 1.f), XMVectorSet(364.283f, 0.f, 120.7572f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(5)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
 
 	return S_OK;
 }
@@ -211,7 +257,7 @@ HRESULT CAlien::Add_Components()
 
 HRESULT CAlien::Bind_ShaderResources()
 {
-	if (m_bDeadState == true)
+	if (m_bKnockdown == true)
 	{
 		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(0))))
 			return E_FAIL;

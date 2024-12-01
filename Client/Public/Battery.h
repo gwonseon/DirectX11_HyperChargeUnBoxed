@@ -67,6 +67,10 @@ private:
 	_bool	m_bFirst_PickUp = true;
 	_float3 fPrevPos{}, fPos{};
 	_float	m_fCharging_Delay{};
+
+
+	_bool  m_bFallOnce = false;
+	_bool  m_bPickUpOnce = false;
 public:
 	static CBattery* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

@@ -205,6 +205,15 @@
     <Filter Include="01. Utility\98. Manager\06. EffectMgr">
       <UniqueIdentifier>{282cb0c8-b37c-454a-9a8f-cdbf6fa59ad9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\11. Frustum">
+      <UniqueIdentifier>{85671123-1e5e-4cfd-8af7-3b086dcfc835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Terrain\QuadTree">
+      <UniqueIdentifier>{3abf93c1-5629-4453-a5a6-a049db7b44c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\98. Manager\SoundMgr">
+      <UniqueIdentifier>{19d4f20a-9e30-4aaa-b4ea-091a691b5363}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -389,6 +398,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\BlendObject.cpp">
       <Filter>01. Utility\02. GameObjects\BlendObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Frustum.cpp">
+      <Filter>01. Utility\11. Frustum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QuadTree.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Terrain\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SoundMgr.cpp">
+      <Filter>01. Utility\98. Manager\SoundMgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -586,6 +604,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\BlendObject.h">
       <Filter>01. Utility\02. GameObjects\BlendObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Frustum.h">
+      <Filter>01. Utility\11. Frustum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QuadTree.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Terrain\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SoundMgr.h">
+      <Filter>01. Utility\98. Manager\SoundMgr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -60,6 +60,8 @@ private:
 	_uint m_iModelIdx = 0;
 
 
+	_bool m_bStartOnce = false;
+
 public:
 	static CTruckShooter* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
