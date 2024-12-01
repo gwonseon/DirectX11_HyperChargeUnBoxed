@@ -2,15 +2,15 @@
 
 #include <process.h>
 
-#define BUILD_EA	155
+#define BUILD_EA	159
 #define ENVIRONMENT_EA 165
 #define WEAPON_EA		13
 #define MONSTER_EA		6
 #define OBJ_DEAD 1
 #define TRAP_EA 17
-#define EFFECT_EA 9
+#define EFFECT_EA 10
 #define	BULLET_EA 6
-#define MISSILEROUND 1
+#define MISSILEROUND 3
 
 namespace Client
 {
@@ -36,3 +36,4 @@ using namespace Client;
 
 
 #pragma comment(lib, "ImGui.lib")
+

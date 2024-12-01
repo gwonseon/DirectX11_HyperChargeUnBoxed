@@ -90,3 +90,40 @@ BlendState BS_OneByOne
     BlendOp = Add;
 };
 
+ // 스포트 조명
+float Calc_Spot_LightPower(float3 vLightDir, float3 vLightPos, float3 vNormal, float3 vPixelPos, float fAngle)
+{
+    float fNDotL = dot(vLightDir, vNormal);
+    if (fNDotL > 0.f)
+        return 0.f;
+
+    float3 vLightToPixel = vPixelPos - vLightPos;
+    float fSpotPower = dot(normalize(vLightDir), normalize(vLightToPixel));
+
+        // 최소 값
+    float fLimit = cos(radians(fAngle * 0.5));
+
+        // 허용 범위
+    float fGap = 1.f - fLimit;
+
+    float ranges[4] =
+    {
+        fLimit + 0.5 * fGap,
+                    fLimit + 0.3 * fGap,
+                    fLimit + 0.1 * fGap,
+                    fLimit
+    };
+
+    float values[4] = { 0.6f, 0.45f, 0.3f, 0.15f };
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (fSpotPower > ranges[i])
+        {
+            return values[i];
+        }
+
+    }
+
+    return 0.f;
+}

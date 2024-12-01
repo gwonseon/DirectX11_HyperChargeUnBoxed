@@ -38,8 +38,8 @@ HRESULT CPony::Initialize(void* pArg)
 	m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
 	m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
 
-	pDesc->fScale = _float3(2.f, 2.f, 2.f);
-	pDesc->fSpeedPerSec = 8.f;
+	pDesc->fScale = _float3(2.5f, 2.5f, 2.5f);
+	pDesc->fSpeedPerSec = 14.f;
 
 	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
@@ -51,6 +51,7 @@ HRESULT CPony::Initialize(void* pArg)
 	m_fPrevHp = m_fHp = 100.f;
 	m_fEnergy = 0.f;
 	m_fAttack = 10.f;
+	m_bDontDestroy = true;
 
 	m_pModelCom->Set_Animation(0, true);
 	m_bCanAttacked = true;
@@ -62,9 +63,10 @@ void CPony::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
-	if (m_bDeadState == true)
+	if (m_bKnockdown == true)
 		return;
-
+	if (m_fHp <= 0.f)
+		m_bKnockdown = true;
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	XMStoreFloat3(&m_fPos, m_vecPosition);
 	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
@@ -88,8 +90,18 @@ void CPony::Update(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return;
-	if (m_bDeadState == true)
+	if (m_bKnockdown == true)
 	{
+		if (m_bOnce == false)
+		{
+			m_pGameInstance->StopSound(SOUND_PONY_BITE);
+			m_pGameInstance->StopSound(SOUND_PONY_DEAD);
+			m_pGameInstance->StopSound(SOUND_PONY_WALK);
+
+			m_pGameInstance->PlaySoundW(L"RunAway.wav", Engine::CHANNELID::SOUND_PONY_DEAD, m_fSound * 0.6f);
+
+			m_bOnce = true;
+		}
 		if (m_fDissolve >= 1.f)
 			m_bDead = true;
 		m_fDissolve += fTimeDelta ;
@@ -165,6 +177,9 @@ void CPony::Update(_float fTimeDelta)
 						m_fAttackTime = 0.f;
 					}
 				}
+
+				m_pGameInstance->PlaySoundW(L"FE_Ninja_Animal_Puma.wav", Engine::CHANNELID::SOUND_PONY_BITE, m_fSound * 0.1f);
+
 				m_fAttackTime += fTimeDelta;
 				m_ePonyState = ATTACK_STATE;
 				m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * 0.1f, true);
@@ -186,6 +201,8 @@ void CPony::Update(_float fTimeDelta)
 				if (Path.size() > 1)
 					Path.erase(Path.begin());
 			}
+			
+
 			m_ePonyState = TROT_STATE;
 			/*m_pCurrentState->Walk(this);*/
 			m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
@@ -227,6 +244,8 @@ void CPony::Update(_float fTimeDelta)
 		}
 		else
 		{
+			m_pGameInstance->PlaySoundW(L"FE_Ninja_Animal_Puma.wav", Engine::CHANNELID::SOUND_PONY_BITE, m_fSound * 0.1f);
+
 			// 공격 상태
 			m_ePonyState = ATTACK_STATE;
 			/*m_pCurrentState->Attack(this);*/
@@ -240,11 +259,18 @@ void CPony::Update(_float fTimeDelta)
 
 void CPony::Late_Update(_float fTimeDelta)
 {
-
-	__super::Late_Update(fTimeDelta);
-	if (m_bDeadState == true)
+	if(m_bKnockdown == false)
 	{
-	
+		__super::Late_Update(fTimeDelta);
+	}
+
+
+	if (m_bKnockdown == true)
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
+			return;
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+			return;
 		return;
 	}
 	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
@@ -296,7 +322,7 @@ HRESULT CPony::Render()
 
 		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
 			return E_FAIL;
-		if (m_bDeadState == true)
+		if (m_bKnockdown == true)
 		{
 			if (FAILED(m_pShaderCom->Begin(6)))
 				return E_FAIL;
@@ -313,6 +339,41 @@ HRESULT CPony::Render()
 #ifdef _DEBUG
 	m_pColliderCom->Render();
 #endif
+
+	return S_OK;
+}
+
+HRESULT CPony::Render_Shadow()
+{
+	_float4x4			ViewMatrix, ProjMatrix;
+
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	fFar = 5000.f;
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(364.283f - 5.f, 30.f, 300.f - 5.f, 1.f), XMVectorSet(364.283f, 0.f, 300.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(5)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
 
 	return S_OK;
 }
@@ -375,7 +436,7 @@ HRESULT CPony::Add_Components()
 
 HRESULT CPony::Bind_ShaderResources()
 {
-	if(m_bDeadState == true)
+	if(m_bKnockdown == true)
 	{
 		if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(0))))
 			return E_FAIL;

@@ -35,8 +35,11 @@ HRESULT CRader_Effect::Initialize(void* pArg)
 
 void CRader_Effect::Priority_Update(_float fTimeDelta)
 {
-    m_pTransformCom->Turn(0.f, 1.f, 0.f, fTimeDelta);
-    m_fUV += fTimeDelta * 2.f;
+    if(m_bWork == true)
+    {
+        m_pTransformCom->Turn(0.f, 1.f, 0.f, fTimeDelta);
+        m_fUV += fTimeDelta * 2.f;
+    }
 }
 
 void CRader_Effect::Update(_float fTimeDelta)
@@ -45,8 +48,13 @@ void CRader_Effect::Update(_float fTimeDelta)
 
 void CRader_Effect::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
-        return;
+   if (m_bWork == true)
+   {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
+               return;
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+            return;
+    }
 }
 
 HRESULT CRader_Effect::Render()

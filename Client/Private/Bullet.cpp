@@ -36,6 +36,7 @@ HRESULT CBullet::Initialize(void* pArg)
     {
     case Client::CBullet::BULLET_RIFLE:
         iRand = 2;
+        m_fSpeed = 250.f;
         m_fSize = 0.1f;
         m_pTransformCom->Set_Scaling(m_fSize, m_fSize, m_fSize);
         break;
@@ -65,7 +66,7 @@ void CBullet::Update(_float fTimeDelta)
     if (m_eType == BULLET_RIFLE)
     {
         m_pTransformCom->Set_Scaling(m_fSize, m_fSize, m_fSize);
-        if (m_fSpeed >= 150.5f)
+        if (m_fSpeed >= 300.5f)
             m_fSize += fTimeDelta ;
         
     }
@@ -73,7 +74,7 @@ void CBullet::Update(_float fTimeDelta)
 
 void CBullet::Late_Update(_float fTimeDelta)
 {
-    m_fSpeed = 150.f;
+    
     m_fBullet_Move += (fTimeDelta * m_fSpeed); // 총알 날아가기
     if (m_bChange_Root == false)
     {
@@ -116,7 +117,7 @@ void CBullet::Late_Update(_float fTimeDelta)
             return;
     }
 
-    m_fSpeed += fTimeDelta;
+    m_fSpeed += fTimeDelta * 20.f;
 }
 
 HRESULT CBullet::Render()

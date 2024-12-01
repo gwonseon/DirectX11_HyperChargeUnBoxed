@@ -147,16 +147,40 @@ PS_OUT PS_MAIN3(PS_IN In)
     float2 UV = fStart + fSize * In.vTexcoord;
 
     vMtrl = g_Texture.Sample(LinearSampler, UV);
-
+    if (vMtrl.b <= 0.3f)
+        discard;
     if (vMtrl.a == 0.f) 
         discard;
     if (vMtrl.r == 0.f)
         discard;
+    vMtrl.a = 100.f;
     Out.vColor = vMtrl;
 
     return Out;
 }
 
+
+PS_OUT PS_PLAYER_FLAME(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrl = g_Texture.Sample(LinearSampler, In.vTexcoord);
+
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // 각 프레임의 UV 크기
+    float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
+    float2 UV = fStart + fSize * In.vTexcoord;
+
+    vMtrl = g_Texture.Sample(LinearSampler, UV);
+
+    if (vMtrl.a == 0.f) 
+        discard;
+    if (vMtrl.r == 0.f)
+        discard;
+    vMtrl.a = 100.f;
+    Out.vColor = vMtrl;
+
+    return Out;
+}
 
 PS_OUT PS_MAIN_SOFT4(PS_IN In)
 {
@@ -192,8 +216,8 @@ PS_OUT PS_LIGHTNING(PS_IN In)
     if (vMtrlDiffuse.r == 0.f) 
         discard;
 
-    Out.vColor.rgb = vMtrlDiffuse.rgb * float3(0.f, 0.8f, 1.f);
-    Out.vColor.a = vMtrlDiffuse.r;
+    Out.vColor.rgb = vMtrlDiffuse.rgb * float3(0.f, 0.8f, 1.f) * 3.f;
+    Out.vColor.a = vMtrlDiffuse.r * 5.f;
 
     return Out;
 
@@ -275,6 +299,17 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MISSILE_FLAME();
     }
+    pass PLAYER_FLAME_PASS // 6
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_PLAYER_FLAME();
+    }
 
     
+
 }

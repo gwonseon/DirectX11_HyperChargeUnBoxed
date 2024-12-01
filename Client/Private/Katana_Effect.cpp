@@ -49,7 +49,7 @@ void CKatana_Effect::Late_Update(_float fTimeDelta)
 {
     if (*m_pParentState & 0x00010000 || *m_pParentState & 0x00020000)
     {
-        m_fBlend_Value -= fTimeDelta * 3.f;
+        m_fBlend_Value -= fTimeDelta * 1.5f;
         if (*m_bKatanaState == true)
         {
             if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))

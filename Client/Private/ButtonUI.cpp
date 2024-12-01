@@ -94,11 +94,11 @@ HRESULT CButtonUI::Render()
         return E_FAIL;
 
     if (m_eTag == BUTTON_PLAY)
-        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("플레이"), _float2(m_vObjectPos.x - 40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
+        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("튜토리얼"), _float2(m_vObjectPos.x - 40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
     if (m_eTag == BUTTON_CREATE)
-        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("Tool"), _float2(m_vObjectPos.x -40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
+        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("게임시작"), _float2(m_vObjectPos.x -40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
     if (m_eTag == BUTTON_MINI)
-        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("환경설정"), _float2(m_vObjectPos.x - 40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
+        m_pGameInstance->Render_Text(TEXT("DunFont"), TEXT("파이팅^^"), _float2(m_vObjectPos.x - 40.f, m_vObjectPos.y - 15.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.7);
 
     
     return S_OK;

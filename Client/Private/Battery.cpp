@@ -48,6 +48,8 @@ void CBattery::Priority_Update(_float fTimeDelta)
 	// 배터리가 머신 안에 있을 때 위치 값 지정해주기
 	if (m_pEnergy_Machine->Get_Battery_Is_In() == true)
 	{
+		m_bPickUpOnce = false;
+		m_bFallOnce = false;
 		m_pInGameUI_Gauge->Set_BatteryGauge(m_fEnergy);
 		m_pInGameUI->Set_BatteryGauge(m_fEnergy);
 		if (m_fEnergy > 0.f)
@@ -88,6 +90,7 @@ void CBattery::Priority_Update(_float fTimeDelta)
 		// 배터리 내려 놓았을 때 바닥에 떨어지도록
 		if (m_bFirst_PickUp == false && (fPos.x != 0.f && fPos.z != 0.f))
 		{
+			m_bPickUpOnce = false;
 			m_pTransformCom->Rotation(0.f, 0.f, XMConvertToRadians(90.f));
 			_vector vCurrentPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			if (XMVectorGetY(vCurrentPos) > 0.5f)
@@ -97,6 +100,14 @@ void CBattery::Priority_Update(_float fTimeDelta)
 			}
 			else
 			{
+				if (m_bFallOnce == false)
+				{
+					m_pGameInstance->StopSound(BATTERY);
+					m_pGameInstance->PlaySoundW(L"FE_Battery_Drop_01.wav", Engine::CHANNELID::BATTERY, m_fSound);
+
+					m_bFallOnce = true;
+
+				}
 				vCurrentPos = XMVectorSetY(vCurrentPos, 0.5f);
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurrentPos);
 			}
@@ -122,6 +133,13 @@ void CBattery::Priority_Update(_float fTimeDelta)
 			// 아이템 상호작용이 끝났을 때 안보이게 만들기, 나중에 위치 업데이트되면 그자리로 보낸 후 업데이트 할 것
 			if (m_pGauge->Get_ItemInteraction_End() == true)
 			{
+				if (m_bPickUpOnce == false)
+				{
+					m_pGameInstance->StopSound(BATTERY);
+					m_pGameInstance->PlaySoundW(L"FE_Battery_Pickup.wav", Engine::CHANNELID::BATTERY, m_fSound);
+					m_bPickUpOnce = true;
+				}
+				m_bFallOnce = false;
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 				*m_bVisible = false;
 				m_bFirst_PickUp = false;

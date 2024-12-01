@@ -202,7 +202,7 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 100.f, 500.f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Final_After_Bloom"), 300.f, 100.f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 300.f, 100.f, 200.f, 200.f)))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Height"), 300.f, 300.f, 200.f, 200.f)))
 		return E_FAIL;
@@ -532,17 +532,15 @@ HRESULT CRenderer::Render_Final()
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 	_float4x4			ViewMatrix, ProjMatrix;
-
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(400.f - 6.f, 60.f, 400.f - 6.f, 1.f), XMVectorSet(400.f, fPlayerPos.y, 400.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 5.f, fPlayerPos.y + 10.f, fPlayerPos.y - 5.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.y, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
 
 	if (FAILED(m_pShader->Bind_Matrix("g_LightViewMatrix", &ViewMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_Matrix("g_LightProjMatrix", &ProjMatrix)))
 		return E_FAIL;
-
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fCamFar", &fFar, sizeof(_float))))
 		return E_FAIL;
@@ -998,7 +996,7 @@ HRESULT CRenderer::Render_Debug()
 	m_pGameInstance->Render_RT_Debug(TEXT("MRT_GameObjects"), m_pShader, m_pVIBuffer);
 	m_pGameInstance->Render_RT_Debug(TEXT("MRT_LightAcc"), m_pShader, m_pVIBuffer);
 	m_pGameInstance->Render_RT_Debug(TEXT("MRT_Height"), m_pShader, m_pVIBuffer);
-	m_pGameInstance->Render_RT_Debug(TEXT("Target_Depth"), m_pShader, m_pVIBuffer);
+	m_pGameInstance->Render_RT_Debug(TEXT("MRT_Shadow"), m_pShader, m_pVIBuffer);
 	m_pGameInstance->Render_RT_Debug(TEXT("MRT_Final_After_Bloom"), m_pShader, m_pVIBuffer);
 	// m_pGameInstance->Render_RT_Debug(TEXT("MRT_Final"), m_pShader, m_pVIBuffer);
 	// m_pGameInstance->Render_RT_Debug(TEXT("MRT_BrightExtract"), m_pShader, m_pVIBuffer);

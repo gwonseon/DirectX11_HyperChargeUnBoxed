@@ -140,10 +140,29 @@ void CBody_Player::Late_Update(_float fTimeDelta)
 {
 	if(m_bDead == false)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
-			return;
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
-			return;
+	
+		if(m_eLevelID == LEVEL_GAMEPLAY)
+		{
+			if (m_bTPSState == true)
+			{
+				if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+					return;
+			}
+			else
+			{
+				if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+					return;
+			}
+		}
+		else
+		{
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+				return;
+		}
+
+
+		//if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+		//	return;
 	}
 }
 
@@ -184,7 +203,7 @@ HRESULT CBody_Player::Render_Shadow()
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(400.f - 6.f, 60.f, 400.f - 6.f, 1.f), XMVectorSet(400.f, fPlayerPos.y, 400.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 5.f, fPlayerPos.y + 10.f, fPlayerPos.y - 5.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.y, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -782,8 +801,9 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 		m_bAnimInit = false;
 		m_iJumpState = 0;
 	}
-	if (m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= m_fMinHeight + 2.5f)
+	if ((m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= m_fMinHeight + 2.5f) || m_fCheck >= 1.f)
 	{
+		m_fCheck = 0.f;
 		m_bAnimInit = false;
 		m_iJumpState = 2;
 	}
@@ -793,6 +813,12 @@ void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 		m_iJumpState = 3;
 	}
 	
+	if (m_bAnimState == false && m_iJumpState == 1 && m_fHeight <= m_fMinHeight + 5.5f)
+	{
+		m_fCheck += fTimeDelta;
+	}
+
+
 	if (*m_pParentState_Lower & CPlayer::JUMP_LOOP)
 		m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Jump_Loop, true);
 

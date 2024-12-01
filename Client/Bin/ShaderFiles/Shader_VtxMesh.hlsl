@@ -176,7 +176,7 @@ PS_OUT PS_Rader(PS_IN In)
     float gradientAlpha = saturate(In.vTexcoord.y); 
     vMtrlDiffuse.a = gradientAlpha * 0.7f; 
 
-// 알파 값이 너무 작으면 픽셀 폐기
+    // 알파 값이 너무 작으면 픽셀 폐기
     if (vMtrlDiffuse.a <= 0.1f)
         discard;
 
@@ -195,7 +195,7 @@ PS_OUT PS_EFFECT(PS_IN In)
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     Out.vDiffuse.a = g_fAlpha;
-    Out.vDiffuse.rgb = vMtrlDiffuse.rgb * float3(0.f,0.5f, g_fAlpha + 0.2f);
+    Out.vDiffuse.rgb = vMtrlDiffuse.rgb * float3(0.f,0.5f, g_fAlpha + 0.2f) * 3.f;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
     Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
@@ -225,8 +225,6 @@ PS_OUT PS_MISSILE_FLAME_EFFECT(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-
-
     Out.vDiffuse.a = 0.7f;
     Out.vDiffuse.rgb = vMtrlDiffuse.rgb;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
@@ -240,13 +238,9 @@ PS_OUT PS_DEADMODEL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    
-    vector vDissole = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
-    
-    
-    if (vDissole.r < g_fDissolve_Value)
+    vector vDissolve = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vDissolve.r < g_fDissolve_Value)
         discard;
-    
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     
     Out.vDiffuse.a = 0.7f;
@@ -257,6 +251,27 @@ PS_OUT PS_DEADMODEL(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_AURA(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vDissolve = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vDissolve.r < g_fDissolve_Value)
+    {
+        Out.vDiffuse.rgb = float3(1.f, 0.7f, 0.f) * 0.3f;
+       
+    }
+    else
+    {
+        Out.vDiffuse.rgb = float3(1.f, 0.7f, 0.f) * 1.2f;
+      
+    }
+    Out.vDiffuse.a = 0.1f;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+    return Out;
+}
 
 struct PS_OUT_HEIGHT
 {
@@ -281,6 +296,35 @@ PS_OUT_LIGHTDEPTH PS_MAIN_LIGHTDEPTH(PS_IN In)
 	
     Out.vLightDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
 
+    return Out;
+}
+
+PS_OUT PS_BULB(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vDiffuse = vMtrlDiffuse * float4(213.f / 255.f, 240.f / 255.f, 255.f / 255.f, 1.f) * 300.f;
+    Out.vDiffuse.a = 1.f;
+    
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
+    return Out;
+}
+
+PS_OUT PS_BULB_SPOTLIGHT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    Out.vDiffuse = vMtrlDiffuse * float4(1.f, 1.f, 1.f, 1.f) * 6.f;
+    Out.vDiffuse.a =  3.f;
+    
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
+    Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
     return Out;
 }
 
@@ -445,5 +489,37 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DEADMODEL();
     }
 
-    
+    pass PASS_BULB // 15
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BULB();
+    }
+    pass PASS_BULB_SPOT // 16
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BULB_SPOTLIGHT();
+    }
+
+    pass AURA_PASS // 17
+    {
+        SetRasterizerState(RS_CULLNONE);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_AURA();
+    }
+
+
 }

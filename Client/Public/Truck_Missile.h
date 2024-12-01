@@ -71,7 +71,7 @@ private:
 	_bool* m_bShotStart = { nullptr };
 	CTracker* m_pTracker = { nullptr };
 	CPlayer* m_pPlayer = { nullptr };
-
+	_bool m_bFire = false;
 	_vector PrevPos{};
 	_vector MidPos{};
 	_vector StartPos{};

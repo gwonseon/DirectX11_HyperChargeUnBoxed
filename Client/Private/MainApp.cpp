@@ -55,6 +55,11 @@ HRESULT CMainApp::Initialize()
 void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update(fTimeDelta);
+
+#ifdef _DEBUG
+	m_fTimeAcc += fTimeDelta;
+#endif
+
 }
 
 void CMainApp::Render()
@@ -69,6 +74,19 @@ void CMainApp::Render()
 	m_pGameInstance->Draw();
 	
 
+#ifdef _DEBUG
+	++m_iNumRender;
+
+	if (m_fTimeAcc >= 1.f)
+	{
+		wsprintf(m_szFPS, TEXT("FPS : %d"), m_iNumRender);
+		m_fTimeAcc = 0.f;
+		m_iNumRender = 0;
+	}
+
+	m_pGameInstance->Render_Text(TEXT("DunFont"), m_szFPS, _float2(0.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 1);
+
+#endif
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -88,11 +106,18 @@ HRESULT CMainApp::Open_Level(LEVELID eLevelID)
 
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
+
+
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,	TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Box"),
 		CVIBuffer_Box::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	// 터레인
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
 		return E_FAIL;
 
 
@@ -114,10 +139,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_GameName"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/T_U_MenuBannerSide.dds")))))
 		return E_FAIL;
-	// 터레인
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
-		return E_FAIL;
+
 
 
 

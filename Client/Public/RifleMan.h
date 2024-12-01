@@ -10,6 +10,7 @@ BEGIN(Engine)
 class CShader;
 class CModel;
 class CCollider;
+class CTexture;
 class CNavigation;
 END
 
@@ -52,7 +53,7 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT Render_Shadow() override;
 
 public: // 상태패턴
 	void ChangeState(CRifleMan_State* pNewState)
@@ -89,7 +90,7 @@ private:
 	_bool m_bShot = false;
 	_bool m_bMove_Anim = false;
 	_bool	m_bFind_Path = false;
-
+	_bool m_bSoundOnce = false;
 	_bool  m_bOnce = false;
 	_bool  m_bDissolveStart = false;
 	_float2 m_fDeadPower{};
@@ -112,6 +113,7 @@ private:
 	CCollider* m_pTargetCollider = { nullptr };
 	CPlayer_Build* m_pBuild = { nullptr };
 	CCamera_Free* m_pCamera = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
 
 public:
 	static CRifleMan* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

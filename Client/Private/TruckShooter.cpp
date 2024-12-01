@@ -51,6 +51,8 @@ HRESULT CTruckShooter::Initialize(void* pArg)
 void CTruckShooter::Priority_Update(_float fTimeDelta)
 {
     m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+    m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
+
     if (m_bKnockdown == true)
         return;
     if (m_bReady_Shot == false)
@@ -61,6 +63,13 @@ void CTruckShooter::Priority_Update(_float fTimeDelta)
 
     if (m_bStart_Shoot == true)
     {
+        if (m_bStartOnce == false)
+        {
+            m_pGameInstance->StopSound(SOUND_MISSILETRUCK_BODY);
+            m_pGameInstance->PlaySoundW(L"MissiletTruckUp.wav", Engine::CHANNELID::SOUND_MISSILETRUCK_BODY, 0.4f);
+            m_pGameInstance->PlaySoundW(L"FE_MissileTruck_WarningSiren.wav", Engine::CHANNELID::SOUND_MISSILE_WARNING, 0.2f);
+            m_bStartOnce = true;
+        }
         if (fRotX >= 0.f)
         {
             m_vecPosition = XMVectorSetY(m_vecPosition, XMVectorGetY(m_vecPosition) - 0.01f);

@@ -46,7 +46,7 @@ HRESULT CDead_Model::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, Up);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, Right);
 	
-	m_fPower = 30.f;
+	m_fPower = 50.f;
 	return S_OK;
 }
 
@@ -59,7 +59,7 @@ void CDead_Model::Priority_Update(_float fTimeDelta)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 		break;
 	case Client::CDead_Model::DEAD_TANK_TURRET:
-		m_fPower -= fTimeDelta * 20.f;
+		m_fPower -= fTimeDelta * 50.f;
 		m_vecPosition += XMVectorSet(0.f, 1.f, 0.f, 0.f) * fTimeDelta * m_fPower;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 
@@ -77,16 +77,14 @@ void CDead_Model::Update(_float fTimeDelta)
 {
 	if (m_eModelType == DEAD_TANK_BODY)
 	{
-		m_fDissolve += fTimeDelta;
+		m_fDissolve += fTimeDelta ;
 	}
 	if (m_fDissolve > 1.f)
 		m_bDead = true;
-
+	if (m_fLifeTime >= 1.f)
+		m_bDeadState = true;
 	if (m_bDeadState == true)
 		m_fDissolve += fTimeDelta;
-
-	if (m_fLifeTime >= 2.f)
-		m_bDeadState = true;
 
 	m_fLifeTime += fTimeDelta;
 

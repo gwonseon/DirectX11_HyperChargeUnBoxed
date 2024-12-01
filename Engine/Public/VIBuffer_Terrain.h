@@ -2,6 +2,7 @@
 
 #include "VIBuffer.h"
 
+#include "QuadTree.h"
 BEGIN(Engine)
 
 class ENGINE_DLL CVIBuffer_Terrain final : public CVIBuffer
@@ -17,11 +18,16 @@ public:
 
 public:
 
-	_bool	Terrain_Picking(_float3 fRayDir, _float3 CameraPos, _float3& ResultPos);
-private:
 
+private:
 	_vector					m_fResultPos = {};
 	_uint m_iSizePixel = {};
+
+
+private:
+	class CQuadTree* m_pQuadTree = { nullptr };
+
+
 public:
 	static CVIBuffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pHeightMapFilePath);
 	virtual CComponent* Clone(void* pArg) override;

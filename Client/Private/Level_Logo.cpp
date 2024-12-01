@@ -30,8 +30,8 @@ HRESULT CLevel_Logo::Initialize()
 
 	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))
 		return E_FAIL;
-
-
+	m_pGameInstance->StopAll();
+	m_pGameInstance->PlayBGM(L"LogoBackGround.wav", 0.1f);
 	return S_OK;
 }
 
@@ -39,7 +39,7 @@ void CLevel_Logo::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 	ShowCursor(TRUE);
-	if (GetKeyState(VK_NUMPAD1) & 0x8000)
+	/*if (GetKeyState(VK_NUMPAD1) & 0x8000)
 	{
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_YARD))))
 			return;
@@ -63,7 +63,7 @@ void CLevel_Logo::Update(_float fTimeDelta)
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_MONSTERSPAWN))))
 			return;
 		return;
-	}
+	}*/
 	if(m_pButton_GamePlay != nullptr)
 	{
 		if (true == dynamic_cast<CButtonUI*> (m_pButton_GamePlay)->Get_bClick())
@@ -73,11 +73,11 @@ void CLevel_Logo::Update(_float fTimeDelta)
 			return;
 		}
 	}
-	if (m_pButton_ImGui != nullptr)
+	if (m_pButton_ImGui != nullptr) // Yard ·¹º§·Î ¹Ù²Þ
 	{
 		if (true == dynamic_cast<CButtonUI*> (m_pButton_ImGui)->Get_bClick())
 		{
-			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_IMGUI))))
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_YARD))))
 				return;
 			return;
 		}

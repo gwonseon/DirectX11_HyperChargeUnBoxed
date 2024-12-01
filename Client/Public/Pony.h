@@ -48,7 +48,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_Shadow() override;
 
 public: // 상태패턴
 	void ChangeState(CPony_State* pNewState)
@@ -94,7 +94,7 @@ private:
 	_bool	m_bWalkState = true;
 	_bool		m_bAnimState{};
 	_bool	m_bFind_Path = false;
-
+	_bool  m_bOnce = false;
 	PONY_STATE m_ePonyState = TROT_STATE;
 public:
 	static CPony* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

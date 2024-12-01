@@ -114,7 +114,7 @@ public: // Light 매니저
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
 	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
-
+	void Free_Light();
 
 public:  // 피킹 매니저
 	_float3 Get_MousePos_NDC(HWND hWnd, const unsigned int g_iWinSizeX, const unsigned int	g_iWinSizeY);
@@ -140,7 +140,9 @@ public: /* For.Font_Manager */
 
 public: // Round Manager
 	void Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer);
-
+	void Set_CurrentLevel(_uint iLevel);
+	void Set_MissileState(_bool bBroken);
+	void Set_Reset();
 public: // UI_Manager
 	void CircleGauge_Interaction(CLayer* Item, CLayer* UI);
 
@@ -162,7 +164,28 @@ public: /* For.Picking */
 		_bool isPicked(_float3* pOut);
 		_bool isComputeHeight(_fvector vTargetPos, _float3* pOut);
 
+#pragma region FRUSTUM
+public: /* For.Frustum */
+	_bool isIn_Frustum_WorldSpace(_fvector vTargetPos, _float fRange = 0.f);
+	_bool isIn_Frustum_LocalSpace(_fvector vTargetPos, _float fRange = 0.f);
+	void Frustum_Transform_To_LocalSpace(_fmatrix WorldMatrixInv);
+#pragma endregion
 
+
+public:	// 사운드 매니저
+	void PlaySoundW(const wstring pSoundKey, CHANNELID eID, float fVolume = 0);
+	void PlayBGM(const wstring pSoundKey, float fVolume = 0);
+	void StopSound(CHANNELID eID);
+	void StopAll();
+
+	void SetChannelVolume(CHANNELID eID, float fVolume);
+	void VolumeFade(bool _bOnOff, float _fMinusVolume = 0.03f, float _fPlusVolume = 0.05f);
+	void VolumeFade_boss();
+	void  Set_BGMVolume(float fVolume);
+	float Get_BGMVolume();
+
+	wstring Get_NowBGM();
+	_float Sound_Cal(_vector vPos);
 private:
 	class CGraphic_Device*		m_pGraphic_Device			= { nullptr };
 	class CInput_Device*		m_pInput_Device				= { nullptr };
@@ -180,7 +203,8 @@ private:
 	class CUIManager*			m_pUI_Manager				= { nullptr };
 	class CTarget_Manager*		m_pTarget_Manager			= { nullptr };
 	class CPicking*				m_pPicking					= { nullptr };
-
+	class CFrustum*				m_pFrustum					= { nullptr };
+	class CSoundMgr*			m_pSound_Manager			= { nullptr };
 
 
 public:

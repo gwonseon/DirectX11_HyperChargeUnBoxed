@@ -33,7 +33,7 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-
+	void Set_Work(_bool bWork) { m_bWork = bWork; }
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
@@ -45,6 +45,7 @@ private:
 	LEVELID	m_eLevel = {};
 	_uint	m_iModelIndex = 0;
 	_float  m_fUV{};
+	_bool m_bWork = false;
 public:
 	static CRader_Effect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

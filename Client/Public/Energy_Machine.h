@@ -2,6 +2,8 @@
 #include "Client_Defines.h"
 #include "Player_Build.h"
 #include "Player.h"
+#include <Energy_Lader.h>
+#include <Rader_Effect.h>
 
 BEGIN(Engine)
 class CShader;
@@ -42,6 +44,8 @@ private:
 	CShader*	m_pShaderCom = { nullptr };
 	CModel*		m_pModelCom = { nullptr };
 	CPlayer*	m_pPlayer = { nullptr };
+	CEnergy_Lader* m_pRader = { nullptr };
+	CRader_Effect* m_pRaderEffect = { nullptr };
 
 public:
 	void		Set_BatteryInsert(_bool bInsert) { m_bBattery_Insert = bInsert; }
@@ -50,6 +54,7 @@ public:
 private:
 	_bool		m_bBattery_Insert = false;
 
+	_bool	m_bOnce = false;
 	_vector m_vecPos{};
 public:
 	static CEnergy_Machine* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

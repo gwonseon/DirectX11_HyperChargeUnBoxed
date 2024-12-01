@@ -2,6 +2,7 @@
 #include "..\Public\Coin.h"
 
 #include "GameInstance.h"
+    
 
 CCoin::CCoin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -33,6 +34,18 @@ HRESULT CCoin::Initialize(void* pArg)
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPickingPos.x, m_fPickingPos.y, m_fPickingPos.z, 1.f));
     m_iCoin = 10;
 
+    if(m_eLevel == LEVEL_YARD)
+    {
+        CAura::AURA_DESC pAura{ };
+        pAura.eLevel = m_eLevel;
+        pAura.vecPos = XMVectorSet(m_fPickingPos.x, m_fPickingPos.y, m_fPickingPos.z, 1.f);
+        pAura.fScale = m_fScale;
+        pAura.eType = CAura::COIN_AURA;
+        CGameObject* pAuraObj = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Aura"), TEXT("Prototype_GameObject_Aura"), &pAura);
+        m_pAura = static_cast<CAura*>(pAuraObj);
+    }
+
+
     return S_OK;
 }
 
@@ -40,6 +53,12 @@ void CCoin::Priority_Update(_float fTimeDelta)
 {
     if (m_bDead)
     {
+        m_pGameInstance->StopSound(COIN);
+        m_pGameInstance->PlaySoundW(L"Coin.wav", Engine::CHANNELID::COIN, m_fSound * 0.2f);
+        if (m_eLevel == LEVEL_YARD)
+        {
+            m_pAura->Set_Dead();
+        }
         return;
     }
     m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
@@ -68,7 +87,6 @@ void CCoin::Late_Update(_float fTimeDelta)
     {
         if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
             return;
- 
     }
  
 }

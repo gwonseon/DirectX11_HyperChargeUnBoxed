@@ -13,7 +13,7 @@ CMonster_Path::CMonster_Path(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 HRESULT CMonster_Path::Initialize()
 {
-	m_eTargetID = LEVEL_YARD;
+	m_eTargetID = LEVEL_GAMEPLAY;
 
 	ShowCursor(true);
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// 朝五虞 持失

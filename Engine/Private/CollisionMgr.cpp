@@ -125,9 +125,10 @@ void CCollisionMgr::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, c
 				// 충돌 비교
 				if (pSrcCol->Intersect(pTarget))
 				{
+
 					pDst->Set_PickUp_Coin(pSrc->Get_Coin()); // 코인 얻음
 					pSrc->Set_Dead();// 동전 삭제 
-
+					
 				}
 			}
 		}
@@ -169,13 +170,11 @@ void CCollisionMgr::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _
 							pDst->Set_CanAttacked(false);
 						}
 						pSrc->Set_Attacked(true); // 공격 당했음을 알림
-							
 						// 총알 일 때
 						if(pDst->Get_IsBullet() == true)
 						{
-							pDst->Set_Dead(); // 총알 없앰
+							pDst->Set_Damaged(100.f); // 총알 없앰
 						}
-						
 						// HP가 0일 때
 						if (pSrc->Get_Hp() <= 0.f)
 						{

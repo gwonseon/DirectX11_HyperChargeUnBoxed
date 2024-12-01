@@ -7,6 +7,7 @@
 BEGIN(Engine)
 class CShader;
 class CModel;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -46,6 +47,7 @@ private:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
 
 	CPlayer* m_pPlayer = { nullptr };
 	CUI_CircleGuage* m_pGuage = { nullptr };
@@ -58,9 +60,9 @@ private:
 	_float3 m_fScale{};
 	_vector m_vecItemPos{};
 
-
-
-
+	_float m_fDeadTime{};
+	_float m_fSizeUp{};
+	_bool m_bOnce = false;
 public:
 	static CCollector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

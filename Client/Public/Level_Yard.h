@@ -46,8 +46,8 @@ public:
 
 public:
 	void	Interaction();
-	void    Texture_Render();
-	void	Texture_Update(_float fTimeDelta);
+	void    Text_Render();
+	void	Text_Update(_float fTimeDelta);
 private:
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Terrain(const _tchar* pLayerTag);
@@ -83,6 +83,7 @@ private:
 	CInGameUI*			m_pConversationBox				= { nullptr };
 	CInGameUI*			m_pCharacter						= { nullptr };
 	CInGameUI*			m_pMissile_Timer					= { nullptr };
+	CInGameUI*			m_pEnding = { nullptr };
 
 	CWeapon_Item*		m_pWeaponItem[2];
 	CMissile_Truck*		m_pMissile_Truck			= { nullptr };
@@ -91,6 +92,7 @@ private:
 	_float	m_fDelay{};
 	_float  m_fConversation_Draw_Timer{};
 	_bool m_bOnce = false;
+	_bool m_bVictory = false;
 	// Ãæµ¹¿ë
 private:
 	CLayer* pPlayerLayer = { nullptr };
@@ -111,7 +113,7 @@ private:
 	_uint	m_iCurrentRound = 0;
 	_uint	m_iPreviousRound = 0;
 	_float XPos{}, ZPos{};
-
+	_float m_fTimerMissile{};
 
 private:
 	vector<CTrap_Marks*> m_vecTrapMark;

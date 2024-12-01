@@ -77,7 +77,8 @@ HRESULT CTruck_Missile::Initialize(void* pArg)
 void CTruck_Missile::Priority_Update(_float fTimeDelta)
 {
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	 
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
+
 	if (m_bKnockdown == true)
 	{
 		if (XMVectorGetY(m_vecPosition) >= 0.05f)
@@ -94,7 +95,7 @@ void CTruck_Missile::Priority_Update(_float fTimeDelta)
 		m_pTransformCom->Rotation(0.f, XMConvertToRadians(fRotX), XMConvertToRadians(m_fAngle));
 		return;
 	}
-
+	
 	
 
 	// 미사일 떨어짐
@@ -159,6 +160,11 @@ void CTruck_Missile::Update(_float fTimeDelta)
 			pCrushed.fScale = _float3{ 20.f, 20.f, 20.f };
 			pCrushed.pPlayer = m_pPlayer;
 			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Terrain_Crushed"), &pCrushed);
+
+			m_pGameInstance->StopSound(SOUND_MISSIE_EXPLOSION);
+			m_pGameInstance->PlaySoundW(L"FE_MissileTruck_Explosion_Nuke.wav", Engine::CHANNELID::SOUND_MISSIE_EXPLOSION, m_fSound + 0.1f);
+			m_pGameInstance->PlaySoundW(L"FE_Explosion_Big_Close_01.wav", Engine::CHANNELID::SOUND_ALIEN_SPEAK, 0.4f);
+
 
 			m_bDraw = false;
 			m_bFog = true;
@@ -246,12 +252,21 @@ void CTruck_Missile::Update(_float fTimeDelta)
 	// 발사 시작 ( 계속 하늘로 올라가기 )
 	if (m_eMissile_State == MISSILE_SHOT_START)
 	{
+		if(m_bFire == false)
+		{
+			m_pGameInstance->StopSound(SOUND_MISSILE);
+			m_pGameInstance->PlaySoundW(L"FE_MissileTruck_WarningVoice.wav", Engine::CHANNELID::SOUND_MISSILE, 0.4f);
+			m_bFire = true;
+		}
+		m_pGameInstance->PlaySoundW(L"FE_MissileTruck_RocketLaunch.wav", Engine::CHANNELID::SOUND_MISSILE_FLAME, m_fSound);
+
 		PrevPos = m_vecPosition;
 		m_vecPosition = XMVectorSetY(m_vecPosition, XMVectorGetY(m_vecPosition) + fTimeDelta * m_fSpeed);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 		m_fSpeed += 3.f;
 		if (XMVectorGetY(m_vecPosition) >= 500.f)
 		{
+			m_pGameInstance->StopSound(SOUND_MISSILE_FLAME);
 			m_eMissile_State = MISSILE_SHOT_ACCEL;
 			m_fPower = 140.f;
 			m_fSpeed = 60.f;

@@ -82,20 +82,33 @@ void CEnvironment::Update(_float fTimeDelta)
 
 void CEnvironment::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-		return;
-	if (m_eLevel == LEVEL_YARD || m_eLevel == LEVEL_GAMEPLAY)
+	if (
+		m_iModelIndex == 123 + ENVIRONMENT_EA ||
+		m_iModelIndex == 128 + ENVIRONMENT_EA ||
+		m_iModelIndex == 129 + ENVIRONMENT_EA ||
+		m_iModelIndex == 130 + ENVIRONMENT_EA ||
+		m_iModelIndex == 131 + ENVIRONMENT_EA ||
+		m_iModelIndex == 132 + ENVIRONMENT_EA ||
+		m_iModelIndex == 143 + ENVIRONMENT_EA ||
+		m_iModelIndex == 142 + ENVIRONMENT_EA ||
+		m_iModelIndex == 37	 + ENVIRONMENT_EA ||
+		m_iModelIndex == 38  + ENVIRONMENT_EA ||
+		m_iModelIndex == 39  + ENVIRONMENT_EA ||
+		m_iModelIndex == 36  + ENVIRONMENT_EA ||
+		m_iModelIndex == 33  + ENVIRONMENT_EA ||
+		m_iModelIndex == 34  + ENVIRONMENT_EA ||
+		m_iModelIndex == 35  + ENVIRONMENT_EA ||
+		true == m_pGameInstance->isIn_Frustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 120.f))
 	{
-
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
 			return;
-	/*	if(
-			m_iModelIndex == 128 + ENVIRONMENT_EA
-			)
+		if (m_eLevel == LEVEL_YARD || m_eLevel == LEVEL_GAMEPLAY)
 		{
-			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+
+			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
 				return;
-		}*/
+		
+		}
 	}
 }
 
@@ -117,6 +130,7 @@ HRESULT CEnvironment::Render()
 			m_iModelIndex == 116	+	ENVIRONMENT_EA ||
 			m_iModelIndex == 142	+	ENVIRONMENT_EA ||
 			m_iModelIndex == 143	+	ENVIRONMENT_EA ||
+			m_iModelIndex == 156	+ ENVIRONMENT_EA ||
 			m_iModelIndex == 152	+	ENVIRONMENT_EA		
 			)
 		{

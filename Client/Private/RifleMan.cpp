@@ -41,7 +41,7 @@ HRESULT CRifleMan::Initialize(void* pArg)
     m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
     m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
     m_pCamera = pDesc->pCamera;
-    pDesc->fScale = _float3(2.f, 2.f, 2.f);
+    pDesc->fScale = _float3(2.5f, 2.5f, 2.5f);
     pDesc->fSpeedPerSec = 5.f;
 
     if (FAILED(__super::Initialize(pDesc)))
@@ -69,6 +69,7 @@ void CRifleMan::Priority_Update(_float fTimeDelta)
    
     vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
 
+    m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
 
 }
 
@@ -79,6 +80,13 @@ void CRifleMan::Update(_float fTimeDelta)
         return;
     if (m_bDeadState == true)
     {
+        if(m_bSoundOnce == false)
+        {
+            m_pGameInstance->StopSound(SOUND_RIFLEMAN_DEDA);
+            m_pGameInstance->PlaySoundW(L"FE_Grunt_Death_12.wav", Engine::CHANNELID::SOUND_RIFLEMAN_DEDA, m_fSound);
+            m_bSoundOnce = true;
+        }
+
         Dead_Motion(fTimeDelta);
         if (m_fDissolve >= 1.f)
             m_bDead = true;
@@ -93,7 +101,7 @@ void CRifleMan::Update(_float fTimeDelta)
     // 상태패턴 업데이트
     m_pCurrentState->Update(this, fTimeDelta);
     
-    vPlayerPos = XMVectorSetY(vPlayerPos, XMVectorGetY(vPlayerPos) + 3.f);
+    vPlayerPos = XMVectorSetY(vPlayerPos, XMVectorGetY(vPlayerPos) + 2.f);
     _float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
     // 사정거리 안에 플레이어가 없으면 
     if (fDistance > 1500.f)
@@ -172,7 +180,9 @@ void CRifleMan::Update(_float fTimeDelta)
                         pFlare.vecTargetPos = m_vecTargetPos;
                         static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
 
-                        
+                        m_pGameInstance->StopSound(SOUND_RIFLEMAN_FLARE);
+                        m_pGameInstance->PlaySoundW(L"FE_Soldier_Pistol_Fire_Far_03.wav", Engine::CHANNELID::SOUND_RIFLEMAN_FLARE, m_fSound);
+
                         m_iShot_Count++;
                     }
                 }
@@ -281,7 +291,9 @@ void CRifleMan::Update(_float fTimeDelta)
                         pFlare.vecTargetPos = &vPlayerPos;
                         static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
 
-                        
+                        m_pGameInstance->StopSound(SOUND_RIFLEMAN_FLARE);
+                        m_pGameInstance->PlaySoundW(L"FE_Soldier_Pistol_Fire_Far_03.wav", Engine::CHANNELID::SOUND_RIFLEMAN_FLARE, m_fSound);
+
                         m_iShot_Count++;
                     }
                 }
@@ -303,9 +315,14 @@ void CRifleMan::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
     if (m_bDeadState == true)
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+            return;
         return;
+    }
     if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
     {
+
         m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
     }
@@ -326,9 +343,16 @@ HRESULT CRifleMan::Render()
 
         if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
             return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
+        if (m_bDeadState == true)
+        {
+            if (FAILED(m_pShaderCom->Begin(6)))
+                return E_FAIL;
+        }
+        else
+        {
+            if (FAILED(m_pShaderCom->Begin(0)))
+                return E_FAIL;
+        }
 
         m_pModelCom->Render(i);
     }
@@ -341,8 +365,48 @@ HRESULT CRifleMan::Render()
     return S_OK;
 }
 
+HRESULT CRifleMan::Render_Shadow()
+{
+    _float4x4			ViewMatrix, ProjMatrix;
+
+    _float fFar = m_pGameInstance->Get_CameraFar();
+    _float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+    XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 8.f, 50.f, fPlayerPos.y - 8.f, 1.f), XMVectorSet(fPlayerPos.x, 0.f, fPlayerPos.y, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+    XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+        return E_FAIL;
+
+    _uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    for (size_t i = 0; i < iNumMeshes; i++)
+    {
+        if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Begin(5)))
+            return E_FAIL;
+
+        m_pModelCom->Render(i);
+    }
+
+    return S_OK;
+}
+
 HRESULT CRifleMan::Add_Components()
 {
+    /* For.Com_Texture */
+    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Dissolved"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+        return E_FAIL;
+
+
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
@@ -392,6 +456,14 @@ HRESULT CRifleMan::Add_Components()
 
 HRESULT CRifleMan::Bind_ShaderResources()
 {
+    if (m_bDeadState == true)
+    {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(0))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value", &m_fDissolve, sizeof(float))))
+            return E_FAIL;
+    }
+
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
@@ -422,8 +494,10 @@ void CRifleMan::Dead_Motion(_float fTimeDelta)
     {
         m_fDeadPower.y = 35.f;
         m_fGravity = 2.7f;
-        m_bDissolveStart = true;
+        
     }
+    m_bDissolveStart = true;
+
     m_fDeadPower.y -= m_fGravity;
 
     if (m_fDeadPower.x > 0.f)
@@ -473,5 +547,5 @@ void CRifleMan::Free()
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pNavigationCom);
-
+    Safe_Release(m_pTextureCom);
 }

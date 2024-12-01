@@ -42,6 +42,10 @@ private:
 	CModel* m_pModelCom = { nullptr };
 
 public:
+	void Set_Work(_bool bWork) { m_bWork = bWork; }
+private:
+	_bool  m_bWork = false;
+public:
 	static CEnergy_Lader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;

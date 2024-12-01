@@ -1090,7 +1090,7 @@ void CLevel_ImGui::Environment_Load()
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		 hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (INVALID_HANDLE_VALUE == hFile)
 		{
 			MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
@@ -1135,7 +1135,7 @@ void CLevel_ImGui::Environment_Load()
 
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
-		Desc.eID = iLevel;
+		Desc.eID = LEVEL_IMGUI;
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
@@ -1640,7 +1640,7 @@ void CLevel_ImGui::Build_Load()
 		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
-		Desc.eID = iLevel;
+		Desc.eID = LEVEL_IMGUI;
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;

@@ -29,7 +29,7 @@ HRESULT CTank::Initialize(void* pArg)
 {
 	TANK_DESC* pDesc = static_cast<TANK_DESC*>(pArg);
 
-	pDesc->fSpeedPerSec = 25.f;
+	pDesc->fSpeedPerSec = 10.f;
 	pDesc->fScale = _float3(3.f, 3.f, 3.f);
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_vecStoreTargetPos = *m_vecTargetPos;
@@ -65,8 +65,9 @@ void CTank::Priority_Update(_float fTimeDelta)
 	if (m_bCanAttacked == false)
 		m_fCurrentTime += fTimeDelta;
 	m_fTime_For_Target += fTimeDelta;
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
 	
 }
 
@@ -76,6 +77,7 @@ void CTank::Update(_float fTimeDelta)
 		return;
 	if (m_bDeadState == true)
 	{
+
 		CDead_Model::DEADMODEL_DESC pDead{};
 		pDead.eLevel = m_eLevel;
 		pDead.eModelType = CDead_Model::DEAD_TANK_BODY;
@@ -93,7 +95,9 @@ void CTank::Update(_float fTimeDelta)
 		Effect.fScale = _float3{ 20.f, 20.f, 20.f };
 		Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
 		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
-
+	
+		m_pGameInstance->StopSound(SOUND_TANK_EXPLOSION);
+		m_pGameInstance->PlaySoundW(L"FE_BigTank_Explosion.wav", Engine::CHANNELID::SOUND_TANK_EXPLOSION, m_fSound);
 		m_bDead = true;
 		return;
 	}
@@ -145,6 +149,9 @@ void CTank::Update(_float fTimeDelta)
 		// Path 따라 갈 때는 Path 목표 바라보기
 		m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
 		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f  );
+		
+		m_pGameInstance->PlaySoundW(L"FE_BigTank_Drive.wav", Engine::CHANNELID::SOUND_TANK_MOVE, m_fSound);
+
 		fAnimSpeed = 1.f;
 		
 		m_pModelCom->Set_Animation(MONSTER_Tank_Drive, true);
@@ -176,8 +183,10 @@ void CTank::Update(_float fTimeDelta)
 			pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
 			pFlare.vecTargetPos = m_vecTargetPos;
 			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+			
+			m_pGameInstance->StopSound(SOUND_TANK_FLARE);
+			m_pGameInstance->PlaySoundW(L"04_12_2016_ArmyMen_Tank_1333_Fire_Expl_03.wav", Engine::CHANNELID::SOUND_TANK_FLARE, m_fSound);
 
-		
 		}
 		m_pTransformCom->LookAt(*m_vecTargetPos);
 		fAnimSpeed = 0.7f;
@@ -224,6 +233,40 @@ HRESULT CTank::Render()
 
 	m_pColliderCom->Render();
 #endif
+	return S_OK;
+}
+
+HRESULT CTank::Render_Shadow()
+{
+	_float4x4			ViewMatrix, ProjMatrix;
+
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 5.f, fPlayerPos.y + 10.f, fPlayerPos.y - 5.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.y, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(5)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
+
 	return S_OK;
 }
 

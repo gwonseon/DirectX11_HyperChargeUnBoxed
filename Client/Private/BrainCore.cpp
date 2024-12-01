@@ -40,11 +40,33 @@ HRESULT CBrainCore::Initialize(void* pArg)
 void CBrainCore::Priority_Update(_float fTimeDelta)
 {
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPos);
+	if (m_fSound != 0.f)
+		m_fSound *= 0.2f;
+	m_pGameInstance->PlaySoundW(L"FE_Base_Braincore_Bubble_01.wav", Engine::CHANNELID::BRAINCORE, m_fSound );
+
 }
 
 void CBrainCore::Update(_float fTimeDelta)
 {
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	if (m_fEnergy <= 50.f && m_bOnce == false)
+	{ 
+		m_bOnce = true;
+		m_pGameInstance->PlaySoundW(L"FE_CoreBeeingAttacked.wav", Engine::CHANNELID::SOUND_EFFECT, m_fSound);
+	}
+
+	if (m_fEnergy > 50.f)
+	{
+		m_bOnce = false;
+	}
+	if (m_fHp <= 50.f)
+	{
+		m_pGameInstance->StopSound(TUTORIAL);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Coredefend_01.wav", Engine::CHANNELID::TUTORIAL, m_fSound);
+
+	}
+	
 
 }
 
@@ -137,7 +159,7 @@ HRESULT CBrainCore::Add_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-
+		
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
 	/* For.Com_Model */

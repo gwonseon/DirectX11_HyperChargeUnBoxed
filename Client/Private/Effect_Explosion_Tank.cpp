@@ -120,6 +120,7 @@ void CEffect_Explosion_Tank::Update(_float fTimeDelta)
 	}
 	if (m_fFrame.y > m_fMaxFrame.y)
 	{
+
 		m_bDead = true;
 	}
 	

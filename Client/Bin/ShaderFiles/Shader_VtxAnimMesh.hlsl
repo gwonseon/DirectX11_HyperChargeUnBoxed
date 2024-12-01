@@ -155,26 +155,26 @@ PS_OUT PS_MAIN_DISSOLVE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vDissole = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
-    if (vDissole.r < g_fDissolve_Value * 0.6f)
+    vector vDissolve = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vDissolve.r < g_fDissolve_Value * 0.3f)
         discard;
     float fNoise = g_MaskTexture.Sample(LinearSampler, In.vTexcoord).r;
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
     if (vMtrlDiffuse.a <= 0.3f)
         discard;
-    float fDissolveFactor = smoothstep(g_fDissolve_Value - 0.2f, g_fDissolve_Value, fNoise);
+    float fDissolveFactor = smoothstep(g_fDissolve_Value - 0.1f, g_fDissolve_Value, fNoise);
     
     if (fDissolveFactor > 0.f && fDissolveFactor < 1.f)
     {
-        vMtrlDiffuse.rgb = float3(1.f, 0.6f, 0.f) * (1.f - fDissolveFactor);
+        vMtrlDiffuse.rgb = float3(1.f, 0.f, 0.f) * 7.f * (1.f - fDissolveFactor);
     }
     else if (fDissolveFactor <= 0.f)
     {
         discard;
     }
 
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse * 10.f;
 
 	/* -1.f ~ 1.f -> 0.f ~ 1.f */
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);

@@ -94,8 +94,15 @@ HRESULT CLevel_GamePlay::Initialize()
 	pCoin = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Coin"));
 	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"));
 	pItem = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Item"));
-
+	m_pGameInstance->Set_CurrentLevel(LEVEL_GAMEPLAY);
 	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;
+
+	m_pGameInstance->StopAll();
+
+	m_pGameInstance->PlayBGM(L"PlayLevelBack.wav",0.1f);
+
+
+
 	return S_OK;
 }
 
@@ -113,7 +120,37 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 	}
 	// Round 클래스는 Initailize에서 생성해서 담고, 생성할 때 dat파일 읽어서 위치 값 저장해두고 
 	// 업데이트에서 해당 조건을 만족했을 때 작동하는 식으로 하면 어떨까
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD1))
+	{
+		m_pGameInstance->StopSound(TUTORIAL);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Enemyspotted_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
 
+	}
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD2))
+	{
+		m_pGameInstance->StopSound(TUTORIAL);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Needcredits_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+
+	}
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD3))
+	{
+		m_pGameInstance->StopSound(TUTORIAL);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Needdefences_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+
+	}
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD4))
+	{
+		m_pGameInstance->StopSound(TUTORIAL);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Compliment_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+
+	}
+	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD5))
+	{
+		m_pGameInstance->StopSound(TUTORIAL);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Pickuphere_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+
+	}
+	
 
 	//  상호작용
 	Interaction();
@@ -167,7 +204,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 
 HRESULT CLevel_GamePlay::Render()
 {
-	Texture_Render();
+	Text_Render();
 	__super::Render();
 	
 
@@ -176,7 +213,9 @@ HRESULT CLevel_GamePlay::Render()
 #endif
 	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
+		m_pGameInstance->Free_Light();
 		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
+		
 	}
 	return S_OK;
 }
@@ -235,10 +274,22 @@ void CLevel_GamePlay::Interaction()
 
 }
 
-void CLevel_GamePlay::Texture_Render()
+void CLevel_GamePlay::Text_Render()
 {
-	if(*m_pPlayer->Get_BuildMode() == true)
-		m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("건설 모드 건너뛰기"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+	if(m_bVictory == false)
+	{
+		if (*m_pPlayer->Get_BuildMode() == true)
+			m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("건설 모드 건너뛰기"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+	}
+
+
+
+}
+
+void CLevel_GamePlay::Conversation_Draw(_bool bDraw)
+{
+	m_pConversationBox->Set_Draw(bDraw);
+	m_pCharacter->Set_Draw(bDraw);
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
@@ -611,15 +662,65 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar* pLayerTag)
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
 	LIGHT_DESC	LightDesc{};
-
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f, 240.f / 255.f * 0.5f, 255.f / 255.f * 0.5f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
+
+	ZeroMemory(&LightDesc, sizeof LightDesc);
+	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+	LightDesc.vPosition = _float4(422.464f, 178.f, 289.020f, 1.f);
+	LightDesc.fRange = 200.f;
+	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f, 240.f / 255.f * 0.5f, 255.f / 255.f * 0.5f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	CBulb::BULB_DESC	pBulb{};
+	pBulb.eID = LEVEL_GAMEPLAY;
+	pBulb.eBulbType = CBulb::BULB_CEIL;
+	pBulb.fPosition = _float3(422.464f, 186.6f, 289.020f);
+	pBulb.fScale = _float3(5.f, 5.f, 5.f);
+	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &pBulb);
+
+
+	ZeroMemory(&LightDesc, sizeof LightDesc);
+	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+	LightDesc.fRange = 200.f;
+	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f, 240.f / 255.f * 0.5f, 255.f / 255.f * 0.5f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	LightDesc.vPosition = _float4(422.464f, 180.f, 444.769f, 1.f);
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	pBulb.fPosition = _float3(422.464f, 186.6f, 444.769f);
+	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &pBulb);
+
+
+
+	ZeroMemory(&LightDesc, sizeof LightDesc);
+	LightDesc.eType = LIGHT_DESC::TYPE_SPOT;
+	LightDesc.vPosition = _float4(496.44f, 3.f, 497.662f, 1.f);
+	LightDesc.fRange =20.f;
+	LightDesc.vDirection = _float4(1.f, 0.f, 0.f, 0.f);
+	LightDesc.fAngle = XMConvertToRadians(120.f);
+	LightDesc.vDiffuse = _float4(2.f, 2.f, 2.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vSpecular = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	pBulb.fScale = _float3(2.3f, 2.3f, 2.3f);
+	pBulb.eBulbType = CBulb::BULB_SPOT;
+	pBulb.fPosition = _float3(530.347f, 13.128f, 474.432f);
+	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &pBulb);
+	
 	return S_OK;
 }
 
@@ -765,6 +866,11 @@ void CLevel_GamePlay::Build_Check()
 
 void CLevel_GamePlay::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
 {
+	if (m_iPreviousRound == 3 && m_iCurrentRound == 0 )
+	{
+		m_bVictory = true;
+		m_pEnding->Set_RoundEnd(true);
+	}
 	m_iPreviousRound = m_iCurrentRound;
 	// 라운드 업데이트, 0은 쉬는 시간, 1 2 3 이 라운드 
 	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart, m_fSkipTimer);
@@ -829,8 +935,6 @@ void CLevel_GamePlay::Free()
 	Safe_Release(m_pRound[2]);
 
 }
-
-
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 {
@@ -1144,36 +1248,47 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 
 
 
-	//CInGameUI::INGAMEUI_DESC	pDesc7{};
-	//pDesc7.eLevel = LEVEL_GAMEPLAY;
-	//pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
-	//	pDesc7.fSizeX = 450.f;
-	//	pDesc7.fSizeY = 90.f;
-	//	pDesc7.iData = 0;
-	//	pDesc7.fX = g_iWinSizeX * 0.55f;
-	//	pDesc7.fY = 65.f;
-	//	pDesc7.fDepth = 0.2f;
-	//	pDesc7.iIndex = 0;	
-	//	pDesc7.pPlayer = m_pPlayer;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
-	//	return E_FAIL;
-
-	//CInGameUI::INGAMEUI_DESC	pDesc6{};
-	//pDesc6.eLevel = LEVEL_GAMEPLAY;
-	//pDesc6.eUITag = CInGameUI::UI_CHARACTER;
-	//	pDesc6.fSizeX = 100.f;
-	//	pDesc6.fSizeY = 100.f;
-	//	pDesc6.iData = 0;
-	//	pDesc6.fX = g_iWinSizeX * 0.7f;
-	//	pDesc6.fY = 65.f;
-	//	pDesc6.fDepth = 0.1f;
-	//	pDesc6.pPlayer = m_pPlayer;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc6)))
-	//	return E_FAIL;
 
 
+	CInGameUI::INGAMEUI_DESC	pDesc7{};
+	pDesc7.eLevel = LEVEL_GAMEPLAY;
+	pDesc7.eUITag = CInGameUI::UI_CONVERSATIONBOX;
+	pDesc7.fSizeX = 450.f;
+	pDesc7.fSizeY = 90.f;
+	pDesc7.iData = 0;
+	pDesc7.fX = g_iWinSizeX * 0.55f;
+	pDesc7.fY = 65.f;
+	pDesc7.fDepth = 0.2f;
+	pDesc7.iIndex = 0;	
+	pDesc7.pPlayer = m_pPlayer;
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
+		return E_FAIL;
+	CGameObject* pConversationBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &pDesc7);
+	m_pConversationBox = static_cast<CInGameUI*>(pConversationBox);
 
+	CInGameUI::INGAMEUI_DESC	pDesc6{};
+	pDesc6.eLevel = LEVEL_GAMEPLAY;
+	pDesc6.eUITag = CInGameUI::UI_CHARACTER;
+	pDesc6.fSizeX = 100.f;
+	pDesc6.fSizeY = 100.f;
+	pDesc6.iData = 0;
+	pDesc6.fX = g_iWinSizeX * 0.7f;
+	pDesc6.fY = 65.f;
+	pDesc6.fDepth = 0.1f;
+	pDesc6.pPlayer = m_pPlayer;
+	CGameObject* pCharacter = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &pDesc6);
+	m_pCharacter = static_cast<CInGameUI*>(pCharacter);
 
+	CInGameUI::INGAMEUI_DESC	Ending{};
+	Ending.eLevel = LEVEL_GAMEPLAY;
+	Ending.eUITag = CInGameUI::UI_VICTORY;
+	Ending.fSizeX = g_iWinSizeX;
+	Ending.fSizeY = g_iWinSizeY;
+	Ending.fX = g_iWinSizeX * 0.5f;
+	Ending.fY = g_iWinSizeY * 0.5f;
+	Ending.fDepth = 0.f;
+	CGameObject* pEnd = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &Ending);
+	m_pEnding = static_cast<CInGameUI*>(pEnd);
 
 	// 코인 UI( 숫자 )
 	CNumberUI::NUMBERUI_DESC pCoin{};

@@ -107,13 +107,13 @@ void CTracker::Priority_Update(_float fTimeDelta)
     else
         m_bInteraction = false;
 
-    if (*m_iRound == 1 && m_bOnce == false) // 미사일 라운드 시작
+    if (*m_iRound == MISSILEROUND && m_bOnce == false) // 미사일 라운드 시작
     {
         m_bOnce = true;
         m_eTrackerState = TRACKER_TURN_OFF;
         m_fMissileTimer = 0.f;
     }
-    else if (*m_iRound != 1)    // 미사일 라운드가 아닐 때 안그리기 & 작동 안함
+    else if (*m_iRound != MISSILEROUND)    // 미사일 라운드가 아닐 때 안그리기 & 작동 안함
     {
         m_eTrackerState = TRACKER_IDLE;
     }
@@ -157,7 +157,7 @@ void CTracker::Update(_float fTimeDelta)
 void CTracker::Late_Update(_float fTimeDelta)
 {
     // 미사일 라운드일 때만 그리기, 단, 플레이어가 들고 있을 땐 안그림
-    if(*m_iRound == 1)
+    if(*m_iRound == MISSILEROUND)
     {
         if(*m_bPickUp_Player == false)
         {

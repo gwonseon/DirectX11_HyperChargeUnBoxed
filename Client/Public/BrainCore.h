@@ -51,7 +51,7 @@ private:
 private:
 	_vector m_vecPos{};
 
-
+	_bool m_bOnce = false;
 
 public:
 	static CBrainCore* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

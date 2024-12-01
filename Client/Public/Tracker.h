@@ -47,12 +47,12 @@ public:
 	_bool* Get_Shot() { return &m_bStart_Shot; }
 	CTransform* Get_Transform() { return m_pTransformCom; }
 	_float* Get_Timer() { return &m_fTimer; }
-
+	_bool** Get_PickUp() { return &m_bPickUp_Player; }
 
 	void		Set_Fall(_bool bFall) { m_bMissile_Fall = bFall; }
 	_vector		Get_Pos(){ return m_vecPosition; }
 
-
+	TRACKER_STATE Get_TrackerState() { return m_eTrackerState; }
 
 	
 private:

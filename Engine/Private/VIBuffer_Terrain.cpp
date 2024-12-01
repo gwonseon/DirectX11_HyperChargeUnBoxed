@@ -47,8 +47,8 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 	// 닫지 않으면 시스템 리소스 누수가 발생할 수 있다. 이경우 프로그램이 더 많은 메모리와 리소스를 사용하게 되어 성능 저하나 시스템 불안정성이 발생할 수 있다.
 	CloseHandle(hFile);
 
-	m_iNumVerticesX = ih.biWidth * 10;// 버텍스 가로 개수 = 이미지의 가로 픽셀 수
-	m_iNumVerticesZ = ih.biHeight * 10;	// 버텍스 세로 개수 = 이미지 세로 픽셀 수
+	m_iNumVerticesX = ih.biWidth * 7;// 버텍스 가로 개수 = 이미지의 가로 픽셀 수
+	m_iNumVerticesZ = ih.biHeight * 7;	// 버텍스 세로 개수 = 이미지 세로 픽셀 수
 	m_iVertexStride = sizeof(VTXNORTEX);// 사이즈는 구조체 사이즈
 	m_iNumVertices = m_iNumVerticesX * m_iNumVerticesZ;// 버텍스 개수는 가로 개수 X 세로 개수
 	m_iIndexStride = sizeof(_uint);	// 인덱스 사이즈 = 4바이트 ( int 사이즈 )
@@ -201,10 +201,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void* pArg)
 	return S_OK;
 }
 
-_bool CVIBuffer_Terrain::Terrain_Picking(_float3 fRayDir, _float3 CameraPos, _float3& ResultPos)
-{
-	return false;
-}
+
 
 
 CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pHeightMapFilePath)

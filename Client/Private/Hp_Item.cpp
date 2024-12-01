@@ -51,14 +51,31 @@ void CHp_Item::Update(_float fTimeDelta)
     if (m_bDead)
         return;
 
+    if (m_bKnockdown == true)
+    {
+        if (m_bOnce == false)
+        {
+            m_pGameInstance->StopSound(ITEM);
+            m_pGameInstance->PlaySoundW(L"fx_pickuphealth.wav", Engine::CHANNELID::ITEM, m_fSound * 0.4f);
+            m_bOnce = true;
+        }
+        m_fDeadTime += fTimeDelta;
+        if (m_fDeadTime >= 1.f)
+        {
+            m_pPlayer->Set_FullHeal();
+            m_bDead = true;
+        }
+    }
     _vector vecPlayerPos = m_pPlayer->Get_Position();
     m_vecItemPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
     // 플레이어와 아이템 거리가 가까워졌을 때
     if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecItemPos) <= 80.f)
     {
+        if (m_fSizeUp <= 2.f)
+            m_fSizeUp += fTimeDelta * 10.f;
         // 사이즈 커지기
-        m_pTransformCom->Set_Scaling(m_fScale.x + 2.f, m_fScale.y + 2.f, m_fScale.z + 2.f);
+        m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp, m_fScale.y + m_fSizeUp, m_fScale.z + m_fSizeUp);
 
         if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
         {
@@ -75,26 +92,25 @@ void CHp_Item::Update(_float fTimeDelta)
     }
     else
     {
-        m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
+        if (m_fSizeUp >= 0.f)
+            m_fSizeUp -= fTimeDelta * 10.f;
+        m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp, m_fScale.y + m_fSizeUp, m_fScale.z + m_fSizeUp);
         m_fCharging_Time = 0.f;
     }
 
 
     if (m_fCharging_Time >= 1.f)
     {
-        m_pPlayer->Set_FullHeal();
-        m_bDead = true;
+        m_bKnockdown = true;
     }
 
 }
 
 void CHp_Item::Late_Update(_float fTimeDelta)
 {
-    if (m_bDead == false)
-    {
-        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-            return;
-    }
+
+       if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
+           return;
 }
 
 HRESULT CHp_Item::Render()
@@ -108,8 +124,16 @@ HRESULT CHp_Item::Render()
     {
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
+        if(m_bKnockdown == false)
+        {
+            if (FAILED(m_pShaderCom->Begin(0)))
+                return E_FAIL;
+        }
+        else
+        {
+            if (FAILED(m_pShaderCom->Begin(1)))
+                return E_FAIL;
+        }
         m_pModelCom->Render(i);
     }
     return S_OK;
@@ -117,6 +141,11 @@ HRESULT CHp_Item::Render()
 
 HRESULT CHp_Item::Add_Components()
 {
+    /* For.Com_Texture */
+    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Dissolved"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+        return E_FAIL;
+
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
@@ -131,6 +160,14 @@ HRESULT CHp_Item::Add_Components()
 
 HRESULT CHp_Item::Bind_ShaderResources()
 {
+    if (m_bKnockdown == true)
+    {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(8))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value", &m_fDeadTime, sizeof(float))))
+            return E_FAIL;
+    }
+
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
@@ -142,19 +179,6 @@ HRESULT CHp_Item::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
         return E_FAIL;
 
-   /* if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
     return S_OK;
 }
 
@@ -184,7 +208,7 @@ CGameObject* CHp_Item::Clone(void* pArg)
 void CHp_Item::Free()
 {
     __super::Free();
-
+    Safe_Release(m_pTextureCom);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

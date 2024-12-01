@@ -64,7 +64,6 @@ void CWeapon_Katana::Priority_Update(_float fTimeDelta)
 	if(m_bKatanaState == true)
 	{
 
-
 	}
 }
 
@@ -99,10 +98,11 @@ void CWeapon_Katana::Late_Update(_float fTimeDelta)
 	if(m_bKatanaState == true)
 	{
 		
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
 			return;
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_SHADOW, this)))
+		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
 			return;
+
 	}
 }
 
@@ -118,7 +118,7 @@ HRESULT CWeapon_Katana::Render()
 		{
 			if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
 				return E_FAIL; 
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if (FAILED(m_pShaderCom->Begin(11)))
 				return E_FAIL;
 			m_pModelCom->Render(i);
 		}

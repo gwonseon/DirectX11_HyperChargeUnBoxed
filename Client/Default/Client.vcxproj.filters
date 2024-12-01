@@ -286,6 +286,12 @@
     <Filter Include="02. GameObjects\Monster\Dead_Model">
       <UniqueIdentifier>{32d97727-a933-4362-ac66-4d3c54fc217f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Environment\Bulb">
+      <UniqueIdentifier>{aa407438-b506-4c09-81cf-c32f8abaf506}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Effect\aura">
+      <UniqueIdentifier>{b2f33a2b-a640-42b7-9dad-ec817efaa055}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -564,6 +570,12 @@
     <ClInclude Include="..\Public\Dead_Model.h">
       <Filter>02. GameObjects\Monster\Dead_Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Bulb.h">
+      <Filter>02. GameObjects\Environment\Bulb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Aura.h">
+      <Filter>02. GameObjects\Effect\aura</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -820,6 +832,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Dead_Model.cpp">
       <Filter>02. GameObjects\Monster\Dead_Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bulb.cpp">
+      <Filter>02. GameObjects\Environment\Bulb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Aura.cpp">
+      <Filter>02. GameObjects\Effect\aura</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
