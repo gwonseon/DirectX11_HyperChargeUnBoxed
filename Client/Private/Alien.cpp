@@ -43,7 +43,7 @@ HRESULT CAlien::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(0, true);
 	m_fAttack = 10.f;
 	m_fEnergy = 0.f;
-	m_fPrevHp = m_fHp = 60.f;
+	m_fPrevHp = m_fHp = 50.f;
 	m_bDontDestroy = true;
 	m_bAttackState = true;
 	return S_OK;

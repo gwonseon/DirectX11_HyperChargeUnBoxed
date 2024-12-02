@@ -18,7 +18,7 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Logo::Initialize()
 {
-
+	ShowCursor(true);
 	if (FAILED(Ready_Layer_Menu_UI(TEXT("Layer_Menu_UI"))))
 		return E_FAIL;
 

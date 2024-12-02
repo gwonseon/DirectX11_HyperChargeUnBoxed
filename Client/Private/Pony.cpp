@@ -48,7 +48,7 @@ HRESULT CPony::Initialize(void* pArg)
 		return E_FAIL;
 
 
-	m_fPrevHp = m_fHp = 100.f;
+	m_fPrevHp = m_fHp = 50.f;
 	m_fEnergy = 0.f;
 	m_fAttack = 10.f;
 	m_bDontDestroy = true;

@@ -45,7 +45,7 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
         vPos = XMVectorSetY(vPos, XMVectorGetY(vPos) + 4.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
         m_pCamera = pDesc->pCamera;
-        m_fAttack = 10.f;
+        m_fAttack = 5.f;
         break;
     }
     case Client::CMonster_Bullet::HELICOPTER_BULLET:
@@ -53,13 +53,13 @@ HRESULT CMonster_Bullet::Initialize(void* pArg)
         m_pTransformCom->LookAt(m_vecTargetPos);
         vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-        m_fAttack = 3.f; 
+        m_fAttack = 2.f; 
         break;
     case Client::CMonster_Bullet::RIFLEMAN_BULLET:
         m_pTransformCom->Set_Scaling(0.05f, 0.05f, 0.05f);
         vPos = XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y + 1.f, pDesc->fPosition.z, 1.f);
         m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-        m_fAttack = 3.f;
+        m_fAttack = 2.f;
         break;
 
         
@@ -160,7 +160,7 @@ void CMonster_Bullet::Late_Update(_float fTimeDelta)
                 Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
                 //Effect.pCamera = m_pCamera;
                 m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
-
+                m_pBuild->Set_Damaged(m_fAttack);
                 m_bDead = true;
             }
             else
