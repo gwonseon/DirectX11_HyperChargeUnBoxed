@@ -35,6 +35,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
+	ShowCursor(false);
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 
@@ -215,7 +216,8 @@ HRESULT CLevel_GamePlay::Render()
 	{
 		m_pGameInstance->Free_Light();
 		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
-		
+		ShowCursor(true);
+
 	}
 	return S_OK;
 }
@@ -399,7 +401,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	pEnergyMachine.fPosition = _float3{ 477.267f, 0.1f,532.115f };
 	pEnergyMachine.pPlayer = m_pPlayer;
 	
-	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
+	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Brain"), TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
 
 	
 	// 에너지 머신 캡
@@ -407,7 +409,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 	pEnergyCap.eID = LEVEL_GAMEPLAY;
 	pEnergyCap.fScale = { 5.f,5.f,5.f };
 	pEnergyCap.fPosition = _float3{ 476.075f, 5.82203f,532.203f };
-	m_pEnergyMachine_Cap = static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
+	m_pEnergyMachine_Cap = static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Brain"), TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
 
 	return S_OK;
 }

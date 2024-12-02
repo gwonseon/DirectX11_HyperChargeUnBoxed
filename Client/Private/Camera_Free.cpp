@@ -100,43 +100,16 @@ void CCamera_Free::Update(_float fTimeDelta)
         break;
     case Client::LEVEL_GAMEPLAY:
         ClientToScreen(g_hWnd, &clientPos);
-        if (GetAsyncKeyState(VK_MBUTTON) & 0x0001)
-        {
-            if (m_bMouseLock == true)
-            {
-                m_bMouseLock = false;
-                ShowCursor(FALSE);
-            }
-            else
-            {
-                m_bMouseLock = true;
-                ShowCursor(TRUE);
-            }
-
-        }
-        if (m_bMouseLock == true)
-            SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
+        ShowCursor(false);
+       SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
+          
 
         break;
     case Client::LEVEL_YARD:
         ClientToScreen(g_hWnd, &clientPos);
-        if (GetAsyncKeyState(VK_MBUTTON) & 0x0001)
-        {
-            if (m_bMouseLock == true)
-            {
-                m_bMouseLock = false;
-                ShowCursor(FALSE);
-            }
-            else
-            {
-                m_bMouseLock = true;
-                ShowCursor(TRUE);
-            }
+        ShowCursor(false);
+        SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
 
-        }
-        if (m_bMouseLock == true)
-            SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
-       
         break;
     case Client::LEVEL_IMGUI:
         if (GetKeyState('S') & 0x8000)

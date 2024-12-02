@@ -23,6 +23,7 @@ CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 HRESULT CLevel_Loading::Initialize(LEVELID eNextLevelID)
 {
+	ShowCursor(false);
 
 	/* 추후에 로딩이 끝날 시에 넘길 레벨에 대한 정보를 저장한다. */
 	m_eNextLevelID = eNextLevelID;
@@ -62,7 +63,7 @@ HRESULT CLevel_Loading::Initialize(LEVELID eNextLevelID)
 void CLevel_Loading::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
-
+	ShowCursor(false);
 	m_fLoading_Per = m_pLoader->Get_LoadingPer();
 	
 	/* 로더가 다음레벨에 대한 자원 생성을 끝냈다라면 */

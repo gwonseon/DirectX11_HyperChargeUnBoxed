@@ -38,6 +38,8 @@ CLevel_Yard::CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Yard::Initialize()
 {
+
+	ShowCursor(false);
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 
@@ -194,7 +196,7 @@ HRESULT CLevel_Yard::Render()
 	{
 		m_pGameInstance->Free_Light();
 		(m_pGameInstance->Open_Level(LEVEL_YARD, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO)));
-		
+		ShowCursor(true);
 	}
 	return S_OK;
 }
