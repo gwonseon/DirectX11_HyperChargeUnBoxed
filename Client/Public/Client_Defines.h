@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <process.h>
 
@@ -11,7 +11,7 @@
 #define EFFECT_EA 10
 #define	BULLET_EA 6
 #define MISSILEROUND 3
-
+#define PI 3.141592
 namespace Client
 {
 	const unsigned int		g_iWinSizeX = 1280;
