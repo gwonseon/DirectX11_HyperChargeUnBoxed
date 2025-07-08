@@ -1,2 +1,6 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# 1) C/C++ 소스는 항상 UTF-8로 체크아웃
+*.cpp   text working-tree-encoding=UTF-8
+*.h     text working-tree-encoding=UTF-8
+
+# 2) 그 외 텍스트 파일은 자동으로 CRLF/LF 정규화
+*       text=auto
