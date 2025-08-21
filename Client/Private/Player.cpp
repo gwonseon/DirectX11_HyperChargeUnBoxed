@@ -6,15 +6,13 @@
 #include <FPS_Pivot.h>
 #include <Slash_Mesh.h>
 
-CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CContainerObject{ pDevice, pContext }
-{
-}
+CPlayer::CPlayer(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CContainerObject{pDevice,pContext}
+{}
 
 CPlayer::CPlayer(const CPlayer& Prototype)
-	: CContainerObject{ Prototype }
-{
-}
+	: CContainerObject{Prototype}
+{}
 
 HRESULT CPlayer::Initialize_Prototype()
 {
@@ -36,20 +34,20 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_vecCameraAt = pPlayer->vCameraAt;
 	m_vecCameraPos = pPlayer->vCameraPos;
 	m_iRound = pPlayer->iRound;
- 
-	/* √ﬂ∞°¿˚¿∏∑Œ √ ±‚»≠∞° « ø‰«œ¥Ÿ∏È ºˆ«‡«ÿ¡ÿ¥Ÿ. */
-	if (FAILED(__super::Initialize(&Desc)))
+
+	/* Ï∂îÍ∞ÄÏ†ÅÏúºÎ°ú Ï¥àÍ∏∞ÌôîÍ∞Ä ÌïÑÏöîÌïòÎã§Î©¥ ÏàòÌñâÌï¥Ï§ÄÎã§. */
+	if(FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
-	if (FAILED(Add_PartObjects()))
+	if(FAILED(Add_PartObjects()))
 		return E_FAIL;
 
-	
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pPlayer->fPosition.x, pPlayer->fPosition.y, pPlayer->fPosition.z, 1.f));
-	m_pTransformCom->Set_Scaling(1.5f, 1.5f, 1.5f);
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(pPlayer->fPosition.x,pPlayer->fPosition.y,pPlayer->fPosition.z,1.f));
+	m_pTransformCom->Set_Scaling(1.5f,1.5f,1.5f);
 	m_iWeaponState = WEAPON_RIFLE;
 	m_iPrevWeaponState = WEAPON_END;
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
@@ -75,114 +73,110 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_fRun_FourDirection = 1.5f;
 	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
 	m_bAffected = true;
-	m_bBuildMode = true; 
+	m_bBuildMode = true;
 	return S_OK;
 }
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
 	Heal(fTimeDelta);
-	// ∫ÙµÂ ∏µÂ ( ∞«√‡)
-	if (m_bBuildMode == true && m_bBuild_Able == true)
+	// ÎπåÎìú Î™®Îìú ( Í±¥Ï∂ï)
+	if(m_bBuildMode == true && m_bBuild_Able == true)
 	{
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
 		{
 			m_bBuild_Gauging = true;
-		}
-		else
+		} else
 			m_bBuild_Gauging = false;
-	}
-	else
+	} else
 	{
 		m_bBuild_Gauging = false;
 	}
-	// ∫ÙµÂ∏µÂ ∞«≥ ∂Ÿ±‚
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_F) && *m_bRoundStart == false)
+	// ÎπåÎìúÎ™®Îìú Í±¥ÎÑàÎõ∞Í∏∞
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_F) && *m_bRoundStart == false)
 	{
-		if (m_bBuildMode == false)
+		if(m_bBuildMode == false)
 			m_bBuildMode = true;
 		else
 			m_bBuildMode = false;
 	}
 
-	// ∫‰ ∫Ø∞Ê 
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_C))
+	// Î∑∞ Î≥ÄÍ≤Ω 
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_C))
 	{
-		if (m_iViewState == PLAYER_TPS_VIEW)
+		if(m_iViewState == PLAYER_TPS_VIEW)
 			m_iViewState = PLAYER_FPS_VIEW;
 		else
 			m_iViewState = PLAYER_TPS_VIEW;
 	}
 
-	
-#pragma region ƒ´∏ﬁ∂Û»∏¿¸
-	_long   MouseMove = { 0 };
-	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
 
-	
-	
+	#pragma region Ïπ¥Î©îÎùºÌöåÏ†Ñ
+	_long   MouseMove = {0};
+	if(MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
+		m_pTransformCom->Turn(XMVectorSet(0.f,1.f,0.f,0.f),fTimeDelta * MouseMove * m_fMouseSensor);
+
+
+
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float3 pos{};	
-	XMStoreFloat3(&pos, m_vecPos);
+	_float3 pos{};
+	XMStoreFloat3(&pos,m_vecPos);
 
-	Player_Movement(fTimeDelta);					// «√∑π¿ÃæÓ µø¿€
+	Player_Movement(fTimeDelta);					// ÌîåÎ†àÏù¥Ïñ¥ ÎèôÏûë
 
-#pragma endregion ƒ´∏ﬁ∂Û»∏¿¸
+	#pragma endregion Ïπ¥Î©îÎùºÌöåÏ†Ñ
 
-#pragma region ¡ˆøˆ
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_P))
+	#pragma region ÏßÄÏõå
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_P))
 	{
 		cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
 		cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
 	}
 
-#pragma endregion ¡ˆøˆ	
+	#pragma endregion ÏßÄÏõå	
 
 	if(m_iViewState == PLAYER_FPS_VIEW)
 	{
 		// FPS
-		m_pHead->Set_PlayerViewState(false); 
+		m_pHead->Set_PlayerViewState(false);
 		m_pBody->Set_PlayerViewState(false);
 		m_pWaepon->Set_TPSState(false);
-	}
-	else if(m_iViewState == PLAYER_TPS_VIEW)
+	} else if(m_iViewState == PLAYER_TPS_VIEW)
 	{
-		 // TPS
+		// TPS
 		m_pHead->Set_PlayerViewState(true);
 		m_pBody->Set_PlayerViewState(true);
 		m_pWaepon->Set_TPSState(true);
 	}
 
-	if (m_bReloading == true) // ¿Â¿¸¿Ã ¬¸¿œ ∂ß 
+	if(m_bReloading == true) // Ïû•Ï†ÑÏù¥ Ï∞∏Ïùº Îïå 
 	{
-		m_fReload_Charging += fTimeDelta; // ¿Â¿¸ Ω√∞£
+		m_fReload_Charging += fTimeDelta; // Ïû•Ï†Ñ ÏãúÍ∞Ñ
 	}
-	if (m_fReload_Charging >= 1.f)  // ¿Â¿¸ Ω√∞£¿Ã ¥Ÿ ≥°≥µ¿ª ∂ß
+	if(m_fReload_Charging >= 1.f)  // Ïû•Ï†Ñ ÏãúÍ∞ÑÏù¥ Îã§ ÎÅùÎÇ¨ÏùÑ Îïå
 	{
 		m_fReload_Charging = 0.f;
-		m_bReloading = false;			// ¿Â¿¸ false
-		m_pWaepon->Set_BulletIn(true);	// √—«—≈◊ ¿Â¿¸µ«æ˙¥Ÿ∞Ì æÀ∑¡¡÷±‚
+		m_bReloading = false;			// Ïû•Ï†Ñ false
+		m_pWaepon->Set_BulletIn(true);	// Ï¥ùÌïúÌÖå Ïû•Ï†ÑÎêòÏóàÎã§Í≥† ÏïåÎ†§Ï£ºÍ∏∞
 	}
-	m_pWaepon->Set_CameraPos(m_vecCameraPos);			// ƒ´∏ﬁ∂Û At ∫∏≥ª¡÷±‚
-	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// ƒ´∏ﬁ∂Û At ∫∏≥ª¡÷±‚
-	m_pGameInstance->Set_PlayerPos(_float4(pos.x, pos.y, pos.z, 1.f)); // «√∑π¿ÃæÓ ¿ßƒ° ¿˙¿Â
+	m_pWaepon->Set_CameraPos(m_vecCameraPos);			// Ïπ¥Î©îÎùº At Î≥¥ÎÇ¥Ï£ºÍ∏∞
+	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// Ïπ¥Î©îÎùº At Î≥¥ÎÇ¥Ï£ºÍ∏∞
+	m_pGameInstance->Set_PlayerPos(_float4(pos.x,pos.y,pos.z,1.f)); // ÌîåÎ†àÏù¥Ïñ¥ ÏúÑÏπò Ï†ÄÏû•
 	if(m_iPrevWeaponState != m_iWeaponState)
 	{
-		m_pBody->Set_WeaponState(m_iWeaponState);		// ∏ˆø°∞‘ π´±‚ ªÛ≈¬ ∫∏≥ª¡÷±‚   TPS	
-		m_pWaepon->Set_WeaponState(m_iWeaponState);		// π´±‚ø°∞‘ π´±‚ ªÛ≈¬ ∫∏≥ª¡÷±‚
+		m_pBody->Set_WeaponState(m_iWeaponState);		// Î™∏ÏóêÍ≤å Î¨¥Í∏∞ ÏÉÅÌÉú Î≥¥ÎÇ¥Ï£ºÍ∏∞   TPS	
+		m_pWaepon->Set_WeaponState(m_iWeaponState);		// Î¨¥Í∏∞ÏóêÍ≤å Î¨¥Í∏∞ ÏÉÅÌÉú Î≥¥ÎÇ¥Ï£ºÍ∏∞
 	}
 	m_iPrevWeaponState = m_iWeaponState;
-	if (m_iWeaponState == BATTERY)		m_iViewState = PLAYER_FPS_VIEW; // πË≈Õ∏Æ¥¬ π´¡∂∞« 1¿Œƒ™
-	if (m_iWeaponState == TRACKER)		m_iViewState = PLAYER_FPS_VIEW; // √ﬂ¿˚±‚¥¬ π´¡∂∞« 1¿Œƒ™
+	if(m_iWeaponState == BATTERY)		m_iViewState = PLAYER_FPS_VIEW; // Î∞∞ÌÑ∞Î¶¨Îäî Î¨¥Ï°∞Í±¥ 1Ïù∏Ïπ≠
+	if(m_iWeaponState == TRACKER)		m_iViewState = PLAYER_FPS_VIEW; // Ï∂îÏ†ÅÍ∏∞Îäî Î¨¥Ï°∞Í±¥ 1Ïù∏Ïπ≠
 
-	if (m_iWeaponState == WEAPON_KATANA)			// ƒÆø°∞‘ π´±‚ ªÛ≈¬ ∫∏≥ª¡÷±‚	
+	if(m_iWeaponState == WEAPON_KATANA)			// ÏπºÏóêÍ≤å Î¨¥Í∏∞ ÏÉÅÌÉú Î≥¥ÎÇ¥Ï£ºÍ∏∞	
 	{
-		m_iViewState = PLAYER_TPS_VIEW;				// ƒ´≈∏≥™¥¬ π´¡∂∞« 3¿Œƒ™ 
+		m_iViewState = PLAYER_TPS_VIEW;				// Ïπ¥ÌÉÄÎÇòÎäî Î¨¥Ï°∞Í±¥ 3Ïù∏Ïπ≠ 
 		m_pKatana->Set_KatanaState(true);
 		m_pGameInstance->Set_KatanaState(true);
-	}
-	else
+	} else
 	{
 		m_pKatana->Set_KatanaState(false);
 		m_pGameInstance->Set_KatanaState(false);
@@ -195,10 +189,10 @@ void CPlayer::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 
-	// ∞¯∞› ¥Á«ﬂ¿ª ∂ß π´¿˚ªÛ≈¬ 1√ ∞£ 
-	if (m_bCanAttacked == false)
+	// Í≥µÍ≤© ÎãπÌñàÏùÑ Îïå Î¨¥Ï†ÅÏÉÅÌÉú 1Ï¥àÍ∞Ñ 
+	if(m_bCanAttacked == false)
 		m_fInvincibleTime += fTimeDelta;
-	if (m_fInvincibleTime >= 1.f)
+	if(m_fInvincibleTime >= 1.f)
 	{
 		m_bCanAttacked = true;
 		m_fInvincibleTime = 0.f;
@@ -213,35 +207,34 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 	if(m_bDead == false)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 			return;
 	}
 
 }
 HRESULT CPlayer::Render()
 {
-#ifdef _DEBUG
-	
+	#ifdef _DEBUG
+
 	m_pNavigationCom->Render();
-#endif
+	#endif
 	return S_OK;
 }
 void CPlayer::Heal(_float fTimeDelta)
-{	
+{
 	if(m_fHpTiem >= 1.f)
 	{
-		// 1√ ∏∂¥Ÿ ««∞° ≤À√°¥¬µ• ΩØµÂø°≥ ¡ˆ∞° ∏∏∂• æ∆¥œ∏È ΩØµÂ ø°≥ ¡ˆ √Ê¿¸
+		// 1Ï¥àÎßàÎã§ ÌîºÍ∞Ä ÍΩâÏ∞ºÎäîÎç∞ Ïâ¥ÎìúÏóêÎÑàÏßÄÍ∞Ä ÎßåÎïÖ ÏïÑÎãàÎ©¥ Ïâ¥Îìú ÏóêÎÑàÏßÄ Ï∂©Ï†Ñ
 		m_fHpTiem = 0.f;
-		if (m_fHp == 100.f)
+		if(m_fHp == 100.f)
 		{
-			if (m_fEnergy < 100.f)
+			if(m_fEnergy < 100.f)
 			{
 				m_fEnergy += 1.f;
 			}
-		}
-		else
+		} else
 		{
-			// ««∞° ∫Œ¡∑«œ∏È «« √Ê¿¸
+			// ÌîºÍ∞Ä Î∂ÄÏ°±ÌïòÎ©¥ Ìîº Ï∂©Ï†Ñ
 			m_fHp += 1.f;
 		}
 	}
@@ -258,26 +251,26 @@ HRESULT CPlayer::Add_Components()
 
 	Desc.iCurrentCellIndex = m_iCellidx;
 
-	 switch (m_eLevelID)
+	switch(m_eLevelID)
 	{
 
 	case Client::LEVEL_GAMEPLAY:
 	{
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-			TEXT("Com_Playerigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Playerigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom),&Desc)))
 			return E_FAIL;
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-			TEXT("Com_Playerigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Playerigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom),&Desc)))
 			return E_FAIL;
 		break;
 	}
 
 	default:
-		break;
+	break;
 	}
 
 	return S_OK;
@@ -294,7 +287,7 @@ HRESULT CPlayer::Add_PartObjects()
 	BodyDesc.m_iViewState = &m_iViewState;
 	BodyDesc.m_bAttackState = &m_bAttackState;
 	BodyDesc.m_eLevelID = m_eLevelID;
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"), TPS_PART_BODY, &BodyDesc)))
+	if(FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Body_Player"),TPS_PART_BODY,&BodyDesc)))
 		return E_FAIL;
 	m_pBody = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY]);
 	/* For.Body */
@@ -308,9 +301,9 @@ HRESULT CPlayer::Add_PartObjects()
 	HeadDesc.m_iWeaponState = &m_iWeaponState;
 	HeadDesc.m_eLevelID = m_eLevelID;
 	/*head_SKEL*/
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Head_Player"), TPS_PART_HEAD, &HeadDesc)))
+	if(FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Head_Player"),TPS_PART_HEAD,&HeadDesc)))
 		return E_FAIL;
-	
+
 	CWeapon::WEAPON_DESC	WeaponDesc{};
 	WeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	WeaponDesc.fSpeedPerSec = 0.f;
@@ -325,7 +318,7 @@ HRESULT CPlayer::Add_PartObjects()
 	WeaponDesc.fReloadingTime = &m_fReload_Charging;
 	WeaponDesc.m_eLevelID = m_eLevelID;
 	WeaponDesc.vTargetPos = &m_vecTargetPos;
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Weapon"), TPS_PART_WEAPON, &WeaponDesc)))
+	if(FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Weapon"),TPS_PART_WEAPON,&WeaponDesc)))
 		return E_FAIL;
 
 	CWeapon_Katana::KATANA_DESC	KatanaDesc{};
@@ -336,7 +329,7 @@ HRESULT CPlayer::Add_PartObjects()
 	KatanaDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("hand_R_SKEL");
 	KatanaDesc.m_iViewState = &m_iViewState;
 	KatanaDesc.m_eLevelID = m_eLevelID;
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Katana"), TPS_PART_KATANA, &KatanaDesc)))
+	if(FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Katana"),TPS_PART_KATANA,&KatanaDesc)))
 		return E_FAIL;
 
 	CPivot::PIVOT_DESC	PivotDesc{};
@@ -346,8 +339,8 @@ HRESULT CPlayer::Add_PartObjects()
 	PivotDesc.pParentState = &m_iState_Upper;
 	PivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	PivotDesc.m_iViewState = &m_iViewState;
-	
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Pivot"), TPS_PART_PIVOT, &PivotDesc)))
+
+	if(FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_Pivot"),TPS_PART_PIVOT,&PivotDesc)))
 		return E_FAIL;
 
 	CFPS_Pivot::FPSPIVOT_DESC	FPSPivotDesc{};
@@ -358,7 +351,7 @@ HRESULT CPlayer::Add_PartObjects()
 	FPSPivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	FPSPivotDesc.m_iViewState = &m_iViewState;
 
-	if (FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_FPSPivot"), FPS_PART_PIVOT, &FPSPivotDesc)))
+	if(FAILED(__super::Add_PartObject(TEXT("Prototype_GameObject_FPSPivot"),FPS_PART_PIVOT,&FPSPivotDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -371,87 +364,82 @@ HRESULT CPlayer::Bind_ShaderResources()
 
 void CPlayer::Player_Movement(_float fTimeDelta)
 {
-	_uint iJumpState = m_pBody->Get_JumpState();	// ¡°«¡ ªÛ≈¬ ∞°¡Æø¿±‚
+	_uint iJumpState = m_pBody->Get_JumpState();	// Ï†êÌîÑ ÏÉÅÌÉú Í∞ÄÏ†∏Ïò§Í∏∞
 	m_pTransformCom->Set_Min_Height();
-	if (iJumpState == LANDING_STATE) // ¡°«¡¡ﬂø£ IDLE ªÛ≈¬ æ»µ«æÓæﬂ«‘
+	if(iJumpState == LANDING_STATE) // Ï†êÌîÑÏ§ëÏóî IDLE ÏÉÅÌÉú ÏïàÎêòÏñ¥ÏïºÌï®
 	{
 
 		m_iState_Lower = STATE_IDLE;
 	}
-	if (m_pBody->Get_UpperBody_AnimState() == true)
+	if(m_pBody->Get_UpperBody_AnimState() == true)
 	{
 		m_iState_Upper = STATE_IDLE;
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_R))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_R))
 	{
-		if (m_iWeaponState != WEAPON_KATANA)
+		if(m_iWeaponState != WEAPON_KATANA)
 		{
-			m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Foley_Reload.wav", Engine::CHANNELID::PLAYER_RELOAD, 0.7f);
+			m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Foley_Reload.wav",Engine::CHANNELID::PLAYER_RELOAD,0.7f);
 			m_fReload_Charging = 0.f;
 			m_bReloading = true;
-			if (m_iViewState == PLAYER_FPS_VIEW)
+			if(m_iViewState == PLAYER_FPS_VIEW)
 			{
-				// æ∆π´∞Õµµ «œ¡ˆ∏∂ ( 1¿Œƒ™ ∏º«¿Ã æ¯¿Ω ) 
-			}
-			else
+				// ÏïÑÎ¨¥Í≤ÉÎèÑ ÌïòÏßÄÎßà ( 1Ïù∏Ïπ≠ Î™®ÏÖòÏù¥ ÏóÜÏùå ) 
+			} else
 			{
-				// ¿Â¿¸ µø¿€«ÿ∂Û  
-				if (!(m_iState_Upper & RELOADING))
+				// Ïû•Ï†Ñ ÎèôÏûëÌï¥Îùº  
+				if(!(m_iState_Upper & RELOADING))
 				{
-					if (m_iState_Upper & STATE_IDLE)
+					if(m_iState_Upper & STATE_IDLE)
 						m_iState_Upper ^= STATE_IDLE;
 					m_iState_Upper |= RELOADING;
 				}
 			}
-		}
-		else
+		} else
 		{
 			m_iState_Upper |= STATE_IDLE;
 		}
 	}
-	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_iWeaponState == BATTERY)
+	if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_iWeaponState == BATTERY)
 	{
-		m_iWeaponState = m_iPrev_WeaponState; // ∞«¿¸¡ˆ ≥ª∏Æ∞Ì ¿Ã¿¸ π´±‚∑Œ µπæ∆∞°±‚
+		m_iWeaponState = m_iPrev_WeaponState; // Í±¥Ï†ÑÏßÄ ÎÇ¥Î¶¨Í≥† Ïù¥Ï†Ñ Î¨¥Í∏∞Î°ú ÎèåÏïÑÍ∞ÄÍ∏∞
 		m_vecBatteryPos = m_vecPos;
 		m_bVisible_Battery = true;
-	}
-	else if ((m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_iWeaponState == TRACKER) || (m_bMissile_Explosion == true && m_iWeaponState == TRACKER))
+	} else if((m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_iWeaponState == TRACKER) || (m_bMissile_Explosion == true && m_iWeaponState == TRACKER))
 	{
-		m_iWeaponState = m_iPrev_WeaponState; // ∞«¿¸¡ˆ ≥ª∏Æ∞Ì ¿Ã¿¸ π´±‚∑Œ µπæ∆∞°±‚
+		m_iWeaponState = m_iPrev_WeaponState; // Í±¥Ï†ÑÏßÄ ÎÇ¥Î¶¨Í≥† Ïù¥Ï†Ñ Î¨¥Í∏∞Î°ú ÎèåÏïÑÍ∞ÄÍ∏∞
 		m_vecTrackerPos = m_vecPos;
-		m_bVisible_Tracker = false;  // ∆Æ∑°ƒø∏¶ µÈæ˙¿ª ∂ß æ»∫∏¿Ã∞Ì, ≥ıæ“¿ª ∂ß ∫∏¿Ã∞‘ «ﬂ¿Ω πË≈Õ∏Æ∂˚ π›¥Î
+		m_bVisible_Tracker = false;  // Ìä∏ÎûòÏª§Î•º Îì§ÏóàÏùÑ Îïå ÏïàÎ≥¥Ïù¥Í≥†, ÎÜìÏïòÏùÑ Îïå Î≥¥Ïù¥Í≤å ÌñàÏùå Î∞∞ÌÑ∞Î¶¨Îûë Î∞òÎåÄ
 		m_bMissile_Explosion = false;
-	}
-	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
+	} else if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == false)
 	{
-		if (m_iWeaponState == WEAPON_KATANA)
+		if(m_iWeaponState == WEAPON_KATANA)
 		{
 			m_pGameInstance->StopSound(PLAYER_SWORD);
-			m_pGameInstance->PlaySoundW(L"Sword1.wav", Engine::CHANNELID::PLAYER_SWORD,0.6f);
+			m_pGameInstance->PlaySoundW(L"Sword1.wav",Engine::CHANNELID::PLAYER_SWORD,0.6f);
 			m_bAttackState = true;
-		
+
 		}
 
-	
-		m_pGameInstance->isPicked(&m_vecTargetPos);
-		
 
-		if (!(m_iState_Upper & FIRE))
+		m_pGameInstance->isPicked(&m_vecTargetPos);
+
+
+		if(!(m_iState_Upper & FIRE))
 		{
-			if (m_iState_Upper & STATE_IDLE)
+			if(m_iState_Upper & STATE_IDLE)
 				m_iState_Upper ^= STATE_IDLE;
 			m_iState_Upper |= FIRE;
 		}
-		// ø©±‚º≠ ∞«¿¸¡ˆ ∂≥±∏¿⁄ 
-	}
-	else if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == true && m_iViewState == PLAYER_FPS_VIEW)
+		// Ïó¨Í∏∞ÏÑú Í±¥Ï†ÑÏßÄ Îñ®Íµ¨Ïûê 
+	} else if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB) && m_bReloading == true && m_iViewState == PLAYER_FPS_VIEW)
 	{
 		m_iState_Upper = STATE_IDLE;
 	}
-	
-	if (m_pGameInstance->Get_DIMouseState_Down(DIM_LB) && m_bReloading == false && m_iWeaponState == WEAPON_KATANA)
+
+	if(m_pGameInstance->Get_DIMouseState_Down(DIM_LB) && m_bReloading == false && m_iWeaponState == WEAPON_KATANA)
 	{
-		//// ø©±‚
+		//// Ïó¨Í∏∞
 		//CSlash_Mesh::SLASH_DESC pSlash{};
 		//pSlash.vecPlayerPos = &m_vecPos;
 		//pSlash.fScale = _float3(50.f, 50.f, 50.f);
@@ -461,85 +449,85 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		//pSlash.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("chest_SKEL");
 		//m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Slash"), &pSlash);
 	}
-	
-	if (m_pGameInstance->Get_DIMouseState_Up(DIM_LB))
+
+	if(m_pGameInstance->Get_DIMouseState_Up(DIM_LB))
 	{
-		if (m_iWeaponState != WEAPON_KATANA)
+		if(m_iWeaponState != WEAPON_KATANA)
 		{
 			m_iState_Upper = STATE_IDLE;
 		}
 	}
-	if (m_pGameInstance->Get_DIMouseState_Pressing(DIM_RB))
+	if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_RB))
 	{
 		m_bAttackState = true;
 		m_pGameInstance->StopSound(PLAYER_SWORD);
-		m_pGameInstance->PlaySoundW(L"Sword2.wav", Engine::CHANNELID::PLAYER_SWORD, 0.6f);
+		m_pGameInstance->PlaySoundW(L"Sword2.wav",Engine::CHANNELID::PLAYER_SWORD,0.6f);
 
-		if (!(m_iState_Upper & FIRE_RB))
+		if(!(m_iState_Upper & FIRE_RB))
 		{
-			if (m_iState_Upper & STATE_IDLE)
+			if(m_iState_Upper & STATE_IDLE)
 				m_iState_Upper ^= STATE_IDLE;
 			m_iState_Upper |= FIRE_RB;
 		}
 	}
 
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_V) && m_iViewState == PLAYER_TPS_VIEW)
+	if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_V) && m_iViewState == PLAYER_TPS_VIEW)
 	{
-		m_pGameInstance->PlaySoundW(L"FE_Player_Melee_Punch_Miss_02_extra.wav", Engine::CHANNELID::PLAYER_MELEE, 0.7f);
-		if (!(m_iState_Upper & MELEE))
+		m_pGameInstance->PlaySoundW(L"FE_Player_Melee_Punch_Miss_02_extra.wav",Engine::CHANNELID::PLAYER_MELEE,0.7f);
+		if(!(m_iState_Upper & MELEE))
 		{
-			if (m_iState_Upper & STATE_IDLE)
+			if(m_iState_Upper & STATE_IDLE)
 				m_iState_Upper ^= STATE_IDLE;
 			m_iState_Upper |= MELEE;
 		}
 	}
 
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_S))
+	if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_S))
 	{
-		// µ⁄ øﬁ¬ ¿∏∑Œ ∞»±‚ 
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
+		// Îí§ ÏôºÏ™ΩÏúºÎ°ú Í±∑Í∏∞ 
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
 
-			if (iJumpState == LANDING_STATE)
+			if(iJumpState == LANDING_STATE)
 			{
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Left(fTimeDelta);
 				m_pTransformCom->Go_Backward(fTimeDelta);
-				if (!(m_iState_Lower & WALKSTATE_SOUTHWEST))
+				if(!(m_iState_Lower & WALKSTATE_SOUTHWEST))
 				{
-					if (m_iState_Lower & STATE_IDLE)
+					if(m_iState_Lower & STATE_IDLE)
 						m_iState_Lower ^= STATE_IDLE;
 					m_iState_Lower |= WALKSTATE_SOUTHWEST;
 				}
 			}
 
 		}
-		// µ⁄ ø¿∏•¬  ¿∏∑Œ ∞»±‚
-		else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
+		// Îí§ Ïò§Î•∏Ï™Ω ÏúºÎ°ú Í±∑Í∏∞
+		else if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
 			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Right(fTimeDelta);
 			m_pTransformCom->Go_Backward(fTimeDelta);
-			if (iJumpState == LANDING_STATE)
+			if(iJumpState == LANDING_STATE)
 			{
-				if (!(m_iState_Lower & WALKSTATE_SOUTHEAST))
+				if(!(m_iState_Lower & WALKSTATE_SOUTHEAST))
 				{
-					if (m_iState_Lower & STATE_IDLE)
+					if(m_iState_Lower & STATE_IDLE)
 						m_iState_Lower ^= STATE_IDLE;
 					m_iState_Lower |= WALKSTATE_SOUTHEAST;
 				}
 			}
 		}
-		// ±◊≥… µ⁄∑Œ ∞»±‚
+		// Í∑∏ÎÉ• Îí§Î°ú Í±∑Í∏∞
 		else
 		{
 			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Backward(fTimeDelta);
-			if (iJumpState == LANDING_STATE)
+			if(iJumpState == LANDING_STATE)
 			{
-				if (!(m_iState_Lower & WALKSTATE_SOUTH))
+				if(!(m_iState_Lower & WALKSTATE_SOUTH))
 				{
-					if (m_iState_Lower & STATE_IDLE)
+					if(m_iState_Lower & STATE_IDLE)
 						m_iState_Lower ^= STATE_IDLE;
 					m_iState_Lower |= WALKSTATE_SOUTH;
 				}
@@ -547,54 +535,52 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 		}
 	}
 
-	if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_LSHIFT))
+	if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_LSHIFT))
 	{
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_W))
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_W))
 		{
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
 				m_bRunState = true;
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Left_Player(fTimeDelta * m_fRun_EightDirection);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_EightDirection);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
-					if (!(m_iState_Lower & RUNSTATE_NORTHWEST))
+					if(!(m_iState_Lower & RUNSTATE_NORTHWEST))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= RUNSTATE_NORTHWEST;
 					}
 				}
-			}
-			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
+			} else if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
 				m_bRunState = true;
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Right_Player(fTimeDelta * m_fRun_EightDirection);
 				//	m_pTransformCom->Go_Straight(fTimeDelta, 1.5f);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_EightDirection);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
-					if (!(m_iState_Lower & RUNSTATE_NORTHEAST))
+					if(!(m_iState_Lower & RUNSTATE_NORTHEAST))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= RUNSTATE_NORTHEAST;
 					}
 				}
-			}
-			else
+			} else
 			{
 				m_bRunState = true;
 				Walk_Sound(fTimeDelta);
 				//	m_pTransformCom->Go_Straight(fTimeDelta, 2.f);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta * m_fRun_FourDirection);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
-					if (!(m_iState_Lower & RUNSTATE_NORTH))
+					if(!(m_iState_Lower & RUNSTATE_NORTH))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= RUNSTATE_NORTH;
 					}
@@ -602,117 +588,113 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 			}
 
 		}
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 		{
 			m_bRunState = true;
 			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Left_Player(fTimeDelta);
-			if (iJumpState == LANDING_STATE)
+			if(iJumpState == LANDING_STATE)
 			{
-				if (!(m_iState_Lower & WALKSTATE_WEST))
+				if(!(m_iState_Lower & WALKSTATE_WEST))
 				{
-					if (m_iState_Lower & STATE_IDLE)
+					if(m_iState_Lower & STATE_IDLE)
 						m_iState_Lower ^= STATE_IDLE;
 					m_iState_Lower |= WALKSTATE_WEST;
 				}
 			}
 		}
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 		{
 			m_bRunState = true;
 			Walk_Sound(fTimeDelta);
 			m_pTransformCom->Go_Right_Player(fTimeDelta);
-			if (iJumpState == LANDING_STATE)
+			if(iJumpState == LANDING_STATE)
 			{
-				if (!(m_iState_Lower & WALKSTATE_EAST))
+				if(!(m_iState_Lower & WALKSTATE_EAST))
 				{
-					if (m_iState_Lower & STATE_IDLE)
+					if(m_iState_Lower & STATE_IDLE)
 						m_iState_Lower ^= STATE_IDLE;
 					m_iState_Lower |= WALKSTATE_EAST;
 				}
 			}
 		}
-	}
-	else
+	} else
 	{
-		m_bRunState = false; 
-		if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_W))
+		m_bRunState = false;
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_W))
 		{
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta);
 				m_pTransformCom->Go_Left_Player(fTimeDelta * m_fRun_EightDirection);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
 					//	m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
 
-					if (!(m_iState_Lower & WALKSTATE_NORTHWEST))
+					if(!(m_iState_Lower & WALKSTATE_NORTHWEST))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= WALKSTATE_NORTHWEST;
 					}
 				}
-			}
-			else if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
+			} else if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta);
 				m_pTransformCom->Go_Right_Player(fTimeDelta * m_fRun_EightDirection);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
 					//		m_pTransformCom->Go_Straight(fTimeDelta * 0.7f);
 
-					if (!(m_iState_Lower & WALKSTATE_NORTHEAST))
+					if(!(m_iState_Lower & WALKSTATE_NORTHEAST))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= WALKSTATE_NORTHEAST;
 					}
 				}
-			}
-			else
+			} else
 			{
 				Walk_Sound(fTimeDelta);
 				//		m_pTransformCom->Go_Straight(fTimeDelta);
 				m_pTransformCom->Go_Straight_Player(fTimeDelta);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
-					if (!(m_iState_Lower & WALKSTATE_NORTH))
+					if(!(m_iState_Lower & WALKSTATE_NORTH))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= WALKSTATE_NORTH;
 					}
 				}
 			}
-		}
-		else
+		} else
 		{
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_A))
 			{
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Left_Player(fTimeDelta);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
-					if (!(m_iState_Lower & WALKSTATE_WEST))
+					if(!(m_iState_Lower & WALKSTATE_WEST))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= WALKSTATE_WEST;
 					}
 				}
 			}
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_D))
 			{
 				Walk_Sound(fTimeDelta);
 				m_pTransformCom->Go_Right_Player(fTimeDelta);
-				if (iJumpState == LANDING_STATE)
+				if(iJumpState == LANDING_STATE)
 				{
-					if (!(m_iState_Lower & WALKSTATE_EAST))
+					if(!(m_iState_Lower & WALKSTATE_EAST))
 					{
-						if (m_iState_Lower & STATE_IDLE)
+						if(m_iState_Lower & STATE_IDLE)
 							m_iState_Lower ^= STATE_IDLE;
 						m_iState_Lower |= WALKSTATE_EAST;
 					}
@@ -724,44 +706,42 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 
 
-	if ((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE && m_iJumpCount == 0)  // ¡°«¡ Ω√¿€
+	if((m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE)) && iJumpState == LANDING_STATE && m_iJumpCount == 0)  // Ï†êÌîÑ ÏãúÏûë
 	{
 		iJumpState = JUMPING_START_STATE;
 
 		m_bJumpStart = false;
 		m_fPower = 0.f;
 		m_iJumpCount = 1;
-		if (!(m_iState_Lower & JUMP_START))
+		if(!(m_iState_Lower & JUMP_START))
 		{
 			{
-				if (m_iState_Lower & STATE_IDLE)
+				if(m_iState_Lower & STATE_IDLE)
 					m_iState_Lower ^= STATE_IDLE;
 				m_iState_Lower |= JUMP_START;
 			}
 		}
-	}
-	else if (iJumpState == JUMPING_LOOP_STATE)  // ¡°«¡ ∑Á«¡ Ω√¿€
+	} else if(iJumpState == JUMPING_LOOP_STATE)  // Ï†êÌîÑ Î£®ÌîÑ ÏãúÏûë
 	{
 
-		if (m_bJumpStart == false)
+		if(m_bJumpStart == false)
 		{
 			m_pGameInstance->StopSound(PLAYER_JUMP);
-			m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Jump_01.wav", Engine::CHANNELID::PLAYER_JUMP, 0.7f);
+			m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Jump_01.wav",Engine::CHANNELID::PLAYER_JUMP,0.7f);
 			m_fPower = 50.f;
 			m_bJumpStart = true;
 		}
-		if (!(m_iState_Lower & JUMP_LOOP))
+		if(!(m_iState_Lower & JUMP_LOOP))
 		{
-			if (m_iState_Lower & STATE_IDLE)
+			if(m_iState_Lower & STATE_IDLE)
 				m_iState_Lower ^= STATE_IDLE;
 			m_iState_Lower |= JUMP_LOOP;
 		}
-	}
-	else if (iJumpState == JUMPING_END_STATE)  // ¡°«¡ ∏∂π´∏Æ
+	} else if(iJumpState == JUMPING_END_STATE)  // Ï†êÌîÑ ÎßàÎ¨¥Î¶¨
 	{
-		if (!(m_iState_Lower & JUMP_END))
+		if(!(m_iState_Lower & JUMP_END))
 		{
-			if (m_iState_Lower & STATE_IDLE)
+			if(m_iState_Lower & STATE_IDLE)
 				m_iState_Lower ^= STATE_IDLE;
 			m_iState_Lower |= JUMP_END;
 		}
@@ -769,45 +749,44 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 	}
 
-	// ≥Ù¿Ã ≈∏±‚ 
+	// ÎÜíÏù¥ ÌÉÄÍ∏∞ 
 	_float3 vHeightPos{};
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	if (true == m_pGameInstance->isComputeHeight(m_vecPos, &vHeightPos))
+	if(true == m_pGameInstance->isComputeHeight(m_vecPos,&vHeightPos))
 	{
 		m_fHeight_Store = vHeightPos.y;
-	}
-	else
+	} else
 		m_fHeight_Store = 0.f;
 
-	if (XMVectorGetY(m_vecPos) < m_fHeight_Store && (m_fHeight_Store - XMVectorGetY(m_vecPos) <= 10.f))
+	if(XMVectorGetY(m_vecPos) < m_fHeight_Store && (m_fHeight_Store - XMVectorGetY(m_vecPos) <= 10.f))
 	{
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(vHeightPos.x, vHeightPos.y, vHeightPos.z,1.f));
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(vHeightPos.x,vHeightPos.y,vHeightPos.z,1.f));
 	}
 
-	// ¡ﬂ∑¬
-	m_pTransformCom->Gravity(m_vecPos, fTimeDelta, m_fHeight_Store);
+	// Ï§ëÎ†•
+	m_pTransformCom->Gravity(m_vecPos,fTimeDelta,m_fHeight_Store);
 
-	if (iJumpState >= JUMPING_LOOP_STATE)
+	if(iJumpState >= JUMPING_LOOP_STATE)
 	{
 		if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE) && m_iJumpCount == 1)
 		{
 			m_pGameInstance->StopSound(PLAYER_JUMP);
-			m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Doublejump_01.wav", Engine::CHANNELID::PLAYER_JUMP, 0.7f);
+			m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Doublejump_01.wav",Engine::CHANNELID::PLAYER_JUMP,0.7f);
 
 			m_fPower = 50.f;
 			m_iJumpCount = 2;
 		}
 
-		m_pTransformCom->Jump(fTimeDelta, m_fHeight, m_fPower, iJumpState, m_iJumpCount, m_fHeight_Store);
-		m_pBody->Set_JumpState(m_fHeight, m_fPower, m_fHeight_Store);
+		m_pTransformCom->Jump(fTimeDelta,m_fHeight,m_fPower,iJumpState,m_iJumpCount,m_fHeight_Store);
+		m_pBody->Set_JumpState(m_fHeight,m_fPower,m_fHeight_Store);
 	}
 }
 
-CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPlayer* CPlayer::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CPlayer* pInstance = new CPlayer(pDevice, pContext);
+	CPlayer* pInstance = new CPlayer(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CPlayer");
 		Safe_Release(pInstance);
@@ -820,7 +799,7 @@ CGameObject* CPlayer::Clone(void* pArg)
 {
 	CPlayer* pInstance = new CPlayer(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CPlayer");
 		Safe_Release(pInstance);
@@ -840,193 +819,189 @@ void CPlayer::Free()
 
 void CPlayer::Walk_Sound(_float fTimDelta)
 {
-	if (XMVectorGetY(m_vecPos) <= m_fHeight_Store + 0.1f)
+	if(XMVectorGetY(m_vecPos) <= m_fHeight_Store + 0.1f)
 	{
-		if (m_bRunState == true && m_eLevelID == LEVEL_GAMEPLAY)
+		if(m_bRunState == true && m_eLevelID == LEVEL_GAMEPLAY)
 		{
 			m_iRunCount++;
-			if (m_iRunCount > 20)
+			if(m_iRunCount > 20)
 			{
 				m_iRunCount = 0;
 				m_pGameInstance->StopSound(PLAYER_WALK);
 			}
-		}
-		else
+		} else
 			m_iRunCount = 0;
 
-		if (m_bGrassState == true)
+		if(m_bGrassState == true)
 		{
 			m_iGrassCount++;
 			if(m_bRunState == true)
 			{
-				if (m_iGrassCount > 12)
+				if(m_iGrassCount > 12)
 				{
 					m_iGrassCount = 0;
 					m_pGameInstance->StopSound(PLAYER_WALK);
 				}
-			}
-			else
+			} else
 			{
-				if (m_iGrassCount > 18)
+				if(m_iGrassCount > 18)
 				{
 					m_iGrassCount = 0;
 					m_pGameInstance->StopSound(PLAYER_WALK);
 				}
 			}
-		}
-		else
+		} else
 			m_iGrassCount = 0;
-		
+
 		m_iWalkCount++;
-		if (m_iWalkCount > 7)
+		if(m_iWalkCount > 7)
 			m_iWalkCount = 0;
-		if (m_eLevelID == LEVEL_GAMEPLAY)
+		if(m_eLevelID == LEVEL_GAMEPLAY)
 		{
-			switch (m_iWalkCount)
+			switch(m_iWalkCount)
 			{
 			case 0:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_01.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_01.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 1:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_02.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_02.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 2:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_03.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_03.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 3:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_04.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_04.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 4:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_05.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_05.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 5:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_06.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_06.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 6:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_07.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_07.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			case 7:
 			{
-				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_08.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+				m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_08.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 				break;
 			}
 			default:
-				break;
+			break;
 			}
 		}
 
-		if (m_eLevelID == LEVEL_YARD)
+		if(m_eLevelID == LEVEL_YARD)
 		{
 			if(m_fHeight_Store <= 0.2f)
 			{
 				m_bGrassState = true;
-				switch (m_iWalkCount)
+				switch(m_iWalkCount)
 				{
 				case 0:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_01.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_01.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 1:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_02.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_02.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 2:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_03.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_03.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 3:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_04.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_04.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 4:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_05.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_05.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 5:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_06.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_06.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 6:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_07.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_07.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 7:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_08.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_FS_Grass_08.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				default:
-					break;
+				break;
 				}
-			}
-			else
+			} else
 			{
 				m_bGrassState = false;
-				switch (m_iWalkCount)
+				switch(m_iWalkCount)
 				{
 				case 0:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_01.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_01.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 1:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_02.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_02.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 2:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_03.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_03.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 3:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_04.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_04.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 4:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_05.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_05.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 5:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_06.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_06.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 6:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_07.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_07.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				case 7:
 				{
-					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_08.wav", Engine::CHANNELID::PLAYER_WALK, 0.6f);
+					m_pGameInstance->PlaySoundW(L"FE_Footstep_Teddy_Walk_Marine_08.wav",Engine::CHANNELID::PLAYER_WALK,0.6f);
 					break;
 				}
 				default:
-					break;
+				break;
 				}
 			}
 		}

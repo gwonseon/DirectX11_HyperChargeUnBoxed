@@ -6,87 +6,86 @@
 #include "Environment.h"
 
 
-CNavigation_Leve::CNavigation_Leve(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLevel{ pDevice, pContext }
-{
-}
+CNavigation_Leve::CNavigation_Leve(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CLevel{pDevice,pContext}
+{}
 
 HRESULT CNavigation_Leve::Initialize()
 {
 	m_eLevel = LEVEL_YARD;
-	// ≥◊∫Ò∞‘¿Ãº«
+	// ÎÑ§ÎπÑÍ≤åÏù¥ÏÖò
 	ShowCursor(true);
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// ƒ´∏ﬁ∂Û ª˝º∫
-	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// ¡ˆ«¸ ª˝º∫
-	if (FAILED(Ready_Lights()))										return E_FAIL;	// ∫˚
-	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// ∑Œµ˘ ¥›±‚
+	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// Ïπ¥Î©îÎùº ÏÉùÏÑ±
+	if(FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// ÏßÄÌòï ÏÉùÏÑ±
+	if(FAILED(Ready_Lights()))										return E_FAIL;	// Îπõ
+	if(FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// Î°úÎî© Îã´Í∏∞
 
-	// ≈Õ∑π¿Œ ««≈∑¿ª ¿ß«ÿ ≈Õ∑π¿Œ ƒƒ∆˜≥Õ∆Æ ∞°¡Æø¿±‚
-	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_NAVIGATION, TEXT("Layer_Terrain"), TEXT("Com_VIBuffer")));
+	// ÌÑ∞Î†àÏù∏ ÌîºÌÇπÏùÑ ÏúÑÌï¥ ÌÑ∞Î†àÏù∏ Ïª¥Ìè¨ÎÑåÌä∏ Í∞ÄÏ†∏Ïò§Í∏∞
+	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_NAVIGATION,TEXT("Layer_Terrain"),TEXT("Com_VIBuffer")));
 	Load_Map();
 
-	m_pSave = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Save.jpg"));
-	m_pLoad = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Load.jpg"));
+	m_pSave = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Save.jpg"));
+	m_pLoad = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Load.jpg"));
 	my_Savetexture = *m_pSave->Get_SRV().begin();
 	my_Loadtexture = *m_pLoad->Get_SRV().begin();
-	
-//	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+
+	//	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(L"../Bin/Data/Navigation_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Environment File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 	DWORD dwByte = 0;
 
 
-	while(ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,vPoints,sizeof(_float3) * 3,&dwByte,nullptr) && dwByte > 0)
 	{
-		_vector vA = XMVectorSet(vPoints[0].x, vPoints[0].y, vPoints[0].z, 1.f);
-		_vector vB = XMVectorSet(vPoints[1].x, vPoints[1].y, vPoints[1].z, 1.f);
-		_vector vC = XMVectorSet(vPoints[2].x, vPoints[2].y, vPoints[2].z, 1.f);
-		_vector vCross = XMVector3Cross(vB - vA, vC - vB);
+		_vector vA = XMVectorSet(vPoints[0].x,vPoints[0].y,vPoints[0].z,1.f);
+		_vector vB = XMVectorSet(vPoints[1].x,vPoints[1].y,vPoints[1].z,1.f);
+		_vector vC = XMVectorSet(vPoints[2].x,vPoints[2].y,vPoints[2].z,1.f);
+		_vector vCross = XMVector3Cross(vB - vA,vC - vB);
 		_float fDot{};
-		_vector vUp = { 0.f,1.f,0.f,0.f };
+		_vector vUp = {0.f,1.f,0.f,0.f};
 
-		// ¿ﬂ∏¯µ» º¯º≠∑Œ ¬Ô¿∫ ªÔ∞¢«¸¿« ¿ßƒ° ∫Ø∞Ê
-		XMVECTOR vDot = XMVector3Dot(vCross, vUp);
-		XMStoreFloat(&fDot, vDot);
-		if (fDot < 0)
+		// ÏûòÎ™ªÎêú ÏàúÏÑúÎ°ú Ï∞çÏùÄ ÏÇºÍ∞ÅÌòïÏùò ÏúÑÏπò Î≥ÄÍ≤Ω
+		XMVECTOR vDot = XMVector3Dot(vCross,vUp);
+		XMStoreFloat(&fDot,vDot);
+		if(fDot < 0)
 		{
-			_float3 fNewB{}, fNewC{};
-			XMStoreFloat3(&fNewB, vC);
-			XMStoreFloat3(&fNewC, vB);
+			_float3 fNewB{},fNewC{};
+			XMStoreFloat3(&fNewB,vC);
+			XMStoreFloat3(&fNewC,vB);
 			vPoints[1] = fNewB;
 			vPoints[2] = fNewC;
 		}
-	
-		// ªÔ∞¢«¸¿« ∞¢ ≤¿¡˛¡°ø° ƒ›∏Æ¿¸ π⁄Ω∫ ª˝º∫
+
+		// ÏÇºÍ∞ÅÌòïÏùò Í∞Å Íº≠ÏßìÏ†êÏóê ÏΩúÎ¶¨Ï†Ñ Î∞ïÏä§ ÏÉùÏÑ±
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
 		CollisionDesc.iCellType = 0; // 
 
 
 		CollisionDesc.iImGuiMode = NAVIGATION;
 		CollisionDesc.eLevel = LEVEL_NAVIGATION;
-		CollisionDesc.iPoint_Number = 0;		// πËø≠¿« µﬁ¿⁄∏Æ º˝¿⁄
-		CollisionDesc.fPosition = vPoints[0];   // ¡° ¿ßƒ° 
+		CollisionDesc.iPoint_Number = 0;		// Î∞∞Ïó¥Ïùò Îí∑ÏûêÎ¶¨ Ïà´Ïûê
+		CollisionDesc.fPosition = vPoints[0];   // Ï†ê ÏúÑÏπò 
 		fPoints[0] = vPoints[0].x;		fPoints[1] = vPoints[0].y; 		fPoints[2] = vPoints[0].z;
 		CollisionDesc.iIndexNumber = m_iIndex;
-		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
 		++m_iIndex;
 
-		CollisionDesc.iPoint_Number = 1;		// πËø≠¿« µﬁ¿⁄∏Æ º˝¿⁄
-		CollisionDesc.fPosition = vPoints[1];   // ¡° ¿ßƒ° 
+		CollisionDesc.iPoint_Number = 1;		// Î∞∞Ïó¥Ïùò Îí∑ÏûêÎ¶¨ Ïà´Ïûê
+		CollisionDesc.fPosition = vPoints[1];   // Ï†ê ÏúÑÏπò 
 		fPoints[0] = vPoints[1].x;		fPoints[1] = vPoints[1].y; 		fPoints[2] = vPoints[1].z;
 		CollisionDesc.iIndexNumber = m_iIndex;
-		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
 		++m_iIndex;
-		
-		CollisionDesc.iPoint_Number = 2;		// πËø≠¿« µﬁ¿⁄∏Æ º˝¿⁄
-		CollisionDesc.fPosition = vPoints[2];   // ¡° ¿ßƒ° 
+
+		CollisionDesc.iPoint_Number = 2;		// Î∞∞Ïó¥Ïùò Îí∑ÏûêÎ¶¨ Ïà´Ïûê
+		CollisionDesc.fPosition = vPoints[2];   // Ï†ê ÏúÑÏπò 
 		fPoints[0] = vPoints[2].x;		fPoints[1] = vPoints[2].y; 		fPoints[2] = vPoints[2].z;
 		CollisionDesc.iIndexNumber = m_iIndex;
-		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
 		++m_iIndex;
 
 	}
@@ -102,14 +101,14 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 
-	if (Save == true)
+	if(Save == true)
 	{
 		Save_Navigation(fTimeDelta);
 		Save = false;
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_TAB))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_TAB))
 	{
-		if (eNaviMode == CREATE_NAVIPOINT)
+		if(eNaviMode == CREATE_NAVIPOINT)
 			eNaviMode = SELECT_NAVIPOINT;
 		else
 		{
@@ -122,42 +121,41 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 			}
 		}
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
 	{
-		// ≈¨∏Ø«“ ºˆ ¿÷¥¬ ªÛ≈¬∑Œ πŸ≤„¡ÿ¥Ÿ.
-		if (eNaviMode == CREATE_NAVIPOINT)
+		// ÌÅ¥Î¶≠Ìï† Ïàò ÏûàÎäî ÏÉÅÌÉúÎ°ú Î∞îÍøîÏ§ÄÎã§.
+		if(eNaviMode == CREATE_NAVIPOINT)
 		{
 			if(m_bAfter_AddPoints == true)
 			{
-				if (m_iCount < 2)
+				if(m_iCount < 2)
 					m_iCount++;
 				m_bDelete = true;
 			}
-			
+
 		}
 		m_bClick = true;
 	}
-	// ƒ¡∆Æ∑— øÏ≈¨∏Ø¿∫ ∏« µ⁄ ªË¡¶
-	if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)) && eNaviMode == CREATE_NAVIPOINT && m_bDelete == true)
+	// Ïª®Ìä∏Î°§ Ïö∞ÌÅ¥Î¶≠ÏùÄ Îß® Îí§ ÏÇ≠Ï†ú
+	if((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)) && eNaviMode == CREATE_NAVIPOINT && m_bDelete == true)
 	{
-		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
+		if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
 		{
 			if(m_vecCollision.size() > 0 && m_iCount >= 0)
 			{
 				m_vecCollision.back()->Set_Dead();
 				m_vecCollision.pop_back();
 				--m_iCount;
-				
-				if (m_iCount < 0)
+
+				if(m_iCount < 0)
 				{
 					m_iCount = 0;
 					fPoints[0] =	m_vecCollision.back()->Get_PickingPos().x;
 					fPoints[1] =	m_vecCollision.back()->Get_PickingPos().y;
 					fPoints[2] =	m_vecCollision.back()->Get_PickingPos().z;
 					m_bAfter_AddPoints = false;
-					m_bDelete = false; // 0π¯ ¿Œµ¶Ω∫ ªË¡¶«— µ⁄ø°¥¬ ªË¡¶«œ∏È æ»µ 
-				}
-				else
+					m_bDelete = false; // 0Î≤à Ïù∏Îç±Ïä§ ÏÇ≠Ï†úÌïú Îí§ÏóêÎäî ÏÇ≠Ï†úÌïòÎ©¥ ÏïàÎê®
+				} else
 				{
 					fPoints[0] = vPoints[m_iCount].x;
 					fPoints[1] = vPoints[m_iCount].y;
@@ -168,11 +166,11 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		}
 	}
 
-	if (eNaviMode == CREATE_NAVIPOINT )
+	if(eNaviMode == CREATE_NAVIPOINT)
 	{
 		if(m_bClick == false)
 		{
-			m_vecCollision.back()->Set_Position(XMVectorSet(fPoints[0], fPoints[1], fPoints[2], 1.f));
+			m_vecCollision.back()->Set_Position(XMVectorSet(fPoints[0],fPoints[1],fPoints[2],1.f));
 			vPoints[m_iCount].x = fPoints[0];
 			vPoints[m_iCount].y = fPoints[1];
 			vPoints[m_iCount].z = fPoints[2];
@@ -180,83 +178,82 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		}
 	}
 
-	if (m_pGameInstance->Get_DIMouseState_Down(DIM_LB) && m_bClick == true)
+	if(m_pGameInstance->Get_DIMouseState_Down(DIM_LB) && m_bClick == true)
 	{
-		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-		XMVECTOR RayPos, RayDir;
-	
-			m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
-	
-			RayDir = XMVector3Normalize(RayDir);
-			_bool bPickCheck = false;
-			// ¬Ô¿∫ ¿ßƒ°∞° π⁄Ω∫øÕ √Êµπ«œ∏È π⁄Ω∫ ¿ßƒ° π›»Ø æ∆¥œ∏È ¬Ô¿∫ ¿ßƒ° π›»Ø
-			for (auto& pCollisionBox : m_vecCollision)
+		XMVECTOR RayPos,RayDir;
+
+		m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
+
+		RayDir = XMVector3Normalize(RayDir);
+		_bool bPickCheck = false;
+		// Ï∞çÏùÄ ÏúÑÏπòÍ∞Ä Î∞ïÏä§ÏôÄ Ï∂©ÎèåÌïòÎ©¥ Î∞ïÏä§ ÏúÑÏπò Î∞òÌôò ÏïÑÎãàÎ©¥ Ï∞çÏùÄ ÏúÑÏπò Î∞òÌôò
+		for(auto& pCollisionBox : m_vecCollision)
+		{
+			XMFLOAT3 fBoxPos{},fMinPoint{},fMaxPoint{};
+			fBoxPos = pCollisionBox->Get_PickingPos();
+			m_pGameInstance->CreateBoundingBox(fBoxPos,{0.3f,0.3f,0.3f},fMinPoint,fMaxPoint);
+
+			float distance;
+			if(m_pGameInstance->Picking_Box(RayPos,RayDir,fMinPoint,fMaxPoint,distance,pCollisionBox->Get_BoundingBox()))
 			{
-				XMFLOAT3 fBoxPos{}, fMinPoint{}, fMaxPoint{};
-				fBoxPos = pCollisionBox->Get_PickingPos();
-				m_pGameInstance->CreateBoundingBox(fBoxPos, { 0.3f,0.3f, 0.3f }, fMinPoint, fMaxPoint);
-
-				float distance;
-				if (m_pGameInstance->Picking_Box(RayPos, RayDir, fMinPoint, fMaxPoint, distance, pCollisionBox->Get_BoundingBox()))
+				bPickCheck = true;
+				m_fPickingPos = fBoxPos;
+				if(eNaviMode == SELECT_NAVIPOINT)
 				{
-					bPickCheck = true;
-					m_fPickingPos = fBoxPos;
-					if (eNaviMode == SELECT_NAVIPOINT)
-					{
-						m_iCellType = pCollisionBox->Get_CellType();
-						m_iSelected_index = pCollisionBox->Get_IndexNumber();				
-					}
-
-					break;
+					m_iCellType = pCollisionBox->Get_CellType();
+					m_iSelected_index = pCollisionBox->Get_IndexNumber();
 				}
+
+				break;
 			}
-		
+		}
+
 		if(bPickCheck == false)
 		{
-			const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 πËø≠¿« Ω√¿€ ¡÷º“ π›»Ø
+			const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 Î∞∞Ïó¥Ïùò ÏãúÏûë Ï£ºÏÜå Î∞òÌôò
 			_uint VtxCountX = pVIBuffer_Terrain->Get_VtxCountX();
 			_uint VtxCountZ = pVIBuffer_Terrain->Get_VtxCountZ();
 
-			m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+			m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos,RayDir,VtxPos,VtxCountX,VtxCountZ);
 
-			if (eNaviMode == SELECT_NAVIPOINT)
+			if(eNaviMode == SELECT_NAVIPOINT)
 			{
 				m_iSelected_index = -1;
 			}
 		}
 
-		
+
 		if(eNaviMode == CREATE_NAVIPOINT)
 		{
-			if (m_fPickingPos.x == 0.f && m_fPickingPos.y == 0.f && m_fPickingPos.z == 0.f)
+			if(m_fPickingPos.x == 0.f && m_fPickingPos.y == 0.f && m_fPickingPos.z == 0.f)
 			{
-			}
-			else
+			} else
 			{
-				Add_Point(fTimeDelta, m_fPickingPos);
+				Add_Point(fTimeDelta,m_fPickingPos);
 				m_bClick = false;
 			}
 		}
 	}
 
-	// Ω∫∆‰¿ÃΩ∫πŸ ¥©∏£∏È ºø ª˝º∫
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE))
+	// Ïä§ÌéòÏù¥Ïä§Î∞î ÎàÑÎ•¥Î©¥ ÏÖÄ ÏÉùÏÑ±
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE))
 	{
-		// Y∞° 0¿œ ∂ß 0.1f∑Œ ø√∑¡¡‹
-		if (vPoints[2].x != 0.f && vPoints[2].z != 0.f)
+		// YÍ∞Ä 0Ïùº Îïå 0.1fÎ°ú Ïò¨Î†§Ï§å
+		if(vPoints[2].x != 0.f && vPoints[2].z != 0.f)
 		{
-			for (int i = 0; i < 3; i++)
+			for(int i = 0; i < 3; i++)
 			{
-				if (vPoints[i].y == 0.f)
+				if(vPoints[i].y == 0.f)
 					vPoints[i].y = 0.2f;
 			}
-			// ºø ª˝º∫ «ÿ¡‹
+			// ÏÖÄ ÏÉùÏÑ± Ìï¥Ï§å
 			m_pTerrain->Get_NaviCom()->Create_Cell(vPoints,m_iCellType);
-			for (int i = 0; i < 3; i++)
+			for(int i = 0; i < 3; i++)
 			{
-				// ª˝º∫»ƒ ∆˜¿Œ∆Æ πËø≠ √ ±‚»≠ «ÿ¡÷±‚
+				// ÏÉùÏÑ±ÌõÑ Ìè¨Ïù∏Ìä∏ Î∞∞Ïó¥ Ï¥àÍ∏∞Ìôî Ìï¥Ï£ºÍ∏∞
 				vPoints[i].x = 0.f;
 				vPoints[i].y = 0.f;
 				vPoints[i].z = 0.f;
@@ -267,30 +264,30 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 			m_iCount = 0;
 		}
 	}
-	
-	// º±≈√∏µÂ¿œ ∂ß
-	if (eNaviMode == SELECT_NAVIPOINT)
+
+	// ÏÑ†ÌÉùÎ™®ÎìúÏùº Îïå
+	if(eNaviMode == SELECT_NAVIPOINT)
 	{
-		if (m_iSelected_index != -1 && m_vecCollision.size() > 0)
+		if(m_iSelected_index != -1 && m_vecCollision.size() > 0)
 		{
-			if (m_iSelected_index > m_iSelected_index)
+			if(m_iSelected_index > m_iSelected_index)
 			{
 				--m_iSelected_index;
 				return;
 			}
 			auto pSelected = m_vecCollision[m_iSelected_index];
-			// ¿ßƒ° ∫Ø∞Ê¿Ã µ«µµ∑œ
+			// ÏúÑÏπò Î≥ÄÍ≤ΩÏù¥ ÎêòÎèÑÎ°ù
 
-			// ªË¡¶
-			if ((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)))
+			// ÏÇ≠Ï†ú
+			if((m_pGameInstance->Get_DIKeyState_Pressing(DIK_LCONTROL)))
 			{
-				if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
+				if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)))
 				{
-					if (m_vecCollision.size() > 0)
+					if(m_vecCollision.size() > 0)
 					{
-						// º±≈√µ» ∞¥√º ªË¡¶
+						// ÏÑ†ÌÉùÎêú Í∞ùÏ≤¥ ÏÇ≠Ï†ú
 						_uint iNum = pSelected->Get_ArrayNumber();
-						if (iNum == 0)
+						if(iNum == 0)
 						{
 							m_pTerrain->Get_NaviCom()->Delete_Cell(m_iSelected_index / 3);
 							pSelected->Set_Dead();
@@ -299,15 +296,14 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 							pSelected = m_vecCollision[m_iSelected_index];
 							pSelected->Set_Dead();
 							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
-							
+
 							pSelected = m_vecCollision[m_iSelected_index];
 							pSelected->Set_Dead();
 							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
 							m_iIndex -= 3;
-							if (m_iIndex < 0)
+							if(m_iIndex < 0)
 								m_iIndex = 0;
-						}
-						else if (iNum == 1)
+						} else if(iNum == 1)
 						{
 							m_pTerrain->Get_NaviCom()->Delete_Cell((m_iSelected_index - 1) / 3);
 							pSelected->Set_Dead();
@@ -322,11 +318,10 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 							pSelected->Set_Dead();
 							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
 							m_iIndex -= 3;
-							if (m_iIndex < 0)
+							if(m_iIndex < 0)
 								m_iIndex = 0;
-							
-						}
-						else if (iNum == 2)
+
+						} else if(iNum == 2)
 						{
 							m_pTerrain->Get_NaviCom()->Delete_Cell((m_iSelected_index - 2) / 3);
 							pSelected->Set_Dead();
@@ -342,25 +337,24 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 							pSelected->Set_Dead();
 							m_vecCollision.erase(m_vecCollision.begin() + m_iSelected_index);
 							m_iIndex -= 3;
-							if (m_iIndex < 0)
+							if(m_iIndex < 0)
 								m_iIndex = 0;
 						}
-						
-						// ¿¸√º ¿Œµ¶Ω∫ ≥—πˆ∞° ªË¡¶«— æ÷µÈ ºˆ∏∏≈≠ æ’¿∏∑Œ øÕæﬂ«‘
-						for (auto& pCol : m_vecCollision)
+
+						// Ï†ÑÏ≤¥ Ïù∏Îç±Ïä§ ÎÑòÎ≤ÑÍ∞Ä ÏÇ≠Ï†úÌïú Ïï†Îì§ ÏàòÎßåÌÅº ÏïûÏúºÎ°ú ÏôÄÏïºÌï®
+						for(auto& pCol : m_vecCollision)
 						{
 							_uint iIndex = pCol->Get_IndexNumber();
 							if(iIndex >= m_iSelected_index)
 								pCol->Set_IndexNumber(iIndex - 3);
 						}
-						if (m_vecCollision.size() > 2)
+						if(m_vecCollision.size() > 2)
 						{
 							fPoints[0] = m_vecCollision.back()->Get_PickingPos().x;
 							fPoints[1] = m_vecCollision.back()->Get_PickingPos().y;
 							fPoints[2] = m_vecCollision.back()->Get_PickingPos().z;
 							m_iSelected_index = -1;
-						}
-						else
+						} else
 							m_iSelected_index = 0;
 					}
 				}
@@ -368,10 +362,10 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 		}
 	}
 
-	// ≥™∞°±‚
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	// ÎÇòÍ∞ÄÍ∏∞
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_NAVIGATION, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
+		if(FAILED(m_pGameInstance->Open_Level(LEVEL_NAVIGATION,CLevel_Loading::Create(m_pDevice,m_pContext,LEVEL_LOGO))))
 			return;
 	}
 
@@ -380,95 +374,93 @@ void CNavigation_Leve::Update(_float fTimeDelta)
 HRESULT CNavigation_Leve::Render()
 {
 	__super::Render();
-//	ImGui::SetNextWindowSize(ImVec2(300, 300)); // ∞°∑Œ 400, ºº∑Œ 600 ≈©±‚∑Œ º≥¡§
-	ImGui::SetNextWindowSizeConstraints(ImVec2(20, 10), ImVec2(400, 400)); // √÷º“ ≈©±‚ 200x200, √÷¥Î ≈©±‚ 800x600
-	ImGui::Begin("ParentWindow", nullptr, ImGuiWindowFlags_None); // √¢ ¿Ãµø ∞°¥…
-	
-	if (eNaviMode == CREATE_NAVIPOINT)
+	//	ImGui::SetNextWindowSize(ImVec2(300, 300)); // Í∞ÄÎ°ú 400, ÏÑ∏Î°ú 600 ÌÅ¨Í∏∞Î°ú ÏÑ§Ï†ï
+	ImGui::SetNextWindowSizeConstraints(ImVec2(20,10),ImVec2(400,400)); // ÏµúÏÜå ÌÅ¨Í∏∞ 200x200, ÏµúÎåÄ ÌÅ¨Í∏∞ 800x600
+	ImGui::Begin("ParentWindow",nullptr,ImGuiWindowFlags_None); // Ï∞Ω Ïù¥Îèô Í∞ÄÎä•
+
+	if(eNaviMode == CREATE_NAVIPOINT)
 	{
 		ImGui::Text("Create Mode");
 		ImGui::Text(" ");		ImGui::Text(" ");
-	}
-	else
+	} else
 	{
 		ImGui::Text("Select Mode");
 		ImGui::Text(" ");		ImGui::Text(" ");
 	}
 	ImGui::Text("Position");
-	ImGui::DragFloat3("Position", fPoints, 0.1f, 0.f, 3000.f);
+	ImGui::DragFloat3("Position",fPoints,0.1f,0.f,3000.f);
 	ImGui::Text(" ");		ImGui::Text(" ");
 	ImGui::Text("CellType");
-	ImGui::InputInt("CellType", &m_iCellType, 1);
+	ImGui::InputInt("CellType",&m_iCellType,1);
 	ImGui::Text(" ");		ImGui::Text(" ");
-	if (ImGui::BeginListBox("Positions"))
+	if(ImGui::BeginListBox("Positions"))
 	{
 		_uint i = 0;
-		for (auto& pCol : m_vecCollision)
+		for(auto& pCol : m_vecCollision)
 		{
 			bool isSelected = (i == m_iSelected_index);
 
-			if (ImGui::Selectable(std::to_string(i).c_str(), isSelected))
+			if(ImGui::Selectable(std::to_string(i).c_str(),isSelected))
 			{
-				m_iSelected_index = i;	// º±≈√µ» ¿Œµ¶Ω∫ ¿˙¿Â
+				m_iSelected_index = i;	// ÏÑ†ÌÉùÎêú Ïù∏Îç±Ïä§ Ï†ÄÏû•
 			}
-			if (m_iSelected_index == pCol->Get_IndexNumber())
+			if(m_iSelected_index == pCol->Get_IndexNumber())
 			{
 				pCol->Set_PickingCheck(true);
-			}
-			else
+			} else
 			{
 				pCol->Set_PickingCheck(false);
 			}
-			
-			ImGui::Text("X=%.2f, Y=%.2f, Z=%.2f", pCol->Get_PickingPos().x, pCol->Get_PickingPos().y, pCol->Get_PickingPos().z);
+
+			ImGui::Text("X=%.2f, Y=%.2f, Z=%.2f",pCol->Get_PickingPos().x,pCol->Get_PickingPos().y,pCol->Get_PickingPos().z);
 			i++;
 		}
 
-		// ∏ÆΩ∫∆Æ π⁄Ω∫ ≥°
+		// Î¶¨Ïä§Ìä∏ Î∞ïÏä§ ÎÅù
 		ImGui::EndListBox();
 	}
 	ImGui::End();
 
 
-	ImGui::SetNextWindowSize(ImVec2(300, 100)); // ∞°∑Œ 400, ºº∑Œ 300 ≈©±‚∑Œ º≥¡§
-	ImGui::SetNextWindowSizeConstraints(ImVec2(30, 30), ImVec2(150, 100)); // √÷º“ ≈©±‚ 200x200, √÷¥Î ≈©±‚ 800x600
-	ImGui::Begin("Save_Load", nullptr, ImGuiWindowFlags_None);
-	if (ImGui::ImageButton("Save", my_Savetexture, ImVec2(50, 50), ImVec2(0, 0)))
+	ImGui::SetNextWindowSize(ImVec2(300,100)); // Í∞ÄÎ°ú 400, ÏÑ∏Î°ú 300 ÌÅ¨Í∏∞Î°ú ÏÑ§Ï†ï
+	ImGui::SetNextWindowSizeConstraints(ImVec2(30,30),ImVec2(150,100)); // ÏµúÏÜå ÌÅ¨Í∏∞ 200x200, ÏµúÎåÄ ÌÅ¨Í∏∞ 800x600
+	ImGui::Begin("Save_Load",nullptr,ImGuiWindowFlags_None);
+	if(ImGui::ImageButton("Save",my_Savetexture,ImVec2(50,50),ImVec2(0,0)))
 	{
 		Save = true;
 
 	}
 	ImGui::SameLine();
-	if (ImGui::ImageButton("Load", my_Loadtexture, ImVec2(50, 50), ImVec2(0, 0)))
+	if(ImGui::ImageButton("Load",my_Loadtexture,ImVec2(50,50),ImVec2(0,0)))
 	{
-		
+
 	}
 	ImGui::End();
 
 
-#ifdef _DEBUG
-	SetWindowText(g_hWnd, TEXT("Navigation∑π∫ß¿‘¥œ¥Ÿ."));
-#endif
+	#ifdef _DEBUG
+	SetWindowText(g_hWnd,TEXT("NavigationÎ†àÎ≤®ÏûÖÎãàÎã§."));
+	#endif
 
 	return S_OK;
 }
 
-void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
+void CNavigation_Leve::Add_Point(_float fTimeDelta,_float3 fPointPos)
 {
-	// m_iCount ∞≥ºˆ∑Œ ∏Ó π¯¬∞ ¡°¿Œ¡ˆ ±∏∫–«—¥Ÿ.
-	switch (m_iCount)
+	// m_iCount Í∞úÏàòÎ°ú Î™á Î≤àÏß∏ Ï†êÏù∏ÏßÄ Íµ¨Î∂ÑÌïúÎã§.
+	switch(m_iCount)
 	{
 	case 0:
 	{
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
 		CollisionDesc.iImGuiMode = NAVIGATION;
 		CollisionDesc.eLevel = LEVEL_NAVIGATION;
-		CollisionDesc.iPoint_Number = 0;		// πËø≠¿« µﬁ¿⁄∏Æ º˝¿⁄
-		CollisionDesc.fPosition = fPointPos;   // ¡° ¿ßƒ° 
-		CollisionDesc.iIndexNumber = m_iIndex; // ¿¸√º ∆˜¿Œ∆Æ¿« º˝¿⁄
+		CollisionDesc.iPoint_Number = 0;		// Î∞∞Ïó¥Ïùò Îí∑ÏûêÎ¶¨ Ïà´Ïûê
+		CollisionDesc.fPosition = fPointPos;   // Ï†ê ÏúÑÏπò 
+		CollisionDesc.iIndexNumber = m_iIndex; // Ï†ÑÏ≤¥ Ìè¨Ïù∏Ìä∏Ïùò Ïà´Ïûê
 		CollisionDesc.iCellType = m_iCellType;
-		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
-		vPoints[0] = { fPointPos.x,fPointPos.y,fPointPos.z };
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
+		vPoints[0] = {fPointPos.x,fPointPos.y,fPointPos.z};
 		fPoints[0] = fPointPos.x;
 		fPoints[1] = fPointPos.y;
 		fPoints[2] = fPointPos.z;
@@ -485,11 +477,11 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.fPosition = fPointPos;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		CollisionDesc.iCellType = m_iCellType;
-		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
-		vPoints[1] = { fPointPos.x,fPointPos.y,fPointPos.z };
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
+		vPoints[1] = {fPointPos.x,fPointPos.y,fPointPos.z};
 		fPoints[0] = fPointPos.x;
 		fPoints[1] = fPointPos.y;
-		fPoints[2] = fPointPos.z; 
+		fPoints[2] = fPointPos.z;
 		m_iIndex++;
 		m_bAfter_AddPoints = true;
 		break;
@@ -503,8 +495,8 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 		CollisionDesc.fPosition = fPointPos;
 		CollisionDesc.iIndexNumber = m_iIndex;
 		CollisionDesc.iCellType = m_iCellType;
-		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
-		vPoints[2] = { fPointPos.x,fPointPos.y,fPointPos.z };
+		m_vecCollision.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
+		vPoints[2] = {fPointPos.x,fPointPos.y,fPointPos.z};
 		fPoints[0] = fPointPos.x;
 		fPoints[1] = fPointPos.y;
 		fPoints[2] = fPointPos.z;
@@ -514,7 +506,7 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 	}
 
 	default:
-		break;
+	break;
 	}
 
 
@@ -524,39 +516,39 @@ void CNavigation_Leve::Add_Point(_float fTimeDelta, _float3 fPointPos)
 
 HRESULT CNavigation_Leve::Save_Navigation(_float fTimeDelta)
 {
-	_ulong		dwByte = { 0 };
-	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation_Yard.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-//	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
+	_ulong		dwByte = {0};
+	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation_Yard.dat"),GENERIC_WRITE,0,nullptr,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
+	//	HANDLE		hFile = CreateFile(TEXT("../Bin/Data/Navigation.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	if(0 == hFile)
 		return E_FAIL;
 
 	_float3		vPoints[3];
 	_uint iCellType{};
-	for (auto& pCol : m_vecCollision)
+	for(auto& pCol : m_vecCollision)
 	{
 		_uint iArray_index = pCol->Get_ArrayNumber();
 		vPoints[iArray_index] = pCol->Get_PickingPos();
 		iCellType = pCol->Get_CellType();
-		if (iArray_index == 2)
+		if(iArray_index == 2)
 		{
-			WriteFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
-			WriteFile(hFile, &iCellType, sizeof(_uint), &dwByte, nullptr);
+			WriteFile(hFile,vPoints,sizeof(_float3) * 3,&dwByte,nullptr);
+			WriteFile(hFile,&iCellType,sizeof(_uint),&dwByte,nullptr);
 
 		}
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL,L"Environment Saved Successfully",L"Success",MB_OK);
 
 	return S_OK;
 }
 
 
 
-CNavigation_Leve* CNavigation_Leve::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CNavigation_Leve* CNavigation_Leve::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CNavigation_Leve* pInstance = new CNavigation_Leve(pDevice, pContext);
+	CNavigation_Leve* pInstance = new CNavigation_Leve(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if(FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CNavigation_Leve");
 		Safe_Release(pInstance);
@@ -582,7 +574,7 @@ HRESULT CNavigation_Leve::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_NAVIGATION;
 	pDesc.eTargetID = m_eLevel;
-	CGameObject* pTerrain =	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc);
+	CGameObject* pTerrain =	m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,pLayerTag,TEXT("Prototype_GameObject_Terrain"),&pDesc);
 	m_pTerrain = static_cast<CTerrain*>(pTerrain);
 	return S_OK;
 
@@ -590,8 +582,8 @@ HRESULT CNavigation_Leve::Ready_Layer_Terrain(const _tchar* pLayerTag)
 HRESULT CNavigation_Leve::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC			Desc{};
-	Desc.vEye = _float4(386.295f, 10.f, 450.425f, 1.f);
-	Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	Desc.vEye = _float4(386.295f,10.f,450.425f,1.f);
+	Desc.vAt = _float4(0.f,0.f,0.f,1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
 	Desc.fFar = 500.f;
@@ -601,8 +593,8 @@ HRESULT CNavigation_Leve::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.fMouseSensor = 0.05f;
 	Desc.eLevel = LEVEL_NAVIGATION;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_NAVIGATION, pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free"), &Desc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_NAVIGATION,pLayerTag,
+		TEXT("Prototype_GameObject_Camera_Free"),&Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -613,47 +605,47 @@ HRESULT CNavigation_Leve::Ready_Lights()
 	LIGHT_DESC	LightDesc{};
 
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vDirection = _float4(1.f,-1.f,1.f,0.f);
+	LightDesc.vDiffuse = _float4(1.f,1.f,1.f,1.f);
+	LightDesc.vAmbient = _float4(1.f,1.f,1.f,1.f);
+	LightDesc.vSpecular = _float4(1.f,1.f,1.f,1.f);
 
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
 	return S_OK;
 }
 void CNavigation_Leve::Load_Map()
 {
-//	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	HANDLE hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	//	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Environment_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Environment_Yard File Failed",L"Error",MB_OK);
 		return;
 	}
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_uint iImGuiMode{};
 	_int  iModelIndex{};
-	_float3 fPos{}, fCollisionBoxScale{}, fScale{};
-	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+	_float3 fPos{},fCollisionBoxScale{},fScale{};
+	_vector	vRight{},vUp{},vLook{},vecCollisionPos{};
 
 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
 
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_NAVIGATION;
@@ -661,38 +653,38 @@ void CNavigation_Leve::Load_Map()
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
 		}
 	}
 	CloseHandle(hFile);
-//	hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	//	hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(L"../Bin/Data/Build_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Build_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Build_Yard File Failed",L"Error",MB_OK);
 		return;
 	}
 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
 
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_NAVIGATION;
@@ -700,12 +692,12 @@ void CNavigation_Leve::Load_Map()
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_NAVIGATION,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
 		}
 	};
 	CloseHandle(hFile);

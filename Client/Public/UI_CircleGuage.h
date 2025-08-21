@@ -13,29 +13,29 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CUI_CircleGuage final : public CUIObject
+class CUI_CircleGuage final: public CUIObject
 {
 
 public:
-	typedef struct : public CUIObject::UIOBJECT_DESC
+	typedef struct: public CUIObject::UIOBJECT_DESC
 	{
 		_uint	iIndex{};
-		CEnergy_Machine* pEnergy_Machine	= { nullptr };
-		CEnergy_Cap* pEnergyMachine_Cap		= { nullptr };
-		CPlayer* pPlayer					= { nullptr };
-		vector<CTrap_Marks*>* vecMarks		= { nullptr };
+		CEnergy_Machine* pEnergy_Machine	= {nullptr};
+		CEnergy_Cap* pEnergyMachine_Cap		= {nullptr};
+		CPlayer* pPlayer					= {nullptr};
+		vector<CTrap_Marks*>* vecMarks		= {nullptr};
 	}CIRCLEGAUGE_DESC;
 private:
-	CUI_CircleGuage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CUI_CircleGuage(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CUI_CircleGuage(const CUI_CircleGuage& Prototype);
 	virtual ~CUI_CircleGuage() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -48,52 +48,64 @@ private:
 
 
 private:
-	CShader*				m_pShaderCom			= { nullptr };
-	CTexture*				m_pTextureCom			= { nullptr };
-	CVIBuffer_Rect*			m_pVIBufferCom			= { nullptr };
-	CEnergy_Machine*		m_pEnergy_Machine		= { nullptr };
-	CEnergy_Cap*			m_pEnergyMachine_Cap = { nullptr };
-	CPlayer*				m_pPlayer				= { nullptr };
+	CShader*				m_pShaderCom			= {nullptr};
+	CTexture*				m_pTextureCom			= {nullptr};
+	CVIBuffer_Rect*			m_pVIBufferCom			= {nullptr};
+	CEnergy_Machine*		m_pEnergy_Machine		= {nullptr};
+	CEnergy_Cap*			m_pEnergyMachine_Cap = {nullptr};
+	CPlayer*				m_pPlayer				= {nullptr};
 
-	vector<CTrap_Marks*>*	m_pvecTrap_Marks		= { nullptr };	// Æ®·¦ ¸¶Å©¿¡ Æ®·¦ ¼³Ä¡
-	_bool*					m_bBuild_Gauging		= { nullptr };	// ºôµå¸ğµå
-	_bool*					m_bBuildMode			= { nullptr };  // ºôµå¸ğµå
+	vector<CTrap_Marks*>*	m_pvecTrap_Marks		= {nullptr};	// íŠ¸ë© ë§ˆí¬ì— íŠ¸ë© ì„¤ì¹˜
+	_bool*					m_bBuild_Gauging		= {nullptr};	// ë¹Œë“œëª¨ë“œ
+	_bool*					m_bBuildMode			= {nullptr};  // ë¹Œë“œëª¨ë“œ
 
 public:
-	void	Set_Charging(_bool bCharging) { m_bCharging = bCharging; }
-	void	Set_Item_Interaction(_bool bItemInteraction) { 
+	void	Set_Charging(_bool bCharging) {
+		m_bCharging = bCharging;
+	}
+	void	Set_Item_Interaction(_bool bItemInteraction) {
 		m_bItem_Interaction = bItemInteraction;
 		if(m_bItem_Interaction == true)
 			m_bItemCharging = true;
 		else
 			m_bItemCharging = false;
 	}
-	void	Set_Item_InteractionEnd(_bool bEnd) { m_bItem_Interaction_End = bEnd; }
-	void	Set_CoinItem_Interation(_bool bInteraction)	{	m_bCoinItem_Interaction = bInteraction;	}
+	void	Set_Item_InteractionEnd(_bool bEnd) {
+		m_bItem_Interaction_End = bEnd;
+	}
+	void	Set_CoinItem_Interation(_bool bInteraction)	{
+		m_bCoinItem_Interaction = bInteraction;
+	}
 
 
-	_bool	Get_Charging() { return m_bCharging; }
-	_bool   Get_ItemInteraction_End() { return m_bItem_Interaction_End; }
-	_bool*	Get_CoinItem_Interaction() { return &m_bCoinItem_Interaction; }
+	_bool	Get_Charging() {
+		return m_bCharging;
+	}
+	_bool   Get_ItemInteraction_End() {
+		return m_bItem_Interaction_End;
+	}
+	_bool*	Get_CoinItem_Interaction() {
+		return &m_bCoinItem_Interaction;
+	}
 
 private:
 	float	m_fGuaging_Time{};
 	_float	m_fReal_Gauging_Time{};
-	_bool	m_bCharging{}, m_bItemCharging{};
-	
-	// ºôµå
+	_bool	m_bCharging{},m_bItemCharging{};
+
+	// ë¹Œë“œ
 	_bool	m_bBuild_Draw = false;
-	
-	// ¹«±â
+
+	// ë¬´ê¸°
 	_bool   m_bItem_Interaction = false;
 	_bool   m_bItem_Interaction_End = false;
 
-	// ¹èÅÍ¸®
+	// ë°°í„°ë¦¬
 	_bool	m_bBattery_Insert = false;
 	_bool	m_bBattery_Insert_End = false;
 	_bool	m_bBattery_Insert_First = false;
 
-	// ÄÚÀÎ ¾ÆÀÌÅÛ
+	// ì½”ì¸ ì•„ì´í…œ
 	_bool	m_bCoinItem_Interaction = false;
 	_bool	m_bCoinItem_Interaction_End = false;
 
@@ -101,7 +113,7 @@ private:
 	LEVELID m_eLevel{};
 
 public:
-	static CUI_CircleGuage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CUI_CircleGuage* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

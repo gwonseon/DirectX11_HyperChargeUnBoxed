@@ -1,26 +1,25 @@
 #include "..\Public\VIBuffer.h"
 
-CVIBuffer::CVIBuffer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CComponent{ pDevice, pContext }
-	, m_fVertexPos()
-{
-}
+CVIBuffer::CVIBuffer(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CComponent{pDevice,pContext}
+	,m_fVertexPos()
+{}
 
 CVIBuffer::CVIBuffer(const CVIBuffer& Prototype)
-	: CComponent{ Prototype }
-	, m_pVB{ Prototype.m_pVB }
-	, m_pIB{ Prototype.m_pIB }
-	, m_iNumVertexBuffers{ Prototype.m_iNumVertexBuffers }
-	, m_iVertexStride{ Prototype.m_iVertexStride }
-	, m_iNumVertices{ Prototype.m_iNumVertices }
-	, m_iIndexStride{ Prototype.m_iIndexStride }
-	, m_iNumIndices{ Prototype.m_iNumIndices }
-	, m_eIndexFormat{ Prototype.m_eIndexFormat }
-	, m_ePrimitiveTopology{ Prototype.m_ePrimitiveTopology }
-	, m_iNumVerticesX{ Prototype.m_iNumVerticesX }
-	, m_iNumVerticesZ{ Prototype.m_iNumVerticesZ }
-	, m_fVertexPos{ Prototype.m_fVertexPos }
-	, m_pVertexPositions{ Prototype.m_pVertexPositions }
+	: CComponent{Prototype}
+	,m_pVB{Prototype.m_pVB}
+	,m_pIB{Prototype.m_pIB}
+	,m_iNumVertexBuffers{Prototype.m_iNumVertexBuffers}
+	,m_iVertexStride{Prototype.m_iVertexStride}
+	,m_iNumVertices{Prototype.m_iNumVertices}
+	,m_iIndexStride{Prototype.m_iIndexStride}
+	,m_iNumIndices{Prototype.m_iNumIndices}
+	,m_eIndexFormat{Prototype.m_eIndexFormat}
+	,m_ePrimitiveTopology{Prototype.m_ePrimitiveTopology}
+	,m_iNumVerticesX{Prototype.m_iNumVerticesX}
+	,m_iNumVerticesZ{Prototype.m_iNumVerticesZ}
+	,m_fVertexPos{Prototype.m_fVertexPos}
+	,m_pVertexPositions{Prototype.m_pVertexPositions}
 {
 	Safe_AddRef(m_pIB);
 	Safe_AddRef(m_pVB);
@@ -37,32 +36,31 @@ HRESULT CVIBuffer::Initialize(void* pArg)
 }
 
 void CVIBuffer::Update(_float fTimeDelta)
-{
-}
+{}
 
 HRESULT CVIBuffer::Render()
 {
-	if (nullptr == m_pContext)
+	if(nullptr == m_pContext)
 		return E_FAIL;
 
-	m_pContext->DrawIndexed(m_iNumIndices, 0, 0);
+	m_pContext->DrawIndexed(m_iNumIndices,0,0);
 
 	return S_OK;
 }
 
 void CVIBuffer::Chang_Topology()
 {
-	
-		if (m_ePrimitiveTopology != D3D_PRIMITIVE_TOPOLOGY_LINELIST)
-			m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
-		else
-			m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	
+
+	if(m_ePrimitiveTopology != D3D_PRIMITIVE_TOPOLOGY_LINELIST)
+		m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	else
+		m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
 }
 
 HRESULT CVIBuffer::Bind_Buffers()
 {
-	if (nullptr == m_pContext)
+	if(nullptr == m_pContext)
 		return E_FAIL;
 
 	ID3D11Buffer* pVertexBuffers[] = {
@@ -78,12 +76,12 @@ HRESULT CVIBuffer::Bind_Buffers()
 	};
 
 
-	/* Á¤Á¡¹öÆÛµéÀ» ÀåÄ¡¿¡ ¹ÙÀÎµùÇÑ´Ù. */
-	/* º¹¼öÀÇ Á¤Á¡¹öÆÛ¸¦ µ¿½Ã¿¡ ÀåÄ¡¿¡ ¹ÙÀÎµùÇÏ´Â °ÍÀÌ °¡´ÉÇÏ´Ù .*/
-	m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pVertexBuffers, iVertexStrides, iOffsets);
+	/* ì •ì ë²„í¼ë“¤ì„ ìž¥ì¹˜ì— ë°”ì¸ë”©í•œë‹¤. */
+	/* ë³µìˆ˜ì˜ ì •ì ë²„í¼ë¥¼ ë™ì‹œì— ìž¥ì¹˜ì— ë°”ì¸ë”©í•˜ëŠ” ê²ƒì´ ê°€ëŠ¥í•˜ë‹¤ .*/
+	m_pContext->IASetVertexBuffers(0,m_iNumVertexBuffers,pVertexBuffers,iVertexStrides,iOffsets);
 
-	/* ÀÎµ¦½º ¹öÆÛ¸¦ ÀåÄ¡¿¡ ¹ÙÀÎµùÇÑ´Ù. */
-	m_pContext->IASetIndexBuffer(m_pIB, m_eIndexFormat, 0);
+	/* ì¸ë±ìŠ¤ ë²„í¼ë¥¼ ìž¥ì¹˜ì— ë°”ì¸ë”©í•œë‹¤. */
+	m_pContext->IASetIndexBuffer(m_pIB,m_eIndexFormat,0);
 
 	m_pContext->IASetPrimitiveTopology(m_ePrimitiveTopology);
 
@@ -97,16 +95,29 @@ HRESULT CVIBuffer::Bind_Buffers()
 
 HRESULT CVIBuffer::Create_Buffer(ID3D11Buffer** ppOut)
 {
-	return m_pDevice->CreateBuffer(&m_BufferDesc, &m_InitialDesc, ppOut);
+	return m_pDevice->CreateBuffer(&m_BufferDesc,&m_InitialDesc,ppOut);
 
 	return S_OK;
 }
 
+HRESULT CVIBuffer::Create_Buffer_Dynamic(ID3D11Buffer** ppOut)
+{
+	// Dynamic ë²„í¼ì˜ ê²½ìš°, ë‘ ë²ˆì§¸ ì¸ìžë¥¼ nullptr ë¡œ ë„˜ê²¨ì•¼ í•©ë‹ˆë‹¤.
+	const D3D11_SUBRESOURCE_DATA* pInitData =
+		(m_BufferDesc.Usage == D3D11_USAGE_DYNAMIC ||
+		 m_BufferDesc.Usage == D3D11_USAGE_STAGING)
+		? nullptr
+		: &m_InitialDesc;
+
+	return m_pDevice->CreateBuffer(&m_BufferDesc,
+								   pInitData,
+								   ppOut);
+}
 
 void CVIBuffer::Free()
 {
 	__super::Free();
-	if (false == m_isCloned)
+	if(false == m_isCloned)
 		Safe_Delete_Array(m_pVertexPositions);
 
 	Safe_Release(m_pIB);

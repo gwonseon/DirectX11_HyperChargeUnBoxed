@@ -11,19 +11,21 @@ END
 
 BEGIN(Client)
 
-class CHelicopter : public CMonster
+class CHelicopter: public CMonster
 {
 public:
-	typedef struct : CMonster::MONSTER_DESC
+	typedef struct: CMonster::MONSTER_DESC
 	{
-		CPlayer_Build* pBuild = { nullptr };
+		CPlayer_Build* pBuild = {nullptr};
 		_vector* vecTargetPos{};
 	}HELICOPTER_DESC;
 
-	enum HELICOPTER_ANIM { HELICOPTER_CENTER, HELICOPTER_EAST, HELICOPTER_NORTH_EAST, HELICOPTER_NORTH_WEST, HELICOPTER_NOTRH, HELICOPTER_SOUTH, HELICOPTER_WEST, HELICOPTER_DIORAMA };
+	enum HELICOPTER_ANIM {
+		HELICOPTER_CENTER,HELICOPTER_EAST,HELICOPTER_NORTH_EAST,HELICOPTER_NORTH_WEST,HELICOPTER_NOTRH,HELICOPTER_SOUTH,HELICOPTER_WEST,HELICOPTER_DIORAMA
+	};
 
 private:
-	CHelicopter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CHelicopter(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CHelicopter(const CHelicopter& Prototype);
 	virtual ~CHelicopter() = default;
 
@@ -41,14 +43,14 @@ private:
 	HRESULT Bind_ShaderResources();
 	void	DeadMotion(_float fTimeDelta);
 private:
-	CCollider* m_pColliderCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CCollider* pTargetCollider = { nullptr };
-	CPlayer_Build* m_pBuild = { nullptr };
+	CCollider* m_pColliderCom = {nullptr};
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	CCollider* pTargetCollider = {nullptr};
+	CPlayer_Build* m_pBuild = {nullptr};
 
 private:
-	_vector* m_vecTargetPos = { nullptr };
+	_vector* m_vecTargetPos = {nullptr};
 
 
 private:
@@ -56,11 +58,11 @@ private:
 	_float		m_fRotation{};
 
 
-	_float		m_iShot_Count = 0; // 3πﬂ ΩÓ±‚ ¿ß«ÿ ∏Ó πﬂ Ω˙¥¬¡ˆ ¿˙¿Â
-	_float		m_fShot_Time_Delay = 3.f; // √—æÀ ΩÓ±‚øÎ µÙ∑π¿Ã Ω√∞£
+	_float		m_iShot_Count = 0; // 3Î∞ú ÏèòÍ∏∞ ÏúÑÌï¥ Î™á Î∞ú ÏêàÎäîÏßÄ Ï†ÄÏû•
+	_float		m_fShot_Time_Delay = 3.f; // Ï¥ùÏïå ÏèòÍ∏∞Ïö© ÎîúÎ†àÏù¥ ÏãúÍ∞Ñ
 	_float     m_fAcc{};
 public:
-	static CHelicopter* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CHelicopter* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

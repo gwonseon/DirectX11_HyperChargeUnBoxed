@@ -11,23 +11,27 @@
 
 BEGIN(Client)
 
-class CMonster_Path final : public CLevel
+class CMonster_Path final: public CLevel
 {
 public:
-	enum PATHFIND_TYPE { NORMAL_PATHFIND, ASTAR_PATHFIND, PATHFIND_END };
-	enum PLAY_ROUND { PLAY_FIRST_ROUND, PLAY_SECOND_ROUND, PLAY_THIRD_ROUND, PLAY_ROUND_END };
+	enum PATHFIND_TYPE {
+		NORMAL_PATHFIND,ASTAR_PATHFIND,PATHFIND_END
+	};
+	enum PLAY_ROUND {
+		PLAY_FIRST_ROUND,PLAY_SECOND_ROUND,PLAY_THIRD_ROUND,PLAY_ROUND_END
+	};
 
 public:
 	typedef struct
 	{
-		_float3 fPos{ };
+		_float3 fPos{};
 		_uint	iLevel{};
 		_uint	iRound{};
 		_uint	iModel_Idx{};
 		_uint	iCellIdx{};
 	}MONSTER_SPAWN_DESC;
 private:
-	CMonster_Path(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMonster_Path(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CMonster_Path() = default;
 
 public:
@@ -59,29 +63,29 @@ private:
 	float				Position[3];
 	_float3				m_fPickingPos{};
 
-	
+
 	_bool				m_bAdd = false;
 	_bool				m_bSave = false;
 	_bool				m_bLoad = false;
-	
+
 	vector< MONSTER_SPAWN_DESC> m_vecMonsterSpawn[LEVEL_END][3];
 
 	_bool				m_bOnce = false;
 	vector<CCollisionBox*> m_vecCollisionCenter;
 private:
-	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // ÅÍ·¹ÀÎ ÇÇÅ·
-	CTerrain* m_pTerrain = { nullptr };
+	CVIBuffer_Terrain* pVIBuffer_Terrain = {nullptr}; // í„°ë ˆì¸ í”¼í‚¹
+	CTerrain* m_pTerrain = {nullptr};
 
 	LEVELID m_eTargetID = LEVEL_GAMEPLAY;
 
-private:// ÀÌ¹ÌÁö ¹öÆ°
+private:// ì´ë¯¸ì§€ ë²„íŠ¼
 	void Create_ImageButton();
 	void ButtonImage_List();
-private: // ÀÌ¹ÌÁö¹öÆ°
+private: // ì´ë¯¸ì§€ë²„íŠ¼
 	CTexture* m_pLoad = nullptr;
 	CTexture* m_pSave = nullptr;
 	CTexture* m_pMonster = nullptr;
-private:// ÀÌ¹ÌÁö ¹öÆ°
+private:// ì´ë¯¸ì§€ ë²„íŠ¼
 	ID3D11ShaderResourceView* my_Savetexture = nullptr;
 	ID3D11ShaderResourceView* my_Loadtexture = nullptr;
 
@@ -89,14 +93,14 @@ private:// ÀÌ¹ÌÁö ¹öÆ°
 
 
 public:
-	static CMonster_Path* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMonster_Path* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 };
 
-// ¿©±â¿¡ ImGui ¸ó½ºÅÍ ÀÌµ¿ °æ·Î Âï´Â ·¹º§ »ı¼ºÇÒ °Í
-// µû·Î ¸¸µç ÀÌÀ¯´Â Àú ÄÚµå°¡ ³Ê¹« º¹ÀâÇØ¼­
-// ÀÌ°Å ¿­¶§ Âï¾î³õÀº Á¤º¸ LoadÇÏÀÚ
-// ¸¸µå´Â ±è¿¡ »ç¿ëÇÑ ¿ÀºêÁ§Æ® Á¤º¸µµ ±â¾ïÇØµÎ°í ²¨³»¿À´Â ÄÚµåµµ Â¥ÀÚ
+// ì—¬ê¸°ì— ImGui ëª¬ìŠ¤í„° ì´ë™ ê²½ë¡œ ì°ëŠ” ë ˆë²¨ ìƒì„±í•  ê²ƒ
+// ë”°ë¡œ ë§Œë“  ì´ìœ ëŠ” ì € ì½”ë“œê°€ ë„ˆë¬´ ë³µì¡í•´ì„œ
+// ì´ê±° ì—´ë•Œ ì°ì–´ë†“ì€ ì •ë³´ Loadí•˜ì
+// ë§Œë“œëŠ” ê¹€ì— ì‚¬ìš©í•œ ì˜¤ë¸Œì íŠ¸ ì •ë³´ë„ ê¸°ì–µí•´ë‘ê³  êº¼ë‚´ì˜¤ëŠ” ì½”ë“œë„ ì§œì
 
 
 

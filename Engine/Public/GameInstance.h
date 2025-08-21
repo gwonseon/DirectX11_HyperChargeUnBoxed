@@ -9,15 +9,15 @@
 #include "CollisionMgr.h"
 #include "Round_Manager.h"
 #include "UIManager.h"
-
+#include "ThreadPool.h"
 
 /* CGameInstance : */
-/* ≥ª Engineø° ¿Ø¿œ«œ∞‘ ¡∏¿Á«œ¥¬ ΩÃ±€≈Ê≈¨∑°Ω∫¥Ÿ. */
-/* ClientªÁøÎ¿⁄∞° ø£¡¯¿« ±‚¥…¿ª ¿ÃøÎ«œ∞Ì¿⁄«—¥Ÿ∏È CGameInstance∏¶ ≈Î«ÿº≠ ±‚¥…¿ª ºˆ«‡«“ ºˆ ¿÷µµ∑œ «œ∞⁄¥Ÿ. */
+/* ÎÇ¥ EngineÏóê Ïú†ÏùºÌïòÍ≤å Ï°¥Ïû¨ÌïòÎäî Ïã±Í∏ÄÌÜ§ÌÅ¥ÎûòÏä§Îã§. */
+/* ClientÏÇ¨Ïö©ÏûêÍ∞Ä ÏóîÏßÑÏùò Í∏∞Îä•ÏùÑ Ïù¥Ïö©ÌïòÍ≥†ÏûêÌïúÎã§Î©¥ CGameInstanceÎ•º ÌÜµÌï¥ÏÑú Í∏∞Îä•ÏùÑ ÏàòÌñâÌï† Ïàò ÏûàÎèÑÎ°ù ÌïòÍ≤†Îã§. */
 
 BEGIN(Engine)
 
-class ENGINE_DLL CGameInstance final : public CBase
+class ENGINE_DLL CGameInstance final: public CBase
 {
 	DECLARE_SINGLETON(CGameInstance)
 private:
@@ -25,7 +25,7 @@ private:
 	virtual ~CGameInstance() = default;
 
 public:
-	HRESULT Initialize_Engine(const ENGINE_DESC& EngineDesc, _Out_ ID3D11Device** ppDevice, _Out_ ID3D11DeviceContext** ppContext);
+	HRESULT Initialize_Engine(const ENGINE_DESC& EngineDesc,_Out_ ID3D11Device** ppDevice,_Out_ ID3D11DeviceContext** ppContext);
 	void Update(_float fTimeDelta);
 	void Draw();
 	void Clear(_uint iClearLevelID);
@@ -33,7 +33,7 @@ public:
 	void RenderGroup_Clear(_uint iClearLevelID);
 
 	_float Compute_Random_Normal();
-	_float Compute_Random(_float fMin, _float fMax);
+	_float Compute_Random(_float fMin,_float fMax);
 
 public: /* For.Graphic_Device */
 	HRESULT Render_Begin(_float4 vClearColor);
@@ -60,20 +60,21 @@ public: // Input_Device
 
 
 public: /* for.Level_Manager */
-	HRESULT Open_Level(_uint iCurrentLevelID, class CLevel* pNewLevel);
+	HRESULT Open_Level(_uint iCurrentLevelID,class CLevel* pNewLevel);
+	HRESULT Open_Level_InGame(_uint iCurrentLevelID,class CLevel* pNewLevel);
 	HRESULT Close_Level(_uint iLevelID);
 
 public: /* For.Object_Manager*/
-	class CComponent* Get_Component(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0, _uint iPartObjID = 0);
-	HRESULT Add_Prototype(const _wstring& strPrototypeTag, class CGameObject* pPrototype);
-	HRESULT Add_GameObject_ToLayer(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg = nullptr);
-	class CGameObject* Add_GameObject_ToLayer_ReturnObject(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg);
-	class CGameObject* Get_Prototype(_uint iLevelIndex, const _tchar* pLayerTag, const _wstring& strPrototypeTag);
+	class CComponent* Get_Component(_uint iLevelIndex,const _wstring& strLayerTag,const _wstring& strComponentTag,_uint iIndex = 0,_uint iPartObjID = 0);
+	HRESULT Add_Prototype(const _wstring& strPrototypeTag,class CGameObject* pPrototype);
+	HRESULT Add_GameObject_ToLayer(_uint iLevelIndex,const _wstring& strLayerTag,const _wstring& strPrototypeTag,void* pArg = nullptr);
+	class CGameObject* Add_GameObject_ToLayer_ReturnObject(_uint iLevelIndex,const _wstring& strLayerTag,const _wstring& strPrototypeTag,void* pArg);
+	class CGameObject* Get_Prototype(_uint iLevelIndex,const _tchar* pLayerTag,const _wstring& strPrototypeTag);
 	//class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
-	
+
 	class CGameObject* Find_Prototype(const _wstring& strPrototypeTag);
-	class CLayer* Find_Layer(_uint iLevelIndex, const _wstring& strLayerTag);
-	class CGameObject* Clone_Prototype(const _wstring& strPrototypeTag, void* pArg = nullptr);
+	class CLayer* Find_Layer(_uint iLevelIndex,const _wstring& strLayerTag);
+	class CGameObject* Clone_Prototype(const _wstring& strPrototypeTag,void* pArg = nullptr);
 	void Set_KatanaState(_bool bFPS);
 	_bool Get_KatanaState();
 	void Set_PlayerPos(_float4 fPos);
@@ -81,15 +82,15 @@ public: /* For.Object_Manager*/
 
 
 public: /* For.Component_Manager */
-	HRESULT Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, class CComponent* pPrototype);
-	class CComponent* Clone_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
-	class CComponent* Find_Prototype_Component(_uint iLevelIndex, const _wstring& strPrototypeTag);
+	HRESULT Add_Prototype(_uint iLevelIndex,const _wstring& strPrototypeTag,class CComponent* pPrototype);
+	class CComponent* Clone_Component(_uint iLevelIndex,const _wstring& strPrototypeTag,void* pArg = nullptr);
+	class CComponent* Find_Prototype_Component(_uint iLevelIndex,const _wstring& strPrototypeTag);
 
 public: /* For.Renderer	*/
-	HRESULT Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
+	HRESULT Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup,class CGameObject* pRenderGameObject);
 	void	RenderList_Clear();
 	HRESULT Add_DebugComponents(class CComponent* pComponent);
-	void Set_Fog(_bool bFog, float fEnd);
+	void Set_Fog(_bool bFog,float fEnd);
 
 
 public:// For PipeLine
@@ -105,81 +106,84 @@ public:// For PipeLine
 	void Set_CameraFar(_float fFar);
 	void Set_CameraDir(_vector vDir);
 
-	void Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
+	void Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState,_fmatrix TransformMatrix);
 
 	const _float4x4* Get_TransformFloat4x4_Inverse(CPipeLine::TRANSFORMSTATE eState);
 	_matrix Get_TransformMatrix_Inverse(CPipeLine::TRANSFORMSTATE eState);
 
-public: // Light ∏≈¥œ¿˙
+public: // Light Îß§ÎãàÏ†Ä
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
-	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	HRESULT Render_Lights(class CShader* pShader,class CVIBuffer_Rect* pVIBuffer);
 	void Free_Light();
 
-public:  // ««≈∑ ∏≈¥œ¿˙
-	_float3 Get_MousePos_NDC(HWND hWnd, const unsigned int g_iWinSizeX, const unsigned int	g_iWinSizeY);
-	_float4 Object_NDC_Cal(_float2 fPos, _float fSizeX, _float fSizeY, const unsigned int g_iWinSizeX, const unsigned int g_iWinSizeY);
-	void Get_MouseRayDirection(_float3 fPosition, XMMATRIX invProj, XMMATRIX invView, XMVECTOR* RayPos_Output, XMVECTOR* RayDir_Output);
-	_float3 Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ);
-	_float3 Picking_Box_FAILED(_vector  RayPos, _vector  RayDir, const _float3* VtxPos);
-	void CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint);
-	bool Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box);
+public:  // ÌîºÌÇπ Îß§ÎãàÏ†Ä
+	_float3 Get_MousePos_NDC(HWND hWnd,const unsigned int g_iWinSizeX,const unsigned int	g_iWinSizeY);
+	_float4 Object_NDC_Cal(_float2 fPos,_float fSizeX,_float fSizeY,const unsigned int g_iWinSizeX,const unsigned int g_iWinSizeY);
+	void Get_MouseRayDirection(_float3 fPosition,XMMATRIX invProj,XMMATRIX invView,XMVECTOR* RayPos_Output,XMVECTOR* RayDir_Output);
+	_float3 Picking_Terrain(XMVECTOR RayPos,XMVECTOR RayDir,const _float3* VtxPos,_uint VtxCountX,_uint VtxCountZ);
+	_float3 Picking_Box_FAILED(_vector  RayPos,_vector  RayDir,const _float3* VtxPos);
+	void CreateBoundingBox(const _float3& center,const _float3& size,_float3& fMinPoint,_float3& fMaxPoint);
+	bool Picking_Box(const _vector& rayOrigin,const _vector& rayDirection,const _float3& fMinPoint,const _float3& fMaxPoint,float& distance,DirectX::BoundingBox box);
 
-public: // ƒ›∏Æ¿¸ ∏≈¥œ¿˙
-	void Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID = 0, _uint iDstPartObjID = 0);
-	void Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos,  _bool* bShot, _float fDamage,_uint iTargetPartObjID = 0);
-	void Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	void Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iCount, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	void Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	void Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring& strSrcComponentTag, _uint iSrcPartObjID = 0);
+public: // ÏΩúÎ¶¨Ï†Ñ Îß§ÎãàÏ†Ä
+	void Collision_Layer(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iPartObjID = 0,_uint iDstPartObjID = 0);
+	void Collision_Layer_Coin(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	_bool Collision_Bullet(CLayer* Target,const _wstring& strTargetComponentTag,_vector vRayDior,_vector vRayPos,_bool* bShot,_float fDamage,_uint iTargetPartObjID = 0);
+	void Collision_Trap(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	void Collision_Explosion(CLayer* pExplosionLayer,CLayer* pAttackedLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iCount,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	void Anti_OverLapping(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	void Anti_OverLapping_SameLayer(CLayer* pSrcLayer,const _wstring& strSrcComponentTag,_uint iSrcPartObjID = 0);
 
 public: /* For.Font_Manager */
-	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePaht);
-	HRESULT Render_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, FXMVECTOR vColor, _float fScale = 1.f, _float fRotation = 0.f, const _float2& vPivot = _float2(0.f, 0.f));
+	HRESULT Add_Font(const _wstring& strFontTag,const _tchar* pFontFilePaht);
+	HRESULT Render_Text(const _wstring& strFontTag,const _tchar* pText,const _float2& vPosition,FXMVECTOR vColor,_float fScale = 1.f,_float fRotation = 0.f,const _float2& vPivot = _float2(0.f,0.f));
 
 public: // Round Manager
-	void Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer);
+	void Update_Round(_float fTimeDelta,_uint& iCurrentRound,_bool& bBuildMode,CLayer* Monster_Near,CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer);
 	void Set_CurrentLevel(_uint iLevel);
 	void Set_MissileState(_bool bBroken);
 	void Set_Reset();
 public: // UI_Manager
-	void CircleGauge_Interaction(CLayer* Item, CLayer* UI);
+	void CircleGauge_Interaction(CLayer* Item,CLayer* UI);
 
 
 public: /* For.Target_Manager */
-	HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
-	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
-	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool isClear = true);
+	HRESULT Add_RenderTarget(const _wstring& strTargetTag,_uint iWidth,_uint iHeight,DXGI_FORMAT ePixelFormat,const _float4& vClearColor);
+	HRESULT Add_MRT(const _wstring& strMRTTag,const _wstring& strTargetTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag,ID3D11DepthStencilView* pDSV = nullptr,_bool isClear = true);
 	HRESULT End_MRT(const _wstring& strMRTTag);
-	HRESULT Bind_RT_SRV(class CShader* pShader, const _char* pConstantName, const _wstring& strTargetTag);
-	HRESULT Copy_RT_Resource(const _wstring& strTargetTag, ID3D11Texture2D* pOut);
+	HRESULT Bind_RT_SRV(class CShader* pShader,const _char* pConstantName,const _wstring& strTargetTag);
+	HRESULT Copy_RT_Resource(const _wstring& strTargetTag,ID3D11Texture2D* pOut);
 
-#ifdef _DEBUG
-	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
-	HRESULT Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
-#endif
+	#ifdef _DEBUG
+	HRESULT Ready_RT_Debug(const _wstring& strTargetTag,_float fX,_float fY,_float fSizeX,_float fSizeY);
+	HRESULT Render_RT_Debug(const _wstring& strMRTTag,class CShader* pShader,class CVIBuffer_Rect* pVIBuffer);
+	#endif
 
 public: /* For.Picking */
-		_bool isPicked(_float3* pOut);
-		_bool isComputeHeight(_fvector vTargetPos, _float3* pOut);
+	_bool isPicked(_float3* pOut);
+	_bool isComputeHeight(_fvector vTargetPos,_float3* pOut);
 
-#pragma region FRUSTUM
+	#pragma region FRUSTUM
 public: /* For.Frustum */
-	_bool isIn_Frustum_WorldSpace(_fvector vTargetPos, _float fRange = 0.f);
-	_bool isIn_Frustum_LocalSpace(_fvector vTargetPos, _float fRange = 0.f);
+	_bool isIn_Frustum_WorldSpace(_fvector vTargetPos,_float fRange = 0.f);
+	_bool isIn_Frustum_LocalSpace(_fvector vTargetPos,_float fRange = 0.f);
 	void Frustum_Transform_To_LocalSpace(_fmatrix WorldMatrixInv);
-#pragma endregion
+	#pragma endregion
 
 
-public:	// ªÁøÓµÂ ∏≈¥œ¿˙
-	void PlaySoundW(const wstring pSoundKey, CHANNELID eID, float fVolume = 0);
-	void PlayBGM(const wstring pSoundKey, float fVolume = 0);
+public:	/* For.Threadpool */
+	CThreadPool* Get_ptrThreadpool();
+
+public:	// ÏÇ¨Ïö¥Îìú Îß§ÎãàÏ†Ä
+	void PlaySoundW(const wstring pSoundKey,CHANNELID eID,float fVolume = 0);
+	void PlayBGM(const wstring pSoundKey,float fVolume = 0);
 	void StopSound(CHANNELID eID);
 	void StopAll();
 
-	void SetChannelVolume(CHANNELID eID, float fVolume);
-	void VolumeFade(bool _bOnOff, float _fMinusVolume = 0.03f, float _fPlusVolume = 0.05f);
+	void SetChannelVolume(CHANNELID eID,float fVolume);
+	void VolumeFade(bool _bOnOff,float _fMinusVolume = 0.03f,float _fPlusVolume = 0.05f);
 	void VolumeFade_boss();
 	void  Set_BGMVolume(float fVolume);
 	float Get_BGMVolume();
@@ -187,24 +191,25 @@ public:	// ªÁøÓµÂ ∏≈¥œ¿˙
 	wstring Get_NowBGM();
 	_float Sound_Cal(_vector vPos);
 private:
-	class CGraphic_Device*		m_pGraphic_Device			= { nullptr };
-	class CInput_Device*		m_pInput_Device				= { nullptr };
-	class CTimer_Manager*		m_pTimer_Manager			= { nullptr };
-	class CLevel_Manager*		m_pLevel_Manager			= { nullptr };
-	class CObject_Manager*		m_pObject_Manager			= { nullptr };
-	class CComponent_Manager*	m_pComponent_Manager		= { nullptr };
-	class CRenderer*			m_pRenderer					= { nullptr };
-	class CPipeLine*			m_pPipeLine					= { nullptr };
-	class CLight_Manager*		m_pLight_Manager			= { nullptr };
-	class CPicking_Manager*		m_pPicking_Manager			= { nullptr };
-	class CCollisionMgr*		m_pCollision_Manager		= { nullptr };
-	class CFont_Manager*		m_pFont_Manager				= { nullptr };
-	class CRound_Manager*		m_pRound_Manager			= { nullptr };
-	class CUIManager*			m_pUI_Manager				= { nullptr };
-	class CTarget_Manager*		m_pTarget_Manager			= { nullptr };
-	class CPicking*				m_pPicking					= { nullptr };
-	class CFrustum*				m_pFrustum					= { nullptr };
-	class CSoundMgr*			m_pSound_Manager			= { nullptr };
+	class CGraphic_Device*		m_pGraphic_Device			= {nullptr};
+	class CInput_Device*		m_pInput_Device				= {nullptr};
+	class CTimer_Manager*		m_pTimer_Manager			= {nullptr};
+	class CLevel_Manager*		m_pLevel_Manager			= {nullptr};
+	class CObject_Manager*		m_pObject_Manager			= {nullptr};
+	class CComponent_Manager*	m_pComponent_Manager		= {nullptr};
+	class CRenderer*			m_pRenderer					= {nullptr};
+	class CPipeLine*			m_pPipeLine					= {nullptr};
+	class CLight_Manager*		m_pLight_Manager			= {nullptr};
+	class CPicking_Manager*		m_pPicking_Manager			= {nullptr};
+	class CCollisionMgr*		m_pCollision_Manager		= {nullptr};
+	class CFont_Manager*		m_pFont_Manager				= {nullptr};
+	class CRound_Manager*		m_pRound_Manager			= {nullptr};
+	class CUIManager*			m_pUI_Manager				= {nullptr};
+	class CTarget_Manager*		m_pTarget_Manager			= {nullptr};
+	class CPicking*				m_pPicking					= {nullptr};
+	class CFrustum*				m_pFrustum					= {nullptr};
+	class CSoundMgr*			m_pSound_Manager			= {nullptr};
+	class CThreadMgr*			m_pThread_Manager			= {nullptr};
 
 
 public:

@@ -4,15 +4,13 @@
 #include "GameInstance.h"
 
 
-CBattery::CBattery(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
-{
-}
+CBattery::CBattery(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CBattery::CBattery(const CBattery& Prototype)
-	: CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CBattery::Initialize_Prototype()
 {
@@ -29,34 +27,34 @@ HRESULT CBattery::Initialize(void* pArg)
 	m_pBrain = pDesc->pBrain;
 	m_pInGameUI = pDesc->pInGameUI;
 	m_pInGameUI_Gauge = pDesc->pInGameUI_Gauge;
-	if (FAILED(__super::Initialize(pArg)))
+	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
-	m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(pDesc->fPosition.x,pDesc->fPosition.y,pDesc->fPosition.z,1.f));
+	m_pTransformCom->Set_Scaling(pDesc->fScale.x,pDesc->fScale.y,pDesc->fScale.z);
 	m_bVisible = m_pPlayer->Get_Visible_Battery();
-	
+
 	m_fEnergy = 100.f;
 	return S_OK;
 }
 
 void CBattery::Priority_Update(_float fTimeDelta)
 {
-	// ¹èÅÍ¸®°¡ ¸Ó½Å ¾È¿¡ ÀÖÀ» ¶§ À§Ä¡ °ª ÁöÁ¤ÇØÁÖ±â
-	if (m_pEnergy_Machine->Get_Battery_Is_In() == true)
+	// ë°°í„°ë¦¬ê°€ ë¨¸ì‹  ì•ˆì— ìžˆì„ ë•Œ ìœ„ì¹˜ ê°’ ì§€ì •í•´ì£¼ê¸°
+	if(m_pEnergy_Machine->Get_Battery_Is_In() == true)
 	{
 		m_bPickUpOnce = false;
 		m_bFallOnce = false;
 		m_pInGameUI_Gauge->Set_BatteryGauge(m_fEnergy);
 		m_pInGameUI->Set_BatteryGauge(m_fEnergy);
-		if (m_fEnergy > 0.f)
+		if(m_fEnergy > 0.f)
 		{
 			m_fCharging_Delay += fTimeDelta;
-			// 2ÃÊ¿¡ 1¾¿ È¸º¹ ½ÃÅ´
-			if (m_pBrain->Get_Energy() < 100.f && m_fCharging_Delay >= 2.f)
+			// 2ì´ˆì— 1ì”© íšŒë³µ ì‹œí‚´
+			if(m_pBrain->Get_Energy() < 100.f && m_fCharging_Delay >= 2.f)
 			{
 				m_fCharging_Delay = 0.f;
 				m_fEnergy -= 1.f;
@@ -65,88 +63,85 @@ void CBattery::Priority_Update(_float fTimeDelta)
 			}
 		}
 		_vector vMachinePos = m_pEnergy_Machine->Get_EnergyMachinePos();
-		vMachinePos = XMVectorSetY(vMachinePos, 4.f);
-		vMachinePos = XMVectorSetZ(vMachinePos, XMVectorGetZ(vMachinePos) + 1.f);
-		vMachinePos = XMVectorSetX(vMachinePos, XMVectorGetX(vMachinePos) - 0.5f);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vMachinePos);
-		m_pTransformCom->Rotation(0.f, 0.f, 0.f);
+		vMachinePos = XMVectorSetY(vMachinePos,4.f);
+		vMachinePos = XMVectorSetZ(vMachinePos,XMVectorGetZ(vMachinePos) + 1.f);
+		vMachinePos = XMVectorSetX(vMachinePos,XMVectorGetX(vMachinePos) - 0.5f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,vMachinePos);
+		m_pTransformCom->Rotation(0.f,0.f,0.f);
 		*m_bVisible = true;
-	}
-	else
+	} else
 	{
 		m_pInGameUI_Gauge->Set_BatteryGauge(0.f);
 		m_pInGameUI->Set_BatteryGauge(0.f);
-		if (m_vecPos != nullptr)
+		if(m_vecPos != nullptr)
 		{
-			// À§Ä¡ º¯°æ, ( ÇÃ·¹ÀÌ¾î°¡ ³»·Á³õÀ» °æ¿ì ÇÃ·¹ÀÌ¾î À§Ä¡ ¹Þ¾Æ¿Í¼­ ³»·Á³õÀ½)
-			XMStoreFloat3(&fPrevPos, m_vecPrevPos);
-			XMStoreFloat3(&fPos, *m_vecPos);
-			if (fPrevPos.x != fPos.x && fPrevPos.z != fPos.z)
+			// ìœ„ì¹˜ ë³€ê²½, ( í”Œë ˆì´ì–´ê°€ ë‚´ë ¤ë†“ì„ ê²½ìš° í”Œë ˆì´ì–´ ìœ„ì¹˜ ë°›ì•„ì™€ì„œ ë‚´ë ¤ë†“ìŒ)
+			XMStoreFloat3(&fPrevPos,m_vecPrevPos);
+			XMStoreFloat3(&fPos,*m_vecPos);
+			if(fPrevPos.x != fPos.x && fPrevPos.z != fPos.z)
 			{
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(fPos.x, fPos.y + 4.f, fPos.z, 1.f));
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(fPos.x,fPos.y + 4.f,fPos.z,1.f));
 			}
 			m_vecPrevPos = *m_vecPos;
 		}
-		// ¹èÅÍ¸® ³»·Á ³õ¾ÒÀ» ¶§ ¹Ù´Ú¿¡ ¶³¾îÁöµµ·Ï
-		if (m_bFirst_PickUp == false && (fPos.x != 0.f && fPos.z != 0.f))
+		// ë°°í„°ë¦¬ ë‚´ë ¤ ë†“ì•˜ì„ ë•Œ ë°”ë‹¥ì— ë–¨ì–´ì§€ë„ë¡
+		if(m_bFirst_PickUp == false && (fPos.x != 0.f && fPos.z != 0.f))
 		{
 			m_bPickUpOnce = false;
-			m_pTransformCom->Rotation(0.f, 0.f, XMConvertToRadians(90.f));
+			m_pTransformCom->Rotation(0.f,0.f,XMConvertToRadians(90.f));
 			_vector vCurrentPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			if (XMVectorGetY(vCurrentPos) > 0.5f)
+			if(XMVectorGetY(vCurrentPos) > 0.5f)
 			{
-				vCurrentPos = XMVectorSetY(vCurrentPos, XMVectorGetY(vCurrentPos) - (fTimeDelta * 10.f));
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurrentPos);
-			}
-			else
+				vCurrentPos = XMVectorSetY(vCurrentPos,XMVectorGetY(vCurrentPos) - (fTimeDelta * 10.f));
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION,vCurrentPos);
+			} else
 			{
-				if (m_bFallOnce == false)
+				if(m_bFallOnce == false)
 				{
 					m_pGameInstance->StopSound(BATTERY);
-					m_pGameInstance->PlaySoundW(L"FE_Battery_Drop_01.wav", Engine::CHANNELID::BATTERY, m_fSound);
+					m_pGameInstance->PlaySoundW(L"FE_Battery_Drop_01.wav",Engine::CHANNELID::BATTERY,m_fSound);
 
 					m_bFallOnce = true;
 
 				}
-				vCurrentPos = XMVectorSetY(vCurrentPos, 0.5f);
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurrentPos);
+				vCurrentPos = XMVectorSetY(vCurrentPos,0.5f);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION,vCurrentPos);
 			}
 		}
 
-		if (m_pTransformCom->Cal_Distance_vec(m_pPlayer->Get_Position(), m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 80.f) // ÇÃ·¹ÀÌ¾î¿ÍÀÇ °Å¸® °è»ê
+		if(m_pTransformCom->Cal_Distance_vec(m_pPlayer->Get_Position(),m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 80.f) // í”Œë ˆì´ì–´ì™€ì˜ ê±°ë¦¬ ê³„ì‚°
 		{
-			// ±ÙÃ³¿¡ ÀÖÀ» ¶§ »óÈ£ÀÛ¿ëÀÌ µÇ¾î¾ß ÇÏ´Âµ¥
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+			// ê·¼ì²˜ì— ìžˆì„ ë•Œ ìƒí˜¸ìž‘ìš©ì´ ë˜ì–´ì•¼ í•˜ëŠ”ë°
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
 			{
-				if (m_pGauge->Get_ItemInteraction_End() == false)
+				if(m_pGauge->Get_ItemInteraction_End() == false)
 				{
-					// Circle GaugeÇÑÅ× ÃæÀüÇÏ¶ó°í º¸³»ÁÖ±â
+					// Circle Gaugeí•œí…Œ ì¶©ì „í•˜ë¼ê³  ë³´ë‚´ì£¼ê¸°
 					m_pGauge->Set_Item_Interaction(true);
 				}
-			}
-			else
+			} else
 			{
-				// Circle Gauge °ª ÃÊ±âÈ­
+				// Circle Gauge ê°’ ì´ˆê¸°í™”
 				m_pGauge->Set_Item_Interaction(false);
 
 			}
-			// ¾ÆÀÌÅÛ »óÈ£ÀÛ¿ëÀÌ ³¡³µÀ» ¶§ ¾Èº¸ÀÌ°Ô ¸¸µé±â, ³ªÁß¿¡ À§Ä¡ ¾÷µ¥ÀÌÆ®µÇ¸é ±×ÀÚ¸®·Î º¸³½ ÈÄ ¾÷µ¥ÀÌÆ® ÇÒ °Í
-			if (m_pGauge->Get_ItemInteraction_End() == true)
+			// ì•„ì´í…œ ìƒí˜¸ìž‘ìš©ì´ ëë‚¬ì„ ë•Œ ì•ˆë³´ì´ê²Œ ë§Œë“¤ê¸°, ë‚˜ì¤‘ì— ìœ„ì¹˜ ì—…ë°ì´íŠ¸ë˜ë©´ ê·¸ìžë¦¬ë¡œ ë³´ë‚¸ í›„ ì—…ë°ì´íŠ¸ í•  ê²ƒ
+			if(m_pGauge->Get_ItemInteraction_End() == true)
 			{
-				if (m_bPickUpOnce == false)
+				if(m_bPickUpOnce == false)
 				{
 					m_pGameInstance->StopSound(BATTERY);
-					m_pGameInstance->PlaySoundW(L"FE_Battery_Pickup.wav", Engine::CHANNELID::BATTERY, m_fSound);
+					m_pGameInstance->PlaySoundW(L"FE_Battery_Pickup.wav",Engine::CHANNELID::BATTERY,m_fSound);
 					m_bPickUpOnce = true;
 				}
 				m_bFallOnce = false;
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(0.f,0.f,0.f,1.f));
 				*m_bVisible = false;
 				m_bFirst_PickUp = false;
 				m_pGauge->Set_Item_Interaction(false);
-				m_pGauge->Set_Item_InteractionEnd(false); // »óÈ£ÀÛ¿ë ³¡³µ´ÂÁö ¾Ë·ÁÁÖ´Â °ª ÃÊ±âÈ­ ÇØÁÖ±â
-				// ÇÃ·¹ÀÌ¾îÇÑÅ× ¹èÅÍ¸® µé¶ó°í ¾Ë·ÁÁÖ±â
-				m_pPlayer->PickUp_Battery(CPlayer::BATTERY); //111¹ø 
+				m_pGauge->Set_Item_InteractionEnd(false); // ìƒí˜¸ìž‘ìš© ëë‚¬ëŠ”ì§€ ì•Œë ¤ì£¼ëŠ” ê°’ ì´ˆê¸°í™” í•´ì£¼ê¸°
+				// í”Œë ˆì´ì–´í•œí…Œ ë°°í„°ë¦¬ ë“¤ë¼ê³  ì•Œë ¤ì£¼ê¸°
+				m_pPlayer->PickUp_Battery(CPlayer::BATTERY); //111ë²ˆ 
 				m_vecPos = m_pPlayer->Get_BatteryPos();
 			}
 		}
@@ -154,31 +149,30 @@ void CBattery::Priority_Update(_float fTimeDelta)
 }
 
 void CBattery::Update(_float fTimeDelta)
-{
-}
+{}
 
 void CBattery::Late_Update(_float fTimeDelta)
 {
 	if(*m_bVisible == true)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 			return;
 	}
 }
 
 HRESULT CBattery::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if(FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -190,16 +184,16 @@ HRESULT CBattery::Render()
 
 HRESULT CBattery::Add_Components()
 {
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxItem"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Weapon");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(11);
 	/* For.Com_Model */
 	;
-	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	return S_OK;
@@ -207,15 +201,15 @@ HRESULT CBattery::Add_Components()
 
 HRESULT CBattery::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 	return S_OK;
@@ -223,11 +217,11 @@ HRESULT CBattery::Bind_ShaderResources()
 
 }
 
-CBattery* CBattery::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBattery* CBattery::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CBattery* pInstance = new CBattery(pDevice, pContext);
+	CBattery* pInstance = new CBattery(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CBattery");
 		Safe_Release(pInstance);
@@ -240,7 +234,7 @@ CGameObject* CBattery::Clone(void* pArg)
 {
 	CBattery* pInstance = new CBattery(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CBattery");
 		Safe_Release(pInstance);

@@ -12,26 +12,28 @@ END
 BEGIN(Client)
 
 
-class CLoading_UI final : public CUIObject
+class CLoading_UI final: public CUIObject
 {
 public:
-	enum UITAG{ LOADING_GAGE, LOADING_LOGO, LOADING_GAMENAME, LOADING_BACKGROUND_GAMENAME,LOADING_END};
-	typedef struct : public CUIObject::UIOBJECT_DESC
+	enum UITAG{
+		LOADING_GAGE,LOADING_LOGO,LOADING_GAMENAME,LOADING_BACKGROUND_GAMENAME,LOADING_END
+	};
+	typedef struct: public CUIObject::UIOBJECT_DESC
 	{
 		enum UITAG eTag{};
 		enum LEVELID eTargetLevel {};
 	}LOADINGUI_DESC;
 private:
-	CLoading_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLoading_UI(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CLoading_UI(const CLoading_UI& Prototype);
 	virtual ~CLoading_UI() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -44,18 +46,18 @@ private:
 	HRESULT Bind_ShaderResources();
 
 public:
-//	void	Set_Percent(_float fPer) { m_fPercent = fPer; }
+	//	void	Set_Percent(_float fPer) { m_fPercent = fPer; }
 	void	Set_Percent(_float fPer) {
 		m_fPercent = fPer;
 	}
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CVIBuffer_Rect* m_pVIBufferCom = {nullptr};
 
-	CTexture* m_pTextureCom_Loading0 = { nullptr };
-	CTexture* m_pTextureCom_Loading1 = { nullptr };
-	CTexture* m_pTextureCom_Loading2 = { nullptr };
+	CTexture* m_pTextureCom_Loading0 = {nullptr};
+	CTexture* m_pTextureCom_Loading1 = {nullptr};
+	CTexture* m_pTextureCom_Loading2 = {nullptr};
 	_uint		m_iIndex = 0;
 	_float		m_fPercent = 0.f;
 	_float		m_fPrePercent = 0.f;
@@ -64,7 +66,7 @@ private:
 
 	LEVELID m_eTargetLevel{};
 public:
-	static CLoading_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLoading_UI* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

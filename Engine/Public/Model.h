@@ -4,12 +4,14 @@
 
 BEGIN(Engine)
 
-class ENGINE_DLL CModel final : public CComponent
+class ENGINE_DLL CModel final: public CComponent
 {
 public:
-	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
+	enum TYPE {
+		TYPE_NONANIM,TYPE_ANIM,TYPE_END
+	};
 private:
-	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CModel(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CModel(const CModel& Prototype);
 	virtual ~CModel() = default;
 
@@ -20,38 +22,51 @@ public:
 
 	_uint Get_BoneIndex(const _char* pBoneName) const;
 	const _float4x4* Get_BoneMatrix(const _char* pBoneName) const;
+	_uint Get_NumBones() const	{
+		return m_Bones.size();
+	}
 public:
-	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
+	void Set_Animation(_uint iAnimIndex,_bool isLoop = false) {
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
-		m_bLinearInterpolation = false; // º±«¸∫∏∞£ «œµµ∑œ false ∑Œ πŸ≤„¡‹
+		m_bLinearInterpolation = false; // ÏÑ†ÌòïÎ≥¥Í∞Ñ ÌïòÎèÑÎ°ù false Î°ú Î∞îÍøîÏ§å
 	}
-	void Set_Animation_UpperBody(_uint iAnimIndex, _bool isLoop = false) {
+	void Set_Animation_UpperBody(_uint iAnimIndex,_bool isLoop = false) {
 		m_iCurrentAnimIndex_UpperBody = iAnimIndex;
 		m_isLoop_UpperBody = isLoop;
-		m_bLinearInterpolation_UpperBody = false; // º±«¸∫∏∞£ «œµµ∑œ false ∑Œ πŸ≤„¡‹
+		m_bLinearInterpolation_UpperBody = false; // ÏÑ†ÌòïÎ≥¥Í∞Ñ ÌïòÎèÑÎ°ù false Î°ú Î∞îÍøîÏ§å
 	}
 
-	void Set_Animation_LowerBody(_uint iAnimIndex, _bool isLoop = false) {
+	void Set_Animation_LowerBody(_uint iAnimIndex,_bool isLoop = false) {
 		m_iCurrentAnimIndex_LowerBody = iAnimIndex;
 		m_isLoop_LowerBody = isLoop;
-		m_bLinearInterpolation_LowerBody = false; // º±«¸∫∏∞£ «œµµ∑œ false ∑Œ πŸ≤„¡‹
+		m_bLinearInterpolation_LowerBody = false; // ÏÑ†ÌòïÎ≥¥Í∞Ñ ÌïòÎèÑÎ°ù false Î°ú Î∞îÍøîÏ§å
 	}
 
-	_uint Get_CurrentAnimationIndex() { return m_iCurrentAnimIndex; }
-	_uint Get_CurrentAnimationIndex_UpperBody() { return m_iCurrentAnimIndex_UpperBody; }
-	_uint Get_CurrentAnimationIndex_LowerBody() { return m_iCurrentAnimIndex_LowerBody; }
+	_uint Get_CurrentAnimationIndex() {
+		return m_iCurrentAnimIndex;
+	}
+	_uint Get_CurrentAnimationIndex_UpperBody() {
+		return m_iCurrentAnimIndex_UpperBody;
+	}
+	_uint Get_CurrentAnimationIndex_LowerBody() {
+		return m_iCurrentAnimIndex_LowerBody;
+	}
 
-	void Set_SecondPreTransform(const _float4x4& mat) { m_PreTransformMatrix_Second = mat; }
-	_float4x4* Get_SecondPreTransform() { return &m_PreTransformMatrix_Second; }
+	void Set_SecondPreTransform(const _float4x4& mat) {
+		m_PreTransformMatrix_Second = mat;
+	}
+	_float4x4* Get_SecondPreTransform() {
+		return &m_PreTransformMatrix_Second;
+	}
 public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	HRESULT Bind_Material_ShaderResource(class CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
-	HRESULT Bind_Mesh_BoneMatrices(class CShader* pShader, _uint iMeshIndex, const _char* pConstantName);
-	_bool Play_Animation(_float fTimeDelta, _bool Once = false, _bool bPlay = true);
-	_bool Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle, _uint iUpperMotion, _bool& bShot);
+	HRESULT Bind_Material_ShaderResource(class CShader* pShader,_uint iMeshIndex,aiTextureType eMaterialType,_uint iIndex,const _char* pConstantName);
+	HRESULT Bind_Mesh_BoneMatrices(class CShader* pShader,_uint iMeshIndex,const _char* pConstantName);
+	_bool Play_Animation(_float fTimeDelta,_bool Once = false,_bool bPlay = true);
+	_bool Play_Animation_UpperBody(_float fTimeDelta,_float fRotation_Angle,_uint iUpperMotion,_bool& bShot);
 	_bool Play_Animation_LowerBody(_float fTimeDelta);
 
 
@@ -59,7 +74,7 @@ public:
 
 
 private:
-	TYPE							m_eModelType = { TYPE_END };
+	TYPE							m_eModelType = {TYPE_END};
 	_float4x4						m_PreTransformMatrix = {};
 
 
@@ -67,23 +82,23 @@ private:
 
 
 
-	_uint							m_iNumMeshes = { 0 };
+	_uint							m_iNumMeshes = {0};
 	vector<class CMesh*>			m_Meshes;
 
-	_uint							m_iNumMaterials = { 0 };
+	_uint							m_iNumMaterials = {0};
 	vector<class CMeshMaterial*>	m_Materials;
 
 	vector<class CBone*>			m_Bones;
 
-	_bool							m_isLoop = { false };
-	_bool							m_isLoop_UpperBody = { false };
-	_bool							m_isLoop_LowerBody = { false };
+	_bool							m_isLoop = {false};
+	_bool							m_isLoop_UpperBody = {false};
+	_bool							m_isLoop_LowerBody = {false};
 
 	_uint							m_iCurrentAnimIndex = {0};
-	_uint							m_iCurrentAnimIndex_UpperBody = { 0 };
-	_uint							m_iCurrentAnimIndex_LowerBody = { 0 };
+	_uint							m_iCurrentAnimIndex_UpperBody = {0};
+	_uint							m_iCurrentAnimIndex_LowerBody = {0};
 
-	_uint							m_iNumAnimations = { 0 };
+	_uint							m_iNumAnimations = {0};
 
 
 	vector<class CAnimation*>		m_Animations;
@@ -97,9 +112,9 @@ private:
 	_bool							isFinished_UpperBody{};
 	_bool							isFinished_LowerBody{};
 private:
-	_uint							m_iPrevAnimIndex = {0};		// ∫∏∞£¿ª ¿ß«— ¿Œµ¶Ω∫ ¿˙¿Â
-	_uint							m_iPrevAnimIndex_UpperBody = { 0 };		// ∫∏∞£¿ª ¿ß«— ¿Œµ¶Ω∫ ¿˙¿Â
-	_uint							m_iPrevAnimIndex_LowerBody = { 0 };		// ∫∏∞£¿ª ¿ß«— ¿Œµ¶Ω∫ ¿˙¿Â
+	_uint							m_iPrevAnimIndex = {0};		// Î≥¥Í∞ÑÏùÑ ÏúÑÌïú Ïù∏Îç±Ïä§ Ï†ÄÏû•
+	_uint							m_iPrevAnimIndex_UpperBody = {0};		// Î≥¥Í∞ÑÏùÑ ÏúÑÌïú Ïù∏Îç±Ïä§ Ï†ÄÏû•
+	_uint							m_iPrevAnimIndex_LowerBody = {0};		// Î≥¥Í∞ÑÏùÑ ÏúÑÌïú Ïù∏Îç±Ïä§ Ï†ÄÏû•
 
 
 	_bool							m_bLinearInterpolation = {};
@@ -117,17 +132,17 @@ public:
 	virtual void Free() override;
 
 
-public: // Data∆ƒ¿œ ReadøÎ
-	static CModel* Create_ReadDataFile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex);
-	HRESULT Initialize_Prototype_ReadDataFile(TYPE eModelType, const wstring pDataFile, _uint iIndex, _fmatrix PreTransformMatrix = XMMatrixIdentity());
+public: // DataÌååÏùº ReadÏö©
+	static CModel* Create_ReadDataFile(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,TYPE eModelType,const wstring pDataFilePath,_fmatrix PreTransformMatrix,_uint iIndex);
+	HRESULT Initialize_Prototype_ReadDataFile(TYPE eModelType,const wstring pDataFile,_uint iIndex,_fmatrix PreTransformMatrix = XMMatrixIdentity());
 	HRESULT Ready_Meshes_ReadData_NonAnim(HANDLE hFileRead);
 	HRESULT Ready_Materials_ReadData_NonAnim(HANDLE hFileRead);
 
 
 
-	static CModel* Create_ReadDataFile_For_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex);
-	HRESULT Initialize_Prototype_ReadDataFile_For_Anim(TYPE eModelType, const wstring pDataFile, _uint iIndex, _fmatrix PreTransformMatrix = XMMatrixIdentity());
-	HRESULT Ready_Bones( _int iParentIndex, HANDLE hFileRead);
+	static CModel* Create_ReadDataFile_For_Anim(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,TYPE eModelType,const wstring pDataFilePath,_fmatrix PreTransformMatrix,_uint iIndex);
+	HRESULT Initialize_Prototype_ReadDataFile_For_Anim(TYPE eModelType,const wstring pDataFile,_uint iIndex,_fmatrix PreTransformMatrix = XMMatrixIdentity());
+	HRESULT Ready_Bones(_int iParentIndex,HANDLE hFileRead);
 	HRESULT Ready_Animations(HANDLE hFileRead);
 	HRESULT Ready_Meshes_ReadData(HANDLE hFileRead);
 

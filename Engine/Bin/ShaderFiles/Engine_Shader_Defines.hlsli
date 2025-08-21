@@ -90,7 +90,7 @@ BlendState BS_OneByOne
     BlendOp = Add;
 };
 
- // ½ºÆ÷Æ® Á¶¸í
+ // ìŠ¤í¬íŠ¸ ì¡°ëª…
 float Calc_Spot_LightPower(float3 vLightDir, float3 vLightPos, float3 vNormal, float3 vPixelPos, float fAngle)
 {
     float fNDotL = dot(vLightDir, vNormal);
@@ -100,10 +100,10 @@ float Calc_Spot_LightPower(float3 vLightDir, float3 vLightPos, float3 vNormal, f
     float3 vLightToPixel = vPixelPos - vLightPos;
     float fSpotPower = dot(normalize(vLightDir), normalize(vLightToPixel));
 
-        // ÃÖ¼Ò °ª
+        // ìµœì†Œ ê°’
     float fLimit = cos(radians(fAngle * 0.5));
 
-        // Çã¿ë ¹üÀ§
+        // í—ˆìš© ë²”ìœ„
     float fGap = 1.f - fLimit;
 
     float ranges[4] =

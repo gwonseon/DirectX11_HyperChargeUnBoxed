@@ -1,4 +1,4 @@
-﻿// Client.cpp : 응용 프로그램에 대한 진입점을 정의합니다.
+// Client.cpp : 응용 프로그램에 대한 진입점을 정의합니다.
 //
 
 #include "stdafx.h"
@@ -92,7 +92,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         fTimeAcc += pGameInstance->Get_TimeDelta(TEXT("Timer_Default"));
 
-        if (fTimeAcc >= 1.f / 60.0f)
+        if (fTimeAcc >= 1.f / 80.0f)
         {
             pGameInstance->Update_TimeDelta(TEXT("Timer_60"));
 

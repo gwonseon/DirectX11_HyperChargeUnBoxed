@@ -5,10 +5,10 @@
 
 BEGIN(Engine)
 
-class CMesh final : public CVIBuffer
+class CMesh final: public CVIBuffer
 {
 private:
-	CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMesh(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CMesh(const CMesh& Prototype);
 	virtual ~CMesh() = default;
 
@@ -18,20 +18,20 @@ public:
 	}
 
 public:
-//	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, class CModel* pModel, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
+	//	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, class CModel* pModel, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	HRESULT Bind_BoneMatrices(class CShader* pShader, const vector<class CBone*>& Bones, const _char* pConstantName);
+	HRESULT Bind_BoneMatrices(class CShader* pShader,const vector<class CBone*>& Bones,const _char* pConstantName);
 
 private:
 	_char					m_szName[MAX_PATH] = "";
-	_uint					m_iMaterialIndex = { 0 };
+	_uint					m_iMaterialIndex = {0};
 
-	/* ÀÌ ¸Ş½ÃÀÇ Á¤Á¡µé¿¡°Ô ¿µÇâÀ» ÁÖ´Â »ÀµéÀÇ °¹¼ö */
-	_uint					m_iNumBones = { 0 };
+	/* ì´ ë©”ì‹œì˜ ì •ì ë“¤ì—ê²Œ ì˜í–¥ì„ ì£¼ëŠ” ë¼ˆë“¤ì˜ ê°¯ìˆ˜ */
+	_uint					m_iNumBones = {0};
 
-	/* ¸ğµ¨Å¬·¡½º¿¡ ¼±¾ğµÈ ÀüÃ¼ »Àµé Áß¿¡¼­ ¸î¹øÂ° »À°¡ Á¤Á¡¿¡°Ô ¿µÇâÀ» ÁÖ´Â°¡? */
+	/* ëª¨ë¸í´ë˜ìŠ¤ì— ì„ ì–¸ëœ ì „ì²´ ë¼ˆë“¤ ì¤‘ì—ì„œ ëª‡ë²ˆì§¸ ë¼ˆê°€ ì •ì ì—ê²Œ ì˜í–¥ì„ ì£¼ëŠ”ê°€? */
 	vector<_uint>			m_Bones;
 	// vector<class CBone*>	m_Bones;
 
@@ -40,20 +40,20 @@ private:
 private:
 	//HRESULT Ready_VIBuffer_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
 	//HRESULT Ready_VIBuffer_For_Anim(const aiMesh* pAIMesh, class CModel* pModel);
-	HRESULT Ready_VIBuffer_For_NonAnim_DataRead(HANDLE hFileRead, _fmatrix PreTransformMatrix);
-	HRESULT Ready_VIBuffer_For_Anim_DataRead(HANDLE hFileRead, class CModel* pModel);
+	HRESULT Ready_VIBuffer_For_NonAnim_DataRead(HANDLE hFileRead,_fmatrix PreTransformMatrix);
+	HRESULT Ready_VIBuffer_For_Anim_DataRead(HANDLE hFileRead,class CModel* pModel);
 
 	// ReadData
 public:
-	static CMesh* Create_NonAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, class CModel* pModel,  _fmatrix PreTransformMatrix, HANDLE hFileRead);
-	virtual HRESULT Initialize_Prototype_NonAnim(CModel::TYPE eModelType, class CModel* pModel, _fmatrix PreTransformMatrix, HANDLE hFileRead);
+	static CMesh* Create_NonAnim(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,CModel::TYPE eModelType,class CModel* pModel,_fmatrix PreTransformMatrix,HANDLE hFileRead);
+	virtual HRESULT Initialize_Prototype_NonAnim(CModel::TYPE eModelType,class CModel* pModel,_fmatrix PreTransformMatrix,HANDLE hFileRead);
 
-	
+
 private:
 	DWORD			dwByte = 0;
 	_uint			m_iFaceNum = 0;
 public:
-//	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, class CModel* pModel, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
+	//	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, class CModel* pModel, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

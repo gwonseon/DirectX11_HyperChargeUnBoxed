@@ -4,15 +4,13 @@
 
 #include "GameInstance.h"
 
-CUI_CircleGuage::CUI_CircleGuage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CUIObject{ pDevice, pContext }
-{
-}
+CUI_CircleGuage::CUI_CircleGuage(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CUIObject{pDevice,pContext}
+{}
 
 CUI_CircleGuage::CUI_CircleGuage(const CUI_CircleGuage& Prototype)
-	: CUIObject{ Prototype }
-{
-}
+	: CUIObject{Prototype}
+{}
 
 HRESULT CUI_CircleGuage::Initialize_Prototype()
 {
@@ -27,13 +25,13 @@ HRESULT CUI_CircleGuage::Initialize(void* pArg)
 	m_pEnergy_Machine = pDesc->pEnergy_Machine;
 	m_pEnergyMachine_Cap = pDesc->pEnergyMachine_Cap;
 	m_eLevel = pDesc->eLevel;
-	if (FAILED(__super::Initialize(pArg)))
+	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components(1)))
+	if(FAILED(Add_Components(1)))
 		return E_FAIL;
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
-	
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(pDesc->fPosition.x,pDesc->fPosition.y,pDesc->fPosition.z,1.f));
+
 	m_bBattery_Insert_End = false;
 
 	m_bBuildMode = m_pPlayer->Get_BuildMode();
@@ -42,26 +40,26 @@ HRESULT CUI_CircleGuage::Initialize(void* pArg)
 
 void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 {
-	// ºôµå¸ðµå¿¡¼­ °Ç¹° ¸¸µé ¶§
+	// ë¹Œë“œëª¨ë“œì—ì„œ ê±´ë¬¼ ë§Œë“¤ ë•Œ
 	if(*m_bBuildMode == true && m_bItemCharging == false)
 	{
-		if (m_pPlayer->Get_Build_Gauging() == true)
+		if(m_pPlayer->Get_Build_Gauging() == true)
 			m_bBuild_Draw = true;
 		else
 			m_bBuild_Draw = false;
 
-		if (m_fReal_Gauging_Time >= 1.f)
+		if(m_fReal_Gauging_Time >= 1.f)
 		{
 			m_fReal_Gauging_Time = 0.f;
 			m_bBuild_Draw = false;
-			for (auto& pMark : *m_pvecTrap_Marks)
+			for(auto& pMark : *m_pvecTrap_Marks)
 			{
-				// ¸¸µé ¼ö ÀÖ°í, »ì ¼ö ÀÖÀ» ¶§
-				if (pMark->Get_BuildAble() == true && pMark->Get_CanBuy() == true)
+				// ë§Œë“¤ ìˆ˜ ìžˆê³ , ì‚´ ìˆ˜ ìžˆì„ ë•Œ
+				if(pMark->Get_BuildAble() == true && pMark->Get_CanBuy() == true)
 				{
-					// µ· ³ª°¡´Â ¼Ò¸®
-					m_pGameInstance->PlaySoundW(L"FE_BuildCredits_Recieved_Cash_02.wav", Engine::CHANNELID::PLAYER_ACT, 0.8f );
-					m_pGameInstance->PlaySoundW(L"FE_Buildable_Barricades_Build_Complete.wav", Engine::CHANNELID::TRAP_BUILD, 0.8f);
+					// ëˆ ë‚˜ê°€ëŠ” ì†Œë¦¬
+					m_pGameInstance->PlaySoundW(L"FE_BuildCredits_Recieved_Cash_02.wav",Engine::CHANNELID::PLAYER_ACT,0.8f);
+					m_pGameInstance->PlaySoundW(L"FE_Buildable_Barricades_Build_Complete.wav",Engine::CHANNELID::TRAP_BUILD,0.8f);
 
 					m_pPlayer->UseCoin(pMark->Get_Privce());
 					pMark->Set_Build_Done(true);
@@ -70,31 +68,29 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 			}
 		}
 	}
-	// ¹èÅÍ¸® ÁÝ±â
-	if (*m_pPlayer->Get_WeaponState() == CPlayer::BATTERY)
+	// ë°°í„°ë¦¬ ì¤ê¸°
+	if(*m_pPlayer->Get_WeaponState() == CPlayer::BATTERY)
 	{
-		if (m_pTransformCom->Cal_Distance_vec(m_pEnergy_Machine->Get_EnergyMachinePos(), m_pPlayer->Get_Position()) <= 80.f)
+		if(m_pTransformCom->Cal_Distance_vec(m_pEnergy_Machine->Get_EnergyMachinePos(),m_pPlayer->Get_Position()) <= 80.f)
 		{
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E) && m_bBattery_Insert_End == false)
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E) && m_bBattery_Insert_End == false)
 			{
 				m_bBattery_Insert = true;
-			}
-			else
+			} else
 			{
 				m_bBattery_Insert = false;
 				m_fReal_Gauging_Time = 0.f;
 				m_fGuaging_Time = 0.f;
 			}
 		}
-	}
-	else
+	} else
 	{
 		m_bBattery_Insert_End = false;
 	}
-	// ¾ÆÀÌÅÛ°úÀÇ »óÈ£ ÀÛ¿ë
-	if (m_bItem_Interaction == true && m_bItem_Interaction_End == false && m_bCoinItem_Interaction == false)
+	// ì•„ì´í…œê³¼ì˜ ìƒí˜¸ ìž‘ìš©
+	if(m_bItem_Interaction == true && m_bItem_Interaction_End == false && m_bCoinItem_Interaction == false)
 	{
-		if (m_fReal_Gauging_Time >= 1.f)
+		if(m_fReal_Gauging_Time >= 1.f)
 		{
 			m_bItem_Interaction = false;
 			m_bItem_Interaction_End = true;
@@ -104,10 +100,10 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 		}
 	}
 
-	//  ¾ÆÀÌÅÛ°úÀÇ »óÈ£ ÀÛ¿ë
-	if (m_bInteraction == true)
+	//  ì•„ì´í…œê³¼ì˜ ìƒí˜¸ ìž‘ìš©
+	if(m_bInteraction == true)
 	{
-		if (m_fReal_Gauging_Time >= 1.f)
+		if(m_fReal_Gauging_Time >= 1.f)
 		{
 			m_bInteraction = false;
 			m_fGuaging_Time = 0.f;
@@ -118,60 +114,59 @@ void CUI_CircleGuage::Priority_Update(_float fTimeDelta)
 
 void CUI_CircleGuage::Update(_float fTimeDelta)
 {
-	// °ÔÀÌÁö Â÷Â¡
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bInteraction == true)
+	// ê²Œì´ì§€ ì°¨ì§•
+	if(m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true || m_bInteraction == true)
 	{
-			m_fReal_Gauging_Time += fTimeDelta;
-			m_fGuaging_Time += fTimeDelta * 10;
-			
-	}
-	else
+		m_fReal_Gauging_Time += fTimeDelta;
+		m_fGuaging_Time += fTimeDelta * 10;
+
+	} else
 	{
-			m_fReal_Gauging_Time = 0.f;
-			m_fGuaging_Time = 0.f;
+		m_fReal_Gauging_Time = 0.f;
+		m_fGuaging_Time = 0.f;
 	}
 }
 
 void CUI_CircleGuage::Late_Update(_float fTimeDelta)
 {
 
-	// ¹èÅÍ¸® »ðÀÔ
-	if (m_bBattery_Insert == true && m_bBattery_Insert_End == false)
+	// ë°°í„°ë¦¬ ì‚½ìž…
+	if(m_bBattery_Insert == true && m_bBattery_Insert_End == false)
 	{
-		// ¹èÅÍ¸® »ðÀÔ ¿Ï·á µÇ¾úÀ» ¶§
-		if (m_fReal_Gauging_Time >= 1.f)
+		// ë°°í„°ë¦¬ ì‚½ìž… ì™„ë£Œ ë˜ì—ˆì„ ë•Œ
+		if(m_fReal_Gauging_Time >= 1.f)
 		{
-			m_bBattery_Insert_End = true;	// »ðÀÔ ¿Ï·á
-			m_bBattery_Insert = false;		// »ðÀÔ ·Îµù ¿Ï·á
-			m_fGuaging_Time = 0.f;			// ½Ã°£ ÃÊ±âÈ­
-			m_fReal_Gauging_Time = 0.f;		// ½Ã°£ ÃÊ±âÈ­
-			m_pEnergy_Machine->Set_BatteryInsert(true);   // ¸Ó½Å¿¡ ¹èÅÍ¸® ³Ö±â
-			m_pPlayer->Insert_Battery();				  // ÇÃ·¹ÀÌ¾î µé°í ÀÖ´Â ¹«±â Á¤»óÈ­
-			if (m_bBattery_Insert_First == false)
+			m_bBattery_Insert_End = true;	// ì‚½ìž… ì™„ë£Œ
+			m_bBattery_Insert = false;		// ì‚½ìž… ë¡œë”© ì™„ë£Œ
+			m_fGuaging_Time = 0.f;			// ì‹œê°„ ì´ˆê¸°í™”
+			m_fReal_Gauging_Time = 0.f;		// ì‹œê°„ ì´ˆê¸°í™”
+			m_pEnergy_Machine->Set_BatteryInsert(true);   // ë¨¸ì‹ ì— ë°°í„°ë¦¬ ë„£ê¸°
+			m_pPlayer->Insert_Battery();				  // í”Œë ˆì´ì–´ ë“¤ê³  ìžˆëŠ” ë¬´ê¸° ì •ìƒí™”
+			if(m_bBattery_Insert_First == false)
 			{
 				m_pEnergyMachine_Cap->Set_BatteryIn();
 				m_bBattery_Insert_First = true;
 			}
 		}
 	}
-	
-	// ±×¸®±â
-	if (m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true ||  m_bInteraction == true)
+
+	// ê·¸ë¦¬ê¸°
+	if(m_bCharging == true || m_bBuild_Draw == true || m_bItemCharging == true || m_bBattery_Insert == true ||  m_bInteraction == true)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_UI,this)))
 			return;
 	}
 }
 
 HRESULT CUI_CircleGuage::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if(FAILED(m_pShaderCom->Begin(0)))
 		return E_FAIL;
-	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+	if(FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
-	if (FAILED(m_pVIBufferCom->Render()))
+	if(FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
 	return S_OK;
@@ -179,15 +174,15 @@ HRESULT CUI_CircleGuage::Render()
 
 HRESULT CUI_CircleGuage::Add_Components(_int iNum)
 {
-	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_CircleGuage"),
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+	if(FAILED(__super::Add_Component(m_eLevel,TEXT("Prototype_Component_Texture_CircleGuage"),
+		TEXT("Com_Texture"),reinterpret_cast<CComponent**>(&m_pTextureCom))))
 		return E_FAIL;
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCircleGuage"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxCircleGuage"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_VIBuffer_Rect"),
+		TEXT("Com_VIBuffer"),reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 	return S_OK;
 
@@ -195,28 +190,28 @@ HRESULT CUI_CircleGuage::Add_Components(_int iNum)
 
 HRESULT CUI_CircleGuage::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&m_ViewMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&m_ProjMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_Time", &m_fGuaging_Time, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_Time",&m_fGuaging_Time,sizeof(float))))
 		return E_FAIL;
-	_float2 Winsize = { g_iWinSizeX,g_iWinSizeY };
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_Winsize", &Winsize,	sizeof(_float2))))
+	_float2 Winsize = {g_iWinSizeX,g_iWinSizeY};
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_Winsize",&Winsize,sizeof(_float2))))
 		return E_FAIL;
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+	if(FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom,"g_Texture",0)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-CUI_CircleGuage* CUI_CircleGuage::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CUI_CircleGuage* CUI_CircleGuage::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CUI_CircleGuage* pInstance = new CUI_CircleGuage(pDevice, pContext);
+	CUI_CircleGuage* pInstance = new CUI_CircleGuage(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CUI_CircleGuage");
 		Safe_Release(pInstance);
@@ -229,7 +224,7 @@ CGameObject* CUI_CircleGuage::Clone(void* pArg)
 {
 	CUI_CircleGuage* pInstance = new CUI_CircleGuage(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CUI_CircleGuage");
 		Safe_Release(pInstance);

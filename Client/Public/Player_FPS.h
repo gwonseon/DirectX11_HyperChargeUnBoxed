@@ -10,13 +10,13 @@ END
 
 BEGIN(Client)
 
-class CPlayer_FPS : public CPartObject
+class CPlayer_FPS: public CPartObject
 {
 public:
-	typedef struct : CPartObject::PARTOBJECT_DESC
+	typedef struct: CPartObject::PARTOBJECT_DESC
 	{
 		LEVELID m_eLevelID{};
-		const _uint* pParentState = { nullptr };
+		const _uint* pParentState = {nullptr};
 
 	}FPS_PLAYER_DESC;
 
@@ -72,7 +72,7 @@ public:
 
 
 private:
-	CPlayer_FPS(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPlayer_FPS(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CPlayer_FPS(const CPlayer_FPS& Prototype);
 	virtual ~CPlayer_FPS() = default;
 
@@ -80,11 +80,11 @@ public:
 	const _float4x4* Get_SocketMatrix(const _char* pBoneName);
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -93,49 +93,55 @@ public:
 
 
 public:
-	void	Set_PlayerViewState(_bool bFPS) { m_bFPSState = bFPS; }
-	
+	void	Set_PlayerViewState(_bool bFPS) {
+		m_bFPSState = bFPS;
+	}
+
 
 public:
-	
 
-
-private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
 
 
 private:
-	const _uint* m_pParentState = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+
+
+private:
+	const _uint* m_pParentState = {nullptr};
 	_bool	m_bAnimState = false;
 	_bool	m_bAnimInit = false;
 
 	_bool	m_bFPSState = false;
 
 	_uint	m_iWeaponState = 0;
-	WEAPONSTATE m_eWeapon{}; // ½ºÀ§Ä¡¹® ÆíÇÏ°Ô ¸¸µå·Á°í
+	WEAPONSTATE m_eWeapon{}; // ìŠ¤ìœ„ì¹˜ë¬¸ í¸í•˜ê²Œ ë§Œë“œë ¤ê³ 
 	LEVELID m_eLevelID{};
 
-	// Á¡ÇÁ
+	// ì í”„
 public:
-	_uint Get_JumpState() { return m_iJumpState; }
-	void  Set_JumpState(_float& fHeight, _float& fPowr) {
+	_uint Get_JumpState() {
+		return m_iJumpState;
+	}
+	void  Set_JumpState(_float& fHeight,_float& fPowr) {
 		m_fHeight = fHeight;
 		m_fPower = fPowr;
 	}
 
 
-	_float3 Position{}, Rotation{};
+	_float3 Position{},Rotation{};
 	float	Scale{};
 
 public:
-	void Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
+	void Set_WeaponState(_uint iState) {
+		m_iWeaponState = iState;
+	}
 private:
-	_uint   m_iJumpState = 0;	// Á¡ÇÁ »óÅÂ
+	_uint   m_iJumpState = 0;	// ì í”„ ìƒíƒœ
 
 private:
-	_float	m_fHeight{};		// Á¡ÇÁ ³ôÀÌ
-	_float	m_fPower{};			// Á¡ÇÁ Èû
+	_float	m_fHeight{};		// ì í”„ ë†’ì´
+	_float	m_fPower{};			// ì í”„ í˜
 
 
 
@@ -146,7 +152,7 @@ private:
 
 
 public:
-	static CPlayer_FPS* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPlayer_FPS* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

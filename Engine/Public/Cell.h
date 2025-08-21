@@ -4,55 +4,67 @@
 
 BEGIN(Engine)
 
-class CCell final : public CBase
+class CCell final: public CBase
 {
-public: // ¼¿Àº »ï°¢Çü ´ÜÀ§ÀÌ±â ¶§¹®¿¡ Á¡µµ ¼±µµ °¢°¢ 3°³ ¾¿ÀÌ´Ù.
-	enum POINT { POINT_A, POINT_B, POINT_C, POINT_END };
-	enum LINE { LINE_AB, LINE_BC, LINE_CA, LINE_END };
-	enum CELL_TYPE {GROUND_TYPE, HEIGHT_TYPE, TYPE_END};
+public: // ì…€ì€ ì‚¼ê°í˜• ë‹¨ìœ„ì´ê¸° ë•Œë¬¸ì— ì ë„ ì„ ë„ ê°ê° 3ê°œ ì”©ì´ë‹¤.
+	enum POINT {
+		POINT_A,POINT_B,POINT_C,POINT_END
+	};
+	enum LINE {
+		LINE_AB,LINE_BC,LINE_CA,LINE_END
+	};
+	enum CELL_TYPE {
+		GROUND_TYPE,HEIGHT_TYPE,TYPE_END
+	};
 
 private:
-	CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCell(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CCell() = default;
 
 public:
-	// POINT ÀÌ³Ñ °ªÀ» ³ÖÀ½¤¤ ÇØ´ç Æ÷ÀÎÆ®ÀÇ À§Ä¡¸¦ ¹İÈ¯ÇÑ´Ù.
+	// POINT ì´ë„˜ ê°’ì„ ë„£ìŒã„´ í•´ë‹¹ í¬ì¸íŠ¸ì˜ ìœ„ì¹˜ë¥¼ ë°˜í™˜í•œë‹¤.
 	_vector Get_Point(POINT ePoint) const {
 		return XMLoadFloat3(&m_vPoints[ePoint]);
 	}
 
-	// LINEÀÌ³Ñ°ª°ú ¼¿À» ³ÖÀ½ ÀÔ·Â ¹ŞÀº ¼¿ÀÇ ÀÎµ¦½º¸¦ ÇØ´ç ¶óÀÎ¿¡ ÀÌ¿ôÀÌ¶ó°í ÆÇ´Ü, ÀÌ¿ô¹è¿­¿¡ ÇØ´çÇÏ´Â ÀÚ¸®¿¡ ³Ö¾îÁØ´Ù.
-	void Set_Neighbor(LINE eLine, CCell* pNeighbor) {
+	// LINEì´ë„˜ê°’ê³¼ ì…€ì„ ë„£ìŒ ì…ë ¥ ë°›ì€ ì…€ì˜ ì¸ë±ìŠ¤ë¥¼ í•´ë‹¹ ë¼ì¸ì— ì´ì›ƒì´ë¼ê³  íŒë‹¨, ì´ì›ƒë°°ì—´ì— í•´ë‹¹í•˜ëŠ” ìë¦¬ì— ë„£ì–´ì¤€ë‹¤.
+	void Set_Neighbor(LINE eLine,CCell* pNeighbor) {
 		m_iNeighbors[eLine] = pNeighbor->m_iIndex;
 	}
 
 public:
-	HRESULT Initialize(const _float3* pPoints, _uint iIndex, CELL_TYPE eType = GROUND_TYPE);
-	_bool isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosition, const _bool& bCalcSlide);
-	_bool Compare_Points(_fvector vSour, _fvector vDest);
+	HRESULT Initialize(const _float3* pPoints,_uint iIndex,CELL_TYPE eType = GROUND_TYPE);
+	_bool isIn(_vector& vLocalPos,_int* pNeighborIndex,_vector& fSlidePosition,const _bool& bCalcSlide);
+	_bool Compare_Points(_fvector vSour,_fvector vDest);
 
-	_uint	Get_CellIndex() { return m_iIndex; }
-	void	Set_CellIndex(_uint iIndex) { m_iIndex = iIndex; }
-	_float3 Get_Cell_CenterPos() { return m_vCenterPoints; }
-#ifdef _DEBUG
+	_uint	Get_CellIndex() {
+		return m_iIndex;
+	}
+	void	Set_CellIndex(_uint iIndex) {
+		m_iIndex = iIndex;
+	}
+	_float3 Get_Cell_CenterPos() {
+		return m_vCenterPoints;
+	}
+	#ifdef _DEBUG
 public:
 	virtual HRESULT Render();
-#endif
+	#endif
 
 
 private:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
 
-	_float3					m_vPoints[POINT_END] = {}; // 3°³ÀÇ Æ÷ÀÎÆ®¸¦ º¸°üÇØ¾ßÇÏ´Ï 3Â¥¸® ¹è¿­
+	_float3					m_vPoints[POINT_END] = {}; // 3ê°œì˜ í¬ì¸íŠ¸ë¥¼ ë³´ê´€í•´ì•¼í•˜ë‹ˆ 3ì§œë¦¬ ë°°ì—´
 	_uint					m_iIndex = {};
-	_int					m_iNeighbors[LINE_END] = { -1, -1, -1 }; // ÀÌ¿ô¼¿ÀÇ ÀÎµ¦½º ³Ñ¹ö 3°³¸¦ º¸°üÇÑ´Ù. ÀÌ¿ôÀÌ ¾øÀ¸¸é -1·Î µÎ°í ³ªÁß¿¡ Ã³¸®ÇÑ´Ù.
+	_int					m_iNeighbors[LINE_END] = {-1,-1,-1}; // ì´ì›ƒì…€ì˜ ì¸ë±ìŠ¤ ë„˜ë²„ 3ê°œë¥¼ ë³´ê´€í•œë‹¤. ì´ì›ƒì´ ì—†ìœ¼ë©´ -1ë¡œ ë‘ê³  ë‚˜ì¤‘ì— ì²˜ë¦¬í•œë‹¤.
 
 	CELL_TYPE				m_eCellType  = GROUND_TYPE;
 
-	// ±æÃ£±â
+	// ê¸¸ì°¾ê¸°
 private:
-	_float3					m_vCenterPoints{};  // ¼¿ÀÇ ÁßÁ¡
+	_float3					m_vCenterPoints{};  // ì…€ì˜ ì¤‘ì 
 	_float					G;
 	_float					H;
 	_float					F;
@@ -62,29 +74,49 @@ private:
 public:
 	void					Astar_Reset()
 	{
-		G = 0;  // ÇöÀç ³ëµå±îÁö ÀÌµ¿ÇÏ´Â µ¥ ¼Ò¿äµÈ ½ÇÁ¦ ºñ¿ë
-		H = 0;	// ÇöÀç ³ëµå¿¡¼­ ¸ñÇ¥ ³ëµå±îÁöÀÇ ¿¹»ó ºñ¿ë
-		F = 0;	// ÇöÀç ³ëµå°¡ ¸ñÇ¥¿¡ µµ´ŞÇÏ´Âµ¥ ÇÊ¿äÇÑ ÀüÃ¼ ºñ¿ë
-		m_pParent = nullptr; // ÇöÀç ³ëµå·Î ¿À±â Á÷Àü¿¡ ¹æ¹®ÇÑ ÀÌÀü ³ëµå
+		G = 0;  // í˜„ì¬ ë…¸ë“œê¹Œì§€ ì´ë™í•˜ëŠ” ë° ì†Œìš”ëœ ì‹¤ì œ ë¹„ìš©
+		H = 0;	// í˜„ì¬ ë…¸ë“œì—ì„œ ëª©í‘œ ë…¸ë“œê¹Œì§€ì˜ ì˜ˆìƒ ë¹„ìš©
+		F = 0;	// í˜„ì¬ ë…¸ë“œê°€ ëª©í‘œì— ë„ë‹¬í•˜ëŠ”ë° í•„ìš”í•œ ì „ì²´ ë¹„ìš©
+		m_pParent = nullptr; // í˜„ì¬ ë…¸ë“œë¡œ ì˜¤ê¸° ì§ì „ì— ë°©ë¬¸í•œ ì´ì „ ë…¸ë“œ
 	}
 
-	void					Set_G(_float fG) { G = fG; }
-	void					Set_H(_float fH) { H = fH; }
-	void					Set_F(_float fF) { F = fF; }
-	void					Set_Parent(CCell* pCell) { m_pParent = pCell; }
+	void					Set_G(_float fG) {
+		G = fG;
+	}
+	void					Set_H(_float fH) {
+		H = fH;
+	}
+	void					Set_F(_float fF) {
+		F = fF;
+	}
+	void					Set_Parent(CCell* pCell) {
+		m_pParent = pCell;
+	}
 
-	_float					Get_G()							{ return G; }
-	_float					Get_H()							{ return H; }
-	_float					Get_F()							{ return F; }
-	CCell*					Get_Parent()					{ return m_pParent;	}
-	_uint					Get_NeighborCell(_uint index)	{ return m_iNeighbors[index]; }
-	_float3					Get_CenterPoints()				{ return m_vCenterPoints; }
-#ifdef _DEBUG
+	_float					Get_G()							{
+		return G;
+	}
+	_float					Get_H()							{
+		return H;
+	}
+	_float					Get_F()							{
+		return F;
+	}
+	CCell*					Get_Parent()					{
+		return m_pParent;
+	}
+	_uint					Get_NeighborCell(_uint index)	{
+		return m_iNeighbors[index];
+	}
+	_float3					Get_CenterPoints()				{
+		return m_vCenterPoints;
+	}
+	#ifdef _DEBUG
 private:
-	class CVIBuffer_Cell* m_pVIBuffer = { nullptr };
-#endif
+	class CVIBuffer_Cell* m_pVIBuffer = {nullptr};
+	#endif
 public:
-	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex, CELL_TYPE eType = GROUND_TYPE);
+	static CCell* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _float3* pPoints,_uint iIndex,CELL_TYPE eType = GROUND_TYPE);
 	virtual void Free() override;
 };
 

@@ -7,11 +7,10 @@
 #include "BackGround.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Box.h"
-//#include "BackGround.h"
-//#include "Loading_UI.h"
+
 
 CMainApp::CMainApp()
-	: m_pGameInstance{ CGameInstance::GetInstance() }
+	: m_pGameInstance{CGameInstance::GetInstance()}
 {
 
 	Safe_AddRef(m_pGameInstance);
@@ -28,26 +27,26 @@ HRESULT CMainApp::Initialize()
 	EngineDesc.iWinSizeY = g_iWinSizeY;
 	EngineDesc.iNumLevels = LEVEL_END;
 
-	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
+	if(FAILED(m_pGameInstance->Initialize_Engine(EngineDesc,&m_pDevice,&m_pContext)))
 		return E_FAIL;
-	if (FAILED(Ready_Prototype_Component_For_Static()))
+	if(FAILED(Ready_Prototype_Component_For_Static()))
 		return E_FAIL;
-	if (FAILED(Open_Level(LEVEL_LOGO)))
-		return E_FAIL;
-
-	// ±¸¹Ì½Ã ÆùÆ®
-	if (FAILED(m_pGameInstance->Add_Font(TEXT("GumiFont"), TEXT("../Bin/Resources/Fonts/GumiFont.spritefont"))))
-		return E_FAIL;
-	// ´øÆÄ ÆùÆ®
-	if (FAILED(m_pGameInstance->Add_Font(TEXT("DunFont"), TEXT("../Bin/Resources/Fonts/Dunfight.spritefont"))))
+	if(FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
-	
-	ImGui::CreateContext(); // ¹«Á¶°Ç ¸ÕÀú È£Ãâ µÇ¾î¾ß ÇÔ, ±×·¸Áö ¾ÊÀ» °æ¿ì ´Ù¸¥ ÄÚµåµéÀÌ Á¤»óÀûÀ¸·Î È£ÃâµÇÁö ¾ÊÀ½.
+	// êµ¬ë¯¸ì‹œ í°íŠ¸
+	if(FAILED(m_pGameInstance->Add_Font(TEXT("GumiFont"),TEXT("../Bin/Resources/Fonts/GumiFont.spritefont"))))
+		return E_FAIL;
+	// ë˜íŒŒ í°íŠ¸
+	if(FAILED(m_pGameInstance->Add_Font(TEXT("DunFont"),TEXT("../Bin/Resources/Fonts/Dunfight.spritefont"))))
+		return E_FAIL;
+
+
+	ImGui::CreateContext(); // ë¬´ì¡°ê±´ ë¨¼ì € í˜¸ì¶œ ë˜ì–´ì•¼ í•¨, ê·¸ë ‡ì§€ ì•Šì„ ê²½ìš° ë‹¤ë¥¸ ì½”ë“œë“¤ì´ ì •ìƒì ìœ¼ë¡œ í˜¸ì¶œë˜ì§€ ì•ŠìŒ.
 	ImGui::StyleColorsDark(); // Gui Style : StyleColorsClassic, StyleColorsDark, StyleColorsLight
 
-	ImGui_ImplWin32_Init(g_hWnd); // win32 °ü·Ã ÃÊ±âÈ­
-	ImGui_ImplDX11_Init(m_pDevice, m_pContext);
+	ImGui_ImplWin32_Init(g_hWnd); // win32 ê´€ë ¨ ì´ˆê¸°í™”
+	ImGui_ImplDX11_Init(m_pDevice,m_pContext);
 
 	return S_OK;
 }
@@ -56,15 +55,15 @@ void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update(fTimeDelta);
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	m_fTimeAcc += fTimeDelta;
-#endif
+	#endif
 
 }
 
 void CMainApp::Render()
 {
-	if (FAILED(m_pGameInstance->Render_Begin(_float4(0.f, 0.f, 1.f, 1.f)))) // »ö 11Àº 255 255 ¾Æ´Ï¶ó ÀÌ°ÅÀÓ
+	if(FAILED(m_pGameInstance->Render_Begin(_float4(0.f,0.f,1.f,1.f)))) // ìƒ‰ 11ì€ 255 255 ì•„ë‹ˆë¼ ì´ê±°ìž„
 		return;
 
 	ImGui_ImplDX11_NewFrame();
@@ -72,33 +71,33 @@ void CMainApp::Render()
 	ImGui::NewFrame();
 
 	m_pGameInstance->Draw();
-	
 
-#ifdef _DEBUG
+
+	#ifdef _DEBUG
 	++m_iNumRender;
 
-	if (m_fTimeAcc >= 1.f)
+	if(m_fTimeAcc >= 1.f)
 	{
-		wsprintf(m_szFPS, TEXT("FPS : %d"), m_iNumRender);
+		//wsprintf(m_szFPS,TEXT("FPS : %d"),m_iNumRender);
 		m_fTimeAcc = 0.f;
 		m_iNumRender = 0;
 	}
 
-	m_pGameInstance->Render_Text(TEXT("DunFont"), m_szFPS, _float2(0.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 1);
+//	m_pGameInstance->Render_Text(TEXT("DunFont"),m_szFPS,_float2(0.f,0.f),XMVectorSet(1.f,1.f,1.f,1.f),1);
 
-#endif
+	#endif
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 
-	if (FAILED(m_pGameInstance->Render_End()))
+	if(FAILED(m_pGameInstance->Render_End()))
 		return;
 }
 
 HRESULT CMainApp::Open_Level(LEVELID eLevelID)
 {
-	if(FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevelID))))
+	if(FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING,CLevel_Loading::Create(m_pDevice,m_pContext,eLevelID))))
 		return E_FAIL;
 
 	return S_OK;
@@ -106,38 +105,40 @@ HRESULT CMainApp::Open_Level(LEVELID eLevelID)
 
 HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 {
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_VIBuffer_Rect"),
+		CVIBuffer_Rect::Create(m_pDevice,m_pContext))))
+		return E_FAIL;
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_VIBuffer_Box"),
+		CVIBuffer_Box::Create(m_pDevice,m_pContext))))
+		return E_FAIL;
+	//if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_VIBuffer_Trail"),
+	//	CVIBuffer_Trail::Create(m_pDevice,m_pContext,150,0.2f))))
+	//	return E_FAIL;
 
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,	TEXT("Prototype_Component_VIBuffer_Rect"),
-		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Box"),
-		CVIBuffer_Box::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	// ÅÍ·¹ÀÎ
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
+	// í„°ë ˆì¸
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVIBuffer_Terrain::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
 		return E_FAIL;
 
 
 
 
-	// ·ÎµùÆäÀÌÁö °ËÀº ¹è°æ
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Loading"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/T_U_BackgroundStats_Soldiers%d.png"),2))))
+	// ë¡œë”©íŽ˜ì´ì§€ ê²€ì€ ë°°ê²½
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_Loading"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Loading/T_U_BackgroundStats_Soldiers%d.png"),2))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Loading0"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Coin/T_U_HyperCoin_%d.png"),35))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_Loading0"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Loading/Coin/T_U_HyperCoin_%d.png"),35))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GameTitle"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_HyperchargeLogoBase.png")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_GameTitle"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/LogoLevel/T_U_HyperchargeLogoBase.png")))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GameName"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/GameLevelName%d.png"),2))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_GameName"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Loading/GameLevelName%d.png"),2))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_GameName"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/T_U_MenuBannerSide.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_BackGround_GameName"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Loading/T_U_MenuBannerSide.dds")))))
 		return E_FAIL;
 
 
@@ -145,71 +146,71 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 
 	/* For.Prototype_Component_Texture_Terrain_Mask */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain_Mask"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Mask.bmp"), 1))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_Terrain_Mask"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Terrain/Mask.bmp"),1))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 3))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Texture_Terrain"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"),3))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxBoxColor"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxBoxColor.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxBoxColor"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxBoxColor.hlsl"),VTXNORTEX::Elements,VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxItem.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxItem"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxItem.hlsl"),VTXMESH::Elements,VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCoin"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCoin.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxCoin"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxCoin.hlsl"),VTXMESH::Elements,VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxNorTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxNorTex"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"),VTXNORTEX::Elements,VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxPosTex"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"),VTXPOSTEX::Elements,VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxAnimMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"),VTXANIMMESH::Elements,VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxMesh"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"),VTXMESH::Elements,VTXMESH::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxMesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh_No_Deffered"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh_NoDeferred.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxMesh_No_Deffered"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxMesh_NoDeferred.hlsl"),VTXMESH::Elements,VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	/* Æ®·¦ ¼ÎÀÌ´õ */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTrap"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTrap.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+	/* íŠ¸ëž© ì…°ì´ë” */
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxTrap"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxTrap.hlsl"),VTXMESH::Elements,VTXMESH::iNumElements))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCircleGuage"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCircle_Gauge.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxCircleGuage"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxCircle_Gauge.hlsl"),VTXPOSTEX::Elements,VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxParticleRect */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxEffect"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxEffect.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxEffect"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxEffect.hlsl"),VTXPOSTEX::Elements,VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
 
-	// ³×ºñ°ÔÀÌ¼Ç_ Æ©Åä¸®¾ó¸Ê (LEVEL_GamePlay)
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation.dat")))))
+	// ë„¤ë¹„ê²Œì´ì…˜_ íŠœí† ë¦¬ì–¼ë§µ (LEVEL_GamePlay)
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice,m_pContext,TEXT("../Bin/Data/Navigation.dat")))))
 		return E_FAIL;
-	// ³×ºñ°ÔÀÌ¼Ç_ ¸¶´ç¸Ê (LEVEL_YARD)
+	// ë„¤ë¹„ê²Œì´ì…˜_ ë§ˆë‹¹ë§µ (LEVEL_YARD)
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/Data/Navigation_Yard.dat")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+		CNavigation::Create(m_pDevice,m_pContext,TEXT("../Bin/Data/Navigation_Yard.dat")))))
 		return E_FAIL;
 	return S_OK;
 }
@@ -218,7 +219,7 @@ CMainApp* CMainApp::Create()
 {
 	CMainApp* pInstance = new CMainApp();
 
-	if (FAILED(pInstance->Initialize()))
+	if(FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CMainApp");
 		Safe_Release(pInstance);
@@ -243,4 +244,3 @@ void CMainApp::Free()
 	CGameInstance::Release_Engine();
 
 }
-

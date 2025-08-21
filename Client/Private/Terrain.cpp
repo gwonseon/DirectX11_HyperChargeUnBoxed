@@ -5,19 +5,17 @@
 #include "PipeLine.h"
 #include "Level_ImGui.h"
 
-CTerrain::CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
-{
-}
+CTerrain::CTerrain(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CTerrain::CTerrain(const CTerrain& Prototype)
-	: CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CTerrain::Initialize_Prototype()
 {
-	/* ÆĞÅ¶, ÆÄÀÏÀÔ¤·Ãâ·ÂÀ» ÅëÇÑ ÃÊ±âÈ­. */
+	/* íŒ¨í‚·, íŒŒì¼ì…ã…‡ì¶œë ¥ì„ í†µí•œ ì´ˆê¸°í™”. */
 
 	return S_OK;
 }
@@ -31,27 +29,27 @@ HRESULT CTerrain::Initialize(void* pArg)
 	{
 		m_eTargetID = pDesc->eTargetID;
 	}
-	/* Ãß°¡ÀûÀ¸·Î ÃÊ±âÈ­°¡ ÇÊ¿äÇÏ´Ù¸é ¼öÇàÇØÁØ´Ù. */
-	if (FAILED(__super::Initialize(nullptr)))
+	/* ì¶”ê°€ì ìœ¼ë¡œ ì´ˆê¸°í™”ê°€ í•„ìš”í•˜ë‹¤ë©´ ìˆ˜í–‰í•´ì¤€ë‹¤. */
+	if(FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
 
-	
-	if (FAILED(Add_Components()))
+
+	if(FAILED(Add_Components()))
 		return E_FAIL;
 
-#ifdef _DEBUG
-	if (m_eLevel == LEVEL_MONSTERSPAWN)
+	#ifdef _DEBUG
+	if(m_eLevel == LEVEL_MONSTERSPAWN)
 	{
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
-		for (auto pCell : m_pNavigationCom->Get_Cells())
+		for(auto pCell : m_pNavigationCom->Get_Cells())
 		{
 			CollisionDesc.iCell_Idx = pCell->Get_CellIndex();
 			CollisionDesc.eLevel = LEVEL_MONSTERSPAWN;
 			CollisionDesc.fPosition = pCell->Get_Cell_CenterPos();
-			m_vecCollisionBox.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc)));
+			m_vecCollisionBox.push_back(static_cast<CCollisionBox*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc)));
 		}
 	}
-#endif
+	#endif
 
 
 	return S_OK;
@@ -66,35 +64,35 @@ void CTerrain::Update(_float fTimeDelta)
 {
 	//if (GetAsyncKeyState(VK_F9) & 0x01)
 	//{
-	//	// ¸Ê ±×¸®µå·Î ¹Ù²Ù±â
+	//	// ë§µ ê·¸ë¦¬ë“œë¡œ ë°”ê¾¸ê¸°
 	//	m_pVIBufferCom->Chang_Topology();
 	//}
 }
 
 void CTerrain::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+	if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 		return;
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 
 	m_pGameInstance->Add_DebugComponents(m_pNavigationCom);
-#endif
+	#endif
 }
 
 HRESULT CTerrain::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if(FAILED(m_pShaderCom->Begin(0)))
 		return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+	if(FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Render()))
-		return E_FAIL;			
+	if(FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -102,155 +100,155 @@ HRESULT CTerrain::Render()
 HRESULT CTerrain::Render_Height()
 {
 
-		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-			return E_FAIL;
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
+		return E_FAIL;
 
-		_float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 
-		_vector PlayerPos = m_pPlayer->Get_Position();
+	_vector PlayerPos = m_pPlayer->Get_Position();
 
-		_matrix			matView = XMMatrixIdentity();
-		matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
-		matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-		matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-		matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), 20.f, XMVectorGetZ(PlayerPos), 1.f);
+	_matrix			matView = XMMatrixIdentity();
+	matView.r[0] = XMVectorSet(1.f,0.f,0.f,0.f);
+	matView.r[1] = XMVectorSet(0.f,0.f,1.f,0.f);
+	matView.r[2] = XMVectorSet(0.f,-1.f,0.f,0.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos),20.f,XMVectorGetZ(PlayerPos),1.f);
 
-		XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
-		XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixInverse(nullptr,matView));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixOrthographicLH(200.f,200.f,0.f,30.f));
 
 
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-			return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&ViewMatrix)))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&ProjMatrix)))
+		return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(1)))
-			return E_FAIL;
+	if(FAILED(m_pShaderCom->Begin(1)))
+		return E_FAIL;
 
-		if (FAILED(m_pVIBufferCom->Bind_Buffers()))
-			return E_FAIL;
+	if(FAILED(m_pVIBufferCom->Bind_Buffers()))
+		return E_FAIL;
 
-		if (FAILED(m_pVIBufferCom->Render()))
-			return E_FAIL;
-	
+	if(FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
+
 
 	return S_OK;
 }
 
- 
+
 HRESULT CTerrain::Add_Components()
 {
-	/* ¸â¹öº¯¼ö·Î Á÷Á¢ ÂüÁ¶¸¦ ÇÏ°ÔµÇ¸é */
-	/* 1. ³»°¡ ³» ÄÄÆ÷³ÍÆ®¸¦ ÀÌ¿ëÇÏ°íÀÚÇÒ ¶§ ±»ÀÌ °Ë»öÀÌ ÇÊ¿ä¾øÀÌ Æ¯Á¤ ¸â¹öº¯¼ö·Î ¹Ù·Î ±â´ÉÀ» ÀÌ¿ëÇÏ¸é µÈ´Ù. */
-	/* 2. ´Ù¸¥ °´Ã¼°¡ ³» ÄÄÆ÷³ÍÆ®¸¦ °Ë»öÇÏ°íÀÚ ÇÒ¶§ ½ºÀ§Ä¡ÄÉÀÌ½º°¡ °Ì³ª ´Ã¾î³ª´Â »óÈ². */
+	/* ë©¤ë²„ë³€ìˆ˜ë¡œ ì§ì ‘ ì°¸ì¡°ë¥¼ í•˜ê²Œë˜ë©´ */
+	/* 1. ë‚´ê°€ ë‚´ ì»´í¬ë„ŒíŠ¸ë¥¼ ì´ìš©í•˜ê³ ìí•  ë•Œ êµ³ì´ ê²€ìƒ‰ì´ í•„ìš”ì—†ì´ íŠ¹ì • ë©¤ë²„ë³€ìˆ˜ë¡œ ë°”ë¡œ ê¸°ëŠ¥ì„ ì´ìš©í•˜ë©´ ëœë‹¤. */
+	/* 2. ë‹¤ë¥¸ ê°ì²´ê°€ ë‚´ ì»´í¬ë„ŒíŠ¸ë¥¼ ê²€ìƒ‰í•˜ê³ ì í• ë•Œ ìŠ¤ìœ„ì¹˜ì¼€ì´ìŠ¤ê°€ ê²ë‚˜ ëŠ˜ì–´ë‚˜ëŠ” ìƒí™©. */
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"),
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Texture_Terrain"),
+		TEXT("Com_Texture"),reinterpret_cast<CComponent**>(&m_pTextureCom))))
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxNorTex"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxNorTex"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_VIBuffer_Terrain"),
+		TEXT("Com_VIBuffer"),reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
-	switch (m_eLevel)
+	switch(m_eLevel)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 			return E_FAIL;
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 			return E_FAIL;
 		break;
 	}
 	case Client::LEVEL_IMGUI:
 	{
-		switch (m_eTargetID)
+		switch(m_eTargetID)
 		{
 
 		case Client::LEVEL_GAMEPLAY:
 		{
-			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+				TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 				return E_FAIL;
 			break;
 		}
 		case Client::LEVEL_YARD:
 		{
-			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+				TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 				return E_FAIL;
 			break;
 		}
 
 		default:
-			break;
+		break;
 		}
-	
+
 		break;
 	}
 	case Client::LEVEL_NAVIGATION:
 	{
-		switch (m_eTargetID)
+		switch(m_eTargetID)
 		{
 
 		case Client::LEVEL_GAMEPLAY:
 		{
-			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+				TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 				return E_FAIL;
 			break;
 		}
 		case Client::LEVEL_YARD:
 		{
-			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+				TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 				return E_FAIL;
 			break;
 		}
 
 		default:
-			break;
+		break;
 		}
 		break;
 	}
 	case Client::LEVEL_MONSTERSPAWN:
 	{
-		switch (m_eTargetID)
+		switch(m_eTargetID)
 		{
 		case Client::LEVEL_GAMEPLAY:
 		{
-			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+				TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 				return E_FAIL;
 			break;
 		}
 		case Client::LEVEL_YARD:
 		{
-			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-				TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+				TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom))))
 				return E_FAIL;
 			break;
 		}
 		default:
-			break;
+		break;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 
@@ -261,31 +259,31 @@ HRESULT CTerrain::Add_Components()
 
 HRESULT CTerrain::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 1)))
+	if(FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom,"g_DiffuseTexture",1)))
 		return E_FAIL;
 
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
-	
+
 	return S_OK;
 }
 
-CTerrain* CTerrain::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTerrain* CTerrain::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CTerrain* pInstance = new CTerrain(pDevice, pContext);
+	CTerrain* pInstance = new CTerrain(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CTerrain");
 		Safe_Release(pInstance);
@@ -298,7 +296,7 @@ CGameObject* CTerrain::Clone(void* pArg)
 {
 	CTerrain* pInstance = new CTerrain(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CTerrain");
 		Safe_Release(pInstance);

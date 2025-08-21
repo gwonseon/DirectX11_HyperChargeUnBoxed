@@ -21,7 +21,7 @@ struct VS_OUT
     float4 vProjPos : TEXCOORD1;
 };
 
-VS_OUT VS_MAIN(VS_IN In) // ÁøÀÔÁ¡ ÇÔ¼ö ( ³»°¡ ¿øÇÏ´Â ÀÌ¸§À¸·Î ¸¸µé ¼ö ÀÖ´Ù)
+VS_OUT VS_MAIN(VS_IN In) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ( ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½)
 {
     VS_OUT Out = (VS_OUT) 0;
 
@@ -31,7 +31,7 @@ VS_OUT VS_MAIN(VS_IN In) // ÁøÀÔÁ¡ ÇÔ¼ö ( ³»°¡ ¿øÇÏ´Â ÀÌ¸§À¸·Î ¸¸µé ¼ö ÀÖ´Ù)
     
     Out.vPosition = vPosition;
     Out.vTexcoord = In.vTexcoord;
-    Out.vProjPos = vPosition; // ÀÌ °ªÀÌ ÇÈ¼¿ ¼ÎÀÌ´õ¿¡ µé¾î°¥ ¶§´Â º¸°£µÈ Åõ¿µ ÁÂÇ¥(z³ª´©±â ¾ÈµÈ »óÅÂ) °¡ µé¾î°¥ °ÍÀÌ´Ù.
+    Out.vProjPos = vPosition; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½È¼ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ ï¿½ï¿½î°¥ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥(zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Èµï¿½ ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ ï¿½ï¿½î°¥ ï¿½ï¿½ï¿½Ì´ï¿½.
     return Out;
     
 }
@@ -47,7 +47,6 @@ struct PS_IN
 
 struct PS_OUT
 {
-	/* º¯¼ö¿¡ ´ëÇÑ ½Ã¸àÆ½À» Á¤ÀÇÇÑ´Ù. */
     vector vColor : SV_TARGET0;
 
 };
@@ -69,7 +68,7 @@ PS_OUT PS_FOG(PS_IN In)
     return Out;
 }
 
-technique11 DefaultTechnique // Technique : ¾î¶² ¹öÀüÀ¸·Î ÀûÇû´ÂÁö ±¸ºÐÇÑ´Ù.
+technique11 DefaultTechnique 
 {
     pass DefaultPass
     {

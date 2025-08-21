@@ -4,15 +4,15 @@
 
 
 
-/* assimp¿¡¼­ Á¦°øÇÏ´Â »ÀÀÇ Á¤º¸´Â ¼¼°¡Áö Å¸ÀÔÀ¸·Î Ç¥ÇöÇÑ´Ù. */
+/* assimpì—ì„œ ì œê³µí•˜ëŠ” ë¼ˆì˜ ì •ë³´ëŠ” ì„¸ê°€ì§€ íƒ€ì…ìœ¼ë¡œ í‘œí˜„í•œë‹¤. */
 /* aiNode, aiBone, aiNodeAnim */
 
-/* »À ÇÏ³ªÀÇ »óÅÂ Á¤º¸¸¦ °¡Áø´Ù. */
+/* ë¼ˆ í•˜ë‚˜ì˜ ìƒíƒœ ì •ë³´ë¥¼ ê°€ì§„ë‹¤. */
 /* */
 
 BEGIN(Engine)
 
-class CBone final : public CBase
+class CBone final: public CBase
 {
 public:
 	enum ATTACK_MOTION
@@ -41,28 +41,30 @@ public:
 	}
 	void Set_TransformationMatrix(_fmatrix TransformationMatrix)
 	{
-		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);
+		XMStoreFloat4x4(&m_TransformationMatrix,TransformationMatrix);
 	}
-	_float4x4 Get_TransformationMatrix() {	return m_TransformationMatrix;	}
+	_float4x4 Get_TransformationMatrix() {
+		return m_TransformationMatrix;
+	}
 
 
 public:
-	HRESULT Initialize(_uint iParentBoneIndex, HANDLE hFileRead);
-	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix);
-	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fTimeDelta);
-	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix, _float fRotation_Angle, _uint iUpperMotion);
+	HRESULT Initialize(_uint iParentBoneIndex,HANDLE hFileRead);
+	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones,_fmatrix PreTransformMatrix);
+	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones,_fmatrix PreTransformMatrix,_float fTimeDelta);
+	void Update_CombinedTransformationMatrix(const vector<class CBone*>& Bones,_fmatrix PreTransformMatrix,_float fRotation_Angle,_uint iUpperMotion);
 
 private:
 	_char				m_szName[MAX_PATH] = {};
-	/* ºÎ¸ğ ±âÁØÀ¸·Î Ç¥ÇöµÈ ³ª¸¸ÀÇ »óÅÂ¸¦ Ç¥ÇöÇÏ±âÀ§ÇÑ Çà·Ä. */
+	/* ë¶€ëª¨ ê¸°ì¤€ìœ¼ë¡œ í‘œí˜„ëœ ë‚˜ë§Œì˜ ìƒíƒœë¥¼ í‘œí˜„í•˜ê¸°ìœ„í•œ í–‰ë ¬. */
 	_float4x4			m_TransformationMatrix = {};
 
-	/* ÀÚ½ÄÇà·Ä * ºÎ¸ğÇà·Ä */
+	/* ìì‹í–‰ë ¬ * ë¶€ëª¨í–‰ë ¬ */
 	/* m_CombinedTransformationMatrix =
 	m_TransformationMatrix * Parent`s m_CombinedTransformationMatrix */
 	_float4x4			m_CombinedTransformationMatrix = {};
 
-	_int				m_iParentBoneIndex = { -1 };
+	_int				m_iParentBoneIndex = {-1};
 
 	// CBone*				m_pParent = { nullptr };
 
@@ -70,7 +72,7 @@ private:
 	_float fLowerBody = -3.5f;
 	_float4x4 floatMatrix;
 public:
-	static CBone* Create(_uint iParentBoneIndex, HANDLE hFileRead);
+	static CBone* Create(_uint iParentBoneIndex,HANDLE hFileRead);
 	CBone* Clone();
 	virtual void Free() override;
 

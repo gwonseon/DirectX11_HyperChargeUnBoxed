@@ -4,10 +4,10 @@
 
 BEGIN(Engine)
 
-class CBounding_Sphere final : public CBounding
+class CBounding_Sphere final: public CBounding
 {
 public:
-	typedef struct : public BOUND_DESC
+	typedef struct: public BOUND_DESC
 	{
 		_float		fRadius;
 	}BOUND_SPHERE_DESC;
@@ -23,23 +23,27 @@ public:
 public:
 	virtual HRESULT Initialize(const BOUND_DESC* pBoundDesc) override;
 	virtual void Update(_fmatrix WorldMatrix) override;
-	virtual _bool Intersect(CCollider::TYPE eType, CBounding* pTargetBounding) override;
-	virtual _bool Intersect_Mouse(_vector rayOrigin, _vector rayDirection, float& fDistance);
+	virtual _bool Intersect(CCollider::TYPE eType,CBounding* pTargetBounding) override;
+	virtual _bool Intersect_Mouse(_vector rayOrigin,_vector rayDirection,float& fDistance);
 
-	virtual _float3 Get_Center() { return m_fCenter; }
-	virtual float Get_Radius() { return m_fRadius; }
+	virtual _float3 Get_Center() {
+		return m_fCenter;
+	}
+	virtual float Get_Radius() {
+		return m_fRadius;
+	}
 
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 public:
-	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor) override;
-#endif
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch,_fvector vColor) override;
+	#endif
 
 private:
-	/* Ãæµ¹Ã¼¸¦ À§ÇÑ µ¥ÀÌÅÍ. */
-	/* Ãæµ¹ÀÀ¤© ¼öÇàÇÏ·Á¸é ÀÌ µ¥ÀÌÅÍµéÀÌ ÃÖ¼Ò ¿ùµå ½ºÆäÀÌ½º °¡Áö´Âº¯È¯ÀÌ ÇÊ¿äÇÏ´Ù. \*/
-	BoundingSphere* m_pBoundDesc_Original = { nullptr };
-	BoundingSphere* m_pBoundDesc = { nullptr };
+	/* ì¶©ëŒì²´ë¥¼ ìœ„í•œ ë°ì´í„°. */
+	/* ì¶©ëŒì‘ã„¹ ìˆ˜í–‰í•˜ë ¤ë©´ ì´ ë°ì´í„°ë“¤ì´ ìµœì†Œ ì›”ë“œ ìŠ¤í˜ì´ìŠ¤ ê°€ì§€ëŠ”ë³€í™˜ì´ í•„ìš”í•˜ë‹¤. \*/
+	BoundingSphere* m_pBoundDesc_Original = {nullptr};
+	BoundingSphere* m_pBoundDesc = {nullptr};
 	_float3			m_fCenter{};
 	float		 m_fRadius{};
 

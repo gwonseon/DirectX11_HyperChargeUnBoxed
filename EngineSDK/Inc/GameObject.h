@@ -2,28 +2,28 @@
 
 #include "Transform.h"
 
-/* ÇÁ·ÎÅäÅ¸ÀÔÀ» ÅëÇØ °´Ã¼¸¦ »ı¼ºÇÑ´Ù. */
+/* í”„ë¡œí† íƒ€ì…ì„ í†µí•´ ê°ì²´ë¥¼ ìƒì„±í•œë‹¤. */
 
 BEGIN(Engine)
 
 class ENGINE_DLL CGameObject abstract : public CBase
 {
 public:
-	typedef struct : public CTransform::TRANSFORM_DESC
+	typedef struct: public CTransform::TRANSFORM_DESC
 	{
 		_uint			iData = {};
 	}GAMEOBJ_DESC;
 protected:
-	CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CGameObject(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CGameObject(const CGameObject& Prototype);
 	virtual ~CGameObject() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype();
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
@@ -32,28 +32,38 @@ public:
 	virtual HRESULT Render_Height();
 	virtual HRESULT Render_Shadow();
 public:
-	bool IsValid() const { return !m_bDead; }
-	bool Get_Dead() { return m_bDead; }
-	void Set_Dead() { m_bDead = true; }
+	bool IsValid() const {
+		return !m_bDead;
+	}
+	bool Get_Dead() {
+		return m_bDead;
+	}
+	void Set_Dead() {
+		m_bDead = true;
+	}
 
 
 public:
-	_float3	Get_PickingPos() { return m_fPickingPos; }
-	class CTransform* Get_Transform() { return m_pTransformCom; }
+	_float3	Get_PickingPos() {
+		return m_fPickingPos;
+	}
+	class CTransform* Get_Transform() {
+		return m_pTransformCom;
+	}
 
 
-	virtual class CComponent* Find_Component(const _wstring& strComponentTag, _uint iPartObjID = 0);
+	virtual class CComponent* Find_Component(const _wstring& strComponentTag,_uint iPartObjID = 0);
 
 
 protected:
-	class CGameInstance* m_pGameInstance = { nullptr };
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	class CGameInstance* m_pGameInstance = {nullptr};
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
 
-	class CTransform* m_pTransformCom = { nullptr };
+	class CTransform* m_pTransformCom = {nullptr};
 
 protected:
-	map<const _wstring, class CComponent*>			m_Components;
+	map<const _wstring,class CComponent*>			m_Components;
 
 protected:
 	_uint							m_iData = {};
@@ -62,81 +72,145 @@ protected:
 
 	_vector							m_vecPosition{};
 	_vector							m_vecDirection{};
-	
+
 public:
-	void	Set_Hp(_float Hp)					{ m_fHp = Hp; }
-	void	Set_Energy(_float Energy)			{ m_fEnergy = Energy; }
-	void	Set_Attact(_float Attack)			{ m_fAttack = Attack; }
-	void	Set_Coin(_uint Coin)				{ m_iCoin = Coin; }
+	void	Set_Hp(_float Hp)					{
+		m_fHp = Hp;
+	}
+	void	Set_Energy(_float Energy)			{
+		m_fEnergy = Energy;
+	}
+	void	Set_Attact(_float Attack)			{
+		m_fAttack = Attack;
+	}
+	void	Set_Coin(_uint Coin)				{
+		m_iCoin = Coin;
+	}
 
-	void	Set_GetEnergy(_float Energy)		{ m_fEnergy += Energy; }
-	void	Set_Heal(_float Heal)				{ m_fHp += Heal; }
-	void	Set_FullHeal()						{ m_fHp = 100.f; }
-	void	UseCoin(_uint Price)				{ m_iCoin -= Price; }
-	void	Set_PickUp_Coin(_uint Price)		{ m_iCoin += Price; }
-	void	Set_Count()							{ m_iCount += 1; }
+	void	Set_GetEnergy(_float Energy)		{
+		m_fEnergy += Energy;
+	}
+	void	Set_Heal(_float Heal)				{
+		m_fHp += Heal;
+	}
+	void	Set_FullHeal()						{
+		m_fHp = 100.f;
+	}
+	void	UseCoin(_uint Price)				{
+		m_iCoin -= Price;
+	}
+	void	Set_PickUp_Coin(_uint Price)		{
+		m_iCoin += Price;
+	}
+	void	Set_Count()							{
+		m_iCount += 1;
+	}
 
-	void	Set_CanAttacked(_bool bCanAttacked) { m_bCanAttacked = bCanAttacked; }  // °ø°İ ´çÇØµµ µÇ´ÂÁö ¾Ë¸²
-	void	Set_Attacked(_bool bAttacked)		{ m_bAttacked = bAttacked; }		// °ø°İ ´çÇßÀ½À» ¾Ë·ÁÁÜ
-	void	Set_knockdown(_bool bknockdown)		{ m_bKnockdown = bknockdown; }
+	void	Set_CanAttacked(_bool bCanAttacked) {
+		m_bCanAttacked = bCanAttacked;
+	}  // ê³µê²© ë‹¹í•´ë„ ë˜ëŠ”ì§€ ì•Œë¦¼
+	void	Set_Attacked(_bool bAttacked)		{
+		m_bAttacked = bAttacked;
+	}		// ê³µê²© ë‹¹í–ˆìŒì„ ì•Œë ¤ì¤Œ
+	void	Set_knockdown(_bool bknockdown)		{
+		m_bKnockdown = bknockdown;
+	}
 
-	void	Set_Interaction(_bool bInteraction) { m_bInteraction = bInteraction; }
-	void	Set_AttackState(_bool bAttackState) { m_bAttackState = bAttackState; }
+	void	Set_Interaction(_bool bInteraction) {
+		m_bInteraction = bInteraction;
+	}
+	void	Set_AttackState(_bool bAttackState) {
+		m_bAttackState = bAttackState;
+	}
 
-	_float	Get_Hp()							{ return m_fHp; }			// Ã¼·Â ¾ó¸¶³ª ÀÖ´ÂÁö
-	_float	Get_Energy()						{ return m_fEnergy; }		// ½¯µå·® ¾ó¸¶³ª ÀÖ´ÂÁö
-	_float	Get_Attack()						{ return m_fAttack; }		// °ø°İ·Â ¾ó¸¶ÀÎÁö 
-	_uint	Get_Coin()							{ return m_iCoin; }			// µ· ¾ó¸¶³ª ÀÖ´ÂÁö
-	_uint	Get_Count()							{ return m_iCount; }
-	_bool	Get_Affected()						{ return m_bAffected; }		// Æø¹ß ¿µÇâ¿¡ ´ëÇÔ
-	_bool	Get_CanAttacked()					{ return m_bCanAttacked; }	// °ø°İÀ» ´çÇØµµ(È¤Àº ÇØµµ) µÇ´ÂÁö ¾Ë·ÁÁÜ
-	_bool	Get_Attacked()						{ return m_bAttacked; }		// °ø°İÀ» ´çÇß´ÂÁö ¾Ë·ÁÁÜ
-	_bool	Get_DontDestroyAble()				{ return m_bDontDestroy; }	// °´Ã¼ »èÁ¦ÇÏ¸é ¾ÈµÇ´Â ¾ÖÀÎÁö ¾Æ´ÑÁö ¾Ë·ÁÁÜ
-	_bool	Get_knockdown()						{ return m_bKnockdown; }	// °´Ã¼ »èÁ¦ÇÏ¸é ¾ÈµÇ´Â ¾Öµé Á×¾ú´Ù°í ¾Ë¸®±â À§ÇÔ
-	_bool	Get_AttackState()					{ return m_bAttackState; }	// °ø°İ ¸ğ¼ÇÀÎÁö ¾Æ´ÑÁö È®ÀÎ¿ë(ÀÌ¶§¸¸ Ãæµ¹ÀÌ µÇ¾î¾ß ÇÔ)
-	_bool	Get_IsBullet()						{ return m_bIsBullet; }
+	_float	Get_Hp()							{
+		return m_fHp;
+	}			// ì²´ë ¥ ì–¼ë§ˆë‚˜ ìˆëŠ”ì§€
+	_float	Get_Energy()						{
+		return m_fEnergy;
+	}		// ì‰´ë“œëŸ‰ ì–¼ë§ˆë‚˜ ìˆëŠ”ì§€
+	_float	Get_Attack()						{
+		return m_fAttack;
+	}		// ê³µê²©ë ¥ ì–¼ë§ˆì¸ì§€ 
+	_uint	Get_Coin()							{
+		return m_iCoin;
+	}			// ëˆ ì–¼ë§ˆë‚˜ ìˆëŠ”ì§€
+	_uint	Get_Count()							{
+		return m_iCount;
+	}
+	_bool	Get_Affected()						{
+		return m_bAffected;
+	}		// í­ë°œ ì˜í–¥ì— ëŒ€í•¨
+	_bool	Get_CanAttacked()					{
+		return m_bCanAttacked;
+	}	// ê³µê²©ì„ ë‹¹í•´ë„(í˜¹ì€ í•´ë„) ë˜ëŠ”ì§€ ì•Œë ¤ì¤Œ
+	_bool	Get_Attacked()						{
+		return m_bAttacked;
+	}		// ê³µê²©ì„ ë‹¹í–ˆëŠ”ì§€ ì•Œë ¤ì¤Œ
+	_bool	Get_DontDestroyAble()				{
+		return m_bDontDestroy;
+	}	// ê°ì²´ ì‚­ì œí•˜ë©´ ì•ˆë˜ëŠ” ì• ì¸ì§€ ì•„ë‹Œì§€ ì•Œë ¤ì¤Œ
+	_bool	Get_knockdown()						{
+		return m_bKnockdown;
+	}	// ê°ì²´ ì‚­ì œí•˜ë©´ ì•ˆë˜ëŠ” ì• ë“¤ ì£½ì—ˆë‹¤ê³  ì•Œë¦¬ê¸° ìœ„í•¨
+	_bool	Get_AttackState()					{
+		return m_bAttackState;
+	}	// ê³µê²© ëª¨ì…˜ì¸ì§€ ì•„ë‹Œì§€ í™•ì¸ìš©(ì´ë•Œë§Œ ì¶©ëŒì´ ë˜ì–´ì•¼ í•¨)
+	_bool	Get_IsBullet()						{
+		return m_bIsBullet;
+	}
 
-	_bool	Get_Interaction()					{ return m_bInteraction; }
+	_bool	Get_Interaction()					{
+		return m_bInteraction;
+	}
 
-	_vector Get_ObjPosition()					{ return m_vecPosition; }
-	
-	void	Set_Energy_Plus(_float Energy) 
+	_vector Get_ObjPosition()					{
+		return m_vecPosition;
+	}
+
+	void	Set_Energy_Plus(_float Energy)
 	{
 		if(m_fEnergy < 80.f)
 		{
 			m_fEnergy += Energy;
-		}
-		else if (m_fEnergy >= 80.f)
+		} else if(m_fEnergy >= 80.f)
 		{
 			m_fEnergy = 100.f;
 		}
 	}
-	// ¿¡³ÊÁö°¡ ÀÖÀ¸¸é ¿¡³ÊÁö ±ğ°í, ¿¡³ÊÁö ¾øÀ¸¸é Hp±ğÀ½
-	void	Set_Damaged(_float Attack) 
+	// ì—ë„ˆì§€ê°€ ìˆìœ¼ë©´ ì—ë„ˆì§€ ê¹ê³ , ì—ë„ˆì§€ ì—†ìœ¼ë©´ Hpê¹ìŒ
+	void	Set_Damaged(_float Attack)
 	{
-		// ½¯µå°¡ ÀÖÀ» ¶§
-		if (m_fEnergy > 0.f)	{
+		// ì‰´ë“œê°€ ìˆì„ ë•Œ
+		if(m_fEnergy > 0.f)	{
 			m_fEnergy -= Attack;
-			// ¿¡³ÊÁö°¡ À½¼ö¸é ±×¸¸Å­ Hp ±ğ¾ÆÁØ´Ù.
-			if (m_fEnergy < 0.f)
+			// ì—ë„ˆì§€ê°€ ìŒìˆ˜ë©´ ê·¸ë§Œí¼ Hp ê¹ì•„ì¤€ë‹¤.
+			if(m_fEnergy < 0.f)
 			{
 				m_fHp += m_fEnergy;
 				m_fEnergy = 0.f;
 			}
-		}
-		else  // ½¯µå°¡ ¾øÀ» ¶§
+		} else  // ì‰´ë“œê°€ ì—†ì„ ë•Œ
 		{
 			m_fHp -= Attack;
 		}
 	}
 
-	// ÇÇ°İ µÆ´ÂÁö È®ÀÎ¿ë 
-	void Set_CollisionChecking(_bool bCheck) { m_bCollision_Check = bCheck; }
-	_bool Get_CollisionChecing() { return m_bCollision_Check; }
+	// í”¼ê²© ëëŠ”ì§€ í™•ì¸ìš© 
+	void Set_CollisionChecking(_bool bCheck) {
+		m_bCollision_Check = bCheck;
+	}
+	_bool Get_CollisionChecing() {
+		return m_bCollision_Check;
+	}
 
-	// ¹æÇâ¿¡ ´ëÇÑ°Í, °ãÃÆ´ÂÁö È®ÀÎ¿ë
-	_vector Get_DIrection() { return m_vecDirection; }
-	void	Set_Direction(_vector vecDirection) { m_vecDirection = vecDirection; }
+	// ë°©í–¥ì— ëŒ€í•œê²ƒ, ê²¹ì³¤ëŠ”ì§€ í™•ì¸ìš©
+	_vector Get_DIrection() {
+		return m_vecDirection;
+	}
+	void	Set_Direction(_vector vecDirection) {
+		m_vecDirection = vecDirection;
+	}
 
 protected:
 
@@ -147,16 +221,16 @@ protected:
 	_float							m_fAttack{};
 	_uint							m_iCount{};
 	_uint							m_iCoin{};
-	_bool							m_bAttacked		= false; // °ø°İ ¹Ş¾ÒÀ½À» Ç¥½Ã 
+	_bool							m_bAttacked		= false; // ê³µê²© ë°›ì•˜ìŒì„ í‘œì‹œ 
 	_bool							m_bDontDestroy	= false;
-	_bool							m_bKnockdown	= false; // »èÁ¦µÇ¸é ¾ÈµÇ´Â ¾Öµé Á×À½ »óÅÂ¸¦ ¾ê·Î ´ëÃ¼
+	_bool							m_bKnockdown	= false; // ì‚­ì œë˜ë©´ ì•ˆë˜ëŠ” ì• ë“¤ ì£½ìŒ ìƒíƒœë¥¼ ì–˜ë¡œ ëŒ€ì²´
 	_bool							m_bAttackState	= false;
-	_bool							m_bCanAttacked	= true;  // ¸ÂÀ» ¼ö ÀÖ´Â »óÅÂÀÎÁö È®ÀÎ
-	_bool							m_bCollision_Check = false; 
-	_bool							m_bIsBullet = false;	// ÃÑ¾ËÀÎÁö ÆÇ´Ü ( ÃÑ¾ËÀÌ¸é »èÁ¦ÇÔ)
+	_bool							m_bCanAttacked	= true;  // ë§ì„ ìˆ˜ ìˆëŠ” ìƒíƒœì¸ì§€ í™•ì¸
+	_bool							m_bCollision_Check = false;
+	_bool							m_bIsBullet = false;	// ì´ì•Œì¸ì§€ íŒë‹¨ ( ì´ì•Œì´ë©´ ì‚­ì œí•¨)
 
-	_bool							m_bAffected = false; // Æø¹ß ¿µÇâ ¹Ş´ÂÁö 
-	_bool							m_bInteraction = false; // ¾ÆÀÌÅÛ°ü·Ã »óÈ£ÀÛ¿ë
+	_bool							m_bAffected = false; // í­ë°œ ì˜í–¥ ë°›ëŠ”ì§€ 
+	_bool							m_bInteraction = false; // ì•„ì´í…œê´€ë ¨ ìƒí˜¸ì‘ìš©
 
 	_bool							m_bOverlab_DifferentLayer = false;
 	_bool							m_bOverlab_SameLayer = false;
@@ -164,15 +238,23 @@ protected:
 
 	_float							m_fSound{};
 public:
-	void Set_OverLap_DifferentLayer(_bool bOverlab) { m_bOverlab_DifferentLayer = bOverlab; }
-	void Set_OverLap_SameLayer(_bool bOverlab) { m_bOverlab_SameLayer = bOverlab; }
-	
-	_bool Get_OverLap_SameLayer() { return m_bOverlab_SameLayer; }
-	_bool Get_OverLap_DifferentLayer() { return m_bOverlab_DifferentLayer; }
+	void Set_OverLap_DifferentLayer(_bool bOverlab) {
+		m_bOverlab_DifferentLayer = bOverlab;
+	}
+	void Set_OverLap_SameLayer(_bool bOverlab) {
+		m_bOverlab_SameLayer = bOverlab;
+	}
+
+	_bool Get_OverLap_SameLayer() {
+		return m_bOverlab_SameLayer;
+	}
+	_bool Get_OverLap_DifferentLayer() {
+		return m_bOverlab_DifferentLayer;
+	}
 
 
 protected:
-	HRESULT Add_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
+	HRESULT Add_Component(_uint iLevelIndex,const _wstring& strPrototypeTag,const _wstring& strComponentTag,CComponent** ppOut,void* pArg = nullptr);
 
 
 public:

@@ -4,18 +4,18 @@
 #include "Level.h"
 
 CLevel_Manager::CLevel_Manager()
-	: m_pGameInstance{ CGameInstance::GetInstance() }
+	: m_pGameInstance{CGameInstance::GetInstance()}
 {
 	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CLevel_Manager::Open_Level(_uint iCurrentLevelID, CLevel* pNewLevel)
+HRESULT CLevel_Manager::Open_Level(_uint iCurrentLevelID,CLevel* pNewLevel)
 {
-	if (nullptr == pNewLevel)
+	if(nullptr == pNewLevel)
 		return E_FAIL;
 
-	/* ÃÖÃÊ·¹º§ÇÒ´çÇÒ¶§ Áö¿ì¸é Å«ÀÏ³­´Ù. m_iCurrentLevelID : ÀÇµµÄ¡ ¾ÊÀº °ªÀ¸·Î ÃÊ±âÈ­µÇ¾îÀÖ±â¶§¹®¿¡ ÀÇµµÄ¡¾ÊÀº ·¹º§ÀÚ¿øÀ» Áö¿ìÀÝ¾î. */
-	if (nullptr != m_pCurrentLevel)
+	/* ìµœì´ˆë ˆë²¨í• ë‹¹í• ë•Œ ì§€ìš°ë©´ í°ì¼ë‚œë‹¤. m_iCurrentLevelID : ì˜ë„ì¹˜ ì•Šì€ ê°’ìœ¼ë¡œ ì´ˆê¸°í™”ë˜ì–´ìžˆê¸°ë•Œë¬¸ì— ì˜ë„ì¹˜ì•Šì€ ë ˆë²¨ìžì›ì„ ì§€ìš°ìž–ì–´. */
+	if(nullptr != m_pCurrentLevel)
 		m_pGameInstance->Clear(m_iCurrentLevelID);
 	Safe_Release(m_pCurrentLevel);
 	m_pCurrentLevel = pNewLevel;
@@ -53,4 +53,3 @@ void CLevel_Manager::Free()
 	Safe_Release(m_pCurrentLevel);
 	Safe_Release(m_pGameInstance);
 }
-

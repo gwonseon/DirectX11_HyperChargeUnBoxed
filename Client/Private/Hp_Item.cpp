@@ -3,212 +3,207 @@
 
 #include "GameInstance.h"
 
-CHp_Item::CHp_Item(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
-{
-}
+CHp_Item::CHp_Item(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CHp_Item::CHp_Item(const CHp_Item& Prototype)
-    : CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CHp_Item::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CHp_Item::Initialize(void* pArg)
 {
-    HPITEM_DESC* pDesc = static_cast<HPITEM_DESC*>(pArg);
-    m_pPlayer = pDesc->pPlayer;
-    m_pGuage = pDesc->pGuage;
+	HPITEM_DESC* pDesc = static_cast<HPITEM_DESC*>(pArg);
+	m_pPlayer = pDesc->pPlayer;
+	m_pGuage = pDesc->pGuage;
 
-    m_fScale = pDesc->fScale;
-    m_eLevel = pDesc->eID;
+	m_fScale = pDesc->fScale;
+	m_eLevel = pDesc->eID;
 
-    if (FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
-    if (FAILED(Add_Components()))
-        return E_FAIL;
+	if(FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+	if(FAILED(Add_Components()))
+		return E_FAIL;
 
-    m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.f));
+	m_pTransformCom->Set_Scaling(m_fScale.x,m_fScale.y,m_fScale.z);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(pDesc->fPosition.x,pDesc->fPosition.y,pDesc->fPosition.z,1.f));
 
 
-    return S_OK;
+	return S_OK;
 }
 
 void CHp_Item::Priority_Update(_float fTimeDelta)
 {
-    // È¸Àü
-    _vector Axis = { 0.f, 1.f, 0.f };
-    m_pTransformCom->Turn(Axis, fTimeDelta * 0.3f);
+	// íšŒì „
+	_vector Axis = {0.f,1.f,0.f};
+	m_pTransformCom->Turn(Axis,fTimeDelta * 0.3f);
 }
 
 void CHp_Item::Update(_float fTimeDelta)
 {
-    if (m_bDead)
-        return;
+	if(m_bDead)
+		return;
 
-    if (m_bKnockdown == true)
-    {
-        if (m_bOnce == false)
-        {
-            m_pGameInstance->StopSound(ITEM);
-            m_pGameInstance->PlaySoundW(L"fx_pickuphealth.wav", Engine::CHANNELID::ITEM, m_fSound * 0.4f);
-            m_bOnce = true;
-        }
-        m_fDeadTime += fTimeDelta;
-        if (m_fDeadTime >= 1.f)
-        {
-            m_pPlayer->Set_FullHeal();
-            m_bDead = true;
-        }
-    }
-    _vector vecPlayerPos = m_pPlayer->Get_Position();
-    m_vecItemPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	if(m_bKnockdown == true)
+	{
+		if(m_bOnce == false)
+		{
+			m_pGameInstance->StopSound(ITEM);
+			m_pGameInstance->PlaySoundW(L"fx_pickuphealth.wav",Engine::CHANNELID::ITEM,m_fSound * 0.4f);
+			m_bOnce = true;
+		}
+		m_fDeadTime += fTimeDelta;
+		if(m_fDeadTime >= 1.f)
+		{
+			m_pPlayer->Set_FullHeal();
+			m_bDead = true;
+		}
+	}
+	_vector vecPlayerPos = m_pPlayer->Get_Position();
+	m_vecItemPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-    // ÇÃ·¹ÀÌ¾î¿Í ¾ÆÀÌÅÛ °Å¸®°¡ °¡±î¿öÁ³À» ¶§
-    if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecItemPos) <= 80.f)
-    {
-        if (m_fSizeUp <= 2.f)
-            m_fSizeUp += fTimeDelta * 10.f;
-        // »çÀÌÁî Ä¿Áö±â
-        m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp, m_fScale.y + m_fSizeUp, m_fScale.z + m_fSizeUp);
+	// í”Œë ˆì´ì–´ì™€ ì•„ì´í…œ ê±°ë¦¬ê°€ ê°€ê¹Œì›Œì¡Œì„ ë•Œ
+	if(m_pTransformCom->Cal_Distance_vec(vecPlayerPos,m_vecItemPos) <= 80.f)
+	{
+		if(m_fSizeUp <= 2.f)
+			m_fSizeUp += fTimeDelta * 10.f;
+		// ì‚¬ì´ì¦ˆ ì»¤ì§€ê¸°
+		m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp,m_fScale.y + m_fSizeUp,m_fScale.z + m_fSizeUp);
 
-        if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
-        {
-            m_bInteraction = true;
+		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+		{
+			m_bInteraction = true;
 
-            m_fCharging_Time += fTimeDelta;
-        }
-        else
-        {
-            m_bInteraction = false;
-            m_fCharging_Time = 0.f;
-        }
+			m_fCharging_Time += fTimeDelta;
+		} else
+		{
+			m_bInteraction = false;
+			m_fCharging_Time = 0.f;
+		}
 
-    }
-    else
-    {
-        if (m_fSizeUp >= 0.f)
-            m_fSizeUp -= fTimeDelta * 10.f;
-        m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp, m_fScale.y + m_fSizeUp, m_fScale.z + m_fSizeUp);
-        m_fCharging_Time = 0.f;
-    }
+	} else
+	{
+		if(m_fSizeUp >= 0.f)
+			m_fSizeUp -= fTimeDelta * 10.f;
+		m_pTransformCom->Set_Scaling(m_fScale.x + m_fSizeUp,m_fScale.y + m_fSizeUp,m_fScale.z + m_fSizeUp);
+		m_fCharging_Time = 0.f;
+	}
 
 
-    if (m_fCharging_Time >= 1.f)
-    {
-        m_bKnockdown = true;
-    }
+	if(m_fCharging_Time >= 1.f)
+	{
+		m_bKnockdown = true;
+	}
 
 }
 
 void CHp_Item::Late_Update(_float fTimeDelta)
 {
 
-       if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT, this)))
-           return;
+	if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONLIGHT,this)))
+		return;
 }
 
 HRESULT CHp_Item::Render()
 {
-    if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
+	if(FAILED(Bind_ShaderResources()))
+		return E_FAIL;
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-    for (size_t i = 0; i < iNumMeshes; i++)
-    {
-        if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-            return E_FAIL;
-        if(m_bKnockdown == false)
-        {
-            if (FAILED(m_pShaderCom->Begin(0)))
-                return E_FAIL;
-        }
-        else
-        {
-            if (FAILED(m_pShaderCom->Begin(1)))
-                return E_FAIL;
-        }
-        m_pModelCom->Render(i);
-    }
-    return S_OK;
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(m_bKnockdown == false)
+		{
+			if(FAILED(m_pShaderCom->Begin(0)))
+				return E_FAIL;
+		} else
+		{
+			if(FAILED(m_pShaderCom->Begin(1)))
+				return E_FAIL;
+		}
+		m_pModelCom->Render(i);
+	}
+	return S_OK;
 }
 
 HRESULT CHp_Item::Add_Components()
 {
-    /* For.Com_Texture */
-    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Dissolved"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-        return E_FAIL;
+	/* For.Com_Texture */
+	if(FAILED(__super::Add_Component(m_eLevel,TEXT("Prototype_Component_Texture_Dissolved"),
+		TEXT("Com_Texture"),reinterpret_cast<CComponent**>(&m_pTextureCom))))
+		return E_FAIL;
 
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxItem"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-        return E_FAIL;
-    const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
-    const _wstring Model_Component_Result = Model_Component + to_wstring(50 + ENVIRONMENT_EA);
-    /* For.Com_Model */
-    if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-        TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-        return E_FAIL;
-    return S_OK;
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxItem"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
+	const _wstring Model_Component_Result = Model_Component + to_wstring(50 + ENVIRONMENT_EA);
+	/* For.Com_Model */
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
+		return E_FAIL;
+	return S_OK;
 }
 
 HRESULT CHp_Item::Bind_ShaderResources()
 {
-    if (m_bKnockdown == true)
-    {
-        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(8))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value", &m_fDeadTime, sizeof(float))))
-            return E_FAIL;
-    }
+	if(m_bKnockdown == true)
+	{
+		if(FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom,"g_MaskTexture",static_cast<_uint>(8))))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value",&m_fDeadTime,sizeof(float))))
+			return E_FAIL;
+	}
 
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
-        return E_FAIL;
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
 
-    _float fFar = m_pGameInstance->Get_CameraFar();
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
-        return E_FAIL;
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
+		return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
-CHp_Item* CHp_Item::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHp_Item* CHp_Item::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-    CHp_Item* pInstance = new CHp_Item(pDevice, pContext);
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX("Failed to Created : CHp_Item");
-        Safe_Release(pInstance);
-    }
-    return pInstance;
+	CHp_Item* pInstance = new CHp_Item(pDevice,pContext);
+	if(FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CHp_Item");
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
 CGameObject* CHp_Item::Clone(void* pArg)
 {
-    CHp_Item* pInstance = new CHp_Item(*this);
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX("Failed to Created : CHp_Item");
-        Safe_Release(pInstance);
-    }
+	CHp_Item* pInstance = new CHp_Item(*this);
+	if(FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Created : CHp_Item");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CHp_Item::Free()
 {
-    __super::Free();
-    Safe_Release(m_pTextureCom);
-    Safe_Release(m_pModelCom);
-    Safe_Release(m_pShaderCom);
+	__super::Free();
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
 }

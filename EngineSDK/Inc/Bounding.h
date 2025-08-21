@@ -6,7 +6,7 @@
 
 BEGIN(Engine)
 
-class CBounding abstract : public CBase
+class CBounding abstract: public CBase
 {
 public:
 	typedef struct
@@ -19,19 +19,29 @@ protected:
 	virtual ~CBounding() = default;
 
 public:
-	/* Äİ¶óÀÌ´õÀÇ »çº»À» »ı¼ºÇÒ ¶§, È£ÃâÇÑ´Ù. */
+	/* ì½œë¼ì´ë”ì˜ ì‚¬ë³¸ì„ ìƒì„±í•  ë•Œ, í˜¸ì¶œí•œë‹¤. */
 	virtual HRESULT Initialize(const BOUND_DESC* pBoundDesc);
-	virtual void Update(_fmatrix WorldMatrix) {} // Ãæµ¹À» Ÿ¢ÇÑ µ¥ÀÌÅÍ¸¦ ¿ùµå·Î º¯È¯ÇÑ´Ù. 
-	virtual _bool Intersect(CCollider::TYPE eType, CBounding* pTargetBounding) = 0;
+	virtual void Update(_fmatrix WorldMatrix) {} // ì¶©ëŒì„ë°ì´í„°ë¥¼ ì›”ë“œë¡œ ë³€í™˜í•œë‹¤. 
+	virtual _bool Intersect(CCollider::TYPE eType,CBounding* pTargetBounding) = 0;
 
-	virtual _float3 Get_Center() { return _float3(); }
-	virtual _float3 Get_Extents() { return _float3(); }
-	virtual float Get_Radius() { return _float(); }
-	virtual _bool Intersect_Mouse(_vector rayOrigin, _vector rayDirection, float& fDistance) { return false; };
-#ifdef _DEBUG
+	virtual _float3 Get_Center() {
+		return _float3();
+	}
+	virtual _float3 Get_Extents() {
+		return _float3();
+	}
+	virtual float Get_Radius() {
+		return _float();
+	}
+	virtual _bool Intersect_Mouse(_vector rayOrigin,_vector rayDirection,float& fDistance) {
+		return false;
+	};
+	#ifdef _DEBUG
 public:
-	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor) { return S_OK; }
-#endif
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch,_fvector vColor) {
+		return S_OK;
+	}
+	#endif
 
 public:
 	virtual void Free() override;

@@ -4,7 +4,7 @@
 BEGIN(Engine)
 
 
-class CTimer final : public CBase
+class CTimer final: public CBase
 {
 private:
 	CTimer(void);
@@ -21,10 +21,10 @@ public:
 	void Update_Timer(void);
 
 private:
-	LARGE_INTEGER			m_FrameTime = {}; // ¸Å ÇÁ·¹ÀÓ ½Ã°£À» ¹Ş´Â´Ù
-	LARGE_INTEGER			m_FixTime = {}; // 1ÃÊ °æ°ú ¿©ºÎ¸¦ ÆÄ¾ÇÇÏ±â À§ÇÑ ±âÁØ ½Ã°£
-	LARGE_INTEGER			m_LastTime = {}; // ÀÌÀü Update ¶§ÀÇ ½Ã°£
-	LARGE_INTEGER			m_CpuTick = {}; // 1ÃÊ °æ°ú ÆÇ´Ü ±âÁØ
+	LARGE_INTEGER			m_FrameTime = {}; // ë§¤ í”„ë ˆì„ ì‹œê°„ì„ ë°›ëŠ”ë‹¤
+	LARGE_INTEGER			m_FixTime = {}; // 1ì´ˆ ê²½ê³¼ ì—¬ë¶€ë¥¼ íŒŒì•…í•˜ê¸° ìœ„í•œ ê¸°ì¤€ ì‹œê°„
+	LARGE_INTEGER			m_LastTime = {}; // ì´ì „ Update ë•Œì˜ ì‹œê°„
+	LARGE_INTEGER			m_CpuTick = {}; // 1ì´ˆ ê²½ê³¼ íŒë‹¨ ê¸°ì¤€
 
 private:
 	_float					m_fTimeDelta = {};

@@ -2,8 +2,8 @@
 #include "..\Public\Aura.h"
 
 #include "GameInstance.h"
-
-
+#include "Coin.h"
+#include "Coin_Item.h"
 
 CAura::CAura(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -28,6 +28,8 @@ HRESULT CAura::Initialize(void* pArg)
 	m_bInteration = pDesc->bInteration;
 	m_fScale = pDesc->fScale;
 	m_eType = pDesc->eType;
+	m_pCoin = pDesc->pCoin;
+	m_pCoin_Item = pDesc->pCoin_Item;
 //	if(m_eType == ITEM_AURA)
 	{
 		m_fScale.x += 6.f;
@@ -61,17 +63,8 @@ void CAura::Update(_float fTimeDelta)
 {
 	if (m_bDead)
 		return;
-	if(m_eType == ITEM_AURA)
-	{
-		if (*m_bInteration == true)
-		{
-			m_pTransformCom->Set_Scaling(m_fScale.x + 2.f, m_fScale.y + 2.f, m_fScale.z + 2.f);
-		}
-		else
-		{
-			m_pTransformCom->Set_Scaling(m_fScale.x, m_fScale.y, m_fScale.z);
-		}
-	}
+
+
 	m_fUVMove += fTimeDelta;
 }
 
@@ -82,7 +75,16 @@ void CAura::Late_Update(_float fTimeDelta)
 
 	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
 		return;
-
+	if(m_eType == ITEM_AURA)
+	{
+		if(m_bInteration != nullptr && *m_bInteration == true)
+		{
+			m_pTransformCom->Set_Scaling(m_fScale.x + 2.f,m_fScale.y + 2.f,m_fScale.z + 2.f);
+		} else
+		{
+			m_pTransformCom->Set_Scaling(m_fScale.x,m_fScale.y,m_fScale.z);
+		}
+	}
 
 }
 

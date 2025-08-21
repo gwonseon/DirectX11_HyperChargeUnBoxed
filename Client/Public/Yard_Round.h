@@ -5,7 +5,7 @@
 #include "Camera_Free.h"
 BEGIN(Client)
 
-class CYard_Round : public CLevel_Yard
+class CYard_Round: public CLevel_Yard
 {
 public:
 	typedef struct
@@ -17,7 +17,7 @@ public:
 	}MONSTER_CREATE_FOR_YARD_DESC;
 
 private:
-	CYard_Round(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CYard_Round(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CYard_Round() = default;
 
 public:
@@ -25,52 +25,80 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 
 public:
-	void Set_CurrentRound(_uint iRound) { m_iCurrentRound = iRound; }
-	void Set_Player_Build(CPlayer_Build* pBuild) { m_pBuild = pBuild; }
-	void Set_Player_BrainCore(CBrainCore* pBrain) { m_pBrain = pBrain; }
-	void Set_BrainPos(_vector* vPos) { vecBrainPos = vPos; }
-	void Set_PlayerPos(_vector* vPos) { vecPlayerPos = vPos; }
-	const void Set_PlayerWorld_matrix(const _float4x4* vMatrix) { matPlayerWorld = vMatrix; }
-	const void Set_BrainCoreWorld_matrix(const _float4x4* vMatrix) { matBrainCoreWorld = vMatrix; }
-	void	Set_RemainMonster_Count(_uint iCount) { m_iCurrent_RemainMonster = iCount; }
-	void	Set_TrapLayer(CLayer* pLayer) { m_pTrapLeyer = pLayer; }
-	void	Set_Player(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
-	void	Set_Camera(CCamera_Free* pCamera) { m_pCamera = pCamera; }
-	_uint	Get_MonsterCount() { return m_iMonsterCount; }
+	void Set_CurrentRound(_uint iRound) {
+		m_iCurrentRound = iRound;
+	}
+	void Set_Player_Build(CPlayer_Build* pBuild) {
+		m_pBuild = pBuild;
+	}
+	void Set_Player_BrainCore(CBrainCore* pBrain) {
+		m_pBrain = pBrain;
+	}
+	void Set_BrainPos(_vector* vPos) {
+		vecBrainPos = vPos;
+	}
+	void Set_PlayerPos(_vector* vPos) {
+		vecPlayerPos = vPos;
+	}
+	const void Set_PlayerWorld_matrix(const _float4x4* vMatrix) {
+		matPlayerWorld = vMatrix;
+	}
+	const void Set_BrainCoreWorld_matrix(const _float4x4* vMatrix) {
+		matBrainCoreWorld = vMatrix;
+	}
+	void	Set_RemainMonster_Count(_uint iCount) {
+		m_iCurrent_RemainMonster = iCount;
+	}
+	void	Set_TrapLayer(CLayer* pLayer) {
+		m_pTrapLeyer = pLayer;
+	}
+	void	Set_Player(CPlayer* pPlayer) {
+		m_pPlayer = pPlayer;
+	}
+	void	Set_Camera(CCamera_Free* pCamera) {
+		m_pCamera = pCamera;
+	}
+	_uint	Get_MonsterCount() {
+		return m_iMonsterCount;
+	}
 	void	MonsterCreate(_float fTimeDelta);
 
-	_bool	IsRound_End() { return m_bthis_Round_End; }
-	void	Set_RoundEnd(_bool bEnd) { m_bthis_Round_End = bEnd; }
-private: 
-	_uint m_iCurrentRound{}; // «ˆ¿Á ∂ÛøÓµÂ
-	_uint m_iMyRound{}; //  ¿Ã ∞¥√º∞° ∞Æ∞Ì ¿÷¥¬ ∂ÛøÓµÂ
-	_uint m_iMonsterCount{}; // ª˝º∫«“ ∏ÛΩ∫≈Õ ºˆ
-	_uint m_iCurrent_RemainMonster{}; // ≥≤¿∫ ∏ÛΩ∫≈Õºˆ
+	_bool	IsRound_End() {
+		return m_bthis_Round_End;
+	}
+	void	Set_RoundEnd(_bool bEnd) {
+		m_bthis_Round_End = bEnd;
+	}
+private:
+	_uint m_iCurrentRound{}; // ÌòÑÏû¨ ÎùºÏö¥Îìú
+	_uint m_iMyRound{}; //  Ïù¥ Í∞ùÏ≤¥Í∞Ä Í∞ñÍ≥† ÏûàÎäî ÎùºÏö¥Îìú
+	_uint m_iMonsterCount{}; // ÏÉùÏÑ±Ìï† Î™¨Ïä§ÌÑ∞ Ïàò
+	_uint m_iCurrent_RemainMonster{}; // ÎÇ®ÏùÄ Î™¨Ïä§ÌÑ∞Ïàò
 
 	_bool m_bthis_Round_End = false;
-	_float fRound_Time{}, fCreate_Time{};
+	_float fRound_Time{},fCreate_Time{};
 
 	vector< MONSTER_CREATE_FOR_YARD_DESC> m_vecMonsterCreate;
 
 	ANIMMODEL_INDEX eModel_Index{};
 
 
-	CLayer* m_pTrapLeyer = { nullptr };
-	_vector* vecBrainPos = { nullptr };
-	_vector* vecPlayerPos = { nullptr };
-	const _float4x4* matPlayerWorld = { nullptr };
-	const _float4x4* matBrainCoreWorld = { nullptr };
-	CPlayer_Build* m_pBuild = { nullptr };
-	CBrainCore* m_pBrain = { nullptr };
-	CPlayer* m_pPlayer = { nullptr };
-	CCamera_Free* m_pCamera = { nullptr };
+	CLayer* m_pTrapLeyer = {nullptr};
+	_vector* vecBrainPos = {nullptr};
+	_vector* vecPlayerPos = {nullptr};
+	const _float4x4* matPlayerWorld = {nullptr};
+	const _float4x4* matBrainCoreWorld = {nullptr};
+	CPlayer_Build* m_pBuild = {nullptr};
+	CBrainCore* m_pBrain = {nullptr};
+	CPlayer* m_pPlayer = {nullptr};
+	CCamera_Free* m_pCamera = {nullptr};
 
 private:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
 
 public:
-	static CYard_Round* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iRound);
+	static CYard_Round* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,_uint iRound);
 	virtual void Free() override;
 
 };

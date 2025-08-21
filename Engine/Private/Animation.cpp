@@ -7,47 +7,47 @@ CAnimation::CAnimation()
 }
 
 CAnimation::CAnimation(const CAnimation& Prototype)
-	: m_fDuration{ Prototype.m_fDuration }
-	, m_fTickPerSecond{ Prototype.m_fTickPerSecond }
-	, m_fCurrentPosition{ Prototype.m_fCurrentPosition }
-	, m_iNumChannels{ Prototype.m_iNumChannels }
-	, m_Channels{ Prototype.m_Channels }
-	, m_iChannelKeyFrameIndices{ Prototype.m_iChannelKeyFrameIndices }
+	: m_fDuration{Prototype.m_fDuration}
+	,m_fTickPerSecond{Prototype.m_fTickPerSecond}
+	,m_fCurrentPosition{Prototype.m_fCurrentPosition}
+	,m_iNumChannels{Prototype.m_iNumChannels}
+	,m_Channels{Prototype.m_Channels}
+	,m_iChannelKeyFrameIndices{Prototype.m_iChannelKeyFrameIndices}
 {
 
-	strcpy_s(m_szName, Prototype.m_szName);
+	strcpy_s(m_szName,Prototype.m_szName);
 
-	for (auto& pChannel : m_Channels)
+	for(auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
 
 }
- 
-_bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bPlay)
+
+_bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones,_bool isLoop,_float fTimeDelta,_bool bPlay)
 {
 
-	if (m_fCurrentPosition == 0)
+	if(m_fCurrentPosition == 0)
 	{
 		m_vecName.resize(m_iNumChannels);
-		LastKeyFrame = nullptr; // LastKeyFrameÀ» nullptr·Î ÃÊ±âÈ­
+		LastKeyFrame = nullptr; // LastKeyFrameì„ nullptrë¡œ ì´ˆê¸°í™”
 	}
 	if(bPlay == true)
 		m_fCurrentPosition += m_fTickPerSecond * fTimeDelta;
 
-	if (m_fCurrentPosition >= m_fDuration &&
+	if(m_fCurrentPosition >= m_fDuration &&
 		true == isLoop)
 	{
 		m_fCurrentPosition = 0.f;
 	}
 
-	if (m_fCurrentPosition >= (m_fDuration) &&
+	if(m_fCurrentPosition >= (m_fDuration) &&
 		false == isLoop)
 	{
 		return true;
 	}
 
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
-		m_Channels[i]->Update_TransformationMatrix(Bones, &m_iChannelKeyFrameIndices[i], m_fCurrentPosition);
+		m_Channels[i]->Update_TransformationMatrix(Bones,&m_iChannelKeyFrameIndices[i],m_fCurrentPosition);
 		LastKeyFrame = &m_Channels[i]->Get_LastKeyFrame();
 		m_vecName[i] = m_Channels[i]->Get_strName();
 	}
@@ -55,30 +55,30 @@ _bool CAnimation::Update_TransformationMatrix(const vector<class CBone*>& Bones,
 	return false;
 }
 
-_bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion, _bool& bShot )
+_bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>& Bones,_bool isLoop,_float fTimeDelta,_bool bUpper,_uint iUpperMotion,_bool& bShot)
 {
 	if(bUpper == true)
 	{
-		if (m_fCurrentPosition_UpperBody == 0)
+		if(m_fCurrentPosition_UpperBody == 0)
 		{
 			m_vecName_UpperBody.resize(m_iNumChannels);
-			LastKeyFrame = nullptr; // LastKeyFrameÀ» nullptr·Î ÃÊ±âÈ­
+			LastKeyFrame = nullptr; // LastKeyFrameì„ nullptrë¡œ ì´ˆê¸°í™”
 		}
 		if(iUpperMotion != 0)
 		{
 			m_fCurrentPosition_UpperBody += m_fTickPerSecond * fTimeDelta;
-			
+
 		}
 
 
-		if (m_fCurrentPosition_UpperBody >= m_fDuration &&
+		if(m_fCurrentPosition_UpperBody >= m_fDuration &&
 			true == isLoop)
 		{
 			bShot = false;
 			m_fCurrentPosition_UpperBody = 0.f;
 		}
 
-		if (m_fCurrentPosition_UpperBody >= (m_fDuration) &&
+		if(m_fCurrentPosition_UpperBody >= (m_fDuration) &&
 			false == isLoop)
 		{
 			return true;
@@ -87,46 +87,45 @@ _bool CAnimation::Update_TransformationMatrix_Player(const vector<class CBone*>&
 
 	else
 	{
-		if (m_fCurrentPosition_LowerBody == 0)
+		if(m_fCurrentPosition_LowerBody == 0)
 		{
 
 			m_vecName_LowerBody.resize(m_iNumChannels);
-			LastKeyFrame = nullptr; // LastKeyFrameÀ» nullptr·Î ÃÊ±âÈ­
+			LastKeyFrame = nullptr; // LastKeyFrameì„ nullptrë¡œ ì´ˆê¸°í™”
 		}
 
 		m_fCurrentPosition_LowerBody += m_fTickPerSecond * fTimeDelta;
-		if (m_fCurrentPosition_LowerBody >= m_fDuration &&
+		if(m_fCurrentPosition_LowerBody >= m_fDuration &&
 			true == isLoop)
 		{
 			m_fCurrentPosition_LowerBody = 0.f;
 		}
 
-		if (m_fCurrentPosition_LowerBody >= (m_fDuration) &&
+		if(m_fCurrentPosition_LowerBody >= (m_fDuration) &&
 			false == isLoop)
 		{
 			return true;
 		}
 	}
-	
-	/* ÀÌ ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ »ç¿ëÇÏ´Â ¸ðµç »ÀÀÇ »óÅÂ¸¦ ½Ã°£¿¡ ¸Â°Ô º¯°æÇÏ³®.*/
-	for (size_t i = 0; i < m_iNumChannels; i++)
+
+	/* ì´ ì• ë‹ˆë©”ì´ì…˜ì´ ì‚¬ìš©í•˜ëŠ” ëª¨ë“  ë¼ˆì˜ ìƒíƒœë¥¼ ì‹œê°„ì— ë§žê²Œ ë³€ê²½í•˜ë‚Ÿ.*/
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
-		/* Ã¤³ÎÀÌ °¡Áö°í ÀÖ´Â Àç»ýÀ§Ä¡´ç »óÅÂ(KeyFrame)¸¦ È°¿ëÇÏ¿© ÇöÀç Àç»ýÀ§Ä¡¿¡ ¸Â´Â »À(Ã¤³Î)ÀÇ »óÅÂ¸¦ ¸¸µé¾îÁØ´Ù.  */
-		/* »óÅÂÇà·ÄÀ» ÇöÀç Ã¤³Î°ú ÀÌ¸§ÀÌ °°Àº »À¿¡°Ô Àü´ÞÇÏ¿© »ÀÀÇ »óÅÂ¸¦ °»½ÅÇÒ ¼ö ÀÖµµ·Ï ÇÏ³®. */
-		if(bUpper == true) // »óÃ¼ÀÏ ¶§
+		/* ì±„ë„ì´ ê°€ì§€ê³  ìžˆëŠ” ìž¬ìƒìœ„ì¹˜ë‹¹ ìƒíƒœ(KeyFrame)ë¥¼ í™œìš©í•˜ì—¬ í˜„ìž¬ ìž¬ìƒìœ„ì¹˜ì— ë§žëŠ” ë¼ˆ(ì±„ë„)ì˜ ìƒíƒœë¥¼ ë§Œë“¤ì–´ì¤€ë‹¤.  */
+		/* ìƒíƒœí–‰ë ¬ì„ í˜„ìž¬ ì±„ë„ê³¼ ì´ë¦„ì´ ê°™ì€ ë¼ˆì—ê²Œ ì „ë‹¬í•˜ì—¬ ë¼ˆì˜ ìƒíƒœë¥¼ ê°±ì‹ í•  ìˆ˜ ìžˆë„ë¡ í•˜ë‚Ÿ. */
+		if(bUpper == true) // ìƒì²´ì¼ ë•Œ
 		{
-			m_Channels[i]->Update_TransformationMatrix_UpperBody(Bones, &m_iChannelKeyFrameIndices[i], m_fCurrentPosition_UpperBody);
+			m_Channels[i]->Update_TransformationMatrix_UpperBody(Bones,&m_iChannelKeyFrameIndices[i],m_fCurrentPosition_UpperBody);
 			LastKeyFrame_UpperBody = &m_Channels[i]->Get_LastKeyFrame();
 			m_vecName_UpperBody[i] = m_Channels[i]->Get_strName();
 
-		}
-		else	// ÇÏÃ¼ ÀÏ ¶§
+		} else	// í•˜ì²´ ì¼ ë•Œ
 		{
-			m_Channels[i]->Update_TransformationMatrix_LowerBody(Bones, &m_iChannelKeyFrameIndices[i], m_fCurrentPosition_LowerBody);
+			m_Channels[i]->Update_TransformationMatrix_LowerBody(Bones,&m_iChannelKeyFrameIndices[i],m_fCurrentPosition_LowerBody);
 			LastKeyFrame_LowerBody = &m_Channels[i]->Get_LastKeyFrame();
 			m_vecName_LowerBody[i] = m_Channels[i]->Get_strName();
-			
-			
+
+
 		}
 	}
 
@@ -137,7 +136,7 @@ void CAnimation::Free()
 {
 	__super::Free();
 
-	for (auto& pChannel : m_Channels)
+	for(auto& pChannel : m_Channels)
 		Safe_Release(pChannel);
 	m_Channels.clear();
 }
@@ -150,17 +149,17 @@ CAnimation* CAnimation::Clone()
 void CAnimation::CurrentPosition_Init(const vector<class CBone*>& Bones)
 {
 	m_fCurrentPosition = 0.f;
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
 		m_iChannelKeyFrameIndices[i] = 0;
-	}	
+	}
 
 }
 
 void CAnimation::CurrentPosition_UpperBody_Init(const vector<class CBone*>& Bones)
 {
 	m_fCurrentPosition_UpperBody = 0.f;
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
 		m_iChannelKeyFrameIndices[i] = 0;
 	}
@@ -170,22 +169,22 @@ void CAnimation::CurrentPosition_UpperBody_Init(const vector<class CBone*>& Bone
 void CAnimation::CurrentPosition_LowerBody_Init(const vector<class CBone*>& Bones)
 {
 	m_fCurrentPosition_LowerBody = 0.f;
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
 		m_iChannelKeyFrameIndices[i] = 0;
 	}
 
 }
 
-_bool CAnimation::Update_LinearInterPolation(KEYFRAME* _PrevKeyFrame, const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta)
+_bool CAnimation::Update_LinearInterPolation(KEYFRAME* _PrevKeyFrame,const vector<class CBone*>& Bones,vector<string> szName,_float fTimeDelta)
 {
-	
+
 	m_bLinearInterpolation = false;
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
-		m_bLinearInterpolation = m_Channels[i]->Update_LinearInterPolation( Bones, szName, fTimeDelta);
+		m_bLinearInterpolation = m_Channels[i]->Update_LinearInterPolation(Bones,szName,fTimeDelta);
 	}
-	if (m_bLinearInterpolation == true)
+	if(m_bLinearInterpolation == true)
 	{
 		return true;
 	}
@@ -193,18 +192,18 @@ _bool CAnimation::Update_LinearInterPolation(KEYFRAME* _PrevKeyFrame, const vect
 	return false;
 }
 
-_bool CAnimation::Update_LinearInterPolation_Player(KEYFRAME* _PrevKeyFrame, const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta, _bool bUpper)
+_bool CAnimation::Update_LinearInterPolation_Player(KEYFRAME* _PrevKeyFrame,const vector<class CBone*>& Bones,vector<string> szName,_float fTimeDelta,_bool bUpper)
 {
 	m_bLinearInterpolation_UpperBody = false;
 	m_bLinearInterpolation_LowerBody = false;
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
 		if(bUpper == true)
-			m_bLinearInterpolation_UpperBody = m_Channels[i]->Update_LinearInterPolation_UpperBody(Bones, szName, fTimeDelta);
+			m_bLinearInterpolation_UpperBody = m_Channels[i]->Update_LinearInterPolation_UpperBody(Bones,szName,fTimeDelta);
 		else
-			m_bLinearInterpolation_LowerBody = m_Channels[i]->Update_LinearInterPolation_LowerBody(Bones, szName, fTimeDelta);
+			m_bLinearInterpolation_LowerBody = m_Channels[i]->Update_LinearInterPolation_LowerBody(Bones,szName,fTimeDelta);
 	}
-	if (m_bLinearInterpolation_LowerBody == true && bUpper == false)
+	if(m_bLinearInterpolation_LowerBody == true && bUpper == false)
 	{
 		return true;
 	}
@@ -216,11 +215,11 @@ _bool CAnimation::Update_LinearInterPolation_Player(KEYFRAME* _PrevKeyFrame, con
 }
 
 
-CAnimation* CAnimation::Create(CModel* pModel, HANDLE hFileRead)
+CAnimation* CAnimation::Create(CModel* pModel,HANDLE hFileRead)
 {
 	CAnimation* pInstance = new CAnimation();
 
-	if (FAILED(pInstance->Initialize(pModel, hFileRead)))
+	if(FAILED(pInstance->Initialize(pModel,hFileRead)))
 	{
 		MSG_BOX("Failed to Created : CAnimation");
 		Safe_Release(pInstance);
@@ -229,36 +228,35 @@ CAnimation* CAnimation::Create(CModel* pModel, HANDLE hFileRead)
 	return pInstance;
 }
 
-HRESULT CAnimation::Initialize(CModel* pModel, HANDLE hFileRead)
+HRESULT CAnimation::Initialize(CModel* pModel,HANDLE hFileRead)
 {
 	_uint iAnimationNameLen = 0;
-	ReadFile(hFileRead, &iAnimationNameLen, sizeof(_uint), &dwByte, nullptr);
+	ReadFile(hFileRead,&iAnimationNameLen,sizeof(_uint),&dwByte,nullptr);
 	char* m_szName = new char[iAnimationNameLen + 1]; // +1 for null terminator
-	ReadFile(hFileRead, m_szName, iAnimationNameLen * sizeof(_char), &dwByte, nullptr);
+	ReadFile(hFileRead,m_szName,iAnimationNameLen * sizeof(_char),&dwByte,nullptr);
 	m_szName[iAnimationNameLen] = '\0';
 	string strAnimationName(m_szName);
-	 cout << strAnimationName << endl;
+	cout << strAnimationName << endl;
 	delete[] m_szName;
 
-	ReadFile(hFileRead, &m_fDuration, sizeof(_float), &dwByte, nullptr);			// for Export 
-//	cout << m_fDuration << endl;
-	ReadFile(hFileRead, &m_fTickPerSecond, sizeof(_float), &dwByte, nullptr);		// for Export 
+	ReadFile(hFileRead,&m_fDuration,sizeof(_float),&dwByte,nullptr);			// for Export 
+	//	cout << m_fDuration << endl;
+	ReadFile(hFileRead,&m_fTickPerSecond,sizeof(_float),&dwByte,nullptr);		// for Export 
 
 
-	/* ÀÌ ¾Ö´ÔÀ» Ç¥ÇöÇÏ±âÀ§ÇØ »ç¿ëÇØ¾ßÇÏ´Â »ÀÀÇ °¹¼ö. */
-	ReadFile(hFileRead, &m_iNumChannels, sizeof(_uint), &dwByte, nullptr);		// for Export 
+	/* ì´ ì• ë‹˜ì„ í‘œí˜„í•˜ê¸°ìœ„í•´ ì‚¬ìš©í•´ì•¼í•˜ëŠ” ë¼ˆì˜ ê°¯ìˆ˜. */
+	ReadFile(hFileRead,&m_iNumChannels,sizeof(_uint),&dwByte,nullptr);		// for Export 
 	m_iChannelKeyFrameIndices.resize(m_iNumChannels);
 
-//	cout << m_iNumChannels << endl;
-	for (size_t i = 0; i < m_iNumChannels; i++)
+	//	cout << m_iNumChannels << endl;
+	for(size_t i = 0; i < m_iNumChannels; i++)
 	{
-		/* °¢°¢ÀÇ »À Á¤º¸(Çà·ÄÀ» ±¸¼ºÇÏ±âÀ§ÇÑ Á¤º¸)¸¦ ÀúÀåÇÑ´Ù .*/
-		CChannel* pChannel = CChannel::Create(pModel, hFileRead);
-		if (nullptr == pChannel)
+		/* ê°ê°ì˜ ë¼ˆ ì •ë³´(í–‰ë ¬ì„ êµ¬ì„±í•˜ê¸°ìœ„í•œ ì •ë³´)ë¥¼ ì €ìž¥í•œë‹¤ .*/
+		CChannel* pChannel = CChannel::Create(pModel,hFileRead);
+		if(nullptr == pChannel)
 			return E_FAIL;
-		
+
 		m_Channels.push_back(pChannel);
 	}
 	return S_OK;
 }
-

@@ -1,8 +1,8 @@
 #include "..\Public\SoundMgr.h"
 
-CSoundMgr::CSoundMgr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice{ pDevice }
-	, m_pContext{ pContext }
+CSoundMgr::CSoundMgr(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: m_pDevice{pDevice}
+	,m_pContext{pContext}
 {
 	Safe_AddRef(m_pContext);
 	Safe_AddRef(m_pDevice);
@@ -17,11 +17,11 @@ HRESULT CSoundMgr::Ready_Sound()
 	nowBGM = L"";
 
 
-	// ªÁøÓµÂ∏¶ ¥„¥Á«œ¥¬ ¥Î«•∞¥√º∏¶ ª˝º∫«œ¥¬ «‘ºˆ
-	result = System_Create(&m_pSystem, FMOD_VERSION);
+	// ÏÇ¨Ïö¥ÎìúÎ•º Îã¥ÎãπÌïòÎäî ÎåÄÌëúÍ∞ùÏ≤¥Î•º ÏÉùÏÑ±ÌïòÎäî Ìï®Ïàò
+	result = System_Create(&m_pSystem,FMOD_VERSION);
 
-	// 1. Ω√Ω∫≈€ ∆˜¿Œ≈Õ, 2. ªÁøÎ«“ ∞°ªÛ√§≥Œ ºˆ , √ ±‚»≠ πÊΩƒ) 
-	result = m_pSystem->init(512, FMOD_INIT_NORMAL, NULL);
+	// 1. ÏãúÏä§ÌÖú Ìè¨Ïù∏ÌÑ∞, 2. ÏÇ¨Ïö©Ìï† Í∞ÄÏÉÅÏ±ÑÎÑê Ïàò , Ï¥àÍ∏∞Ìôî Î∞©Ïãù) 
+	result = m_pSystem->init(512,FMOD_INIT_NORMAL,NULL);
 
 	LoadSoundFile(L"YardBackGround.wav");
 	LoadSoundFile(L"PlayLevelBack.wav");
@@ -29,198 +29,198 @@ HRESULT CSoundMgr::Ready_Sound()
 	LoadSoundFile(L"LogoBackGround.wav");
 	LoadSoundFile(L"PlayLevelBack2.wav");
 
-	// πÃªÁ¿œ ∆Æ∑∞
-	LoadSoundFile(L"MissiletTruckUp.wav");  // ≈©∑π¿Œ ø√∂Û∞®
-	LoadSoundFile(L"FE_MissileTruck_WarningVoice.wav"); // πÃªÁ¿œ πﬂªÁ«‘¿ª æÀ∏≤
+	// ÎØ∏ÏÇ¨Ïùº Ìä∏Îü≠
+	LoadSoundFile(L"MissiletTruckUp.wav");  // ÌÅ¨Î†àÏù∏ Ïò¨ÎùºÍ∞ê
+	LoadSoundFile(L"FE_MissileTruck_WarningVoice.wav"); // ÎØ∏ÏÇ¨Ïùº Î∞úÏÇ¨Ìï®ÏùÑ ÏïåÎ¶º
 	LoadSoundFile(L"FE_MissileTruck_WarningSiren.wav");
-	LoadSoundFile(L"FE_MissileTruck_RocketLaunch.wav"); // πﬂªÁ ∫“≤… º“∏Æ
-	LoadSoundFile(L"FE_MissileTruck_Idle_Loop_Short.wav"); // Ω√µø
-	LoadSoundFile(L"FE_Base_Destroyed_Junk_03.wav"); // ∫Œº≠¡¸
+	LoadSoundFile(L"FE_MissileTruck_RocketLaunch.wav"); // Î∞úÏÇ¨ Î∂àÍΩÉ ÏÜåÎ¶¨
+	LoadSoundFile(L"FE_MissileTruck_Idle_Loop_Short.wav"); // ÏãúÎèô
+	LoadSoundFile(L"FE_Base_Destroyed_Junk_03.wav"); // Î∂ÄÏÑúÏßê
 
-	// ø‹∞Ë¿Œ
-	LoadSoundFile(L"FE_Mothership_Flying_AlienVoice_Level_02_06.wav"); // ø‹∞ËæÓ Ω√∫Œ∏≤
+	// Ïô∏Í≥ÑÏù∏
+	LoadSoundFile(L"FE_Mothership_Flying_AlienVoice_Level_02_06.wav"); // Ïô∏Í≥ÑÏñ¥ ÏãúÎ∂ÄÎ¶º
 	LoadSoundFile(L"FE_Mothership_LittleSpinner_Death_03.wav"); // Dead
-	LoadSoundFile(L"FE_Mothership_AlienVoice_TeethBite_05.wav"); // ø‹∞Ëæ∆
-	LoadSoundFile(L"FE_Mothership_LittleSpinner_Pain_12.wav"); // ø‹∞Ë¿Œ ∏¬¿Ω
-	LoadSoundFile(L"FE_Diarama_Alienqueen.wav"); // ø‹∞Ëæ∆
+	LoadSoundFile(L"FE_Mothership_AlienVoice_TeethBite_05.wav"); // Ïô∏Í≥ÑÏïÑ
+	LoadSoundFile(L"FE_Mothership_LittleSpinner_Pain_12.wav"); // Ïô∏Í≥ÑÏù∏ ÎßûÏùå
+	LoadSoundFile(L"FE_Diarama_Alienqueen.wav"); // Ïô∏Í≥ÑÏïÑ
 	LoadSoundFile(L"FE_Mothership_LittleSpinner_Pain_05.wav"); // Dead
 
-	
-	// «Ô±‚
-	LoadSoundFile(L"FE_NPC_BH60_Loop_HealthMid.wav"); // «¡∑Œ∆Á∑Ø
-	LoadSoundFile(L"FE_NPC_BH60_Metal_Break_04.wav"); // ∫Œº≠¡¸
-	LoadSoundFile(L"FE_NPC_BH60_MinigunR_Tail.wav"); // √—æÀ πﬂªÁ
-	LoadSoundFile(L"FE_NPC_BH60_PilotSOS_06.wav");	//  √ﬂ∂Ù«“ ∂ß ∏ﬁ¿Ãµ•¿Ã
-	LoadSoundFile(L"FE_NPC_ArmyMen_Cobra_Far.wav"); // ∏÷∏Æº≠ ≥Øæ∆∞°¥¬º“∏Æ
-	LoadSoundFile(L"FE_Playground_PropellerAirplane.wav"); // ∏÷∏Æº≠ ≥Øæ∆∞°¥¬º“∏Æ
 
-	
-	// ∂Û¿Ã«√∏«
-	LoadSoundFile(L"FE_Grunt_Death_12.wav"); // ∂Û¿Ã«√∏« ¡◊¿Ω
-	LoadSoundFile(L"FE_Grunt_Pain_21.wav"); //  ∂Û¿Ã«√∏« æ∆«ƒ
+	// Ìó¨Í∏∞
+	LoadSoundFile(L"FE_NPC_BH60_Loop_HealthMid.wav"); // ÌîÑÎ°úÌé†Îü¨
+	LoadSoundFile(L"FE_NPC_BH60_Metal_Break_04.wav"); // Î∂ÄÏÑúÏßê
+	LoadSoundFile(L"FE_NPC_BH60_MinigunR_Tail.wav"); // Ï¥ùÏïå Î∞úÏÇ¨
+	LoadSoundFile(L"FE_NPC_BH60_PilotSOS_06.wav");	//  Ï∂îÎùΩÌï† Îïå Î©îÏù¥Îç∞Ïù¥
+	LoadSoundFile(L"FE_NPC_ArmyMen_Cobra_Far.wav"); // Î©ÄÎ¶¨ÏÑú ÎÇ†ÏïÑÍ∞ÄÎäîÏÜåÎ¶¨
+	LoadSoundFile(L"FE_Playground_PropellerAirplane.wav"); // Î©ÄÎ¶¨ÏÑú ÎÇ†ÏïÑÍ∞ÄÎäîÏÜåÎ¶¨
 
-	// ≈ ≈©
-	LoadSoundFile(L"FE_BigTank_Drive.wav"); // ≈ ≈©øÚ¡˜¿”
-	LoadSoundFile(L"04_12_2016_ArmyMen_Tank_1333_Drive_Drive_Close_Short.wav"); // ≈ ≈©øÚ¡˜¿”
 
-	LoadSoundFile(L"FE_BigTank_Explosion.wav"); // ≈ ≈©, «Ô±‚ ∆¯πﬂ
-	LoadSoundFile(L"FE_Explosion_Small_Close_01.wav"); // ≈ ≈© πﬂªÁ
-	LoadSoundFile(L"FE_BigTank_Fire_Close_01.wav"); // ≈ ≈© πﬂªÁ
-	LoadSoundFile(L"FE_BigTank_Fire_Close_02.wav"); // ≈ ≈© πﬂªÁ
-	LoadSoundFile(L"04_12_2016_ArmyMen_Tank_1333_Fire_Expl_03.wav"); // ≈ ≈© πﬂªÁ
+	// ÎùºÏù¥ÌîåÎß®
+	LoadSoundFile(L"FE_Grunt_Death_12.wav"); // ÎùºÏù¥ÌîåÎß® Ï£ΩÏùå
+	LoadSoundFile(L"FE_Grunt_Pain_21.wav"); //  ÎùºÏù¥ÌîåÎß® ÏïÑÌîî
 
-	// ∆˜¥œ
-	LoadSoundFile(L"FE_Ninja_Animal_Puma.wav"); // ∆˜¥œ π∞±‚
-	LoadSoundFile(L"FE_TRex_FS_Light_01.wav"); // ∆˜¥œ ∞»±‚
-	LoadSoundFile(L"FE_TRex_FS_Light_02.wav"); // ∆˜¥œ ∞»±‚
-	LoadSoundFile(L"RunAway.wav"); // ∆˜¥œ ∞»±‚
+	// ÌÉ±ÌÅ¨
+	LoadSoundFile(L"FE_BigTank_Drive.wav"); // ÌÉ±ÌÅ¨ÏõÄÏßÅÏûÑ
+	LoadSoundFile(L"04_12_2016_ArmyMen_Tank_1333_Drive_Drive_Close_Short.wav"); // ÌÉ±ÌÅ¨ÏõÄÏßÅÏûÑ
 
-	
+	LoadSoundFile(L"FE_BigTank_Explosion.wav"); // ÌÉ±ÌÅ¨, Ìó¨Í∏∞ Ìè≠Î∞ú
+	LoadSoundFile(L"FE_Explosion_Small_Close_01.wav"); // ÌÉ±ÌÅ¨ Î∞úÏÇ¨
+	LoadSoundFile(L"FE_BigTank_Fire_Close_01.wav"); // ÌÉ±ÌÅ¨ Î∞úÏÇ¨
+	LoadSoundFile(L"FE_BigTank_Fire_Close_02.wav"); // ÌÉ±ÌÅ¨ Î∞úÏÇ¨
+	LoadSoundFile(L"04_12_2016_ArmyMen_Tank_1333_Fire_Expl_03.wav"); // ÌÉ±ÌÅ¨ Î∞úÏÇ¨
+
+	// Ìè¨Îãà
+	LoadSoundFile(L"FE_Ninja_Animal_Puma.wav"); // Ìè¨Îãà Î¨ºÍ∏∞
+	LoadSoundFile(L"FE_TRex_FS_Light_01.wav"); // Ìè¨Îãà Í±∑Í∏∞
+	LoadSoundFile(L"FE_TRex_FS_Light_02.wav"); // Ìè¨Îãà Í±∑Í∏∞
+	LoadSoundFile(L"RunAway.wav"); // Ìè¨Îãà Í±∑Í∏∞
+
+
 	// Ui
 	LoadSoundFile(L"fe_ui_unlock_06.wav");
 
 
 
 	// PowerNode
-	LoadSoundFile(L"FE_Turret_Activate.wav"); // ¿€µø Ω√¿˚
-	LoadSoundFile(L"FE_Powernode_base_Mono.wav"); // ∆ÚªÛΩ√ º“∏Æ
+	LoadSoundFile(L"FE_Turret_Activate.wav"); // ÏûëÎèô ÏãúÏ†Å
+	LoadSoundFile(L"FE_Powernode_base_Mono.wav"); // ÌèâÏÉÅÏãú ÏÜåÎ¶¨
 	LoadSoundFile(L"FE_Radar_Play.wav"); // Rader Sound 
-	
-	// ∫Í∑π¿Œƒ⁄æ∆
-	LoadSoundFile(L"FE_CoreBeeingAttacked.wav"); // «« æ¯¿Ω ∞Ê∞Ì
-	LoadSoundFile(L"FE_Base_Braincore_Bubble_01.wav"); // πˆ∫Ì
-	LoadSoundFile(L"FE_Base_Braincore_Alarm1.wav"); // «« æ¯¿Ω ∞Ê∞Ì
+
+	// Î∏åÎ†àÏù∏ÏΩîÏïÑ
+	LoadSoundFile(L"FE_CoreBeeingAttacked.wav"); // Ìîº ÏóÜÏùå Í≤ΩÍ≥†
+	LoadSoundFile(L"FE_Base_Braincore_Bubble_01.wav"); // Î≤ÑÎ∏î
+	LoadSoundFile(L"FE_Base_Braincore_Alarm1.wav"); // Ìîº ÏóÜÏùå Í≤ΩÍ≥†
 
 
-	// ∫ÙµÂ«“ ∂ß	
-	LoadSoundFile(L"FE_BuildCredits_Recieved_Cash_02.wav"); // µ∑ ≥™∞®
-	LoadSoundFile(L"FE_Buildable_Trap_Destroy.wav"); // ∫Œº≠¡¸
-	LoadSoundFile(L"FE_Buildable_Barricades_Destroy.wav"); // ∑π∞Ì ∫Œº≠¡¸
-	LoadSoundFile(L"FE_Buildable_Barricades_Build_Complete.wav"); // ∫ÙµÂ µ 
+	// ÎπåÎìúÌï† Îïå	
+	LoadSoundFile(L"FE_BuildCredits_Recieved_Cash_02.wav"); // Îèà ÎÇòÍ∞ê
+	LoadSoundFile(L"FE_Buildable_Trap_Destroy.wav"); // Î∂ÄÏÑúÏßê
+	LoadSoundFile(L"FE_Buildable_Barricades_Destroy.wav"); // Î†àÍ≥† Î∂ÄÏÑúÏßê
+	LoadSoundFile(L"FE_Buildable_Barricades_Build_Complete.wav"); // ÎπåÎìú Îê®
 
 
 	// KATANA
-	LoadSoundFile(L"FE_Blade_Impact_Spark_01.wav"); // ¿¸±‚ ª˝º∫
-	LoadSoundFile(L"FE_Buildable_Barricades_Build_Complete.wav"); // ∫ÙµÂ µ 
-	LoadSoundFile(L"FE_Buildable_Barricades_Build_Complete.wav"); // ∫ÙµÂ µ 
-	
-	
-	// πË≈Õ∏Æ
-	LoadSoundFile(L"FE_Battery_Catch.wav");  // ¡›±‚
-	LoadSoundFile(L"FE_Battery_Drop_01.wav"); // ∂≥±∏±‚
-	LoadSoundFile(L"FE_Battery_Drop_02.wav"); // ∂≥±∏±‚
-	LoadSoundFile(L"FE_Battery_In_Powernode.wav"); // πË≈Õ∏Æ ≥÷±‚
-	LoadSoundFile(L"FE_Battery_Out_Powernode.wav"); // πË≈Õ∏Æ ª©±‚
-	LoadSoundFile(L"FE_Battery_Pickup.wav"); // ¡∂øÎ»˜ ¡›±‚
+	LoadSoundFile(L"FE_Blade_Impact_Spark_01.wav"); // Ï†ÑÍ∏∞ ÏÉùÏÑ±
+	LoadSoundFile(L"FE_Buildable_Barricades_Build_Complete.wav"); // ÎπåÎìú Îê®
+	LoadSoundFile(L"FE_Buildable_Barricades_Build_Complete.wav"); // ÎπåÎìú Îê®
 
 
-	// √—πﬂªÁ
-	LoadSoundFile(L"FE_Soldier_ShockTrooper_Xenon_Bullet_Impact_01.wav"); // ∑π¿Ã¿˙∞∞¿∫ √—º“∏Æ
-	LoadSoundFile(L"FE_Soldier_Pistol_Fire_Far_03.wav"); // ¡∂±› ∏÷∏Æº≠ «— πﬂ
+	// Î∞∞ÌÑ∞Î¶¨
+	LoadSoundFile(L"FE_Battery_Catch.wav");  // Ï§çÍ∏∞
+	LoadSoundFile(L"FE_Battery_Drop_01.wav"); // Îñ®Íµ¨Í∏∞
+	LoadSoundFile(L"FE_Battery_Drop_02.wav"); // Îñ®Íµ¨Í∏∞
+	LoadSoundFile(L"FE_Battery_In_Powernode.wav"); // Î∞∞ÌÑ∞Î¶¨ ÎÑ£Í∏∞
+	LoadSoundFile(L"FE_Battery_Out_Powernode.wav"); // Î∞∞ÌÑ∞Î¶¨ ÎπºÍ∏∞
+	LoadSoundFile(L"FE_Battery_Pickup.wav"); // Ï°∞Ïö©Ìûà Ï§çÍ∏∞
 
 
-	// ∆¯πﬂ
-	LoadSoundFile(L"FE_SmallTank_Explosion_Close_03.wav"); // πŸ∑Œ æ’ ¿€¿∫ ∆¯πﬂ
-	LoadSoundFile(L"FE_Explosion_Medium_Close_01.wav"); // πŸ∑Œ æ’ ¿€¿∫ ∆¯πﬂ2
-	LoadSoundFile(L"FE_Explosion_Big_Close_01.wav"); // πŸ∑Œ æ’ ≈´ ∆¯πﬂ
-	LoadSoundFile(L"FE_MissileTruck_Explosion_Nuke.wav"); // πŸ∑Œ æ’ ≈´ ∆¯πﬂ
-
-	
-	// «‡µø
-	LoadSoundFile(L"FE_FX_Pickup_Coin.wav"); // æ∆¿Ã≈€ ¡›±‚
-	LoadSoundFile(L"fx_pickuphealth.wav"); // æ∆¿Ã≈€ ¡›±‚
-	LoadSoundFile(L"Coin.wav"); // ƒ⁄¿Œ ¡›±‚
-
-	LoadSoundFile(L"FE_Footstep_Teddy_Foley_Reload.wav"); // ¿Â¿¸
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_01.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_02.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_03.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_04.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_05.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_06.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_07.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_08.wav"); // ∞»±‚
+	// Ï¥ùÎ∞úÏÇ¨
+	LoadSoundFile(L"FE_Soldier_ShockTrooper_Xenon_Bullet_Impact_01.wav"); // Î†àÏù¥Ï†ÄÍ∞ôÏùÄ Ï¥ùÏÜåÎ¶¨
+	LoadSoundFile(L"FE_Soldier_Pistol_Fire_Far_03.wav"); // Ï°∞Í∏à Î©ÄÎ¶¨ÏÑú Ìïú Î∞ú
 
 
-	LoadSoundFile(L"FE_FS_Grass_01.wav"); // ¿‹µ ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_02.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_03.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_04.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_05.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_06.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_07.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_FS_Grass_08.wav"); // ∞»±‚
-	LoadSoundFile(L"FE_Player_Landing_Low_Grass.wav"); // ¿‹µπﬁ √£±‚
+	// Ìè≠Î∞ú
+	LoadSoundFile(L"FE_SmallTank_Explosion_Close_03.wav"); // Î∞îÎ°ú Ïïû ÏûëÏùÄ Ìè≠Î∞ú
+	LoadSoundFile(L"FE_Explosion_Medium_Close_01.wav"); // Î∞îÎ°ú Ïïû ÏûëÏùÄ Ìè≠Î∞ú2
+	LoadSoundFile(L"FE_Explosion_Big_Close_01.wav"); // Î∞îÎ°ú Ïïû ÌÅ∞ Ìè≠Î∞ú
+	LoadSoundFile(L"FE_MissileTruck_Explosion_Nuke.wav"); // Î∞îÎ°ú Ïïû ÌÅ∞ Ìè≠Î∞ú
 
 
-	LoadSoundFile(L"FE_Player_Melee_Punch_Miss_02_extra.wav"); // ∆›ƒ°
+	// ÌñâÎèô
+	LoadSoundFile(L"FE_FX_Pickup_Coin.wav"); // ÏïÑÏù¥ÌÖú Ï§çÍ∏∞
+	LoadSoundFile(L"fx_pickuphealth.wav"); // ÏïÑÏù¥ÌÖú Ï§çÍ∏∞
+	LoadSoundFile(L"Coin.wav"); // ÏΩîÏù∏ Ï§çÍ∏∞
 
-	// ∏Òº“∏Æ
+	LoadSoundFile(L"FE_Footstep_Teddy_Foley_Reload.wav"); // Ïû•Ï†Ñ
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_01.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_02.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_03.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_04.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_05.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_06.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_07.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Footstep_Teddy_Walk_Marine_08.wav"); // Í±∑Í∏∞
 
-	LoadSoundFile(L"FE_VO_Blaze_Coredefend_01.wav"); // ƒ⁄æÓ ¡ˆƒ—
-	LoadSoundFile(L"FE_VO_Blaze_Doublejump_01.wav"); // ¥ı∫Ì ¡°«¡
-	LoadSoundFile(L"FE_VO_Blaze_Jump_01.wav"); // ¡°«¡
-	LoadSoundFile(L"FE_VO_Blaze_Enemyspotted_01.wav"); // ¿˚ ª˝º∫
-	LoadSoundFile(L"FE_VO_Blaze_Melee_03.wav"); // ∆›ƒ°
-	LoadSoundFile(L"FE_VO_Blaze_Needcredits_01.wav"); //ƒ⁄¿Œ¿Ã « ø‰«ÿ
-	LoadSoundFile(L"FE_VO_Blaze_Needdefences_01.wav"); // πÊæÓπ∞¿ª ∏∏µÈæÓæﬂ«ÿ
-	LoadSoundFile(L"FE_VO_Blaze_Needtraps_01.wav"); // ∆Æ∑¶¿Ã « ø‰«ÿ
 
-	LoadSoundFile(L"FE_VO_Blaze_Nicekill_01.wav"); // ¿ﬂ ¡◊ø¥æÓ
-	LoadSoundFile(L"FE_VO_Blaze_Powerneeded_01.wav"); // ø°≥ ¡ˆ ƒ⁄æÓ ∆ƒøˆ∞° « ø‰«ÿ
+	LoadSoundFile(L"FE_FS_Grass_01.wav"); // ÏûîÎîî Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_02.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_03.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_04.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_05.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_06.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_07.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_FS_Grass_08.wav"); // Í±∑Í∏∞
+	LoadSoundFile(L"FE_Player_Landing_Low_Grass.wav"); // ÏûîÎîîÎ∞õ Ï∞æÍ∏∞
+
+
+	LoadSoundFile(L"FE_Player_Melee_Punch_Miss_02_extra.wav"); // ÌéÄÏπò
+
+	// Î™©ÏÜåÎ¶¨
+
+	LoadSoundFile(L"FE_VO_Blaze_Coredefend_01.wav"); // ÏΩîÏñ¥ ÏßÄÏºú
+	LoadSoundFile(L"FE_VO_Blaze_Doublejump_01.wav"); // ÎçîÎ∏î Ï†êÌîÑ
+	LoadSoundFile(L"FE_VO_Blaze_Jump_01.wav"); // Ï†êÌîÑ
+	LoadSoundFile(L"FE_VO_Blaze_Enemyspotted_01.wav"); // Ï†Å ÏÉùÏÑ±
+	LoadSoundFile(L"FE_VO_Blaze_Melee_03.wav"); // ÌéÄÏπò
+	LoadSoundFile(L"FE_VO_Blaze_Needcredits_01.wav"); //ÏΩîÏù∏Ïù¥ ÌïÑÏöîÌï¥
+	LoadSoundFile(L"FE_VO_Blaze_Needdefences_01.wav"); // Î∞©Ïñ¥Î¨ºÏùÑ ÎßåÎì§Ïñ¥ÏïºÌï¥
+	LoadSoundFile(L"FE_VO_Blaze_Needtraps_01.wav"); // Ìä∏Îû©Ïù¥ ÌïÑÏöîÌï¥
+
+	LoadSoundFile(L"FE_VO_Blaze_Nicekill_01.wav"); // Ïûò Ï£ΩÏòÄÏñ¥
+	LoadSoundFile(L"FE_VO_Blaze_Powerneeded_01.wav"); // ÏóêÎÑàÏßÄ ÏΩîÏñ¥ ÌååÏõåÍ∞Ä ÌïÑÏöîÌï¥
 
 	LoadSoundFile(L"Sword1.wav"); // katana1
 	LoadSoundFile(L"Sword2.wav"); // katana2
 
 
-	// ∆©≈‰∏ÆæÛ
-	LoadSoundFile(L"FE_VO_Blaze_Compliment_01.wav"); // ¿£¥¯
-	LoadSoundFile(L"FE_VO_Blaze_Pain_03.wav"); // æ∆∆ƒ
-	LoadSoundFile(L"FE_VO_Blaze_Pickuphere_01.wav"); // ¡÷øˆ ¿˙∞≈
+	// ÌäúÌÜ†Î¶¨Ïñº
+	LoadSoundFile(L"FE_VO_Blaze_Compliment_01.wav"); // Ïõ∞Îçò
+	LoadSoundFile(L"FE_VO_Blaze_Pain_03.wav"); // ÏïÑÌåå
+	LoadSoundFile(L"FE_VO_Blaze_Pickuphere_01.wav"); // Ï£ºÏõå Ï†ÄÍ±∞
 
-	
-    return S_OK;
+
+	return S_OK;
 }
 
-void CSoundMgr::PlaySoundW(const wstring pSoundKey, CHANNELID eID, float fVolume)
+void CSoundMgr::PlaySoundW(const wstring pSoundKey,CHANNELID eID,float fVolume)
 {
-	auto iter = find_if(m_mapSound.begin(), m_mapSound.end(),
+	auto iter = find_if(m_mapSound.begin(),m_mapSound.end(),
 		[&](const auto& iter) -> bool
-		{
-			return lstrcmpW(pSoundKey.c_str(), iter.first.c_str()) == 0;
-		});
+	{
+		return lstrcmpW(pSoundKey.c_str(),iter.first.c_str()) == 0;
+	});
 
-	if (iter == m_mapSound.end())
+	if(iter == m_mapSound.end())
 		return;
 
 	bool bPlay = false;
 
-	if (m_pChannelArr[eID]->isPlaying(&bPlay))
+	if(m_pChannelArr[eID]->isPlaying(&bPlay))
 	{
-		result = m_pSystem->playSound(iter->second, nullptr, false, &m_pChannelArr[eID]);
+		result = m_pSystem->playSound(iter->second,nullptr,false,&m_pChannelArr[eID]);
 	}
 
-	if (fVolume != 0)
+	if(fVolume != 0)
 		m_pChannelArr[eID]->setVolume(fVolume);
 
 	m_pSystem->update();
 }
 
-void CSoundMgr::PlayBGM(const wstring pSoundKey, float fVolume)
+void CSoundMgr::PlayBGM(const wstring pSoundKey,float fVolume)
 {
-	auto iter = find_if(m_mapSound.begin(), m_mapSound.end(),
+	auto iter = find_if(m_mapSound.begin(),m_mapSound.end(),
 		[&](const auto& iter) -> bool
-		{
-			return lstrcmpW(pSoundKey.c_str(), iter.first.c_str()) == 0;
-		});
+	{
+		return lstrcmpW(pSoundKey.c_str(),iter.first.c_str()) == 0;
+	});
 
-	if (iter == m_mapSound.end())
+	if(iter == m_mapSound.end())
 		return;
 
-	result = m_pSystem->playSound(iter->second, nullptr, false, &m_pChannelArr[SOUND_BGM]);
+	result = m_pSystem->playSound(iter->second,nullptr,false,&m_pChannelArr[SOUND_BGM]);
 	m_pChannelArr[SOUND_BGM]->setMode(FMOD_LOOP_NORMAL);
 
-	if (fVolume != 0)
+	if(fVolume != 0)
 		m_pChannelArr[SOUND_BGM]->setVolume(fVolume);
 
 	nowBGM = pSoundKey;
@@ -234,77 +234,76 @@ void CSoundMgr::StopSound(CHANNELID eID)
 
 void CSoundMgr::StopAll()
 {
-	for (int i = 0; i < MAXCHANNEL; ++i)
+	for(int i = 0; i < MAXCHANNEL; ++i)
 		m_pChannelArr[i]->stop();
 }
 
-void CSoundMgr::SetChannelVolume(CHANNELID eID, float fVolume)
+void CSoundMgr::SetChannelVolume(CHANNELID eID,float fVolume)
 {
 	m_pChannelArr[eID]->setVolume(fVolume);
 	m_pSystem->update();
 }
 
-void CSoundMgr::VolumeFade(bool _bOnOff, float _fMinusVolume, float _fPlusVolume)
+void CSoundMgr::VolumeFade(bool _bOnOff,float _fMinusVolume,float _fPlusVolume)
 {
-	if (!_bOnOff) //off == false;
+	if(!_bOnOff) //off == false;
 	{
 		//fVolume -= 0.03f;
 		m_fVolume -= _fMinusVolume;
-		if (m_fVolume <= 0)
+		if(m_fVolume <= 0)
 		{
 			m_fVolume = 0;
 			StopSound(SOUND_BGM);
 		}
-		SetChannelVolume(SOUND_BGM, m_fVolume);
-	}
-	else //on == true
+		SetChannelVolume(SOUND_BGM,m_fVolume);
+	} else //on == true
 	{
 		//fVolume += 0.10f;
 		m_fVolume += _fPlusVolume;
-		if (m_fVolume >= VOLUME_BGM) m_fVolume = VOLUME_BGM;
-		SetChannelVolume(SOUND_BGM, m_fVolume);
+		if(m_fVolume >= VOLUME_BGM) m_fVolume = VOLUME_BGM;
+		SetChannelVolume(SOUND_BGM,m_fVolume);
 	}
 }
 
 void CSoundMgr::VolumeFade_boss()
 {
 	m_fVolume -= 0.001f;
-	if (m_fVolume <= 0)
+	if(m_fVolume <= 0)
 	{
 		m_fVolume = 0;
 		StopSound(SOUND_BGM);
 	}
-	SetChannelVolume(SOUND_BGM, m_fVolume);
+	SetChannelVolume(SOUND_BGM,m_fVolume);
 }
 
 void CSoundMgr::LoadSoundFile(const wstring soundFile)
 {
-	char szCurPath[128] = "../Bin/Sound/"; // ªÛ¥Î ∞Ê∑Œ
-	char szFullPath[256] = "";             // ¿¸√º ∞Ê∑Œ∏¶ ¿˙¿Â«“ πËø≠
+	char szCurPath[128] = "../Bin/Sound/"; // ÏÉÅÎåÄ Í≤ΩÎ°ú
+	char szFullPath[256] = "";             // Ï†ÑÏ≤¥ Í≤ΩÎ°úÎ•º Ï†ÄÏû•Ìï† Î∞∞Ïó¥
 
-	strcpy_s(szFullPath, szCurPath);       // ªÛ¥Î ∞Ê∑Œ∏¶ ¿¸√º ∞Ê∑Œ πËø≠ø° ∫πªÁ
+	strcpy_s(szFullPath,szCurPath);       // ÏÉÅÎåÄ Í≤ΩÎ°úÎ•º Ï†ÑÏ≤¥ Í≤ΩÎ°ú Î∞∞Ïó¥Ïóê Î≥µÏÇ¨
 
-	// wstring¿ª string¿∏∑Œ ∫Ø»Ø
-	int len = WideCharToMultiByte(CP_ACP, 0, soundFile.c_str(), -1, szFullPath + strlen(szCurPath), static_cast<int>(sizeof(szFullPath) - strlen(szCurPath)), NULL, NULL);
+	// wstringÏùÑ stringÏúºÎ°ú Î≥ÄÌôò
+	int len = WideCharToMultiByte(CP_ACP,0,soundFile.c_str(),-1,szFullPath + strlen(szCurPath),static_cast<int>(sizeof(szFullPath) - strlen(szCurPath)),NULL,NULL);
 
-	// "../Bin/Sound/" + "Success.wav" √≥∑≥ ∞·«’µ 
+	// "../Bin/Sound/" + "Success.wav" Ï≤òÎüº Í≤∞Ìï©Îê®
 
 	FMOD::Sound* pSound = nullptr;
-	FMOD_RESULT eRes = m_pSystem->createSound(szFullPath, FMOD_DEFAULT, 0, &pSound);
+	FMOD_RESULT eRes = m_pSystem->createSound(szFullPath,FMOD_DEFAULT,0,&pSound);
 
-	if (eRes == FMOD_OK)
+	if(eRes == FMOD_OK)
 	{
-		m_mapSound.emplace(soundFile, pSound); // ∫Ø»Øµ» πÆ¿⁄ø≠¿ª ªÁøÓµÂ ≈∞∑Œ ªÁøÎ
+		m_mapSound.emplace(soundFile,pSound); // Î≥ÄÌôòÎêú Î¨∏ÏûêÏó¥ÏùÑ ÏÇ¨Ïö¥Îìú ÌÇ§Î°ú ÏÇ¨Ïö©
 	}
 
 	m_pSystem->update();
 }
 
-CSoundMgr* CSoundMgr::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSoundMgr* CSoundMgr::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CSoundMgr* pInstance = new CSoundMgr(pDevice, pContext);
+	CSoundMgr* pInstance = new CSoundMgr(pDevice,pContext);
 
-	if (FAILED(pInstance->Ready_Sound()))
+	if(FAILED(pInstance->Ready_Sound()))
 	{
 		MSG_BOX("Failed to Created : CSoundMgr");
 		Safe_Release(pInstance);
@@ -320,7 +319,7 @@ void CSoundMgr::Free()
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
 
-	for (auto& Mypair : m_mapSound)
+	for(auto& Mypair : m_mapSound)
 	{
 		Mypair.second->release();
 	}

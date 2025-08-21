@@ -4,134 +4,131 @@
 #include "GameInstance.h"
 
 
-CParticle_Snow::CParticle_Snow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
-{
-}
+CParticle_Snow::CParticle_Snow(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CParticle_Snow::CParticle_Snow(const CParticle_Snow& Prototype)
-    : CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CParticle_Snow::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CParticle_Snow::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
+	if(FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-    if (FAILED(Add_Components()))
-        return E_FAIL;
+	if(FAILED(Add_Components()))
+		return E_FAIL;
 
- 
-    return S_OK;
+
+	return S_OK;
 }
 
 void CParticle_Snow::Priority_Update(_float fTimeDelta)
-{
-}
+{}
 
 void CParticle_Snow::Update(_float fTimeDelta)
 {
-    // m_pVIBufferCom->Drop(fTimeDelta);
+	// m_pVIBufferCom->Drop(fTimeDelta);
 }
 
 void CParticle_Snow::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-        return;
+	if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
+		return;
 }
 
 HRESULT CParticle_Snow::Render()
 {
-    if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Begin(0)))
-        return E_FAIL;
-    if (FAILED(m_pVIBufferCom->Bind_Buffers()))
-        return E_FAIL;
-    if (FAILED(m_pVIBufferCom->Render()))
-        return E_FAIL;
-    return S_OK;
+	if(FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Begin(0)))
+		return E_FAIL;
+	if(FAILED(m_pVIBufferCom->Bind_Buffers()))
+		return E_FAIL;
+	if(FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
+	return S_OK;
 }
 
 HRESULT CParticle_Snow::Add_Components()
 {
-    /* ¸â¹öº¯¼ö·Î Á÷Á¢ ÂüÁ¶¸¦ ÇÏ°ÔµÇ¸é */
-      /* 1. ³»°¡ ³» ÄÄÆ÷³ÍÆ®¸¦ ÀÌ¿ëÇÏ°íÀÚÇÒ ¶§ ±»ÀÌ °Ë»öÀÌ ÇÊ¿ä¾øÀÌ Æ¯Á¤ ¸â¹öº¯¼ö·Î ¹Ù·Î ±â´ÉÀ» ÀÌ¿ëÇÏ¸é µÈ´Ù. */
-      /* 2. ´Ù¸¥ °´Ã¼°¡ ³» ÄÄÆ÷³ÍÆ®¸¦ °Ë»öÇÏ°íÀÚ ÇÒ¶§ ½ºÀ§Ä¡ÄÉÀÌ½º°¡ °Ì³ª ´Ã¾î³ª´Â »óÈ². */
-    
-    /* For.Com_Texture */
-    if (FAILED(__super::Add_Component(LEVEL_YARD, TEXT("Prototype_Component_Texture_Snow"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-        return E_FAIL;
+	/* ë©¤ë²„ë³€ìˆ˜ë¡œ ì§ì ‘ ì°¸ì¡°ë¥¼ í•˜ê²Œë˜ë©´ */
+	  /* 1. ë‚´ê°€ ë‚´ ì»´í¬ë„ŒíŠ¸ë¥¼ ì´ìš©í•˜ê³ ìí•  ë•Œ êµ³ì´ ê²€ìƒ‰ì´ í•„ìš”ì—†ì´ íŠ¹ì • ë©¤ë²„ë³€ìˆ˜ë¡œ ë°”ë¡œ ê¸°ëŠ¥ì„ ì´ìš©í•˜ë©´ ëœë‹¤. */
+	  /* 2. ë‹¤ë¥¸ ê°ì²´ê°€ ë‚´ ì»´í¬ë„ŒíŠ¸ë¥¼ ê²€ìƒ‰í•˜ê³ ì í• ë•Œ ìŠ¤ìœ„ì¹˜ì¼€ì´ìŠ¤ê°€ ê²ë‚˜ ëŠ˜ì–´ë‚˜ëŠ” ìƒí™©. */
 
-    /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticlePoint"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-        return E_FAIL;
+	/* For.Com_Texture */
+	if(FAILED(__super::Add_Component(LEVEL_YARD,TEXT("Prototype_Component_Texture_Snow"),
+		TEXT("Com_Texture"),reinterpret_cast<CComponent**>(&m_pTextureCom))))
+		return E_FAIL;
 
-    /* For.Com_VIBuffer */
-    if (FAILED(__super::Add_Component(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Snow"),
-        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
-        return E_FAIL;
+	/* For.Com_Shader */
+	if(FAILED(__super::Add_Component(LEVEL_YARD,TEXT("Prototype_Component_Shader_VtxParticlePoint"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
 
-    return S_OK;
+	/* For.Com_VIBuffer */
+	if(FAILED(__super::Add_Component(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Particle_Snow"),
+		TEXT("Com_VIBuffer"),reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CParticle_Snow::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
-        return E_FAIL;
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
-        return E_FAIL;
+	if(FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom,"g_Texture",0)))
+		return E_FAIL;
 
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-    //    return E_FAIL;
+	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	//    return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
-CParticle_Snow* CParticle_Snow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CParticle_Snow* CParticle_Snow::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-    CParticle_Snow* pInstance = new CParticle_Snow(pDevice, pContext);
+	CParticle_Snow* pInstance = new CParticle_Snow(pDevice,pContext);
 
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX("Failed to Created : CParticle_Snow");
-        Safe_Release(pInstance);
-    }
+	if(FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CParticle_Snow");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 CGameObject* CParticle_Snow::Clone(void* pArg)
 {
-    CParticle_Snow* pInstance = new CParticle_Snow(*this);
+	CParticle_Snow* pInstance = new CParticle_Snow(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX("Failed to Created : CParticle_Snow");
-        Safe_Release(pInstance);
-    }
+	if(FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Created : CParticle_Snow");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CParticle_Snow::Free()
 {
-    __super::Free();
+	__super::Free();
 
-    Safe_Release(m_pVIBufferCom);
-    Safe_Release(m_pTextureCom);
-    Safe_Release(m_pShaderCom);
+	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pShaderCom);
 }

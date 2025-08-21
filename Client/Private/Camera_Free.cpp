@@ -3,317 +3,326 @@
 
 #include "GameInstance.h"
 
-CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CCamera{ pDevice, pContext }
-{
-}
+CCamera_Free::CCamera_Free(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CCamera{pDevice,pContext}
+{}
 
 CCamera_Free::CCamera_Free(const CCamera_Free& Prototype)
-    : CCamera{ Prototype }
-{
-}
+	: CCamera{Prototype}
+{}
 
 HRESULT CCamera_Free::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CCamera_Free::Initialize(void* pArg)
 {
-    CAMERA_FREE_DESC* pDesc = static_cast<CAMERA_FREE_DESC*>(pArg);
-    m_fMouseSensor = pDesc->fMouseSensor;
-    m_fFovy = pDesc->fFovy;
-    m_fAspect = pDesc->fAspect;
-    m_fNearZ = pDesc->fNearZ;
-    m_fFar = pDesc->fFar;
-    m_eLevelID = pDesc->eLevel;                     // ÇöÀç ·¹º§(¾À)
-    m_matPlayerWorld = pDesc->matPlayerWorld;       // ÇÃ·¹ÀÌ¾îÀÇ ¿ùµå ¸ÞÆ®¸¯½º
-    m_fRotationPerSec =  pDesc->fRotationPerSec;    // È¸Àü ¼Óµµ
-    m_vecTPSPos = pDesc->m_vecTPS_CamPos;           // 3ÀÎÄª Ä«¸Þ¶óÀÇ À§Â÷
-    m_vecFPSPos = pDesc->m_vecFPS_CamPos;          // 1ÀÎÄª Ä«¸Þ¶óÀÇ À§Ä¡
-    m_iViewState = pDesc->iViewState;           // ÀÎÄª º¯È­
-    m_iUpperMotion = pDesc->iUpperMotion;         // »óÃ¼ ¸ð¼Ç( 1ÀÎÄª ÀÏ ¶§ Æ¯Á¤ µ¿ÀÛ¿¡¼­ Ä«¸Þ¶óÀÇ Dir¸¦ °íÁ¤½ÃÄÑÁà¾ßÇÔ_)
-    m_vecWeaponPos = pDesc->m_vecWeaponPos;     // ¹«±â À§Ä¡
-    m_vecWeaponDir = pDesc->m_vecWeaponDir;     // ¹«±â ¹æÇâ
-    m_pShotNow = pDesc->bShotNow;   // ÃÑ ½î´Â Å¸ÀÌ¹Ö
-    m_pShotStart = pDesc->bShotStart; // ÃÑ ½î´Â ½ÃÀÛ Å¸ÀÌ¹Ö
-    m_pWeaponState = pDesc->iWeaponState; // ¾î¶² ÃÑÀÎÁö
-    if (FAILED(__super::Initialize(pDesc)))
-        return E_FAIL;
+	CAMERA_FREE_DESC* pDesc = static_cast<CAMERA_FREE_DESC*>(pArg);
+	m_fMouseSensor = pDesc->fMouseSensor;
+	m_fFovy = pDesc->fFovy;
+	m_fAspect = pDesc->fAspect;
+	m_fNearZ = pDesc->fNearZ;
+	m_fFar = pDesc->fFar;
+	m_eLevelID = pDesc->eLevel;                     // í˜„ìž¬ ë ˆë²¨(ì”¬)
+	m_matPlayerWorld = pDesc->matPlayerWorld;       // í”Œë ˆì´ì–´ì˜ ì›”ë“œ ë©”íŠ¸ë¦­ìŠ¤
+	m_fRotationPerSec =  pDesc->fRotationPerSec;    // íšŒì „ ì†ë„
+	m_vecTPSPos = pDesc->m_vecTPS_CamPos;           // 3ì¸ì¹­ ì¹´ë©”ë¼ì˜ ìœ„ì°¨
+	m_vecFPSPos = pDesc->m_vecFPS_CamPos;          // 1ì¸ì¹­ ì¹´ë©”ë¼ì˜ ìœ„ì¹˜
+	m_iViewState = pDesc->iViewState;           // ì¸ì¹­ ë³€í™”
+	m_iUpperMotion = pDesc->iUpperMotion;         // ìƒì²´ ëª¨ì…˜( 1ì¸ì¹­ ì¼ ë•Œ íŠ¹ì • ë™ìž‘ì—ì„œ ì¹´ë©”ë¼ì˜ Dirë¥¼ ê³ ì •ì‹œì¼œì¤˜ì•¼í•¨_)
+	m_vecWeaponPos = pDesc->m_vecWeaponPos;     // ë¬´ê¸° ìœ„ì¹˜
+	m_vecWeaponDir = pDesc->m_vecWeaponDir;     // ë¬´ê¸° ë°©í–¥
+	m_pShotNow = pDesc->bShotNow;   // ì´ ì˜ëŠ” íƒ€ì´ë°
+	m_pShotStart = pDesc->bShotStart; // ì´ ì˜ëŠ” ì‹œìž‘ íƒ€ì´ë°
+	m_pWeaponState = pDesc->iWeaponState; // ì–´ë–¤ ì´ì¸ì§€
+	if(FAILED(__super::Initialize(pDesc)))
+		return E_FAIL;
 
-    
-    m_bMouseLock = false;  // ¸¶¿ì½º ¸ØÃã
-    m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-    m_pGameInstance->Set_CameraFar(m_fFar);
-    m_pTransformCom->Rotation(0.f, 0.f, 0.f);
-    return S_OK;
+
+	m_bMouseLock = false;  // ë§ˆìš°ìŠ¤ ë©ˆì¶¤
+	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_pGameInstance->Set_CameraFar(m_fFar);
+	m_pTransformCom->Rotation(0.f,0.f,0.f);
+	return S_OK;
 }
 
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
-    m_pGameInstance->Set_CameraFar(m_fFar);
-    m_vecDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-    m_pGameInstance->Set_CameraDir(m_vecDir);
-    m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-    // ÆíÁýÅø¿¡¼­ Ä«¸Þ¶ó Á¶Á¤
-    if (m_eLevelID == LEVEL_IMGUI || m_eLevelID == LEVEL_NAVIGATION || m_eLevelID == LEVEL_MONSTERSPAWN)
-    {
-        if (m_bMouseLock == false)
-        {
-            _long   MouseMove = { 0 };
-            _long   MouseMoveY = { 0 };
-            if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
-            {
-                m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
-            }
-            MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y);
-            if (MouseMoveY != 0 ) // yÃà È¸Àü
-            {
-                m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), fTimeDelta * MouseMoveY * m_fMouseSensor);
-            }
+	m_pGameInstance->Set_CameraFar(m_fFar);
+	m_vecDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	m_pGameInstance->Set_CameraDir(m_vecDir);
+	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	// íŽ¸ì§‘íˆ´ì—ì„œ ì¹´ë©”ë¼ ì¡°ì •
+	if(m_eLevelID == LEVEL_IMGUI || m_eLevelID == LEVEL_NAVIGATION || m_eLevelID == LEVEL_MONSTERSPAWN)
+	{
+		if(m_bMouseLock == false)
+		{
+			_long   MouseMove = {0};
+			_long   MouseMoveY = {0};
+			if(MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
+			{
+				m_pTransformCom->Turn(XMVectorSet(0.f,1.f,0.f,0.f),fTimeDelta * MouseMove * m_fMouseSensor);
+			}
+			MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y);
+			if(MouseMoveY != 0) // yì¶• íšŒì „
+			{
+				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT),fTimeDelta * MouseMoveY * m_fMouseSensor);
+			}
 
-        }
-    }
+		}
+	}
 
-   if(m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD)
-   {
-       *m_pShotStart = false;
-   }
+	if(m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD)
+	{
+		*m_pShotStart = false;
+	}
 
-  
+
 }
 
 void CCamera_Free::Update(_float fTimeDelta)
 {
 
-    POINT clientPos{};
-    switch (m_eLevelID)
-    {
-    case Client::LEVEL_STATIC:
-        ShowCursor(TRUE);
-        break;
-    case Client::LEVEL_LOADING:
-        ShowCursor(TRUE);
-        break;
-    case Client::LEVEL_LOGO:
-        ShowCursor(TRUE);
-        break;
-    case Client::LEVEL_GAMEPLAY:
-        ClientToScreen(g_hWnd, &clientPos);
-        ShowCursor(false);
-       SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
-          
-
-        break;
-    case Client::LEVEL_YARD:
-        ClientToScreen(g_hWnd, &clientPos);
-        ShowCursor(false);
-        SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f, clientPos.y + g_iWinSizeY * 0.5f);
-
-        break;
-    case Client::LEVEL_IMGUI:
-        if (GetKeyState('S') & 0x8000)
-        {
-            m_pTransformCom->Go_Backward(fTimeDelta);
-        }
-        if (GetKeyState('W') & 0x8000)
-        {
-            m_pTransformCom->Go_Straight(fTimeDelta);
-        }
-        if (GetKeyState('A') & 0x8000)
-        {
-            m_pTransformCom->Go_Left(fTimeDelta);
-        }
-        if (GetKeyState('D') & 0x8000)
-        {
-            m_pTransformCom->Go_Right(fTimeDelta);
-        }
-        // ¸¶¿ì½º °íÁ¤
-        if (GetAsyncKeyState(VK_MBUTTON) & 0x0001)
-        {
-            if (m_bMouseLock == true)
-                m_bMouseLock = false;
-            else
-                m_bMouseLock = true;
-
-        }
-        ShowCursor(TRUE);
-        break;
-    case Client::LEVEL_NAVIGATION:
-        if (GetKeyState('S') & 0x8000)
-        {
-            m_pTransformCom->Go_Backward(fTimeDelta);
-        }
-        if (GetKeyState('W') & 0x8000)
-        {
-            m_pTransformCom->Go_Straight(fTimeDelta);
-        }
-        if (GetKeyState('A') & 0x8000)
-        {
-            m_pTransformCom->Go_Left(fTimeDelta);
-        }
-        if (GetKeyState('D') & 0x8000)
-        {
-            m_pTransformCom->Go_Right(fTimeDelta);
-        }
-        // ¸¶¿ì½º °íÁ¤
-        if (GetAsyncKeyState(VK_MBUTTON) & 0x0001)
-        {
-            if (m_bMouseLock == true)
-                m_bMouseLock = false;
-            else
-                m_bMouseLock = true;
-
-        }
-        ShowCursor(TRUE);
-        break;
-
-    case Client::LEVEL_MONSTERSPAWN:
-        if (GetKeyState('S') & 0x8000)
-        {
-            m_pTransformCom->Go_Backward(fTimeDelta);
-        }
-        if (GetKeyState('W') & 0x8000)
-        {
-            m_pTransformCom->Go_Straight(fTimeDelta);
-        }
-        if (GetKeyState('A') & 0x8000)
-        {
-            m_pTransformCom->Go_Left(fTimeDelta);
-        }
-        if (GetKeyState('D') & 0x8000)
-        {
-            m_pTransformCom->Go_Right(fTimeDelta);
-        }
-        // ¸¶¿ì½º °íÁ¤
-        if (GetAsyncKeyState(VK_MBUTTON) & 0x0001)
-        {
-            if (m_bMouseLock == true)
-                m_bMouseLock = false;
-            else
-                m_bMouseLock = true;
-
-        }
-        ShowCursor(TRUE);
-        break;
-
-    default:
-        break;
-    }
-
-    if (m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD)
-    {
-        XMMATRIX matWorld = XMLoadFloat4x4(m_matPlayerWorld); // ÇÃ·¹ÀÌ¾î ¿ùµå ¸ÅÆ®¸¯½º
-        // Ä«¸Þ¶ó È¸Àü
-        _long MouseMoveY = { 0 };  _matrix RotationMatrix{};
-        if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
-        {
-            if (*m_iViewState == PLAYER_TPS_VIEW)
-            {
-                if (m_fAngle_Y <= 8.f && m_fAngle_Y >= -8.f)
-                    m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
-                if (m_fAngle_Y > 4.f)
-                    m_fAngle_Y = 4.f;
-                if (m_fAngle_Y < -6.f)
-                    m_fAngle_Y = -6.f;
-            }
-            else
-            {
-                if (m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
-                    m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
-                if (m_fAngle_Y > 2.f)
-                    m_fAngle_Y = 2.f;
-                if (m_fAngle_Y < -4.f)
-                    m_fAngle_Y = -4.f;
-            }
-        }
-        // At ¼³Á¤
-        if (*m_iViewState == PLAYER_TPS_VIEW) // 3ÀÎÄª
-        {
-            // Ä«¸Þ¶ó À§Ä¡ Á¶Á¤
-            XMVECTOR vCamPos = *m_vecTPSPos;
-
-            vCamPos = XMVectorSetY(vCamPos, XMVectorGetY(vCamPos) + m_fAngle_Y);
-            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
-#pragma region Ä«¸Þ¶ó½¦ÀÌÅ·
-            if (*m_pShotStart == true)
-            {
-                m_fStore_RandomValue = (float(rand() % 15) * 0.01f); // ¹Ýµ¿ °ª °è»ê¿ë , ¶óÀÌÇÃ ( ÃÑ ¸¶´Ù ´Ù¸£°Ô ¼³Á¤ÇØ¾ß ÇÒ µíÇÑµð ³ªÁß¿¡ ÇÏÀÚ)
-                m_fAngle_Y -= m_fStore_RandomValue;     // ¾Þ±Û°¢µµ¿¡¼­ »©ÁÖ±â'
-
-            }
-
-#pragma endregion Ä«¸Þ¶ó½¦ÀÌÅ·
-            // ¹Ù¶óº¸´Â ¹æÇâ Á¶Á¤
-            vAt = *m_vecTPSPos + matWorld.r[2] * 7.f;
-            if (m_fAngle_Y > 0)
-            {
-                vAt = vAt + matWorld.r[0] * (m_fAngle_Y * 0.3f);
-                vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y / 2);
-            }
-            else
-            {
-                vAt = XMVectorSetY(vAt, XMVectorGetY(vAt) - m_fAngle_Y);
-            }
-            m_pTransformCom->LookAt(vAt);
+	POINT clientPos{};
+	switch(m_eLevelID)
+	{
+	case Client::LEVEL_STATIC:
+	ShowCursor(TRUE);
+	break;
+	case Client::LEVEL_LOADING:
+	ShowCursor(TRUE);
+	break;
+	case Client::LEVEL_LOGO:
+	ShowCursor(TRUE);
+	break;
+	case Client::LEVEL_GAMEPLAY:
+	ClientToScreen(g_hWnd,&clientPos);
+	ShowCursor(false);
+	SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f,clientPos.y + g_iWinSizeY * 0.5f);
 
 
-        }
-        else if (*m_iViewState == PLAYER_FPS_VIEW)// 1ÀÎÄª
-        {
-            XMVECTOR vCamPos = *m_vecFPSPos;
-            m_vecStore_Dir = *m_vecWeaponDir;
-            vAt = *m_vecWeaponPos + XMVector3Normalize(*m_vecWeaponDir) * 100.f;
-            m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCamPos);
-            m_pTransformCom->LookAt(vAt);
+	break;
+	case Client::LEVEL_YARD:
+	if(m_bMouseLock == true)
+	{
+		ClientToScreen(g_hWnd,&clientPos);
+		ShowCursor(false);
+		SetCursorPos(clientPos.x + g_iWinSizeX * 0.5f,clientPos.y + g_iWinSizeY * 0.5f);
+	}
+	else
+	{
+		ShowCursor(true);
+	}
+
+	if(GetAsyncKeyState(VK_MBUTTON) & 0x0001)
+	{
+		if(m_bMouseLock == true)
+			m_bMouseLock = false;
+		else
+			m_bMouseLock = true;
+	}
+
+	break;
+	case Client::LEVEL_IMGUI:
+	if(GetKeyState('S') & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+	}
+	if(GetKeyState('W') & 0x8000)
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	if(GetKeyState('A') & 0x8000)
+	{
+		m_pTransformCom->Go_Left(fTimeDelta);
+	}
+	if(GetKeyState('D') & 0x8000)
+	{
+		m_pTransformCom->Go_Right(fTimeDelta);
+	}
+	// ë§ˆìš°ìŠ¤ ê³ ì •
+	if(GetAsyncKeyState(VK_MBUTTON) & 0x0001)
+	{
+		if(m_bMouseLock == true)
+			m_bMouseLock = false;
+		else
+			m_bMouseLock = true;
+	}
+	ShowCursor(TRUE);
+	break;
+	case Client::LEVEL_NAVIGATION:
+	if(GetKeyState('S') & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+	}
+	if(GetKeyState('W') & 0x8000)
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	if(GetKeyState('A') & 0x8000)
+	{
+		m_pTransformCom->Go_Left(fTimeDelta);
+	}
+	if(GetKeyState('D') & 0x8000)
+	{
+		m_pTransformCom->Go_Right(fTimeDelta);
+	}
+	// ë§ˆìš°ìŠ¤ ê³ ì •
+	if(GetAsyncKeyState(VK_MBUTTON) & 0x0001)
+	{
+		if(m_bMouseLock == true)
+			m_bMouseLock = false;
+		else
+			m_bMouseLock = true;
+
+	}
+	ShowCursor(TRUE);
+	break;
+
+	case Client::LEVEL_MONSTERSPAWN:
+	if(GetKeyState('S') & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+	}
+	if(GetKeyState('W') & 0x8000)
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	if(GetKeyState('A') & 0x8000)
+	{
+		m_pTransformCom->Go_Left(fTimeDelta);
+	}
+	if(GetKeyState('D') & 0x8000)
+	{
+		m_pTransformCom->Go_Right(fTimeDelta);
+	}
+	// ë§ˆìš°ìŠ¤ ê³ ì •
+	if(GetAsyncKeyState(VK_MBUTTON) & 0x0001)
+	{
+		if(m_bMouseLock == true)
+			m_bMouseLock = false;
+		else
+			m_bMouseLock = true;
+
+	}
+	ShowCursor(TRUE);
+	break;
+
+	default:
+	break;
+	}
+
+	if(m_eLevelID == LEVEL_GAMEPLAY || m_eLevelID == LEVEL_YARD)
+	{
+		XMMATRIX matWorld = XMLoadFloat4x4(m_matPlayerWorld); // í”Œë ˆì´ì–´ ì›”ë“œ ë§¤íŠ¸ë¦­ìŠ¤
+		// ì¹´ë©”ë¼ íšŒì „
+		_long MouseMoveY = {0};  _matrix RotationMatrix{};
+		if(MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		{
+			if(*m_iViewState == PLAYER_TPS_VIEW)
+			{
+				if(m_fAngle_Y <= 8.f && m_fAngle_Y >= -8.f)
+					m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
+				if(m_fAngle_Y > 4.f)
+					m_fAngle_Y = 4.f;
+				if(m_fAngle_Y < -6.f)
+					m_fAngle_Y = -6.f;
+			} else
+			{
+				if(m_fAngle_Y <= 4.f && m_fAngle_Y >= -4.f)
+					m_fAngle_Y += fTimeDelta * MouseMoveY * m_fMouseSensor * 4.f;
+				if(m_fAngle_Y > 2.f)
+					m_fAngle_Y = 2.f;
+				if(m_fAngle_Y < -4.f)
+					m_fAngle_Y = -4.f;
+			}
+		}
+		// At ì„¤ì •
+		if(*m_iViewState == PLAYER_TPS_VIEW) // 3ì¸ì¹­
+		{
+			// ì¹´ë©”ë¼ ìœ„ì¹˜ ì¡°ì •
+			XMVECTOR vCamPos = *m_vecTPSPos;
+
+			vCamPos = XMVectorSetY(vCamPos,XMVectorGetY(vCamPos) + m_fAngle_Y);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION,vCamPos);
+			#pragma region ì¹´ë©”ë¼ì‰ì´í‚¹
+			if(*m_pShotStart == true)
+			{
+				m_fStore_RandomValue = (float(rand() % 15) * 0.01f); // ë°˜ë™ ê°’ ê³„ì‚°ìš© , ë¼ì´í”Œ ( ì´ ë§ˆë‹¤ ë‹¤ë¥´ê²Œ ì„¤ì •í•´ì•¼ í•  ë“¯í•œë”” ë‚˜ì¤‘ì— í•˜ìž)
+				m_fAngle_Y -= m_fStore_RandomValue;     // ì•µê¸€ê°ë„ì—ì„œ ë¹¼ì£¼ê¸°'
+
+			}
+
+			#pragma endregion ì¹´ë©”ë¼ì‰ì´í‚¹
+			// ë°”ë¼ë³´ëŠ” ë°©í–¥ ì¡°ì •
+			vAt = *m_vecTPSPos + matWorld.r[2] * 7.f;
+			if(m_fAngle_Y > 0)
+			{
+				vAt = vAt + matWorld.r[0] * (m_fAngle_Y * 0.3f);
+				vAt = XMVectorSetY(vAt,XMVectorGetY(vAt) - m_fAngle_Y / 2);
+			} else
+			{
+				vAt = XMVectorSetY(vAt,XMVectorGetY(vAt) - m_fAngle_Y);
+			}
+			m_pTransformCom->LookAt(vAt);
 
 
-        }
-    }
-    m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-    __super::Priority_Update(fTimeDelta);
+		} else if(*m_iViewState == PLAYER_FPS_VIEW)// 1ì¸ì¹­
+		{
+			XMVECTOR vCamPos = *m_vecFPSPos;
+			m_vecStore_Dir = *m_vecWeaponDir;
+			vAt = *m_vecWeaponPos + XMVector3Normalize(*m_vecWeaponDir) * 100.f;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION,vCamPos);
+			m_pTransformCom->LookAt(vAt);
+
+
+		}
+	}
+	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CCamera_Free::Late_Update(_float fTimeDelta)
 {
-   
+
 }
 
 HRESULT CCamera_Free::Render()
 {
-    return S_OK;
+	return S_OK;
 }
 
 
 
-CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-    CCamera_Free* pInstance = new CCamera_Free(pDevice, pContext);
+	CCamera_Free* pInstance = new CCamera_Free(pDevice,pContext);
 
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX("Failed to Created : CCamera_Free");
-        Safe_Release(pInstance);
-    }
+	if(FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CCamera_Free");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 CGameObject* CCamera_Free::Clone(void* pArg)
 {
-    CCamera_Free* pInstance = new CCamera_Free(*this);
+	CCamera_Free* pInstance = new CCamera_Free(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX("Failed to Created : CCamera_Free");
-        Safe_Release(pInstance);
-    }
+	if(FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Created : CCamera_Free");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CCamera_Free::Free()
 {
-    __super::Free();
-    
+	__super::Free();
+
 }

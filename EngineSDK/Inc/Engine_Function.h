@@ -3,72 +3,72 @@
 
 namespace Engine
 {
-	// ÅÛÇÃ¸´Àº ±â´ÉÀÇ Á¤ÇØÁ®ÀÖÀ¸³ª ÀÚ·áÇüÀº Á¤ÇØÁ®ÀÖÁö ¾ÊÀº °Í
-	// ±â´ÉÀ» ÀÎ½ºÅÏ½ºÈ­ ÇÏ±â À§ÇÏ¿© ¸¸µé¾îµÎ´Â Æ²
+// í…œí”Œë¦¿ì€ ê¸°ëŠ¥ì˜ ì •í•´ì ¸ìˆìœ¼ë‚˜ ìë£Œí˜•ì€ ì •í•´ì ¸ìˆì§€ ì•Šì€ ê²ƒ
+// ê¸°ëŠ¥ì„ ì¸ìŠ¤í„´ìŠ¤í™” í•˜ê¸° ìœ„í•˜ì—¬ ë§Œë“¤ì–´ë‘ëŠ” í‹€
 
-	template<typename T>
-	void	Safe_Delete(T& Pointer)
+template<typename T>
+void	Safe_Delete(T& Pointer)
+{
+	if(nullptr != Pointer)
 	{
-		if (nullptr != Pointer)
-		{
-			delete Pointer;
-			Pointer = nullptr;
-		}
+		delete Pointer;
+		Pointer = nullptr;
+	}
+}
+
+template<typename T>
+void	Safe_Delete_Array(T& Pointer)
+{
+	if(nullptr != Pointer)
+	{
+		delete[] Pointer;
+		Pointer = nullptr;
+	}
+}
+
+template<typename T>
+unsigned int Safe_Release(T& pInstance)
+{
+	unsigned int		dwRefCnt = {0};
+
+	if(nullptr != pInstance)
+	{
+		dwRefCnt = pInstance->Release();
+
+		if(0 == dwRefCnt)
+			pInstance = nullptr;
 	}
 
+	return dwRefCnt;
+}
+
+template<typename T>
+unsigned int Safe_AddRef(T& pInstance)
+{
+	unsigned int		dwRefCnt = {0};
+
+	if(nullptr != pInstance)
+		dwRefCnt = pInstance->AddRef();
+
+	return dwRefCnt;
+}
+
+// Functor
+class CTag_Finder
+{
+public:
+	explicit CTag_Finder(const std::wstring pTag): m_pTargetTag(pTag) {}
+	~CTag_Finder() {}
+
+public:
 	template<typename T>
-	void	Safe_Delete_Array(T& Pointer)
+	bool operator()(const T& pair)
 	{
-		if (nullptr != Pointer)
-		{
-			delete[] Pointer;
-			Pointer = nullptr;
-		}
+		return m_pTargetTag == pair.first;
 	}
 
-	template<typename T>
-	unsigned int Safe_Release(T& pInstance)
-	{
-		unsigned int		dwRefCnt = { 0 };
-
-		if (nullptr != pInstance)
-		{
-			dwRefCnt = pInstance->Release();
-
-			if (0 == dwRefCnt)
-				pInstance = nullptr;
-		}
-
-		return dwRefCnt;
-	}
-
-	template<typename T>
-	unsigned int Safe_AddRef(T& pInstance)
-	{
-		unsigned int		dwRefCnt = { 0 };
-
-		if (nullptr != pInstance)		
-			dwRefCnt = pInstance->AddRef();	
-
-		return dwRefCnt;
-	}
-
-	// Functor
-	class CTag_Finder
-	{
-	public:
-		explicit CTag_Finder(const std::wstring pTag) : m_pTargetTag(pTag) {}
-		~CTag_Finder() {}
-
-	public:
-		template<typename T>
-		bool operator()(const T& pair)
-		{
-			return m_pTargetTag == pair.first;
-		}
-
-	private:
-		std::wstring m_pTargetTag;
-	};
+private:
+	std::wstring m_pTargetTag;
+};
 }
 #endif // Engine_Function_h__

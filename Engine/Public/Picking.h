@@ -3,32 +3,32 @@
 
 BEGIN(Engine)
 
-class CPicking final : public CBase
+class CPicking final: public CBase
 {
 private:
-	CPicking(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPicking(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CPicking() = default;
 
 public:
-	HRESULT Initialize(HWND hWnd, _uint iViewportWidth, _uint iViewportHeight);
+	HRESULT Initialize(HWND hWnd,_uint iViewportWidth,_uint iViewportHeight);
 	_bool isPicked(_float3* pOut);
-	_bool isComputeHeight(_fvector vTargetPos, _float3* pOut);
+	_bool isComputeHeight(_fvector vTargetPos,_float3* pOut);
 
-	
+
 private:
 	HWND							m_hWnd = {};
-	_uint							m_iViewportWidth{}, m_iViewportHeight{};
+	_uint							m_iViewportWidth{},m_iViewportHeight{};
 
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
-	/* ∫πªÁ πﬁæ∆ø¿±‚¿ß«— øÎµµ */
-	/* ∂Ù, æ∂Ù«œ∏Èº≠ ∆Ø¡§ «»ºø¿« ¡§∫∏∏¶ æÚæÓø¬¥Ÿ. */
-	ID3D11Texture2D* m_pTexture2D = { nullptr };
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
+	/* Î≥µÏÇ¨ Î∞õÏïÑÏò§Í∏∞ÏúÑÌïú Ïö©ÎèÑ */
+	/* ÎùΩ, Ïñ∏ÎùΩÌïòÎ©¥ÏÑú ÌäπÏ†ï ÌîΩÏÖÄÏùò Ï†ïÎ≥¥Î•º ÏñªÏñ¥Ïò®Îã§. */
+	ID3D11Texture2D* m_pTexture2D = {nullptr};
 
-	class CGameInstance* m_pGameInstance = { nullptr };
+	class CGameInstance* m_pGameInstance = {nullptr};
 
 public:
-	static CPicking* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, HWND hWnd, _uint iViewportWidth, _uint iViewportHeight);
+	static CPicking* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,HWND hWnd,_uint iViewportWidth,_uint iViewportHeight);
 	virtual void Free() override;
 };
 

@@ -1,75 +1,70 @@
 #include "..\Public\UIObject.h"
 
-CUIObject::CUIObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
-{
-}
+CUIObject::CUIObject(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CUIObject::CUIObject(const CUIObject& Prototype)
-    : CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CUIObject::Initialize_Prototype()
 {
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CUIObject::Initialize(void* pArg)
 {
-    if (nullptr != pArg)
-    {
-        UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
+	if(nullptr != pArg)
+	{
+		UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
 
-        m_fX = pDesc->fX;
-        m_fY = pDesc->fY;
-        m_fSizeX = pDesc->fSizeX;
-        m_fSizeY = pDesc->fSizeY;
-        m_fDepth = pDesc->fDepth;
-        m_iCount = pDesc->m_iCount;
-    }
+		m_fX = pDesc->fX;
+		m_fY = pDesc->fY;
+		m_fSizeX = pDesc->fSizeX;
+		m_fSizeY = pDesc->fSizeY;
+		m_fDepth = pDesc->fDepth;
+		m_iCount = pDesc->m_iCount;
+	}
 
-    if(FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
+	if(FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-    _uint   iNumViewports = { 1 };
-    D3D11_VIEWPORT ViewportDesc{};
-    
-    m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+	_uint   iNumViewports = {1};
+	D3D11_VIEWPORT ViewportDesc{};
 
-    m_pTransformCom->Set_Scaling(m_fSizeX, m_fSizeY, 1.f);
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fX - ViewportDesc.Width * 0.5f, -m_fY + ViewportDesc.Height * 0.5f, m_fDepth, 1.f));
+	m_pContext->RSGetViewports(&iNumViewports,&ViewportDesc);
 
-    XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	m_pTransformCom->Set_Scaling(m_fSizeX,m_fSizeY,1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(m_fX - ViewportDesc.Width * 0.5f,-m_fY + ViewportDesc.Height * 0.5f,m_fDepth,1.f));
 
-    /* ∫‰Ω∫∆‰¿ÃΩ∫ ªÛ¿« »≠∏Èø° ∫∏ø©¡Ÿ øµø™(∫‰∫º∑˝)¿ª º≥¡§«—¥Ÿ. */
-    XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
+	XMStoreFloat4x4(&m_ViewMatrix,XMMatrixIdentity());
 
-    return S_OK;
+	/* Î∑∞Ïä§ÌéòÏù¥Ïä§ ÏÉÅÏùò ÌôîÎ©¥Ïóê Î≥¥Ïó¨Ï§Ñ ÏòÅÏó≠(Î∑∞Î≥ºÎ•®)ÏùÑ ÏÑ§Ï†ïÌïúÎã§. */
+	XMStoreFloat4x4(&m_ProjMatrix,XMMatrixOrthographicLH(ViewportDesc.Width,ViewportDesc.Height,0.f,1.f));
+
+	return S_OK;
 
 }
 
 void CUIObject::Priority_Update(_float fTimeDelta)
-{
-}
+{}
 
 void CUIObject::Update(_float fTimeDelta)
-{
-}
+{}
 
 void CUIObject::Late_Update(_float fTimeDelta)
-{
-}
+{}
 
 HRESULT CUIObject::Render()
 {
-    return S_OK;
+	return S_OK;
 }
 
 
 
 void CUIObject::Free()
 {
-    __super::Free();
+	__super::Free();
 }

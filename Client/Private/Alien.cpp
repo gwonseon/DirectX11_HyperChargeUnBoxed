@@ -107,7 +107,7 @@ void CAlien::Update(_float fTimeDelta)
 		m_pTransformCom->Go_Straight_Nav(fTimeDelta,m_pNavigationCom);
 	}
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-	// ³Ë¹éÀÌ TrueÀÏ ¶§ ³Ë¹é ¸ğ¼ÇÇÏ°Ô ÇÏ±â
+	// ë„‰ë°±ì´ Trueì¼ ë•Œ ë„‰ë°± ëª¨ì…˜í•˜ê²Œ í•˜ê¸°
 	if (m_bAttacked == true)
 	{
 		m_pGameInstance->StopSound(SOUND_ALIEN_SPEAK);
@@ -131,14 +131,14 @@ void CAlien::Late_Update(_float fTimeDelta)
 		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
 	}
-	// ³Ë¹éÀÌ trueÀÏ ¶§ ³Ë¹é ¸ğ¼Ç
+	// ë„‰ë°±ì´ trueì¼ ë•Œ ë„‰ë°± ëª¨ì…˜
 	if (m_bKnockBacking == true)
 	{
-		_vector vKnockBack_DIr = m_vecPosition - vPlayerPos; // ÇÃ·¹ÀÌ¾î ¹æÇâÀ¸·ÎºÎÅÍ ¹İ´ë¹æÇâÀ¸·Î ³¯¾Æ°¡±â
+		_vector vKnockBack_DIr = m_vecPosition - vPlayerPos; // í”Œë ˆì´ì–´ ë°©í–¥ìœ¼ë¡œë¶€í„° ë°˜ëŒ€ë°©í–¥ìœ¼ë¡œ ë‚ ì•„ê°€ê¸°
 		vKnockBack_DIr = XMVector3Normalize(vKnockBack_DIr);
 		if (m_pTransformCom->KnockBack(fTimeDelta, vKnockBack_DIr, m_fKnockBack_Power, m_fKnockBack_Height) == true)
 		{
-			// ³Ë¹é ³¡³²
+			// ë„‰ë°± ëë‚¨
 			m_bCanAttacked = true;
 			m_bKnockBacking = false;
 		}

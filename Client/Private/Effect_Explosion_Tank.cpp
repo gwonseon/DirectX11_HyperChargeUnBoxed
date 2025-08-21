@@ -41,7 +41,8 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 	switch (m_eType)
 	{
 	case Client::CEffect_Explosion_Tank::EXPLOSION_TANK:
-		m_fMaxFrame.x = m_fMaxFrame.y = 7.f;
+		m_fMaxFrame.y = 7.f;
+		m_fMaxFrame.x = 7.f;
 		m_iTextureNum = 0;
 		vFinalPos = m_vecPosition;
 		vFinalPos = XMVectorSetY(vFinalPos, XMVectorGetY(vFinalPos) + 2.f);
@@ -52,7 +53,8 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 		vFinalPos = m_vecPosition;
 		break;
 	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE2:
-		m_fMaxFrame.x = m_fMaxFrame.y = 3.f;
+		m_fMaxFrame.y = 3.f;
+		m_fMaxFrame.x = 3.f;
 		m_iTextureNum = 3;
 		vCamPos = XMVectorSet(CamPos.x, CamPos.y, CamPos.z, 1.f);
 		vLookDir = vCamPos - m_vecPosition;
@@ -63,7 +65,8 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 		vFinalPos = m_vecPosition;
 		break;
 	case Client::CEffect_Explosion_Tank::EXPLOSION_MISSILE3:
-		m_fMaxFrame.x = m_fMaxFrame.y = 3.f;
+		m_fMaxFrame.y = 3.f;
+		m_fMaxFrame.x = 3.f;
 		m_iTextureNum = 3;
 		 vCamPos = XMVectorSet(CamPos.x , CamPos.y, CamPos.z, 1.f);
 		 vLookDir = vCamPos - m_vecPosition;
@@ -74,7 +77,8 @@ HRESULT CEffect_Explosion_Tank::Initialize(void* pArg)
 		vFinalPos = m_vecPosition;
 		break;
 	case Client::CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD:
-		m_fMaxFrame.x = m_fMaxFrame.y = 6.f;
+		m_fMaxFrame.y = 6.f;
+		m_fMaxFrame.x = 6.f;
 		m_iTextureNum = 2;
 		vFinalPos = m_vecPosition;
 		break;
@@ -160,8 +164,8 @@ void CEffect_Explosion_Tank::Late_Update(_float fTimeDelta)
 		break;
 
 	case Client::CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD:
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
-			return;
+		//if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
+		//	return;
 		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLEND, this)))
 			return;
 		break;

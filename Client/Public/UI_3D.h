@@ -13,31 +13,33 @@ END
 
 BEGIN(Client)
 
-class CUI_3D final : public CGameObject
+class CUI_3D final: public CGameObject
 {
 public:
-	enum UI_OBJECT_TYPE { UI_NUCLEAR, UI_HP, UI_OBJ_END};
+	enum UI_OBJECT_TYPE {
+		UI_NUCLEAR,UI_HP,UI_OBJ_END
+	};
 
-	typedef struct : public CGameObject::GAMEOBJ_DESC
+	typedef struct: public CGameObject::GAMEOBJ_DESC
 	{
 		UI_OBJECT_TYPE eUIType{};
 		LEVELID m_eLevel{};
-		CPlayer* pPlayer = { nullptr };
-		CCamera_Free* pCamera = { nullptr };
-		CMissile_Truck* m_pMissile_Truck = { nullptr };
+		CPlayer* pPlayer = {nullptr};
+		CCamera_Free* pCamera = {nullptr};
+		CMissile_Truck* m_pMissile_Truck = {nullptr};
 	}UIOBJ_DESC;
 
 private:
-	CUI_3D(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CUI_3D(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CUI_3D(const CUI_3D& Prototype);
 	virtual ~CUI_3D() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -45,13 +47,13 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
-	CPlayer* m_pPlayer = { nullptr };
-	CMissile_Truck* m_pMissile_Truck = { nullptr };
-	CTracker* m_pTracker = { nullptr };
-	CCamera_Free* m_pCamera = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CTexture* m_pTextureCom = {nullptr};
+	CVIBuffer_Rect* m_pVIBufferCom = {nullptr};
+	CPlayer* m_pPlayer = {nullptr};
+	CMissile_Truck* m_pMissile_Truck = {nullptr};
+	CTracker* m_pTracker = {nullptr};
+	CCamera_Free* m_pCamera = {nullptr};
 
 private:
 	HRESULT Add_Components();
@@ -67,7 +69,7 @@ private:
 	_float m_fScale{};
 	XMFLOAT4X4 viewMatrixFloat4x4{};
 public:
-	static CUI_3D* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CUI_3D* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

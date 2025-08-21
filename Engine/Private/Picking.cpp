@@ -2,19 +2,19 @@
 
 #include "GameInstance.h"
 
-CPicking::CPicking(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice{ pDevice }
-	, m_pContext{ pContext }
-	, m_pGameInstance{ CGameInstance::GetInstance() }
+CPicking::CPicking(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: m_pDevice{pDevice}
+	,m_pContext{pContext}
+	,m_pGameInstance{CGameInstance::GetInstance()}
 {
-
+	Safe_AddRef(m_pTexture2D);
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
 
 }
 
-HRESULT CPicking::Initialize(HWND hWnd, _uint iViewportWidth, _uint iViewportHeight)
+HRESULT CPicking::Initialize(HWND hWnd,_uint iViewportWidth,_uint iViewportHeight)
 {
 	m_hWnd = hWnd;
 	m_iViewportWidth = iViewportWidth;
@@ -36,7 +36,7 @@ HRESULT CPicking::Initialize(HWND hWnd, _uint iViewportWidth, _uint iViewportHei
 	TextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
 	TextureDesc.MiscFlags = 0;
 
-	if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &m_pTexture2D)))
+	if(FAILED(m_pDevice->CreateTexture2D(&TextureDesc,nullptr,&m_pTexture2D)))
 		return E_FAIL;
 
 	return S_OK;
@@ -47,61 +47,61 @@ _bool CPicking::isPicked(_float3* pOut)
 	POINT			ptMouse;
 	GetCursorPos(&ptMouse);
 
-	/* ºäÆ÷Æ® »óÀÇ ¸¶¿ì½º À§Ä¡¸¦ ±¸Çß´Ù. */
-	ScreenToClient(m_hWnd, &ptMouse);
+	/* ë·°í¬íŠ¸ ìƒì˜ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
+	ScreenToClient(m_hWnd,&ptMouse);
 
 	_uint			iIndex = ptMouse.y * m_iViewportWidth + ptMouse.x;
 
-	m_pGameInstance->Copy_RT_Resource(TEXT("Target_Depth"), m_pTexture2D);
+	m_pGameInstance->Copy_RT_Resource(TEXT("Target_Depth"),m_pTexture2D);
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
-	
-	m_pContext->Map(m_pTexture2D, 0, D3D11_MAP_READ_WRITE, 0, &SubResource);
+
+	m_pContext->Map(m_pTexture2D,0,D3D11_MAP_READ_WRITE,0,&SubResource);
 
 	_float4* pPixel = static_cast<_float4*>(SubResource.pData) + iIndex;
-	
+
 	_float3			vWorldPos = {};
 
-	/* Åõ¿µ°ø°£»óÀÇ À§Ä¡¸¦ ±¸ÇÑ´Ù. */
+	/* íˆ¬ì˜ê³µê°„ìƒì˜ ìœ„ì¹˜ë¥¼ êµ¬í•œë‹¤. */
 	vWorldPos.x = ptMouse.x / (m_iViewportWidth * 0.5f) - 1.f;
 	vWorldPos.y = ptMouse.y / (m_iViewportHeight * -0.5f) + 1.f;
 	vWorldPos.z = pPixel->x;
 
-	/* ºä°ø°£»óÀÇ À§Ä¡¸¦ ±¸ÇÑ´Ù. */
-	_vector			vPosition = XMVector3TransformCoord(XMLoadFloat3(&vWorldPos), m_pGameInstance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ));
+	/* ë·°ê³µê°„ìƒì˜ ìœ„ì¹˜ë¥¼ êµ¬í•œë‹¤. */
+	_vector			vPosition = XMVector3TransformCoord(XMLoadFloat3(&vWorldPos),m_pGameInstance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ));
 
-	/* ¿ùµå°ø°£»óÀÇ À§Ä¡¸¦ ±¸ÇÑ´Ù. */
-	vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW));
+	/* ì›”ë“œê³µê°„ìƒì˜ ìœ„ì¹˜ë¥¼ êµ¬í•œë‹¤. */
+	vPosition = XMVector3TransformCoord(vPosition,m_pGameInstance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW));
 
-	m_pContext->Unmap(m_pTexture2D, 0);
+	m_pContext->Unmap(m_pTexture2D,0);
 
-	XMStoreFloat3(pOut, vPosition);
+	XMStoreFloat3(pOut,vPosition);
 
 	return _bool(pPixel->w);
 }
 
 
-_bool CPicking::isComputeHeight(_fvector vTargetPos, _float3* pOut)
+_bool CPicking::isComputeHeight(_fvector vTargetPos,_float3* pOut)
 {
-	/* ¹Þ¾Æ¿Â °´Ã¼ÀÇ ¿ùµåÀ§Ä¡¸¦ Á÷±³Åõ¿µÇÑ »óÅÂ´ë·Î Åõ¿µ°ø°£»óÀÇ À§Ä¡·Î º¯È¯ÇÏ°í. */
-	/* ±× Åõ¿µ°ø°£»óÀÇ ÁÂÇ¥¸¦ ÅØ½ºÃÄ »óÀÇ ÁÂÇ¥·Î º¯È¯ÇÏ³®. */
+	/* ë°›ì•„ì˜¨ ê°ì²´ì˜ ì›”ë“œìœ„ì¹˜ë¥¼ ì§êµíˆ¬ì˜í•œ ìƒíƒœëŒ€ë¡œ íˆ¬ì˜ê³µê°„ìƒì˜ ìœ„ì¹˜ë¡œ ë³€í™˜í•˜ê³ . */
+	/* ê·¸ íˆ¬ì˜ê³µê°„ìƒì˜ ì¢Œí‘œë¥¼ í…ìŠ¤ì³ ìƒì˜ ì¢Œí‘œë¡œ ë³€í™˜í•˜ë‚Ÿ. */
 
-	_float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 
 	// XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(64.5f, 20.f, 64.5f, 1.f), XMVectorSet(64.5f, 0.f, 64.5f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 
 	_matrix			matView = XMMatrixIdentity();
-	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
-	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-	matView.r[3] = XMVectorSet(XMVectorGetX(vTargetPos), 20.f, XMVectorGetZ(vTargetPos), 1.f);
+	matView.r[0] = XMVectorSet(1.f,0.f,0.f,0.f);
+	matView.r[1] = XMVectorSet(0.f,0.f,1.f,0.f);
+	matView.r[2] = XMVectorSet(0.f,-1.f,0.f,0.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(vTargetPos),20.f,XMVectorGetZ(vTargetPos),1.f);
 
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixInverse(nullptr,matView));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixOrthographicLH(200.f,200.f,0.f,30.f));
 
 
-	_vector		vProjPos = XMVector3TransformCoord(vTargetPos, XMLoadFloat4x4(&ViewMatrix));
-	vProjPos = XMVector3TransformCoord(vProjPos, XMLoadFloat4x4(&ProjMatrix));
+	_vector		vProjPos = XMVector3TransformCoord(vTargetPos,XMLoadFloat4x4(&ViewMatrix));
+	vProjPos = XMVector3TransformCoord(vProjPos,XMLoadFloat4x4(&ProjMatrix));
 
 	_float2		vTexcoord;
 	vTexcoord.x = XMVectorGetX(vProjPos) * m_iViewportWidth * 0.5f + m_iViewportWidth * 0.5f;
@@ -109,27 +109,27 @@ _bool CPicking::isComputeHeight(_fvector vTargetPos, _float3* pOut)
 
 	_uint			iIndex = (_uint)vTexcoord.y * m_iViewportWidth + (_uint)vTexcoord.x;
 
-	m_pGameInstance->Copy_RT_Resource(TEXT("Target_Height"), m_pTexture2D);
+	m_pGameInstance->Copy_RT_Resource(TEXT("Target_Height"),m_pTexture2D);
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
 
-	m_pContext->Map(m_pTexture2D, 0, D3D11_MAP_READ_WRITE, 0, &SubResource);
+	m_pContext->Map(m_pTexture2D,0,D3D11_MAP_READ_WRITE,0,&SubResource);
 
 	_float4* pPixel = static_cast<_float4*>(SubResource.pData) + iIndex;
 
-	m_pContext->Unmap(m_pTexture2D, 0);
-	if (pPixel == nullptr)
+	m_pContext->Unmap(m_pTexture2D,0);
+	if(pPixel == nullptr)
 		return false;
-	XMStoreFloat3(pOut, XMVectorSetY(vTargetPos, pPixel->x));
+	XMStoreFloat3(pOut,XMVectorSetY(vTargetPos,pPixel->x));
 
 	return _bool(pPixel->w);
 }
 
-CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, HWND hWnd, _uint iViewportWidth, _uint iViewportHeight)
+CPicking* CPicking::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,HWND hWnd,_uint iViewportWidth,_uint iViewportHeight)
 {
-	CPicking* pInstance = new CPicking(pDevice, pContext);
+	CPicking* pInstance = new CPicking(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize(hWnd, iViewportWidth, iViewportHeight)))
+	if(FAILED(pInstance->Initialize(hWnd,iViewportWidth,iViewportHeight)))
 	{
 		MSG_BOX("Failed to Created : CPicking");
 		Safe_Release(pInstance);

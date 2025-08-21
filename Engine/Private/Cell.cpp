@@ -2,75 +2,74 @@
 
 #include "VIBuffer_Cell.h"
 
-CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice{ pDevice }
-	, m_pContext{ pContext }
+CCell::CCell(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: m_pDevice{pDevice}
+	,m_pContext{pContext}
 {
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CCell::Initialize(const _float3* pPoints, _uint iIndex, CELL_TYPE eType)
+HRESULT CCell::Initialize(const _float3* pPoints,_uint iIndex,CELL_TYPE eType)
 {
-	m_iIndex = iIndex; // ºø¿« ¿Œµ¶Ω∫
-	_float fCenterX{}, fCenterY{}, fCenterZ{};
-	for (size_t i = 0; i < POINT_END; i++)
+	m_iIndex = iIndex; // ÏÖÄÏùò Ïù∏Îç±Ïä§
+	_float fCenterX{},fCenterY{},fCenterZ{};
+	for(size_t i = 0; i < POINT_END; i++)
 	{
 		m_vPoints[i] = pPoints[i];
 		fCenterX = fCenterX + m_vPoints[i].x;
 		fCenterY = fCenterY + m_vPoints[i].y;
 		fCenterZ = fCenterZ + m_vPoints[i].z;
-	
+
 	}
-	m_vCenterPoints = {fCenterX/3, fCenterY/3, fCenterZ/3}; // ¡ﬂ¡° ¡¬«• , 3¡°¿ª ¥ı«ÿº≠ 3¿∏∑Œ ≥™¥≤¡‹
-	// m_iNeighbors ¿Ã ¿ÃøÙºø
+	m_vCenterPoints = {fCenterX/3,fCenterY/3,fCenterZ/3}; // Ï§ëÏ†ê Ï¢åÌëú , 3Ï†êÏùÑ ÎçîÌï¥ÏÑú 3ÏúºÎ°ú ÎÇòÎà†Ï§å
+	// m_iNeighbors Ïù¥ Ïù¥ÏõÉÏÖÄ
 	m_eCellType = eType;
-#ifdef _DEBUG
-	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
-	if (nullptr == m_pVIBuffer)
+	#ifdef _DEBUG
+	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice,m_pContext,m_vPoints);
+	if(nullptr == m_pVIBuffer)
 		return E_FAIL;
-#endif
+	#endif
 
 	return S_OK;
 }
 
-  
-_bool CCell::isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosition,  const _bool& bCalcSlide)
+
+_bool CCell::isIn(_vector& vLocalPos,_int* pNeighborIndex,_vector& fSlidePosition,const _bool& bCalcSlide)
 {
-	for (size_t i = 0; i < LINE_END; i++)
+	for(size_t i = 0; i < LINE_END; i++)
 	{
 		_vector		vLine = XMLoadFloat3(&m_vPoints[(i + 1) % POINT_END]) - XMLoadFloat3(&m_vPoints[i]);
-		_vector		vNormal = XMVectorSet(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine), 0.f);
-		// _vector vNormal = XMVector3Cross(vLine, XMVectorSet(0.f, 1.f, 0.f, 0.f)); // Y√‡ ∆˜«‘«— π˝º± ∞ËªÍ
+		_vector		vNormal = XMVectorSet(XMVectorGetZ(vLine) * -1.f,0.f,XMVectorGetX(vLine),0.f);
+		// _vector vNormal = XMVector3Cross(vLine, XMVectorSet(0.f, 1.f, 0.f, 0.f)); // YÏ∂ï Ìè¨Ìï®Ìïú Î≤ïÏÑ† Í≥ÑÏÇ∞
 		_vector		vDir = vLocalPos - XMLoadFloat3(&m_vPoints[i]);
-		_vector		vDot = XMVector3Dot(XMVector3Normalize(vNormal), (vDir));
-		if (0 < XMVectorGetX(vDot))
+		_vector		vDot = XMVector3Dot(XMVector3Normalize(vNormal),(vDir));
+		if(0 < XMVectorGetX(vDot))
 		{
 			if(pNeighborIndex)
 				*pNeighborIndex = m_iNeighbors[i];
 
 
 
-			if (m_iNeighbors[i] == -1)
+			if(m_iNeighbors[i] == -1)
 			{
 				_vector vSlidePos = XMLoadFloat3(&m_vPoints[i]) + vDir + -1.f * XMVectorGetX(vDot) * XMVector3Normalize(vNormal);
 				_vector vSlideDir = vSlidePos - XMLoadFloat3(&m_vPoints[i]);
-				if (XMVectorGetX(XMVector3Length(vLine)) < XMVectorGetX(XMVector3Length(vSlideDir)))
+				if(XMVectorGetX(XMVector3Length(vLine)) < XMVectorGetX(XMVector3Length(vSlideDir)))
 				{
-					// ¿ÃøÙºø¿Ã æ¯¿∏∏È ¿ÃøÙºø¿ª ≥°¡°¿∏∑Œ 
-					if (m_iNeighbors[i] == -1)
+					// Ïù¥ÏõÉÏÖÄÏù¥ ÏóÜÏúºÎ©¥ Ïù¥ÏõÉÏÖÄÏùÑ ÎÅùÏ†êÏúºÎ°ú 
+					if(m_iNeighbors[i] == -1)
 						*pNeighborIndex = m_iNeighbors[(i + 1) % 3];
-					vLocalPos = XMVectorSet(XMVectorGetX(vSlidePos), XMVectorGetY(vSlidePos), XMVectorGetZ(vSlidePos), 1.f);
+					vLocalPos = XMVectorSet(XMVectorGetX(vSlidePos),XMVectorGetY(vSlidePos),XMVectorGetZ(vSlidePos),1.f);
 					vSlidePos = XMLoadFloat3(&m_vPoints[(i + 1) % 3]);
-				}
-				else if (XMVectorGetX(XMVector3Dot(vSlideDir, vLine)) < 0.f)
+				} else if(XMVectorGetX(XMVector3Dot(vSlideDir,vLine)) < 0.f)
 				{
-					if (m_iNeighbors[i] == -1)
+					if(m_iNeighbors[i] == -1)
 						*pNeighborIndex = m_iNeighbors[(i - 1 + 3) % 3];
-					vLocalPos = XMVectorSet(XMVectorGetX(vSlidePos), XMVectorGetY(vSlidePos), XMVectorGetZ(vSlidePos), 1.f);
+					vLocalPos = XMVectorSet(XMVectorGetX(vSlidePos),XMVectorGetY(vSlidePos),XMVectorGetZ(vSlidePos),1.f);
 					vSlidePos = XMLoadFloat3(&m_vPoints[(i)]);
 				}
-				fSlidePosition = XMVectorSet(XMVectorGetX(vSlidePos), XMVectorGetY(vSlidePos), XMVectorGetZ(vSlidePos), 1.f);
+				fSlidePosition = XMVectorSet(XMVectorGetX(vSlidePos),XMVectorGetY(vSlidePos),XMVectorGetZ(vSlidePos),1.f);
 			}
 			return false;
 		}
@@ -84,63 +83,63 @@ _bool CCell::isIn(_vector& vLocalPos, _int* pNeighborIndex, _vector& fSlidePosit
 //{
 //	for (size_t i = 0; i < LINE_END; i++)
 //	{
-//		// «ˆ¿Á ¡°∞˙ ¥Ÿ¿Ω ¡°¿ª ø¨∞·«œ¥¬ ∫§≈Õ ∞ËªÍ
+//		// ÌòÑÏû¨ Ï†êÍ≥º Îã§Ïùå Ï†êÏùÑ Ïó∞Í≤∞ÌïòÎäî Î≤°ÌÑ∞ Í≥ÑÏÇ∞
 //		_vector vLine = XMLoadFloat3(&m_vPoints[(i + 1) % POINT_END]) - XMLoadFloat3(&m_vPoints[i]);
-//		// π˝º± ∫§≈Õ ∞ËªÍ
+//		// Î≤ïÏÑ† Î≤°ÌÑ∞ Í≥ÑÏÇ∞
 //		_vector vNormal = XMVector3Cross(vLine, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 //
-//		// ΩΩ∂Û¿Ãµ˘ ∫§≈Õ ∞ËªÍ
+//		// Ïä¨ÎùºÏù¥Îî© Î≤°ÌÑ∞ Í≥ÑÏÇ∞
 //		_vector SlidingVector = vEntervector - XMVectorGetX(XMVector3Dot(vEntervector, vNormal)) * vNormal;
 //		SlidingVector = XMVector3Normalize(SlidingVector);
 //
-//		// ΩΩ∂Û¿Ãµ˘ ¿˚øÎ »ƒ ªı∑ŒøÓ ¿ßƒ° ∞ËªÍ
-//		_vector SlidingPos = vCurrentPos + SlidingVector * -1.f; // ΩΩ∂Û¿Ãµ˘ ¿˚øÎ »ƒ ¿ßƒ°
+//		// Ïä¨ÎùºÏù¥Îî© Ï†ÅÏö© ÌõÑ ÏÉàÎ°úÏö¥ ÏúÑÏπò Í≥ÑÏÇ∞
+//		_vector SlidingPos = vCurrentPos + SlidingVector * -1.f; // Ïä¨ÎùºÏù¥Îî© Ï†ÅÏö© ÌõÑ ÏúÑÏπò
 //
-//		// ΩΩ∂Û¿Ãµ˘ πÊ«‚ ∞ÀªÁ
+//		// Ïä¨ÎùºÏù¥Îî© Î∞©Ìñ• Í≤ÄÏÇ¨
 //		_vector Sliding_Dir = SlidingPos - XMLoadFloat3(&m_vPoints[i]);
 //
-//		// ΩΩ∂Û¿Ãµ˘ πÊ«‚¿Ã π˝º± πÊ«‚∞˙¿« ≥ª¿˚¿Ã æÁºˆ¿Œ¡ˆ ∞ÀªÁ
+//		// Ïä¨ÎùºÏù¥Îî© Î∞©Ìñ•Ïù¥ Î≤ïÏÑ† Î∞©Ìñ•Í≥ºÏùò ÎÇ¥Ï†ÅÏù¥ ÏñëÏàòÏù∏ÏßÄ Í≤ÄÏÇ¨
 //		if (XMVectorGetX(XMVector3Dot(XMVector3Normalize(vNormal), XMVector3Normalize(Sliding_Dir))) > 0)
 //		{
-//			cout << i << "π¯ ¬∞ ¿ßƒ° º±ø°º± π€¿∏∑Œ ≥™∞¨≥◊ " << endl;
+//			cout << i << "Î≤à Ïß∏ ÏúÑÏπò ÏÑ†ÏóêÏÑ† Î∞ñÏúºÎ°ú ÎÇòÍ∞îÎÑ§ " << endl;
 //			
-//			*pNeighborIndex = m_iNeighbors[i]; // ¿ÃøÙ ºø∑Œ ¿Ãµø
-//			return false; // ΩΩ∂Û¿Ãµ˘ ¡ﬂ¥‹
+//			*pNeighborIndex = m_iNeighbors[i]; // Ïù¥ÏõÉ ÏÖÄÎ°ú Ïù¥Îèô
+//			return false; // Ïä¨ÎùºÏù¥Îî© Ï§ëÎã®
 //		}
-//		cout  << "ΩΩ∂Û¿Ãµ˘ ¿ßƒ°¥Ÿ : "  << XMVectorGetX(vSlidingPos) << "  " << XMVectorGetY(vSlidingPos) << "  " << XMVectorGetZ(vSlidingPos) << "  " << endl;
+//		cout  << "Ïä¨ÎùºÏù¥Îî© ÏúÑÏπòÎã§ : "  << XMVectorGetX(vSlidingPos) << "  " << XMVectorGetY(vSlidingPos) << "  " << XMVectorGetZ(vSlidingPos) << "  " << endl;
 //		if (m_iNeighbors[i] != -1)
 //		{
-//			// ΩΩ∂Û¿Ãµ˘ ¿ßƒ° æ˜µ•¿Ã∆Æ
+//			// Ïä¨ÎùºÏù¥Îî© ÏúÑÏπò ÏóÖÎç∞Ïù¥Ìä∏
 //			vSlidingPos = SlidingPos;
 //		}
 //	}
-//	return true; // ΩΩ∂Û¿Ãµ˘ º∫∞¯
+//	return true; // Ïä¨ÎùºÏù¥Îî© ÏÑ±Í≥µ
 //}
 
 
-_bool CCell::Compare_Points(_fvector vSour, _fvector vDest)
+_bool CCell::Compare_Points(_fvector vSour,_fvector vDest)
 {
-	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]), vSour))
+	if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]),vSour))
 	{
-		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]), vDest))
+		if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]),vDest))
 			return true;
-		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]), vDest))
+		if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]),vDest))
 			return true;
 	}
 
-	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]), vSour))
+	if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]),vSour))
 	{
-		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]), vDest))
+		if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]),vDest))
 			return true;
-		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]), vDest))
+		if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]),vDest))
 			return true;
 	}
 
-	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]), vSour))
+	if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]),vSour))
 	{
-		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]), vDest))
+		if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]),vDest))
 			return true;
-		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]), vDest))
+		if(true == XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]),vDest))
 			return true;
 	}
 	return false;
@@ -154,11 +153,11 @@ HRESULT CCell::Render()
 
 }
 #endif
-CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex, CELL_TYPE eType)
+CCell* CCell::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _float3* pPoints,_uint iIndex,CELL_TYPE eType)
 {
-	CCell* pInstance = new CCell(pDevice, pContext);
+	CCell* pInstance = new CCell(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize(pPoints, iIndex, eType)))
+	if(FAILED(pInstance->Initialize(pPoints,iIndex,eType)))
 	{
 		MSG_BOX("Failed To Created : CCell");
 		Safe_Release(pInstance);
@@ -170,10 +169,10 @@ void CCell::Free()
 {
 	__super::Free();
 
-#ifdef _DEBUG
-    Safe_Release(m_pVIBuffer);
-#endif
+	#ifdef _DEBUG
+	Safe_Release(m_pVIBuffer);
+	#endif
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
-	
+
 }

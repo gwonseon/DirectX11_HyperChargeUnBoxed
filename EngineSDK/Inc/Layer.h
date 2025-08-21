@@ -1,37 +1,41 @@
 #pragma once
 #include "Base.h"
 
-// CGameObject*¸¦ ¿ø¼Ò·Î °®´Â list ÄÁÅ×ÀÌ³Ê¸¦ m_GameObjects·Î °®´Â´Ù.
-// AddÇÏ°í Updateµé ´Ù ÀÖ´Ù/
+// CGameObject*ë¥¼ ì›ì†Œë¡œ ê°–ëŠ” list ì»¨í…Œì´ë„ˆë¥¼ m_GameObjectsë¡œ ê°–ëŠ”ë‹¤.
+// Addí•˜ê³  Updateë“¤ ë‹¤ ìˆë‹¤/
 
 
 BEGIN(Engine)
-class CLayer final : public CBase
+class CLayer final: public CBase
 {
 private:
 	CLayer();
 	virtual ~CLayer() = default;
 
 public:
-	class CComponent* Get_Component(const _wstring& strComponentTag, _uint iIndex, _uint iPartObjID = 0);
+	class CComponent* Get_Component(const _wstring& strComponentTag,_uint iIndex,_uint iPartObjID = 0);
 
 public:
 	HRESULT Add_GameObject(class CGameObject* pGameObject);
 	void Priority_Update(_float fTimeDelta);
 	void Update(_float fTimeDelta);
 	void Late_Update(_float fTimeDelta);
-//	class CComponent* Get_Component(const _tchar* pComponentTag, _uint iIndex = 0);
+	//	class CComponent* Get_Component(const _tchar* pComponentTag, _uint iIndex = 0);
 	class CGameObject* Get_Object(_uint iIndex = 0);
 
 	void GameObject_Clear();
 	void Set_Dead();
 
 
-	// Ãæµ¹
+	// ì¶©ëŒ
 public:
-	list<class CGameObject*> Get_GameObject_List() { return m_GameObjects; }
+	list<class CGameObject*> Get_GameObject_List() {
+		return m_GameObjects;
+	}
 
-	_int	Get_GameObjectList_Size() { return m_GameObjects.size(); }
+	_int	Get_GameObjectList_Size() {
+		return m_GameObjects.size();
+	}
 
 private:
 	list<class CGameObject*> m_GameObjects;

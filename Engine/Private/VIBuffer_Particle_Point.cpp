@@ -1,15 +1,13 @@
 #include "..\Public\VIBuffer_Particle_Point.h"
 #include "GameInstance.h"
 
-CVIBuffer_Particle_Point::CVIBuffer_Particle_Point(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CVIBuffer_Instancing{ pDevice, pContext }
-{
-}
+CVIBuffer_Particle_Point::CVIBuffer_Particle_Point(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CVIBuffer_Instancing{pDevice,pContext}
+{}
 
 CVIBuffer_Particle_Point::CVIBuffer_Particle_Point(const CVIBuffer_Particle_Point& Prototype)
-    : CVIBuffer_Instancing{ Prototype }
-{
-}
+	: CVIBuffer_Instancing{Prototype}
+{}
 
 HRESULT CVIBuffer_Particle_Point::Initialize_Prototype(const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
 {
@@ -25,37 +23,37 @@ HRESULT CVIBuffer_Particle_Point::Initialize_Prototype(const CVIBuffer_Instancin
 	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
 
-#pragma region VERTEX_BUFFER
-	/* dx9 : Á¤Á¡¹öÆÛ¸¦ ÇÒ´çÇÏ°í -> ¶ô¾ğ¶ôÇØ¼­ Á¤Á¡¹öÆÛ¿¡ ÃÊ±â°ªÀ» Ã¤¿î´Ù. */
-	/* dx9 : Á¤Á¡¹öÆÛ¿¡ ÃÊ±â°ªÀ» Ã¤¿ì¸é¼­ Á¤Á¡¹öÆÛ¸¦ ÇÒ´çÇÑ´Ù*/
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	#pragma region VERTEX_BUFFER
+	/* dx9 : ì •ì ë²„í¼ë¥¼ í• ë‹¹í•˜ê³  -> ë½ì–¸ë½í•´ì„œ ì •ì ë²„í¼ì— ì´ˆê¸°ê°’ì„ ì±„ìš´ë‹¤. */
+	/* dx9 : ì •ì ë²„í¼ì— ì´ˆê¸°ê°’ì„ ì±„ìš°ë©´ì„œ ì •ì ë²„í¼ë¥¼ í• ë‹¹í•œë‹¤*/
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);
 
-	/* ÇÒ´çÇÏ°íÀÚÇÏ´Â ¸Ş¸ğ¸®°ø°£ÀÇ Å©±â(Byte)*/
+	/* í• ë‹¹í•˜ê³ ìí•˜ëŠ” ë©”ëª¨ë¦¬ê³µê°„ì˜ í¬ê¸°(Byte)*/
 	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
 
-	/* ¹öÆÛÀÇ ¼Ó¼º (Á¤Àû, µ¿Àû) */
+	/* ë²„í¼ì˜ ì†ì„± (ì •ì , ë™ì ) */
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);
 	VTXPOINT* pVertices = new VTXPOINT[m_iNumVertices];
 
-	pVertices[0].vPosition = _float3(0.0f, 0.0f, 0.f);
-	pVertices[0].vPSize = _float2(1.0f, 1.f);
+	pVertices[0].vPosition = _float3(0.0f,0.0f,0.f);
+	pVertices[0].vPSize = _float2(1.0f,1.f);
 
 	m_InitialDesc.pSysMem = pVertices;
 
-	if (FAILED(__super::Create_Buffer(&m_pVB)))
+	if(FAILED(__super::Create_Buffer(&m_pVB)))
 		return E_FAIL;
 
-#pragma endregion
+	#pragma endregion
 
-#pragma region INDEX_BUFFER
+	#pragma region INDEX_BUFFER
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -64,55 +62,55 @@ HRESULT CVIBuffer_Particle_Point::Initialize_Prototype(const CVIBuffer_Instancin
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);
 	_ushort* pIndices = new _ushort[m_iNumIndices];
-	ZeroMemory(pIndices, sizeof(_ushort) * m_iNumIndices);
+	ZeroMemory(pIndices,sizeof(_ushort) * m_iNumIndices);
 
 	m_InitialDesc.pSysMem = pIndices;
 
-	if (FAILED(__super::Create_Buffer(&m_pIB)))
+	if(FAILED(__super::Create_Buffer(&m_pIB)))
 		return E_FAIL;
 
-#pragma endregion
+	#pragma endregion
 
-#pragma region INSTANCE_BUFFER
-	ZeroMemory(&m_InstanceBufferDesc, sizeof m_InstanceBufferDesc);
+	#pragma region INSTANCE_BUFFER
+	ZeroMemory(&m_InstanceBufferDesc,sizeof m_InstanceBufferDesc);
 
 	m_iInstanceVertexStride = sizeof(VTXMATRIX);
 
-	/* ÇÒ´çÇÏ°íÀÚÇÏ´Â ¸Ş¸ğ¸®°ø°£ÀÇ Å©±â(Byte)*/
+	/* í• ë‹¹í•˜ê³ ìí•˜ëŠ” ë©”ëª¨ë¦¬ê³µê°„ì˜ í¬ê¸°(Byte)*/
 	m_InstanceBufferDesc.ByteWidth = m_iInstanceVertexStride * m_iNumInstance;
 
-	/* ¹öÆÛÀÇ ¼Ó¼º (Á¤Àû, µ¿Àû) */
+	/* ë²„í¼ì˜ ì†ì„± (ì •ì , ë™ì ) */
 	m_InstanceBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_InstanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_InstanceBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_InstanceBufferDesc.MiscFlags = 0;
 	m_InstanceBufferDesc.StructureByteStride = m_iInstanceVertexStride;
 
-	ZeroMemory(&m_InstanceInitialDesc, sizeof m_InstanceInitialDesc);
+	ZeroMemory(&m_InstanceInitialDesc,sizeof m_InstanceInitialDesc);
 	m_pInstanceVertices = new VTXMATRIX[m_iNumInstance];
 	m_pSpeed = new _float[m_iNumInstance];
 
-	for (size_t i = 0; i < m_iNumInstance; i++)
+	for(size_t i = 0; i < m_iNumInstance; i++)
 	{
-		_float		fScale = m_pGameInstance->Compute_Random(pDesc->vSize.x, pDesc->vSize.y);
-		m_pSpeed[i] = m_pGameInstance->Compute_Random(pDesc->vSpeed.x, pDesc->vSpeed.y);
+		_float		fScale = m_pGameInstance->Compute_Random(pDesc->vSize.x,pDesc->vSize.y);
+		m_pSpeed[i] = m_pGameInstance->Compute_Random(pDesc->vSpeed.x,pDesc->vSpeed.y);
 
-		m_pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-		m_pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
-		m_pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+		m_pInstanceVertices[i].vRight = _float4(fScale,0.f,0.f,0.f);
+		m_pInstanceVertices[i].vUp = _float4(0.f,fScale,0.f,0.f);
+		m_pInstanceVertices[i].vLook = _float4(0.f,0.f,fScale,0.f);
 
-		m_pInstanceVertices[i].vTranslation = _float4(m_pGameInstance->Compute_Random(pDesc->vCenter.x - pDesc->vRange.x * 0.5f, pDesc->vCenter.x + pDesc->vRange.x * 0.5f),
-			m_pGameInstance->Compute_Random(pDesc->vCenter.y - pDesc->vRange.y * 0.5f, pDesc->vCenter.y + pDesc->vRange.y * 0.5f),
-			m_pGameInstance->Compute_Random(pDesc->vCenter.z - pDesc->vRange.z * 0.5f, pDesc->vCenter.z + pDesc->vRange.z * 0.5f),
+		m_pInstanceVertices[i].vTranslation = _float4(m_pGameInstance->Compute_Random(pDesc->vCenter.x - pDesc->vRange.x * 0.5f,pDesc->vCenter.x + pDesc->vRange.x * 0.5f),
+			m_pGameInstance->Compute_Random(pDesc->vCenter.y - pDesc->vRange.y * 0.5f,pDesc->vCenter.y + pDesc->vRange.y * 0.5f),
+			m_pGameInstance->Compute_Random(pDesc->vCenter.z - pDesc->vRange.z * 0.5f,pDesc->vCenter.z + pDesc->vRange.z * 0.5f),
 			1.f);
-		m_pInstanceVertices[i].vLifeTime = _float2(m_pGameInstance->Compute_Random(pDesc->vLifeTime.x, pDesc->vLifeTime.y), 0.f);
+		m_pInstanceVertices[i].vLifeTime = _float2(m_pGameInstance->Compute_Random(pDesc->vLifeTime.x,pDesc->vLifeTime.y),0.f);
 	}
 
 	m_InstanceInitialDesc.pSysMem = m_pInstanceVertices;
 
-#pragma endregion
+	#pragma endregion
 
 	Safe_Delete_Array(pVertices);
 	Safe_Delete_Array(pIndices);
@@ -122,17 +120,17 @@ HRESULT CVIBuffer_Particle_Point::Initialize_Prototype(const CVIBuffer_Instancin
 
 HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-CVIBuffer_Particle_Point* CVIBuffer_Particle_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
+CVIBuffer_Particle_Point* CVIBuffer_Particle_Point::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const CVIBuffer_Instancing::INSTANCING_DESC* pDesc)
 {
-	CVIBuffer_Particle_Point* pInstance = new CVIBuffer_Particle_Point(pDevice, pContext);
+	CVIBuffer_Particle_Point* pInstance = new CVIBuffer_Particle_Point(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pDesc)))
+	if(FAILED(pInstance->Initialize_Prototype(pDesc)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Particle_Point");
 		Safe_Release(pInstance);
@@ -145,7 +143,7 @@ CComponent* CVIBuffer_Particle_Point::Clone(void* pArg)
 {
 	CVIBuffer_Particle_Point* pInstance = new CVIBuffer_Particle_Point(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Particle_Point");
 		Safe_Release(pInstance);

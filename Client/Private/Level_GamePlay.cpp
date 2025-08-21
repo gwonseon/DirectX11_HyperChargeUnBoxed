@@ -26,58 +26,63 @@
 #include "Sky.h"
 #include <Coin_Item.h>
 #include <Hp_Item.h>
+#include <PlayerHp.h>
+#include <MachineHp.h>
+#include <DeadUI.h>
+#include <BulletUI.h>
+#include <DamagedUI.h>
+#include <ConstUI.h>
 
 
-CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLevel{ pDevice, pContext }
-{
-}
+CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CLevel{pDevice,pContext}
+{}
 
 HRESULT CLevel_GamePlay::Initialize()
 {
 	ShowCursor(false);
-	if (FAILED(Ready_Lights()))
+	if(FAILED(Ready_Lights()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	if(FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_PlayerBuild"))))
+	if(FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_PlayerBuild"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
+	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))
+	if(FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+	if(FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_WeaponITem(TEXT("Layer_WeaponItem"))))
+	if(FAILED(Ready_Layer_WeaponITem(TEXT("Layer_WeaponItem"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_ITem(TEXT("Layer_Item"))))
+	if(FAILED(Ready_Layer_ITem(TEXT("Layer_Item"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Icon(TEXT("Layer_UI_Icon"))))
+	if(FAILED(Ready_Layer_Icon(TEXT("Layer_UI_Icon"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
+	if(FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;
-	
-	// ∞°¿Â ∏∂¡ˆ∏∑ø° ±◊∑¡æﬂ«—¥Ÿ.
-	if (FAILED(Ready_Layer_Damaged(TEXT("Layer_UI_Damaged"))))
+
+	// Í∞ÄÏû• ÎßàÏßÄÎßâÏóê Í∑∏Î†§ÏïºÌïúÎã§.
+	if(FAILED(Ready_Layer_Damaged(TEXT("Layer_UI_Damaged"))))
 		return E_FAIL;
 
 	Load_Map();
-	pTrap = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Trap"));
-#pragma region ∂ÛøÓµÂ
-	// ∂ÛøÓµÂ( ∞¢ ∂ÛøÓµÂ ∏∂¥Ÿ µ•¿Ã≈Õ∞° ¥Ÿ∏£±‚ ∂ßπÆø° ∞¢∞¢ µ˚∑Œ ∂ÛøÓµÂ∏¶ ª˝º∫«ÿº≠ ∞¸∏Æ«ÿ¡‹)
-	m_pRound[0] = CGamePlay_Round::Create(m_pDevice, m_pContext,1);
-	m_pRound[1] = CGamePlay_Round::Create(m_pDevice, m_pContext,2);
-	m_pRound[2] = CGamePlay_Round::Create(m_pDevice, m_pContext,3);
-	for (int i = 0; i < 3; i++)
+	pTrap = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Trap"));
+	#pragma region ÎùºÏö¥Îìú
+	// ÎùºÏö¥Îìú( Í∞Å ÎùºÏö¥Îìú ÎßàÎã§ Îç∞Ïù¥ÌÑ∞Í∞Ä Îã§Î•¥Í∏∞ ÎïåÎ¨∏Ïóê Í∞ÅÍ∞Å Îî∞Î°ú ÎùºÏö¥ÎìúÎ•º ÏÉùÏÑ±Ìï¥ÏÑú Í¥ÄÎ¶¨Ìï¥Ï§å)
+	m_pRound[0] = CGamePlay_Round::Create(m_pDevice,m_pContext,1);
+	m_pRound[1] = CGamePlay_Round::Create(m_pDevice,m_pContext,2);
+	m_pRound[2] = CGamePlay_Round::Create(m_pDevice,m_pContext,3);
+	for(int i = 0; i < 3; i++)
 	{
 		m_pRound[i]->Set_Player(m_pPlayer);
 		m_pRound[i]->Set_TrapLayer(pTrap);
@@ -85,18 +90,18 @@ HRESULT CLevel_GamePlay::Initialize()
 		m_pRound[i]->Set_Player_BrainCore(m_pBrain);
 		m_pRound[i]->Set_BrainCoreWorld_matrix(m_pBrain->Get_Transform()->Get_WorldMatrixPtr());
 		m_pRound[i]->Set_PlayerWorld_matrix(m_pPlayer->Get_Transform()->Get_WorldMatrixPtr());
-		m_pRound[i]->Set_Camera(m_pCamera); 
+		m_pRound[i]->Set_Camera(m_pCamera);
 	}
-#pragma endregion ∂ÛøÓµÂ
+	#pragma endregion ÎùºÏö¥Îìú
 
 	m_pPlayer->Set_RoundStart(&m_bRoundStart);
 	m_pReloading = m_pPlayer->Get_Reloading();
-	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Player"));
-	pCoin = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Coin"));
-	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"));
-	pItem = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Item"));
+	pPlayerLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Player"));
+	pCoin = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Coin"));
+	pCircleUI = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_CircleUI"));
+	pItem = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Item"));
 	m_pGameInstance->Set_CurrentLevel(LEVEL_GAMEPLAY);
-	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;
+	if(FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;
 
 	m_pGameInstance->StopAll();
 
@@ -110,96 +115,96 @@ HRESULT CLevel_GamePlay::Initialize()
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
-	Build_Check(); // ∆Æ∑¶ º≥ƒ°∞¸∑√ 
-	RoundMgr_And_MonsterSpawn(fTimeDelta); // ∂ÛøÓµÂ∞¸∏Æ π◊ ∏ÛΩ∫≈Õ Ω∫∆˘ 
-	
-	
-	if (*m_pPlayer->Get_BuildMode() == false)
+	Build_Check(); // Ìä∏Îû© ÏÑ§ÏπòÍ¥ÄÎ†® 
+	RoundMgr_And_MonsterSpawn(fTimeDelta); // ÎùºÏö¥ÎìúÍ¥ÄÎ¶¨ Î∞è Î™¨Ïä§ÌÑ∞ Ïä§Ìè∞ 
+
+
+	if(*m_pPlayer->Get_BuildMode() == false)
 	{
-		// ∫ÙµÂ ∏µÂ Ω∫≈µ Ω√∞£ 
+		// ÎπåÎìú Î™®Îìú Ïä§ÌÇµ ÏãúÍ∞Ñ 
 		//cout << m_fSkipTimer << endl;
 	}
-	// Round ≈¨∑°Ω∫¥¬ Initailizeø°º≠ ª˝º∫«ÿº≠ ¥„∞Ì, ª˝º∫«“ ∂ß dat∆ƒ¿œ ¿–æÓº≠ ¿ßƒ° ∞™ ¿˙¿Â«ÿµŒ∞Ì 
-	// æ˜µ•¿Ã∆Æø°º≠ «ÿ¥Á ¡∂∞«¿ª ∏∏¡∑«ﬂ¿ª ∂ß ¿€µø«œ¥¬ Ωƒ¿∏∑Œ «œ∏È æÓ∂≥±Ó
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD1))
+	// Round ÌÅ¥ÎûòÏä§Îäî InitailizeÏóêÏÑú ÏÉùÏÑ±Ìï¥ÏÑú Îã¥Í≥†, ÏÉùÏÑ±Ìï† Îïå datÌååÏùº ÏùΩÏñ¥ÏÑú ÏúÑÏπò Í∞í Ï†ÄÏû•Ìï¥ÎëêÍ≥† 
+	// ÏóÖÎç∞Ïù¥Ìä∏ÏóêÏÑú Ìï¥Îãπ Ï°∞Í±¥ÏùÑ ÎßåÏ°±ÌñàÏùÑ Îïå ÏûëÎèôÌïòÎäî ÏãùÏúºÎ°ú ÌïòÎ©¥ Ïñ¥Îñ®Íπå
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD1))
 	{
 		m_pGameInstance->StopSound(TUTORIAL);
-		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Enemyspotted_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Enemyspotted_01.wav",Engine::CHANNELID::TUTORIAL,0.7f);
 
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD2))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD2))
 	{
 		m_pGameInstance->StopSound(TUTORIAL);
-		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Needcredits_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Needcredits_01.wav",Engine::CHANNELID::TUTORIAL,0.7f);
 
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD3))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD3))
 	{
 		m_pGameInstance->StopSound(TUTORIAL);
-		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Needdefences_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Needdefences_01.wav",Engine::CHANNELID::TUTORIAL,0.7f);
 
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD4))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD4))
 	{
 		m_pGameInstance->StopSound(TUTORIAL);
-		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Compliment_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Compliment_01.wav",Engine::CHANNELID::TUTORIAL,0.7f);
 
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD5))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_NUMPAD5))
 	{
 		m_pGameInstance->StopSound(TUTORIAL);
-		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Pickuphere_01.wav", Engine::CHANNELID::TUTORIAL, 0.7f);
+		m_pGameInstance->PlaySoundW(L"FE_VO_Blaze_Pickuphere_01.wav",Engine::CHANNELID::TUTORIAL,0.7f);
 
 	}
-	
 
-	//  ªÛ»£¿€øÎ
+
+	//  ÏÉÅÌò∏ÏûëÏö©
 	Interaction();
 
-#pragma region Collision
+	#pragma region Collision
 	if(pTrap_Shield == nullptr)
-		pTrap_Shield = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Trap_Shield"));
-	if (pExplosion == nullptr)
-		pExplosion = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_Explosion"));
-	if (pBuild == nullptr)
-		pBuild = m_pGameInstance->Find_Layer(LEVEL_YARD, TEXT("Layer_PlayerBuild"));
+		pTrap_Shield = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Trap_Shield"));
+	if(pExplosion == nullptr)
+		pExplosion = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Explosion"));
+	if(pBuild == nullptr)
+		pBuild = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_PlayerBuild"));
 
-	// æ’¿Ã ¥Á«œ¥¬ æ÷
-	m_pGameInstance->Collision_Layer(pPlayerLayer, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"), CPlayer::TPS_PART_BODY);		 // ±Ÿ¡¢ ∞¯∞› ∏ÛΩ∫≈Õ∂˚ «√∑π¿ÃæÓ
-	m_pGameInstance->Collision_Layer(pNearMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"),0, CPlayer::TPS_PART_KATANA); // ƒÆ¿Ã∂˚ ∏ÛΩ∫≈Õ
-	m_pGameInstance->Collision_Layer(pFarMonsterLayer, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, CPlayer::TPS_PART_KATANA); // ƒÆ¿Ã∂˚ ∏ÛΩ∫≈Õ
-	m_pGameInstance->Collision_Layer_Coin(pCoin, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 0, CPlayer::TPS_PART_BODY);
-	m_pGameInstance->Collision_Trap(pTrap_Shield, pMonsterBullet, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
-	m_pGameInstance->Collision_Trap(pTrap_Shield, pNearMonsterLayer, TEXT("Com_Collider_AABB"), TEXT("Com_Collider_Sphere"));
-	m_pGameInstance->Collision_Explosion(pExplosion, pBuild, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 3);
-	m_pGameInstance->Collision_Explosion(pExplosion, pTrap_Shield, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 3);
-	m_pGameInstance->Collision_Explosion(pExplosion, pPlayerLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_AABB"), 3, 0, CPlayer::TPS_PART_BODY);
+	// ÏïûÏù¥ ÎãπÌïòÎäî Ïï†
+	m_pGameInstance->Collision_Layer(pPlayerLayer,pNearMonsterLayer,TEXT("Com_Collider_AABB"),TEXT("Com_Collider_Sphere"),CPlayer::TPS_PART_BODY);		 // Í∑ºÏ†ë Í≥µÍ≤© Î™¨Ïä§ÌÑ∞Îûë ÌîåÎ†àÏù¥Ïñ¥
+	m_pGameInstance->Collision_Layer(pNearMonsterLayer,pPlayerLayer,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_Sphere"),0,CPlayer::TPS_PART_KATANA); // ÏπºÏù¥Îûë Î™¨Ïä§ÌÑ∞
+	m_pGameInstance->Collision_Layer(pFarMonsterLayer,pPlayerLayer,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_Sphere"),0,CPlayer::TPS_PART_KATANA); // ÏπºÏù¥Îûë Î™¨Ïä§ÌÑ∞
+	m_pGameInstance->Collision_Layer_Coin(pCoin,pPlayerLayer,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_AABB"),0,CPlayer::TPS_PART_BODY);
+	m_pGameInstance->Collision_Trap(pTrap_Shield,pMonsterBullet,TEXT("Com_Collider_AABB"),TEXT("Com_Collider_Sphere"));
+	m_pGameInstance->Collision_Trap(pTrap_Shield,pNearMonsterLayer,TEXT("Com_Collider_AABB"),TEXT("Com_Collider_Sphere"));
+	m_pGameInstance->Collision_Explosion(pExplosion,pBuild,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_AABB"),3);
+	m_pGameInstance->Collision_Explosion(pExplosion,pTrap_Shield,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_AABB"),3);
+	m_pGameInstance->Collision_Explosion(pExplosion,pPlayerLayer,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_AABB"),3,0,CPlayer::TPS_PART_BODY);
 
-//	m_pGameInstance->Anti_OverLapping(pFarMonsterLayer, pNearMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
-	m_pGameInstance->Anti_OverLapping(pNearMonsterLayer, pFarMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
-	m_pGameInstance->Anti_OverLapping_SameLayer(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
-	m_pGameInstance->Anti_OverLapping_SameLayer(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), 0);
+	//	m_pGameInstance->Anti_OverLapping(pFarMonsterLayer, pNearMonsterLayer, TEXT("Com_Collider_Sphere"), TEXT("Com_Collider_Sphere"), 0, 0);
+	m_pGameInstance->Anti_OverLapping(pNearMonsterLayer,pFarMonsterLayer,TEXT("Com_Collider_Sphere"),TEXT("Com_Collider_Sphere"),0,0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pNearMonsterLayer,TEXT("Com_Collider_Sphere"),0);
+	m_pGameInstance->Anti_OverLapping_SameLayer(pFarMonsterLayer,TEXT("Com_Collider_Sphere"),0);
 
 
-#pragma endregion Collision	
-#pragma region √—æÀ√Êµπ∞ÀªÁ
-	_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+	#pragma endregion Collision	
+	#pragma region Ï¥ùÏïåÏ∂©ÎèåÍ≤ÄÏÇ¨
+	_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 	XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 	XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-	XMVECTOR RayPos, RayDir;
-	m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+	XMVECTOR RayPos,RayDir;
+	m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
 	RayDir = XMVector3Normalize(RayDir);
-	
-	// ∑π¿Ã ∞™¿Ã æ≤∑π±‚ ∞™¿Œ ∞ÊøÏ ∞ÀªÁ ∆–Ω∫~
-	if (!XMVector3IsInfinite(RayPos) && !XMVector3IsNaN(RayPos) &&
+
+	// Î†àÏù¥ Í∞íÏù¥ Ïì∞Î†àÍ∏∞ Í∞íÏù∏ Í≤ΩÏö∞ Í≤ÄÏÇ¨ Ìå®Ïä§~
+	if(!XMVector3IsInfinite(RayPos) && !XMVector3IsNaN(RayPos) &&
 		!XMVector3IsInfinite(RayDir) && !XMVector3IsNaN(RayDir))
 	{
 		_bool* bShot = m_pPlayer->Get_ShotStart();
-		m_pGameInstance->Collision_Bullet(pNearMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack()); // √—∞˙ ±Ÿ∞≈∏Æ ∏ÛΩ∫≈Õ
-		m_pGameInstance->Collision_Bullet(pFarMonsterLayer, TEXT("Com_Collider_Sphere"), RayDir, RayPos, bShot, m_pPlayer->Get_Attack());  // √—∞˙ ¿Â∞≈∏Æ ∏ÛΩ∫≈Õ
+		m_pGameInstance->Collision_Bullet(pNearMonsterLayer,TEXT("Com_Collider_Sphere"),RayDir,RayPos,bShot,m_pPlayer->Get_Attack()); // Ï¥ùÍ≥º Í∑ºÍ±∞Î¶¨ Î™¨Ïä§ÌÑ∞
+		m_pGameInstance->Collision_Bullet(pFarMonsterLayer,TEXT("Com_Collider_Sphere"),RayDir,RayPos,bShot,m_pPlayer->Get_Attack());  // Ï¥ùÍ≥º Ïû•Í±∞Î¶¨ Î™¨Ïä§ÌÑ∞
 
 	}
-#pragma endregion √—æÀ√Êµπ∞ÀªÁ
+	#pragma endregion Ï¥ùÏïåÏ∂©ÎèåÍ≤ÄÏÇ¨
 
 }
 
@@ -207,15 +212,15 @@ HRESULT CLevel_GamePlay::Render()
 {
 	Text_Render();
 	__super::Render();
-	
 
-#ifdef _DEBUG
-	SetWindowText(g_hWnd, TEXT("∞‘¿”«√∑π¿Ã∑π∫ß¿‘¥œ¥Ÿ."));
-#endif
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+
+	#ifdef _DEBUG
+	SetWindowText(g_hWnd,TEXT("Í≤åÏûÑÌîåÎ†àÏù¥Î†àÎ≤®ÏûÖÎãàÎã§."));
+	#endif
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
 		m_pGameInstance->Free_Light();
-		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO));
+		m_pGameInstance->Open_Level(LEVEL_GAMEPLAY,CLevel_Loading::Create(m_pDevice,m_pContext,LEVEL_LOGO));
 		ShowCursor(true);
 
 	}
@@ -224,50 +229,48 @@ HRESULT CLevel_GamePlay::Render()
 
 void CLevel_GamePlay::Interaction()
 {
-	m_pGameInstance->CircleGauge_Interaction(pItem, pCircleUI);
+	m_pGameInstance->CircleGauge_Interaction(pItem,pCircleUI);
 
 	_vector vPlayerPos = m_pPlayer->Get_Position();
-	_float3 fPlayerPos{}, fWeaponPos{};
-	XMStoreFloat3(&fPlayerPos, vPlayerPos);
-	for (int i = 0; i < 2; i++)
+	_float3 fPlayerPos{},fWeaponPos{};
+	XMStoreFloat3(&fPlayerPos,vPlayerPos);
+	for(int i = 0; i < 2; i++)
 	{
 		_vector vWeaponPos = m_pWeaponItem[i]->Get_Position();
-		XMStoreFloat3(&fWeaponPos, vWeaponPos);
-		if (((fPlayerPos.x - fWeaponPos.x) * (fPlayerPos.x - fWeaponPos.x) + (fPlayerPos.y - fWeaponPos.y) * (fPlayerPos.y - fWeaponPos.y) + (fPlayerPos.z - fWeaponPos.z) * (fPlayerPos.z - fWeaponPos.z)) <= 80.f)
+		XMStoreFloat3(&fWeaponPos,vWeaponPos);
+		if(((fPlayerPos.x - fWeaponPos.x) * (fPlayerPos.x - fWeaponPos.x) + (fPlayerPos.y - fWeaponPos.y) * (fPlayerPos.y - fWeaponPos.y) + (fPlayerPos.z - fWeaponPos.z) * (fPlayerPos.z - fWeaponPos.z)) <= 80.f)
 		{
 			m_pWeaponItem[i]->Set_Interation(true);
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
-				m_pWeaponItem[i]->Set_Charging(true); // æ∆¿Ã≈€ø°º≠ ¬˜¬°¡ﬂ¿”¿ª æÀ∑¡¡‹
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+				m_pWeaponItem[i]->Set_Charging(true); // ÏïÑÏù¥ÌÖúÏóêÏÑú Ï∞®ÏßïÏ§ëÏûÑÏùÑ ÏïåÎ†§Ï§å
 			else
 				m_pWeaponItem[i]->Set_Charging(false);
 
-			// «√∑π¿ÃæÓø°∞‘ ¿Â¬¯µ» ¿Â∫Ò∞° π´æ˘¿Œ¡ˆ æÀ∑¡¡‹
+			// ÌîåÎ†àÏù¥Ïñ¥ÏóêÍ≤å Ïû•Ï∞©Îêú Ïû•ÎπÑÍ∞Ä Î¨¥ÏóáÏù∏ÏßÄ ÏïåÎ†§Ï§å
 			_bool bEquip{};
 			_uint iEuquipNum{};
-			m_pWeaponItem[i]->Set_WeaponItem_Equip(bEquip, iEuquipNum);
-			if (bEquip == true)
+			m_pWeaponItem[i]->Set_WeaponItem_Equip(bEquip,iEuquipNum);
+			if(bEquip == true)
 				m_pPlayer->Set_EquipNumber(iEuquipNum);
-		}
-		else
+		} else
 		{
 			m_pWeaponItem[i]->Set_Charging(false);
 			m_pWeaponItem[i]->Set_Interation(false);
 		}
 	}
 
-	if (*m_pReloading == true)
+	if(*m_pReloading == true)
 	{
 		m_pGuage->Set_Charging(true);
-	}
-	else
+	} else
 	{
 		_int iCheck = 0;
-		for (int i = 0; i < 2; i++)
+		for(int i = 0; i < 2; i++)
 		{
-			if (m_pWeaponItem[i]->Get_Charging() == true)
+			if(m_pWeaponItem[i]->Get_Charging() == true)
 				iCheck++;
 		}
-		if (iCheck > 0)
+		if(iCheck > 0)
 			m_pGuage->Set_Charging(true);
 		else
 			m_pGuage->Set_Charging(false);
@@ -280,8 +283,8 @@ void CLevel_GamePlay::Text_Render()
 {
 	if(m_bVictory == false)
 	{
-		if (*m_pPlayer->Get_BuildMode() == true)
-			m_pGameInstance->Render_Text(TEXT("GumiFont"), TEXT("∞«º≥ ∏µÂ ∞«≥ ∂Ÿ±‚"), _float2(g_iWinSizeX * 0.45f, g_iWinSizeY * 0.785f), XMVectorSet(1.f, 1.f, 1.f, 0.5f), 0.6);
+		if(*m_pPlayer->Get_BuildMode() == true)
+			m_pGameInstance->Render_Text(TEXT("GumiFont"),TEXT("Í±¥ÏÑ§ Î™®Îìú Í±¥ÎÑàÎõ∞Í∏∞"),_float2(g_iWinSizeX * 0.45f,g_iWinSizeY * 0.785f),XMVectorSet(1.f,1.f,1.f,0.5f),0.6);
 	}
 
 
@@ -299,13 +302,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_GAMEPLAY;
 	pDesc.pPlayer = m_pPlayer;
-	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"),&pDesc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Terrain"),&pDesc)))
 		return E_FAIL;
 
 	CSky::SKY_DESC pSky{};
 	pSky.m_eLevel = LEVEL_GAMEPLAY;
 	pSky.pCamPos = m_pCamera->Get_Camera_Pos();
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Sky"),&pSky)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Sky"),&pSky)))
 		return E_FAIL;
 
 	return S_OK;
@@ -318,12 +321,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar* pLayerTag)
 	Desc.vCameraPos = m_pCamera->Get_Camera_Pos();
 	Desc.iRound = &m_iCurrentRound;
 	Desc.iCellIdx = 7;
-	Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
-	// 7; ¿Œµ¶Ω∫π¯»£   «√∑π¿ÃæÓ ¿Ã¥œº»∂Û¿Ã¡Óø°º≠ ¿˙¿Â«œ∞Ì , ø©±‚º≠ ∫∏≥ª¡÷¥¬ πÊΩƒ¿∏∑Œ ¥Ÿ πŸ≤„ ¿ßƒ°µµ
+	Desc.fPosition = _float3(386.295f,1.f,450.425f);
+	// 7; Ïù∏Îç±Ïä§Î≤àÌò∏   ÌîåÎ†àÏù¥Ïñ¥ Ïù¥ÎãàÏÖúÎùºÏù¥Ï¶àÏóêÏÑú Ï†ÄÏû•ÌïòÍ≥† , Ïó¨Í∏∞ÏÑú Î≥¥ÎÇ¥Ï£ºÎäî Î∞©ÏãùÏúºÎ°ú Îã§ Î∞îÍøî ÏúÑÏπòÎèÑ
 	//Desc.fPosition = _float3(386.295f, 1.f, 450.425f);
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(386.295f, 1.f, 450.425f, 1.f));
 	Desc.m_eLevelID = LEVEL_GAMEPLAY;
-	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Player"), &Desc);
+	CGameObject* pPlayer = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Player"),&Desc);
 	m_pPlayer = static_cast<CPlayer*>(pPlayer);
 
 	return S_OK;
@@ -334,31 +337,31 @@ HRESULT CLevel_GamePlay::Ready_Layer_WeaponITem(const _tchar* pLayerTag)
 	CWeapon_Item::WEAPONITEM_DESC Desc{};
 	Desc.eID = LEVEL_GAMEPLAY;
 	Desc.iModelIndex = 5;
-	Desc.fScale = { 30.f,30.f,30.f };
-	Desc.fPosition = { 469.82f, 3.f, 442.094f };
-	CGameObject* pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
+	Desc.fScale = {30.f,30.f,30.f};
+	Desc.fPosition = {469.82f,3.f,442.094f};
+	CGameObject* pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_WeaponItem"),&Desc);
 	m_pWeaponItem[0] = static_cast<CWeapon_Item*>(pItem);
 
-	Desc.fScale = { 10.f,10.f,10.f };
+	Desc.fScale = {10.f,10.f,10.f};
 	Desc.iModelIndex = 7;
-	Desc.fPosition = { 433.203f, 2.f, 457.242f };
-	pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_WeaponItem"), &Desc);
+	Desc.fPosition = {433.203f,2.f,457.242f};
+	pItem = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_WeaponItem"),&Desc);
 	m_pWeaponItem[1] = static_cast<CWeapon_Item*>(pItem);
 
 
 	CBattery::BATTERY_DESC pBattery;
 	pBattery.eID = LEVEL_GAMEPLAY;
-	pBattery.fScale = { 7.f, 7.f, 7.f };
-	pBattery.fPosition = { 400.f,2.f, 450.f };
+	pBattery.fScale = {7.f,7.f,7.f};
+	pBattery.fPosition = {400.f,2.f,450.f};
 	pBattery.pGauge = m_pGuage;
 	pBattery.pPlayer = m_pPlayer;
 	pBattery.pEnergy_Machine = m_pEnergyMachine;
 	pBattery.pBrain = m_pBrain;
 	pBattery.pInGameUI = m_pBatteryUI;
 	pBattery.pInGameUI_Gauge = m_pBatteryGaugeUI;
-	m_pBattery = static_cast<CBattery*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Battery"), &pBattery));
+	m_pBattery = static_cast<CBattery*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Battery"),&pBattery));
 
-	
+
 	return S_OK;
 }
 
@@ -367,18 +370,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_ITem(const _tchar* pLayerTag)
 	CCoin_Item::COINITEM_DESC pCoinItem{};
 	pCoinItem.eID = LEVEL_GAMEPLAY;
 	pCoinItem.pPlayer = m_pPlayer;
-	pCoinItem.fScale = { 6.f, 6.f,6.f };
-	pCoinItem.fPosition = { 644.512f, 0.f, 560.156f };
+	pCoinItem.fScale = {6.f,6.f,6.f};
+	pCoinItem.fPosition = {644.512f,0.f,560.156f};
 	pCoinItem.iModelIndex = 47;
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CoinItem"), &pCoinItem));
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_CoinItem"),&pCoinItem));
 
 
 	CHp_Item::HPITEM_DESC pHpItem{};
 	pHpItem.eID = LEVEL_GAMEPLAY;
 	pHpItem.pPlayer = m_pPlayer;
-	pHpItem.fScale = { 6.f, 6.f,6.f };
-	pHpItem.fPosition = { 644.512f, 0.f, 560.156f };
-	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HpItem"), &pHpItem));
+	pHpItem.fScale = {6.f,6.f,6.f};
+	pHpItem.fPosition = {644.512f,0.f,560.156f};
+	(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_HpItem"),&pHpItem));
 
 
 	return S_OK;
@@ -386,111 +389,103 @@ HRESULT CLevel_GamePlay::Ready_Layer_ITem(const _tchar* pLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 {
-	// ∫Í∑π¿Œ ƒ⁄æÓ
+	// Î∏åÎ†àÏù∏ ÏΩîÏñ¥
 	CBrainCore::BRAIN_CORE_DESC pDesc{};
 	pDesc.eID = LEVEL_GAMEPLAY;
-	pDesc.fPosition = _float3(490.f, 0.1f, 505.f);
-	pDesc.fScale = { 4.f,4.f,4.f };
+	pDesc.fPosition = _float3(490.f,0.1f,505.f);
+	pDesc.fScale = {4.f,4.f,4.f};
 	pDesc.iModelComponentIndex = 205;
-	m_pBrain = static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
+	m_pBrain = static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_BrainCore"),&pDesc));
 
-	// ø°≥ ¡ˆ ∏”Ω≈
+	// ÏóêÎÑàÏßÄ Î®∏Ïã†
 	CEnergy_Machine::ENERGYMACHINE_DESC pEnergyMachine{};
 	pEnergyMachine.eID = LEVEL_GAMEPLAY;
-	pEnergyMachine.fScale = { 5.f,5.f,5.f };
-	pEnergyMachine.fPosition = _float3{ 477.267f, 0.1f,532.115f };
+	pEnergyMachine.fScale = {5.f,5.f,5.f};
+	pEnergyMachine.fPosition = _float3{477.267f,0.1f,532.115f};
 	pEnergyMachine.pPlayer = m_pPlayer;
-	
-	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Brain"), TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
 
-	
-	// ø°≥ ¡ˆ ∏”Ω≈ ƒ∏
+	m_pEnergyMachine = static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_Brain"),TEXT("Prototype_GameObject_EnergyMachine"),&pEnergyMachine));
+
+
+	// ÏóêÎÑàÏßÄ Î®∏Ïã† Ï∫°
 	CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
 	pEnergyCap.eID = LEVEL_GAMEPLAY;
-	pEnergyCap.fScale = { 5.f,5.f,5.f };
-	pEnergyCap.fPosition = _float3{ 476.075f, 5.82203f,532.203f };
-	m_pEnergyMachine_Cap = static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Brain"), TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
+	pEnergyCap.fScale = {5.f,5.f,5.f};
+	pEnergyCap.fPosition = _float3{476.075f,5.82203f,532.203f};
+	m_pEnergyMachine_Cap = static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_Brain"),TEXT("Prototype_GameObject_EnergyCap"),&pEnergyCap));
 
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_Icon(const _tchar* pLayerTag)
 {
-	CInGameUI::INGAMEUI_DESC	pDesc{};
-	pDesc.eLevel = LEVEL_GAMEPLAY;
-	pDesc.eUITag = CInGameUI::UI_F;
-	pDesc.fSizeX = 30.f;
-	pDesc.fSizeY = 30.f;
-	pDesc.iData = 0;
-	pDesc.fX = g_iWinSizeX - 75.f;
-	pDesc.fY = 490.f;
-	pDesc.fDepth = 0.1f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc)))
+	CConstUI::CONST_UI_DESC constUI{};
+	constUI.eLevel = LEVEL_GAMEPLAY;
+	constUI.eUITag = CConstUI::UI_F;
+	constUI.fSizeX = 30.f;
+	constUI.fSizeY = 30.f;
+	constUI.iData = 0;
+	constUI.fX = g_iWinSizeX - 75.f;
+	constUI.fY = 490.f;
+	constUI.fDepth = 0.1f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc1{};
-	pDesc1.eLevel = LEVEL_GAMEPLAY;
-	pDesc1.eUITag = CInGameUI::UI_V;
-	pDesc1.fSizeX = 30.f;
-	pDesc1.fSizeY = 30.f;
-	pDesc1.iData = 0;
-	pDesc1.fX = g_iWinSizeX - 75.f;
-	pDesc1.fY = 530.f;
-	pDesc1.fDepth = 0.1f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc1)))
+	constUI.eUITag = CConstUI::UI_V;
+	constUI.fY = 530.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc2{};
-	pDesc2.eLevel = LEVEL_GAMEPLAY;
-	pDesc2.eUITag = CInGameUI::UI_SPACE;
-	pDesc2.fSizeX = 70.f;
-	pDesc2.fSizeY = 30.f;
-	pDesc2.iData = 0;
-	pDesc2.fX = g_iWinSizeX - 55.f;
-	pDesc2.fY = 450.f;
-	pDesc2.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc2)))
+	constUI.eUITag = CConstUI::UI_SPACE;
+	constUI.fSizeX = 70.f;
+	constUI.fSizeY = 30.f;
+	constUI.fX = g_iWinSizeX - 55.f;
+	constUI.fY = 450.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc19{};
-	pDesc19.eLevel = LEVEL_GAMEPLAY;
-	pDesc19.eUITag = CInGameUI::UI_JUMP_ICON;
-	pDesc19.fSizeX = 28.f;
-	pDesc19.fSizeY = 32.f;
-	pDesc19.iData = 0;
-	pDesc19.fX = g_iWinSizeX - 110.f;
-	pDesc19.fY = 450.f;
-	pDesc19.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc19)))
+	constUI.eUITag = CConstUI::UI_JUMP_ICON;
+	constUI.fSizeX = 28.f;
+	constUI.fSizeY = 32.f;
+	constUI.fX = g_iWinSizeX - 110.f;
+	constUI.fY = 450.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc3{};
-	pDesc3.eLevel = LEVEL_GAMEPLAY;
-	pDesc3.eUITag = CInGameUI::UI_SHIFT;
-	pDesc3.fSizeX = 70.f;
-	pDesc3.fSizeY = 30.f;
-	pDesc3.iData = 0;
-	pDesc3.fX = g_iWinSizeX - 55.f;
-	pDesc3.fY = 410.f;
-	pDesc3.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc3)))
+	constUI.eUITag = CConstUI::UI_SHIFT;
+	constUI.fSizeX = 70.f;
+	constUI.fSizeY = 30.f;
+	constUI.fX = g_iWinSizeX - 55.f;
+	constUI.fY = 410.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc18{};
-	pDesc18.eLevel = LEVEL_GAMEPLAY;
-	pDesc18.eUITag = CInGameUI::UI_RUN_ICON;
-	pDesc18.fSizeX = 30.f;
-	pDesc18.fSizeY = 30.f;
-	pDesc18.iData = 0;
-	pDesc18.fX = g_iWinSizeX - 110.f;
-	pDesc18.fY = 410.f;
-	pDesc18.fDepth = 0.1f;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc18)))
+	constUI.eUITag = CConstUI::UI_RUN_ICON;
+	constUI.fSizeX = 30.f;
+	constUI.fSizeY = 30.f;
+	constUI.fX = g_iWinSizeX - 110.f;
+	constUI.fY = 410.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
+
+	constUI.eUITag = CConstUI::UI_PUNCH_ICON;
+	constUI.fY = 530.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
+		return E_FAIL;
+
+	constUI.eUITag = CConstUI::UI_C;
+	constUI.fX = g_iWinSizeX - 75.f;
+	constUI.fY = 570.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
+		return E_FAIL;
+
+	constUI.eUITag = CConstUI::UI_VIEWCHANGE_ICON;
+	constUI.fX = g_iWinSizeX - 110.f;
+	constUI.fY = 570.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
+		return E_FAIL;
+
+	
 
 	CInGameUI::INGAMEUI_DESC	pDesc20{};
 	pDesc20.eLevel = LEVEL_GAMEPLAY;
@@ -503,48 +498,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Icon(const _tchar* pLayerTag)
 	pDesc20.fDepth = 0.1f;
 	pDesc20.iIndex = 0;
 	pDesc20.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc20)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&pDesc20)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc21{};
-	pDesc21.eLevel = LEVEL_GAMEPLAY;
-	pDesc21.eUITag = CInGameUI::UI_PUNCH_ICON;
-	pDesc21.fSizeX = 30.f;
-	pDesc21.fSizeY = 30.f;
-	pDesc21.iData = 0;
-	pDesc21.fX = g_iWinSizeX - 110.f;
-	pDesc21.fY = 530.f;
-	pDesc21.fDepth = 0.1f;
-	pDesc21.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc21)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc23{};
-	pDesc23.eLevel = LEVEL_GAMEPLAY;
-	pDesc23.eUITag = CInGameUI::UI_C;
-	pDesc23.fSizeX = 30.f;
-	pDesc23.fSizeY = 30.f;
-	pDesc23.iData = 0;
-	pDesc23.fX = g_iWinSizeX - 75.f;
-	pDesc23.fY = 570.f;
-	pDesc23.fDepth = 0.1f;
-	pDesc23.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc23)))
-		return E_FAIL;
-
-
-	CInGameUI::INGAMEUI_DESC	pDesc24{};
-	pDesc24.eLevel = LEVEL_GAMEPLAY;
-	pDesc24.eUITag = CInGameUI::UI_VIEWCHANGE_ICON;
-	pDesc24.fSizeX = 30.f;
-	pDesc24.fSizeY = 30.f;
-	pDesc24.iData = 0;
-	pDesc24.fX = g_iWinSizeX - 110.f;
-	pDesc24.fY = 570.f;
-	pDesc24.fDepth = 0.1f;
-	pDesc24.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc24)))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -553,77 +509,71 @@ HRESULT CLevel_GamePlay::Ready_Layer_Trap(const _tchar* pLayerTag)
 {
 	CTrap_Marks::TRAP_MARKS_DESC Mark_Desc{};
 	Mark_Desc.eID = LEVEL_GAMEPLAY;
-	Mark_Desc.fScale = { 4.f,4.f,4.f };
+	Mark_Desc.fScale = {4.f,4.f,4.f};
 	Mark_Desc.pPlayer = m_pPlayer;
 
 
-#pragma region ∑π∞Ì∆Æ∑¶
+	#pragma region Î†àÍ≥†Ìä∏Îû©
 	Mark_Desc.eType = CTrap_Marks::BRICKS_TRAP;
 
-	Mark_Desc.fPosition = _float3(502.f, 0.11f, 505.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(502.f,0.11f,505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(478.f, 0.11f, 505.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(478.f,0.11f,505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(490.f, 0.11f, 493.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
-	
-	Mark_Desc.fPosition = _float3(490.f, 0.11f, 517.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(490.f,0.11f,493.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-#pragma endregion ∑π∞Ì∆Æ∑¶
+	Mark_Desc.fPosition = _float3(490.f,0.11f,517.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-#pragma region ≈ ≈©∆Æ∑¶
+	#pragma endregion Î†àÍ≥†Ìä∏Îû©
+
+	#pragma region ÌÉ±ÌÅ¨Ìä∏Îû©
 	Mark_Desc.eType = CTrap_Marks::TANK_TRAP;
 
-	Mark_Desc.fPosition = _float3(485.692f, 0.11f, 437.152f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(485.692f,0.11f,437.152f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(440.698f, 0.11f, 428.292f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(440.698f,0.11f,428.292f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(440.114f, 0.11f, 520.027f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
-
-
-#pragma endregion ≈ ≈©∆Æ∑¶
+	Mark_Desc.fPosition = _float3(440.114f,0.11f,520.027f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
 
-
-
-
+	#pragma endregion ÌÉ±ÌÅ¨Ìä∏Îû©
 
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_Damaged(const _tchar* pLayerTag)
 {
-	CInGameUI::INGAMEUI_DESC	pDesc12{};
-	pDesc12.eLevel = LEVEL_GAMEPLAY;
-	pDesc12.eUITag = CInGameUI::UI_DAMAGED;
-	pDesc12.fSizeX = g_iWinSizeX;
-	pDesc12.fSizeY = g_iWinSizeY;
-	pDesc12.iData = 0;
-	pDesc12.fX = g_iWinSizeX * 0.5f;
-	pDesc12.fY = g_iWinSizeY * 0.5f;
-	pDesc12.fDepth = 0.f;
-	pDesc12.iIndex = 0;
-	pDesc12.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc12)))
+	CDamagedUI::DAMAGED_UI_DESC DamagedUI;
+	DamagedUI.eLevel = LEVEL_GAMEPLAY;
+	DamagedUI.fSizeX = g_iWinSizeX;
+	DamagedUI.fSizeY = g_iWinSizeY;
+	DamagedUI.iData = 0;
+	DamagedUI.fX = g_iWinSizeX * 0.5f;
+	DamagedUI.fY = g_iWinSizeY * 0.5f;
+	DamagedUI.fDepth = 0.f;
+	DamagedUI.iIndex = 0;
+	DamagedUI.pPlayer = m_pPlayer;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Damaged_UI"),&DamagedUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc4{};
-	pDesc4.eLevel = LEVEL_GAMEPLAY;
-	pDesc4.eUITag = CInGameUI::UI_DEAD;
-	pDesc4.fSizeX = 100.f;
-	pDesc4.fSizeY = 100.f;
-	pDesc4.iData = 0;
-	pDesc4.fX = g_iWinSizeX * 0.5f;
-	pDesc4.fY = g_iWinSizeY * 0.3f;
-	pDesc4.fDepth = 0.1f;
-	pDesc4.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc4)))
+
+	CDeadUI::DEAD_UI_DESC DeadUI;
+	DeadUI.eLevel = LEVEL_GAMEPLAY;
+	DeadUI.fSizeX = 100.f;
+	DeadUI.fSizeY = 100.f;
+	DeadUI.iData = 0;
+	DeadUI.fX = g_iWinSizeX * 0.5f;
+	DeadUI.fY = g_iWinSizeY * 0.3f;
+	DeadUI.fDepth = 0.1f;
+	DeadUI.pPlayer = m_pPlayer;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Dead_UI"),&DeadUI)))
 		return E_FAIL;
 
 	return S_OK;
@@ -633,9 +583,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC			Desc{};
 
-	Desc.vEye = _float4(418.755f, 1.5f, 245.710f, 1.f);
-	Desc.fPosition = _float3(418.755f, 1.5f, 245.710f);
-	Desc.vAt = _float4(0.f, 0.f, 1.f, 1.f);
+	Desc.vEye = _float4(418.755f,1.5f,245.710f,1.f);
+	Desc.fPosition = _float3(418.755f,1.5f,245.710f);
+	Desc.vAt = _float4(0.f,0.f,1.f,1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
 	Desc.fFar = 500.f;
@@ -654,7 +604,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.bShotStart = m_pPlayer->Get_ShotStart();
 	Desc.iWeaponState = m_pPlayer->Get_WeaponState();
 	Desc.iUpperMotion = m_pPlayer->Get_UpperMotion();
-	m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &Desc));
+	m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Camera_Free"),&Desc));
 	m_pPlayer->Set_CameraAt(m_pCamera->Get_Camera_At());
 	m_pPlayer->Set_CameraPos(m_pCamera->Get_Camera_Pos());
 	return S_OK;
@@ -665,98 +615,98 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 {
 	LIGHT_DESC	LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f, 240.f / 255.f * 0.5f, 255.f / 255.f * 0.5f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	LightDesc.vDirection = _float4(1.f,-1.f,1.f,0.f);
+	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f,240.f / 255.f * 0.5f,255.f / 255.f * 0.5f,1.f);
+	LightDesc.vAmbient = _float4(0.3f,0.3f,0.3f,1.f);
+	LightDesc.vSpecular = _float4(0.f,0.f,0.f,1.f);
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
 
-	ZeroMemory(&LightDesc, sizeof LightDesc);
+	ZeroMemory(&LightDesc,sizeof LightDesc);
 	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
-	LightDesc.vPosition = _float4(422.464f, 178.f, 289.020f, 1.f);
+	LightDesc.vPosition = _float4(422.464f,178.f,289.020f,1.f);
 	LightDesc.fRange = 200.f;
-	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f, 240.f / 255.f * 0.5f, 255.f / 255.f * 0.5f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f,240.f / 255.f * 0.5f,255.f / 255.f * 0.5f,1.f);
+	LightDesc.vAmbient = _float4(0.4f,0.4f,0.4f,1.f);
+	LightDesc.vSpecular = _float4(0.5f,0.5f,0.5f,1.f);
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
 	CBulb::BULB_DESC	pBulb{};
 	pBulb.eID = LEVEL_GAMEPLAY;
 	pBulb.eBulbType = CBulb::BULB_CEIL;
-	pBulb.fPosition = _float3(422.464f, 186.6f, 289.020f);
-	pBulb.fScale = _float3(5.f, 5.f, 5.f);
-	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &pBulb);
+	pBulb.fPosition = _float3(422.464f,186.6f,289.020f);
+	pBulb.fScale = _float3(5.f,5.f,5.f);
+	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Bulb"),TEXT("Prototype_GameObject_Bulb"),&pBulb);
 
 
-	ZeroMemory(&LightDesc, sizeof LightDesc);
+	ZeroMemory(&LightDesc,sizeof LightDesc);
 	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 	LightDesc.fRange = 200.f;
-	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f, 240.f / 255.f * 0.5f, 255.f / 255.f * 0.5f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
-	LightDesc.vPosition = _float4(422.464f, 180.f, 444.769f, 1.f);
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	LightDesc.vDiffuse = _float4(213.f / 255.f * 0.5f,240.f / 255.f * 0.5f,255.f / 255.f * 0.5f,1.f);
+	LightDesc.vAmbient = _float4(0.4f,0.4f,0.4f,1.f);
+	LightDesc.vSpecular = _float4(0.5f,0.5f,0.5f,1.f);
+	LightDesc.vPosition = _float4(422.464f,180.f,444.769f,1.f);
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	pBulb.fPosition = _float3(422.464f, 186.6f, 444.769f);
-	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &pBulb);
+	pBulb.fPosition = _float3(422.464f,186.6f,444.769f);
+	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Bulb"),TEXT("Prototype_GameObject_Bulb"),&pBulb);
 
 
 
-	ZeroMemory(&LightDesc, sizeof LightDesc);
+	ZeroMemory(&LightDesc,sizeof LightDesc);
 	LightDesc.eType = LIGHT_DESC::TYPE_SPOT;
-	LightDesc.vPosition = _float4(496.44f, 3.f, 497.662f, 1.f);
+	LightDesc.vPosition = _float4(496.44f,3.f,497.662f,1.f);
 	LightDesc.fRange =20.f;
-	LightDesc.vDirection = _float4(1.f, 0.f, 0.f, 0.f);
+	LightDesc.vDirection = _float4(1.f,0.f,0.f,0.f);
 	LightDesc.fAngle = XMConvertToRadians(120.f);
-	LightDesc.vDiffuse = _float4(2.f, 2.f, 2.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	LightDesc.vSpecular = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	LightDesc.vDiffuse = _float4(2.f,2.f,2.f,1.f);
+	LightDesc.vAmbient = _float4(0.4f,0.4f,0.4f,1.f);
+	LightDesc.vSpecular = _float4(0.3f,0.3f,0.3f,1.f);
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	pBulb.fScale = _float3(2.3f, 2.3f, 2.3f);
+	pBulb.fScale = _float3(2.3f,2.3f,2.3f);
 	pBulb.eBulbType = CBulb::BULB_SPOT;
-	pBulb.fPosition = _float3(530.347f, 13.128f, 474.432f);
-	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &pBulb);
-	
+	pBulb.fPosition = _float3(530.347f,13.128f,474.432f);
+	m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Bulb"),TEXT("Prototype_GameObject_Bulb"),&pBulb);
+
 	return S_OK;
 }
 
 void CLevel_GamePlay::Load_Map()
 {
-	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(L"../Bin/Data/Environment.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 
-	if (INVALID_HANDLE_VALUE == hFile)
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Environment File Failed",L"Error",MB_OK);
 		return;
 	}
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_uint iImGuiMode{};
 	_int  iModelIndex{};
-	_float3 fPos{}, fCollisionBoxScale{}, fScale{};
-	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+	_float3 fPos{},fCollisionBoxScale{},fScale{};
+	_vector	vRight{},vUp{},vLook{},vecCollisionPos{};
 
 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
 
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_GAMEPLAY;
@@ -765,37 +715,37 @@ void CLevel_GamePlay::Load_Map()
 		Desc.fScale = fScale;
 		Desc.pPlayer = m_pPlayer;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
 		}
 	}
 	CloseHandle(hFile);
 
-	 hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(L"../Bin/Data/Build.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Build File Failed",L"Error",MB_OK);
 		return;
 	}
 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
 
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_GAMEPLAY;
@@ -804,45 +754,45 @@ void CLevel_GamePlay::Load_Map()
 		Desc.fScale = fScale;
 		Desc.pPlayer = m_pPlayer;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
-			
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
+
 		}
-		
+
 	}
 
 	CloseHandle(hFile);
 
-	hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(L"../Bin/Data/Coin.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Coin File Failed",L"Error",MB_OK);
 		return;
 	}
 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		fScale = { 15.f, 15.f, 15.f };
+		fScale = {15.f,15.f,15.f};
 		fPos.y = 3.f;
 		CCoin::COIN_DESC			Desc{};
 		Desc.eID = LEVEL_GAMEPLAY;
 		Desc.fPosition = fPos;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_Coin"),
-			TEXT("Prototype_GameObject_Coin"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_Coin"),
+			TEXT("Prototype_GameObject_Coin"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CCoin*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CCoin*>(pGameObj)->MovePos(fPos.x, fPos.y, fPos.z);
-			
+			dynamic_cast<CCoin*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CCoin*>(pGameObj)->MovePos(fPos.x,fPos.y,fPos.z);
+
 		}
 	}
 
@@ -852,14 +802,14 @@ void CLevel_GamePlay::Load_Map()
 void CLevel_GamePlay::Build_Check()
 {
 	_bool bBuildCheck = false;
-	for (auto& pBuild : m_vecTrapMark)
+	for(auto& pBuild : m_vecTrapMark)
 	{
-		if (pBuild->Get_BuildAble() == true)
+		if(pBuild->Get_BuildAble() == true)
 		{
 			m_pPlayer->Set_Build_Able(true);
 			bBuildCheck = true;
 		}
-		if (bBuildCheck == false)
+		if(bBuildCheck == false)
 		{
 			m_pPlayer->Set_Build_Able(false);
 		}
@@ -868,57 +818,56 @@ void CLevel_GamePlay::Build_Check()
 
 void CLevel_GamePlay::RoundMgr_And_MonsterSpawn(_float fTimeDelta)
 {
-	if (m_iPreviousRound == 3 && m_iCurrentRound == 0 )
+	if(m_iPreviousRound == 3 && m_iCurrentRound == 0)
 	{
 		m_bVictory = true;
 		m_pEnding->Set_RoundEnd(true);
 	}
 	m_iPreviousRound = m_iCurrentRound;
-	// ∂ÛøÓµÂ æ˜µ•¿Ã∆Æ, 0¿∫ Ω¨¥¬ Ω√∞£, 1 2 3 ¿Ã ∂ÛøÓµÂ 
-	m_pGameInstance->Update_Round(fTimeDelta, m_iCurrentRound, *m_pPlayer->Get_BuildMode(), pNearMonsterLayer, pFarMonsterLayer, m_bRoundStart, m_fSkipTimer);
-	if (m_iPreviousRound != m_iCurrentRound && m_iCurrentRound == 0)
+	// ÎùºÏö¥Îìú ÏóÖÎç∞Ïù¥Ìä∏, 0ÏùÄ Ïâ¨Îäî ÏãúÍ∞Ñ, 1 2 3 Ïù¥ ÎùºÏö¥Îìú 
+	m_pGameInstance->Update_Round(fTimeDelta,m_iCurrentRound,*m_pPlayer->Get_BuildMode(),pNearMonsterLayer,pFarMonsterLayer,m_bRoundStart,m_fSkipTimer);
+	if(m_iPreviousRound != m_iCurrentRound && m_iCurrentRound == 0)
 	{
-		// ∫ÙµÂ ∏µÂ Ω√¿€ (Ω¨¥¬ Ω√∞£ Ω√¿€)
-		for (auto pMark : m_vecTrapMark)
+		// ÎπåÎìú Î™®Îìú ÏãúÏûë (Ïâ¨Îäî ÏãúÍ∞Ñ ÏãúÏûë)
+		for(auto pMark : m_vecTrapMark)
 		{
-			// ∏∏µÁ ∑π∞Ì ∫Í∏Ø¿Ã ∫ŒΩ§¡≥¿ª ∂ß ¥ŸΩ√ ∏∏µÈ ºˆ ¿÷∞‘ ∞™ √ ±‚»≠
-			if (pMark->Get_Bricks_KnockDown() == true)
+			// ÎßåÎì† Î†àÍ≥† Î∏åÎ¶≠Ïù¥ Î∂ÄÏà¥Ï°åÏùÑ Îïå Îã§Ïãú ÎßåÎì§ Ïàò ÏûàÍ≤å Í∞í Ï¥àÍ∏∞Ìôî
+			if(pMark->Get_Bricks_KnockDown() == true)
 			{
 				pMark->Set_ReBuild();
 			}
 		}
 	}
-	if (m_bRoundStart == true && m_iCurrentRound < 4)
-	{		// πËø≠¿∫ 0∫Œ≈Õ Ω√¿€¿Ã∂Û 1 ª©¡‹ 
+	if(m_bRoundStart == true && m_iCurrentRound < 4)
+	{		// Î∞∞Ïó¥ÏùÄ 0Î∂ÄÌÑ∞ ÏãúÏûëÏù¥Îùº 1 ÎπºÏ§å 
 		m_pRound[m_iCurrentRound - 1]->Set_CurrentRound(m_iCurrentRound);
 		m_pRound[m_iCurrentRound - 1]->Update(fTimeDelta);
-		if (m_bOnce == false) // «— π¯∏∏ √£¿∏∏È µ»¥Ÿ
+		if(m_bOnce == false) // Ìïú Î≤àÎßå Ï∞æÏúºÎ©¥ ÎêúÎã§
 		{
-			// ∏ÛΩ∫≈Õ ∑π¿ÃæÓ √£±‚ ( Initializeø°º≠¥¬ æ∆¡˜ ∏ÛΩ∫≈Õ ª˝º∫¿Ã æ»µ«æ˙±‚ ∂ßπÆø° ø©±‚º≠ √£æ∆æﬂ«—¥Ÿ.)
-			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"));
-			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"));
+			// Î™¨Ïä§ÌÑ∞ Î†àÏù¥Ïñ¥ Ï∞æÍ∏∞ ( InitializeÏóêÏÑúÎäî ÏïÑÏßÅ Î™¨Ïä§ÌÑ∞ ÏÉùÏÑ±Ïù¥ ÏïàÎêòÏóàÍ∏∞ ÎïåÎ¨∏Ïóê Ïó¨Í∏∞ÏÑú Ï∞æÏïÑÏïºÌïúÎã§.)
+			pNearMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Near"));
+			pFarMonsterLayer = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Far"));
 			m_bOnce = true;
 		}
 		if(pMonsterBullet == nullptr)
-			pMonsterBullet = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY, TEXT("MonsterBullet_Layer"));
+			pMonsterBullet = m_pGameInstance->Find_Layer(LEVEL_GAMEPLAY,TEXT("MonsterBullet_Layer"));
 
-		if (pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
+		if(pNearMonsterLayer != nullptr && pFarMonsterLayer != nullptr)
 		{
-			// ≥≤¿∫ ∏ÛΩ∫≈Õ ºˆ∏¶ ∫∏≥ª¡‹
+			// ÎÇ®ÏùÄ Î™¨Ïä§ÌÑ∞ ÏàòÎ•º Î≥¥ÎÇ¥Ï§å
 			m_pRound[m_iCurrentRound - 1]->Set_RemainMonster_Count(pNearMonsterLayer->Get_GameObjectList_Size() + pFarMonsterLayer->Get_GameObjectList_Size());
-		}
-		else
+		} else
 			m_bOnce = false;
 	}
 
-	
+
 }
 
-CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CLevel_GamePlay* pInstance = new CLevel_GamePlay(pDevice, pContext);
+	CLevel_GamePlay* pInstance = new CLevel_GamePlay(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if(FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CLevel_GamePlay");
 		Safe_Release(pInstance);
@@ -930,7 +879,7 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 void CLevel_GamePlay::Free()
 {
 	__super::Free();
-	
+
 	ShowCursor(true);
 	Safe_Release(m_pRound[0]);
 	Safe_Release(m_pRound[1]);
@@ -953,7 +902,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCircleDesc.vecMarks = &m_vecTrapMark;
 	pCircleDesc.pEnergy_Machine = m_pEnergyMachine;
 	pCircleDesc.pEnergyMachine_Cap = m_pEnergyMachine_Cap;
-	CGameObject* pGuage = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_CircleUI"), TEXT("Prototype_GameObject_Circle_UI"), &pCircleDesc);
+	CGameObject* pGuage = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_CircleUI"),TEXT("Prototype_GameObject_Circle_UI"),&pCircleDesc);
 	m_pGuage = static_cast<CUI_CircleGuage*>(pGuage);
 
 
@@ -968,25 +917,24 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	DescCenterIcon.fDepth = 0.1f;
 	DescCenterIcon.pPlayer = m_pPlayer;
 	DescCenterIcon.pCircle = m_pGuage;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescCenterIcon)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&DescCenterIcon)))
 		return E_FAIL;
 
 
-	// √—æÀ æ∆¿Ãƒ‹
-	CInGameUI::INGAMEUI_DESC	DescBulletIcon{};
-	DescBulletIcon.eLevel = LEVEL_GAMEPLAY;
-	DescBulletIcon.eUITag = CInGameUI::UI_BULLET;
-	DescBulletIcon.fSizeX = 30.f;
-	DescBulletIcon.fSizeY = 30.f;
-	DescBulletIcon.iData = 0;
-	DescBulletIcon.fX = g_iWinSizeX - 140.f;
-	DescBulletIcon.fY = 610.f;
-	DescBulletIcon.fDepth = 0.1f;
-	DescBulletIcon.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescBulletIcon)))
+	// Ï¥ùÏïå ÏïÑÏù¥ÏΩò
+	CBulletUI::BULLET_UI_DESC BulletIcon{};
+	BulletIcon.eLevel = LEVEL_GAMEPLAY;
+	BulletIcon.fSizeX = 30.f;
+	BulletIcon.fSizeY = 30.f;
+	BulletIcon.iData = 0;
+	BulletIcon.fX = g_iWinSizeX - 140.f;
+	BulletIcon.fY = 610.f;
+	BulletIcon.fDepth = 0.1f;
+	BulletIcon.pPlayer = m_pPlayer;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_BulletIcon_UI"),&BulletIcon)))
 		return E_FAIL;
 
-	// «ˆ¿Á √—æÀ ∞≥ºˆ
+	// ÌòÑÏû¨ Ï¥ùÏïå Í∞úÏàò
 	CNumberUI::NUMBERUI_DESC pBullet{};
 	pBullet.fDepth = 0.1f;
 	pBullet.eLevel = LEVEL_GAMEPLAY;
@@ -995,28 +943,28 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pBullet.fSizeX = 26.f;
 	pBullet.fSizeY = 26.f;
 	pBullet.eTypeUsage = CNumberUI::TYPE_BULLET;
-	pBullet.eDigit = CNumberUI::ONE_DIGIT; // ¿œ¿« ¿⁄∏Æºˆ
+	pBullet.eDigit = CNumberUI::ONE_DIGIT; // ÏùºÏùò ÏûêÎ¶¨Ïàò
 	pBullet.iData = 0;
 	pBullet.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pBullet)))
 		return E_FAIL;
 
-	pBullet.eDigit = CNumberUI::TEN_DIGIT; // Ω ¿« ¿⁄∏Æºˆ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+	pBullet.eDigit = CNumberUI::TEN_DIGIT; // Ïã≠Ïùò ÏûêÎ¶¨Ïàò
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pBullet)))
 		return E_FAIL;
 
-	// √— ≈∫æÀ ºˆ
+	// Ï¥ù ÌÉÑÏïå Ïàò
 	pBullet.fSizeX = 15.f;
 	pBullet.fSizeY = 15.f;
 	pBullet.fX = g_iWinSizeX - 40.f;
 	pBullet.fY = 620.f;
 	pBullet.eTypeUsage = CNumberUI::TYPE_FULLBULLET;
-	pBullet.eDigit = CNumberUI::ONE_DIGIT; // ¿œ¿« ¿⁄∏Æºˆ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+	pBullet.eDigit = CNumberUI::ONE_DIGIT; // ÏùºÏùò ÏûêÎ¶¨Ïàò
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pBullet)))
 		return E_FAIL;
 
-	pBullet.eDigit = CNumberUI::TEN_DIGIT; // Ω ¿« ¿⁄∏Æºˆ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pBullet)))
+	pBullet.eDigit = CNumberUI::TEN_DIGIT; // Ïã≠Ïùò ÏûêÎ¶¨Ïàò
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pBullet)))
 		return E_FAIL;
 
 
@@ -1030,10 +978,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	DescSlice.fY = 615.f;
 	DescSlice.fDepth = 0.1f;
 	DescSlice.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &DescSlice)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&DescSlice)))
 		return E_FAIL;
 
-	// ≈©∑ŒΩ∫∂Û¿Œ
+	// ÌÅ¨Î°úÏä§ÎùºÏù∏
 	CCrossLine::UIOBJECT_DESC			Desc{};
 	Desc.fX = g_iWinSizeX * 0.5f;
 	Desc.fY = g_iWinSizeY * 0.5f;
@@ -1042,7 +990,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	Desc.fDepth = 0.1f;
 	Desc.iData = 0;
 	Desc.eLevel = LEVEL_GAMEPLAY;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CrossLine"), &Desc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_CrossLine"),&Desc)))
 		return E_FAIL;
 
 	CInGameUI::INGAMEUI_DESC	pDesc9{};
@@ -1055,82 +1003,68 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDesc9.fY = 100.f;
 	pDesc9.fDepth = 0.5f;
 	pDesc9.iIndex = 1;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc9)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&pDesc9)))
 		return E_FAIL;
 
 
-	CInGameUI::INGAMEUI_DESC	pDesc5{};
-	pDesc5.eLevel = LEVEL_GAMEPLAY;
-	pDesc5.eUITag = CInGameUI::UI_BATTERY;
-	pDesc5.fSizeX = 20.f;
-	pDesc5.fSizeY = 20.f;
-	pDesc5.iData = 0;
-	pDesc5.fX = 95.f;
-	pDesc5.fY = 120.f;
-	pDesc5.fDepth = 0.1f;
-	m_pBatteryUI = static_cast<CInGameUI*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc5));
+	CBatteryUI::BATTERY_UI_DESC pBatteryUI;
+	pBatteryUI.eLevel = LEVEL_GAMEPLAY;
+	pBatteryUI.fSizeX = 20.f;
+	pBatteryUI.fSizeY = 20.f;
+	pBatteryUI.iData = 0;
+	pBatteryUI.fX = 95.f;
+	pBatteryUI.fY = 120.f;
+	pBatteryUI.fDepth = 0.1f;
+	m_pBatteryUI = static_cast<CBatteryUI*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Battery_UI"),&pBatteryUI));
 
+	CBatteryGage::BATTERYGAGE_UI_DESC pBattery_gage;
+	pBattery_gage.eLevel = LEVEL_GAMEPLAY;
+	pBattery_gage.fSizeX = 80.f;
+	pBattery_gage.fSizeY = 10.f;
+	pBattery_gage.iData = 0;
+	pBattery_gage.fX = 150;
+	pBattery_gage.fY = 120;
+	pBattery_gage.fDepth = 0.2f;
+	pBattery_gage.iIndex = 3;
+	m_pBatteryGaugeUI = static_cast<CBatteryGage*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_Battery_Gage"),&pBattery_gage));
 
-	CInGameUI::INGAMEUI_DESC	pDesc8{};
-	pDesc8.eLevel = LEVEL_GAMEPLAY;
-	pDesc8.eUITag = CInGameUI::UI_BATTERY_GAGE;
-	pDesc8.fSizeX = 80.f;
-	pDesc8.fSizeY = 10.f;
-	pDesc8.iData = 0;
-	pDesc8.fX = 150;
-	pDesc8.fY = 120;
-	pDesc8.fDepth = 0.2f;
-	pDesc8.iIndex = 3;
-	m_pBatteryGaugeUI = static_cast<CInGameUI*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc8));
-		
+	pBattery_gage.fDepth = 0.1f;
+	pBattery_gage.iIndex = 3;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_Battery_Gage"),&pBattery_gage)))
+		return E_FAIL;
 
-	pDesc8.fDepth = 0.1f;
-	pDesc8.iIndex = 3;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc8)))
+	// Machine Hp
+	CMachineHp::MACHINE_HP_UI_DESC pMachine;
+	pMachine.eLevel = LEVEL_GAMEPLAY;
+	pMachine.fSizeX = 100.f;
+	pMachine.fSizeY = 10.f;
+	pMachine.iData = 0;
+	pMachine.fX = 140;
+	pMachine.fY = 100;
+	pMachine.fMachineHP = m_pBrain->Get_BrainHp();
+	pMachine.fDepth = 0.2f;
+	pMachine.iIndex = 4;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_MachineHp"),&pMachine)))
+		return E_FAIL;
+	pMachine.fDepth = 0.1f;
+	pMachine.iIndex = 1;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_MachineHp"),&pMachine)))
+		return E_FAIL;
+	// Machine Energy
+	pMachine.fY = 80;
+	pMachine.fDepth = 0.3f;
+	pMachine.iIndex = 4;
+	pMachine.fMachineHP = m_pBrain->Get_BrainEnergy();
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_MachineHp"),&pMachine)))
+		return E_FAIL;
+
+	pMachine.fDepth = 0.2f;
+	pMachine.iIndex = 0;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_MachineHp"),&pMachine)))
 		return E_FAIL;
 
 
-	CInGameUI::INGAMEUI_DESC	pDesc10{};
-	pDesc10.eLevel = LEVEL_GAMEPLAY;
-	pDesc10.eUITag = CInGameUI::UI_MACHINE_HP;
-	pDesc10.fSizeX = 100.f;
-	pDesc10.fSizeY = 10.f;
-	pDesc10.iData = 0;
-	pDesc10.fX = 140;
-	pDesc10.fY = 100;
-	pDesc10.fBrainHP = m_pBrain->Get_BrainHp();
-	pDesc10.fDepth = 0.2f;
-	pDesc10.iIndex = 4;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc10)))
-		return E_FAIL;
-
-	pDesc10.fDepth = 0.1f;
-	pDesc10.iIndex = 1;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc10)))
-		return E_FAIL;
-
-
-	CInGameUI::INGAMEUI_DESC	pDesc11{};
-	pDesc11.eLevel = LEVEL_GAMEPLAY;
-	pDesc11.eUITag = CInGameUI::UI_MACHINE_ENERGY;
-	pDesc11.fSizeX = 100.f;
-	pDesc11.fSizeY = 10.f;
-	pDesc11.iData = 0;
-	pDesc11.fX = 140;
-	pDesc11.fY = 80;
-	pDesc11.fDepth = 0.3f;
-	pDesc11.iIndex = 4;
-	pDesc11.fBrainEnergy = m_pBrain->Get_BrainEnergy();
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc11)))
-		return E_FAIL;
-
-	pDesc11.fDepth = 0.2f;
-	pDesc11.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc11)))
-		return E_FAIL;
-
-
-	// «√∑π¿ÃæÓ ¡§∫∏ µﬁ πË∞Ê
+	// ÌîåÎ†àÏù¥Ïñ¥ Ï†ïÎ≥¥ Îí∑ Î∞∞Í≤Ω
 	CInGameUI::INGAMEUI_DESC	pDesc22{};
 	pDesc22.eLevel = LEVEL_GAMEPLAY;
 	pDesc22.eUITag = CInGameUI::UI_CONVERSATIONBOX_BACKGROUND;
@@ -1141,84 +1075,66 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDesc22.fY = g_iWinSizeY - 45.f;
 	pDesc22.fDepth = 0.4f;
 	pDesc22.iIndex = 1;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc22)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&pDesc22)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc13{};
-	pDesc13.eLevel = LEVEL_GAMEPLAY;
-	pDesc13.eUITag = CInGameUI::UI_PLAYER_HP;
-	pDesc13.fSizeX = 120.f;
-	pDesc13.fSizeY = 20.f;
-	pDesc13.iData = 0;
-	pDesc13.fX = g_iWinSizeX - 90.f;
-	pDesc13.fY = g_iWinSizeY - 45.f;
-	pDesc13.fPlayerHP = m_pPlayer->Get_PlayerHP();
-	pDesc13.fDepth = 0.3f;
-	pDesc13.iIndex = 4;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc13)))
+	// Hp
+	CPlayerHp::PLAYEYER_HP_UI_DESC	pPlayerHp{};
+	pPlayerHp.eLevel = LEVEL_GAMEPLAY;
+	pPlayerHp.fSizeX = 120.f;
+	pPlayerHp.fSizeY = 20.f;
+	pPlayerHp.iData = 0;
+	pPlayerHp.fX = g_iWinSizeX - 90.f;
+	pPlayerHp.fY = g_iWinSizeY - 45.f;
+	pPlayerHp.fPlayerHP = m_pPlayer->Get_PlayerHP();
+	pPlayerHp.fDepth = 0.3f;
+	pPlayerHp.iIndex = 4;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_PlayerHp"),&pPlayerHp)))
+		return E_FAIL;
+	pPlayerHp.fDepth = 0.2f;
+	pPlayerHp.iIndex = 1;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_PlayerHp"),&pPlayerHp)))
 		return E_FAIL;
 
-	pDesc13.fDepth = 0.2f;
-	pDesc13.iIndex = 1;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc13)))
+	// Energy
+	pPlayerHp.fY = g_iWinSizeY - 70.f;
+	pPlayerHp.fDepth = 0.3f;
+	pPlayerHp.iIndex = 4;
+	pPlayerHp.fPlayerHP = m_pPlayer->Get_PlayerEnergy();
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_PlayerHp"),&pPlayerHp)))
 		return E_FAIL;
 
-
-	CInGameUI::INGAMEUI_DESC	pDesc14{};
-	pDesc14.eLevel = LEVEL_GAMEPLAY;
-	pDesc14.eUITag = CInGameUI::UI_PLAYER_ENERGY;
-	pDesc14.fSizeX = 120.f;
-	pDesc14.fSizeY = 20.f;
-	pDesc14.iData = 0;
-	pDesc14.fX = g_iWinSizeX - 90.f;
-	pDesc14.fY = g_iWinSizeY - 70.f;
-	pDesc14.fDepth = 0.3f;
-	pDesc14.iIndex = 4;
-	pDesc14.fPlayerEnergy = m_pPlayer->Get_PlayerEnergy();
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc14)))
+	pPlayerHp.fDepth = 0.2f;
+	pPlayerHp.iIndex = 0;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI_PlayerHp"),&pPlayerHp)))
 		return E_FAIL;
 
-	pDesc14.fDepth = 0.2f;
-	pDesc14.iIndex = 0;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc14)))
-		return E_FAIL;
-
-	CInGameUI::INGAMEUI_DESC	pDesc15{};
-	pDesc15.eLevel = LEVEL_GAMEPLAY;
-	pDesc15.eUITag = CInGameUI::UI_ENERGY_ICON;
-	pDesc15.fSizeX = 23.f;
-	pDesc15.fSizeY = 23.f;
-	pDesc15.iData = 0;
-	pDesc15.fX = g_iWinSizeX - 160.f;
-	pDesc15.fY = g_iWinSizeY - 70.f;
-	pDesc15.fDepth = 0.2f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc15)))
+	CConstUI::CONST_UI_DESC constUI{};
+	constUI.eLevel = LEVEL_GAMEPLAY;
+	constUI.eUITag = CConstUI::UI_ENERGY_ICON;
+	constUI.fSizeX = 23.f;
+	constUI.fSizeY = 23.f;
+	constUI.iData = 0;
+	constUI.fX = g_iWinSizeX - 160.f;
+	constUI.fY = g_iWinSizeY - 70.f;
+	constUI.fDepth = 0.2f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
 
-	CInGameUI::INGAMEUI_DESC	pDesc16{};
-	pDesc16.eLevel = LEVEL_GAMEPLAY;
-	pDesc16.eUITag = CInGameUI::UI_HP_ICON;
-	pDesc16.fSizeX = 15.f;
-	pDesc16.fSizeY = 15.f;
-	pDesc16.iData = 0;
-	pDesc16.fX = g_iWinSizeX - 160.f;
-	pDesc16.fY = g_iWinSizeY - 45.f;
-	pDesc16.fDepth = 0.2f;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc16)))
+	constUI.eUITag = CConstUI::UI_HP_ICON;
+	constUI.fSizeX = 15.f;
+	constUI.fSizeY = 15.f;
+	constUI.fY = g_iWinSizeY - 45.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
-	CInGameUI::INGAMEUI_DESC	pDesc17{};
-	pDesc17.eLevel = LEVEL_GAMEPLAY;
-	pDesc17.eUITag = CInGameUI::UI_CREDIT_ICON;
-	pDesc17.fSizeX = 18.f;
-	pDesc17.fSizeY = 18.f;
-	pDesc17.iData = 0;
-	pDesc17.fX = g_iWinSizeX - 160.f;
-	pDesc17.fY = g_iWinSizeY - 22.f;
-	pDesc17.fDepth = 0.2f;
-	pDesc17.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc17)))
+	constUI.eUITag = CConstUI::UI_CREDIT_ICON;
+	constUI.fSizeX = 18.f;
+	constUI.fSizeY = 18.f;
+	constUI.fX = g_iWinSizeX - 160.f;
+	constUI.fY = g_iWinSizeY - 22.f;
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_Const_UI"),&constUI)))
 		return E_FAIL;
 
 	CInGameUI::INGAMEUI_DESC	pDescMidCenter_Sign{};
@@ -1232,7 +1148,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDescMidCenter_Sign.fDepth = 0.4f;
 	pDescMidCenter_Sign.iIndex = 1;
 	pDescMidCenter_Sign.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDescMidCenter_Sign)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&pDescMidCenter_Sign)))
 		return E_FAIL;
 
 	CInGameUI::INGAMEUI_DESC	pBuild_F_Desc{};
@@ -1245,12 +1161,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pBuild_F_Desc.fY = g_iWinSizeY * 0.8f;
 	pBuild_F_Desc.fDepth = 0.1f;
 	pBuild_F_Desc.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pBuild_F_Desc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&pBuild_F_Desc)))
 		return E_FAIL;
-
-
-
-
 
 	CInGameUI::INGAMEUI_DESC	pDesc7{};
 	pDesc7.eLevel = LEVEL_GAMEPLAY;
@@ -1261,11 +1173,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDesc7.fX = g_iWinSizeX * 0.55f;
 	pDesc7.fY = 65.f;
 	pDesc7.fDepth = 0.2f;
-	pDesc7.iIndex = 0;	
+	pDesc7.iIndex = 0;
 	pDesc7.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UI"), &pDesc7)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UI"),&pDesc7)))
 		return E_FAIL;
-	CGameObject* pConversationBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &pDesc7);
+	CGameObject* pConversationBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_UI"),TEXT("Prototype_GameObject_UI"),&pDesc7);
 	m_pConversationBox = static_cast<CInGameUI*>(pConversationBox);
 
 	CInGameUI::INGAMEUI_DESC	pDesc6{};
@@ -1278,21 +1190,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pDesc6.fY = 65.f;
 	pDesc6.fDepth = 0.1f;
 	pDesc6.pPlayer = m_pPlayer;
-	CGameObject* pCharacter = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &pDesc6);
+	CGameObject* pCharacter = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_UI"),TEXT("Prototype_GameObject_UI"),&pDesc6);
 	m_pCharacter = static_cast<CInGameUI*>(pCharacter);
 
-	CInGameUI::INGAMEUI_DESC	Ending{};
+	CEnding_UI::ENDING_UI_DESC Ending{};
 	Ending.eLevel = LEVEL_GAMEPLAY;
-	Ending.eUITag = CInGameUI::UI_VICTORY;
 	Ending.fSizeX = g_iWinSizeX;
 	Ending.fSizeY = g_iWinSizeY;
 	Ending.fX = g_iWinSizeX * 0.5f;
 	Ending.fY = g_iWinSizeY * 0.5f;
 	Ending.fDepth = 0.f;
-	CGameObject* pEnd = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY, TEXT("Layer_UI"), TEXT("Prototype_GameObject_UI"), &Ending);
-	m_pEnding = static_cast<CInGameUI*>(pEnd);
+	CGameObject* pEnd = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_GAMEPLAY,TEXT("Layer_UI"),TEXT("Prototype_GameObject_Ending_UI"),&Ending);
+	m_pEnding = static_cast<CEnding_UI*>(pEnd);
 
-	// ƒ⁄¿Œ UI( º˝¿⁄ )
+	// ÏΩîÏù∏ UI( Ïà´Ïûê )
 	CNumberUI::NUMBERUI_DESC pCoin{};
 	pCoin.fDepth = 0.1f;
 	pCoin.eLevel = LEVEL_GAMEPLAY;
@@ -1301,30 +1212,30 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar* pLayerTag)
 	pCoin.fSizeX = 13.f;
 	pCoin.fSizeY = 13.f;
 	pCoin.eTypeUsage = CNumberUI::TYPE_COIN;
-	pCoin.eDigit = CNumberUI::ONE_DIGIT; // √π π¯¬∞ ¿⁄∏Æºˆ
+	pCoin.eDigit = CNumberUI::ONE_DIGIT; // Ï≤´ Î≤àÏß∏ ÏûêÎ¶¨Ïàò
 	pCoin.iData = 0;
 	pCoin.pPlayer = m_pPlayer;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pCoin)))
 		return E_FAIL;
 
-	pCoin.eDigit = CNumberUI::TEN_DIGIT; // Ω ¿« ¿⁄∏Æ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+	pCoin.eDigit = CNumberUI::TEN_DIGIT; // Ïã≠Ïùò ÏûêÎ¶¨
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pCoin)))
 		return E_FAIL;
 
-	pCoin.eDigit = CNumberUI::HUNDREDS_DIGIT; // πÈ¿« ¿⁄∏Æ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+	pCoin.eDigit = CNumberUI::HUNDREDS_DIGIT; // Î∞±Ïùò ÏûêÎ¶¨
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pCoin)))
 		return E_FAIL;
 
-	pCoin.eDigit = CNumberUI::THOUSANDS_DIGIT; // √µ¿« ¿⁄∏Æ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+	pCoin.eDigit = CNumberUI::THOUSANDS_DIGIT; // Ï≤úÏùò ÏûêÎ¶¨
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pCoin)))
 		return E_FAIL;
 
-	pCoin.eDigit = CNumberUI::TENS_OF_THOUSANDS_DIGIT; // ∏∏¿« ¿⁄∏Æ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+	pCoin.eDigit = CNumberUI::TENS_OF_THOUSANDS_DIGIT; // ÎßåÏùò ÏûêÎ¶¨
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pCoin)))
 		return E_FAIL;
 
-	pCoin.eDigit = CNumberUI::HUNDREDS_OF_THOUSANDS_DIGIT; // Ω ∏∏¿« ¿⁄∏Æ
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_UINumber"), &pCoin)))
+	pCoin.eDigit = CNumberUI::HUNDREDS_OF_THOUSANDS_DIGIT; // Ïã≠ÎßåÏùò ÏûêÎ¶¨
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,pLayerTag,TEXT("Prototype_GameObject_UINumber"),&pCoin)))
 		return E_FAIL;
 
 

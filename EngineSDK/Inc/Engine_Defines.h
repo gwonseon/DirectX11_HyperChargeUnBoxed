@@ -52,84 +52,88 @@ using namespace DirectX;
 
 namespace Engine
 {
-	const _wstring g_strTransformTag = TEXT("Com_Transform"); // Transform ∞˙ Component µŒ ∏ ø° ≥÷æÓ¡‡æﬂ «œ¥œ ¿¸ø™¿˚¿Œ ¿Ã∏ß¿∏∑Œ ∏∏µÈæÓ¡‹
+const _wstring g_strTransformTag = TEXT("Com_Transform"); // Transform Í≥º Component Îëê ÎßµÏóê ÎÑ£Ïñ¥Ï§òÏïº ÌïòÎãà Ï†ÑÏó≠Ï†ÅÏù∏ Ïù¥Î¶ÑÏúºÎ°ú ÎßåÎì§Ïñ¥Ï§å
 
-	enum MOUSEKEYSTATE { DIM_LB, DIM_RB, DIM_MB, DIM_END };
-	enum MOUSEMOVESTATE { DIMS_X, DIMS_Y, DIMS_Z, DIMS_END };
+enum MOUSEKEYSTATE {
+	DIM_LB,DIM_RB,DIM_MB,DIM_END
+};
+enum MOUSEMOVESTATE {
+	DIMS_X,DIMS_Y,DIMS_Z,DIMS_END
+};
 
-	enum CHANNELID
-	{
-		SOUND_BGM,
-		SOUND_TANK_FLARE,
-		SOUND_TANK_EXPLOSION,
-		SOUND_TANK_MOVE,
-		SOUND_RIFLEMAN_FLARE,
-		SOUND_RIFLEMAN_DEDA,
-		SOUND_HELICOPTER_FLY,
-		SOUND_HELICOPTER_DEAD,
-		SOUND_HELICOPTER_FALL,
-		SOUND_HELICOPTER_FLARE,
-		SOUND_MISSILETRUCK_BODY,
-		SOUND_MISSIE_EXPLOSION,
-		SOUND_MISSILE,
-		SOUND_MISSILE_WARNING,
-		SOUND_MISSILE_FLAME,
-		SOUND_MISSILE_CARSOUND,
-		SOUND_ALIEN_DEAD,
-		SOUND_ALIEN_SPEAK,
-		SOUND_PONY_BITE,
-		SOUND_PONY_WALK,
-		SOUND_PONY_DEAD,
-		SOUND_EFFECT,
-		PLAYER_FIRE,
-		PLAYER_JUMP,
-		PLAYER_DOUBLEJUMP,
-		PLAYER_WALK,
-		PLAYER_PAIN,
-		PLAYER_RELOAD,
-		PLAYER_SWORD,
-		PLAYER_MELEE,
-		BRAINCORE,
-		POWERNODE_START,
-		POWERNODE,
-		BATTERY,
-		TRAP_BUILD,
-		TRAP_BROKEN,
-		PLAYER_ACT,
-		COIN,
-		ITEM,
-		TUTORIAL,
-		MAXCHANNEL
-	};
+enum CHANNELID
+{
+	SOUND_BGM,
+	SOUND_TANK_FLARE,
+	SOUND_TANK_EXPLOSION,
+	SOUND_TANK_MOVE,
+	SOUND_RIFLEMAN_FLARE,
+	SOUND_RIFLEMAN_DEDA,
+	SOUND_HELICOPTER_FLY,
+	SOUND_HELICOPTER_DEAD,
+	SOUND_HELICOPTER_FALL,
+	SOUND_HELICOPTER_FLARE,
+	SOUND_MISSILETRUCK_BODY,
+	SOUND_MISSIE_EXPLOSION,
+	SOUND_MISSILE,
+	SOUND_MISSILE_WARNING,
+	SOUND_MISSILE_FLAME,
+	SOUND_MISSILE_CARSOUND,
+	SOUND_ALIEN_DEAD,
+	SOUND_ALIEN_SPEAK,
+	SOUND_PONY_BITE,
+	SOUND_PONY_WALK,
+	SOUND_PONY_DEAD,
+	SOUND_EFFECT,
+	PLAYER_FIRE,
+	PLAYER_JUMP,
+	PLAYER_DOUBLEJUMP,
+	PLAYER_WALK,
+	PLAYER_PAIN,
+	PLAYER_RELOAD,
+	PLAYER_SWORD,
+	PLAYER_MELEE,
+	BRAINCORE,
+	POWERNODE_START,
+	POWERNODE,
+	BATTERY,
+	TRAP_BUILD,
+	TRAP_BROKEN,
+	PLAYER_ACT,
+	COIN,
+	ITEM,
+	TUTORIAL,
+	MAXCHANNEL
+};
 
 
-	enum aiTextureType
-	{
-		aiTextureType_NONE = 0,
-		aiTextureType_DIFFUSE = 1,
-		aiTextureType_SPECULAR = 2,
-		aiTextureType_AMBIENT = 3,
-		aiTextureType_EMISSIVE = 4,
-		aiTextureType_HEIGHT = 5,
-		aiTextureType_NORMALS = 6,
-		aiTextureType_SHININESS = 7,
-		aiTextureType_OPACITY = 8,
-		aiTextureType_DISPLACEMENT = 9,
-		aiTextureType_LIGHTMAP = 10,
-		aiTextureType_REFLECTION = 11,
-		aiTextureType_BASE_COLOR = 12,
-		aiTextureType_NORMAL_CAMERA = 13,
-		aiTextureType_EMISSION_COLOR = 14,
-		aiTextureType_METALNESS = 15,
-		aiTextureType_DIFFUSE_ROUGHNESS = 16,
-		aiTextureType_AMBIENT_OCCLUSION = 17,
+enum aiTextureType
+{
+	aiTextureType_NONE = 0,
+	aiTextureType_DIFFUSE = 1,
+	aiTextureType_SPECULAR = 2,
+	aiTextureType_AMBIENT = 3,
+	aiTextureType_EMISSIVE = 4,
+	aiTextureType_HEIGHT = 5,
+	aiTextureType_NORMALS = 6,
+	aiTextureType_SHININESS = 7,
+	aiTextureType_OPACITY = 8,
+	aiTextureType_DISPLACEMENT = 9,
+	aiTextureType_LIGHTMAP = 10,
+	aiTextureType_REFLECTION = 11,
+	aiTextureType_BASE_COLOR = 12,
+	aiTextureType_NORMAL_CAMERA = 13,
+	aiTextureType_EMISSION_COLOR = 14,
+	aiTextureType_METALNESS = 15,
+	aiTextureType_DIFFUSE_ROUGHNESS = 16,
+	aiTextureType_AMBIENT_OCCLUSION = 17,
 
-		aiTextureType_UNKNOWN = 18,
+	aiTextureType_UNKNOWN = 18,
 
-#ifndef SWIG
-		_aiTextureType_Force32Bit = INT_MAX
-#endif
-	};
+	#ifndef SWIG
+	_aiTextureType_Force32Bit = INT_MAX
+	#endif
+};
 
 
 }

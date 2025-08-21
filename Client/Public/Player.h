@@ -17,10 +17,10 @@ class CNavigation;
 END
 
 BEGIN(Client)
-class CPlayer final : public CContainerObject
+class CPlayer final: public CContainerObject
 {
 public:
-	typedef struct : public CGameObject::GAMEOBJ_DESC
+	typedef struct: public CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID m_eLevelID{};
 		_vector* vCameraAt = {};
@@ -31,7 +31,9 @@ public:
 
 
 public:
-	enum TPS_PARTOBJID { TPS_PART_BODY, TPS_PART_WEAPON, TPS_PART_EFFECT, TPS_PART_HEAD, TPS_PART_PIVOT, TPS_PART_KATANA, FPS_PART_BODY, FPS_PART_PIVOT, PART_END };
+	enum TPS_PARTOBJID {
+		TPS_PART_BODY,TPS_PART_WEAPON,TPS_PART_EFFECT,TPS_PART_HEAD,TPS_PART_PIVOT,TPS_PART_KATANA,FPS_PART_BODY,FPS_PART_PIVOT,PART_END
+	};
 	enum TPSSTATE {
 		STATE_IDLE			= 0x00000001,
 		WALKSTATE_NORTH		= 0x00000002,
@@ -77,16 +79,16 @@ public:
 	};
 
 private:
-	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPlayer(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CPlayer(const CPlayer& Prototype);
 	virtual ~CPlayer() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -97,36 +99,72 @@ private:
 	void Heal(_float fTimeDelta);
 	void Walk_Sound(_float fTimDelta);
 public:
-	void Set_Dir(_vector vDir) { m_pTransformCom->Set_State(CTransform::STATE_LOOK, vDir); }
-	_vector Get_Dir() { return m_pTransformCom->Get_State(CTransform::STATE_LOOK); }
-	void		Get_Rotation(_vector& vRight, _vector& vUp, _vector& vLook) {
+	void Set_Dir(_vector vDir) {
+		m_pTransformCom->Set_State(CTransform::STATE_LOOK,vDir);
+	}
+	_vector Get_Dir() {
+		return m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	}
+	void		Get_Rotation(_vector& vRight,_vector& vUp,_vector& vLook) {
 		vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
 		vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
 		vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	}
-	_uint* Get_ViewState() { return &m_iViewState; }
-	void   Set_CameraAt(_vector* pAt) { m_vecCameraAt = pAt; }
-	void   Set_CameraPos(_vector* pPos) { m_vecCameraPos = pPos; }
-	void   Set_Rotaion(_vector	vRight, _vector	vUp, _vector	vLook) {
-		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, vRight);
-		m_pTransformCom->Set_State(CTransform::STATE_UP, vUp);
-		m_pTransformCom->Set_State(CTransform::STATE_LOOK, vLook);
+	_uint* Get_ViewState() {
+		return &m_iViewState;
 	}
-	_float	Get_Rotation_Value() { return m_fRotation_Value; }
-	void Set_Rotation(_float fAngleY) { m_pTransformCom->Rotation(0.f, fAngleY, 0.f); }
-	void Set_RoundStart(_bool* bStart) { m_bRoundStart = bStart; }
+	void   Set_CameraAt(_vector* pAt) {
+		m_vecCameraAt = pAt;
+	}
+	void   Set_CameraPos(_vector* pPos) {
+		m_vecCameraPos = pPos;
+	}
+	void   Set_Rotaion(_vector	vRight,_vector	vUp,_vector	vLook) {
+		m_pTransformCom->Set_State(CTransform::STATE_RIGHT,vRight);
+		m_pTransformCom->Set_State(CTransform::STATE_UP,vUp);
+		m_pTransformCom->Set_State(CTransform::STATE_LOOK,vLook);
+	}
+	_float	Get_Rotation_Value() {
+		return m_fRotation_Value;
+	}
+	void Set_Rotation(_float fAngleY) {
+		m_pTransformCom->Rotation(0.f,fAngleY,0.f);
+	}
+	void Set_RoundStart(_bool* bStart) {
+		m_bRoundStart = bStart;
+	}
 
 
-	CTransform* Get_Transform() { return m_pTransformCom; }
-	_vector* Get_TPSPosptr() { return m_vecTPS_CamPos; }
-	_vector* Get_FPSPosptr() { return m_vecFPS_CamPos; }
-	_vector* Get_WeaponPos() { return m_vecWeaponPos; }
-	_vector* Get_WeaponDir() { return m_vecWeaponDir; }
-	_bool* Get_ShotNow() { return m_pBody->Get_ShotNow(); }
-	_bool* Get_ShotStart() { return m_pBody->Get_ShotStart(); }
-	_uint* Get_WeaponState() { return &m_iWeaponState; }
-	_uint* Get_UpperMotion() { return m_pBody->Get_UpperMotion(); }
-	_bool* Get_Reloading() { return &m_bReloading; }
+	CTransform* Get_Transform() {
+		return m_pTransformCom;
+	}
+	_vector* Get_TPSPosptr() {
+		return m_vecTPS_CamPos;
+	}
+	_vector* Get_FPSPosptr() {
+		return m_vecFPS_CamPos;
+	}
+	_vector* Get_WeaponPos() {
+		return m_vecWeaponPos;
+	}
+	_vector* Get_WeaponDir() {
+		return m_vecWeaponDir;
+	}
+	_bool* Get_ShotNow() {
+		return m_pBody->Get_ShotNow();
+	}
+	_bool* Get_ShotStart() {
+		return m_pBody->Get_ShotStart();
+	}
+	_uint* Get_WeaponState() {
+		return &m_iWeaponState;
+	}
+	_uint* Get_UpperMotion() {
+		return m_pBody->Get_UpperMotion();
+	}
+	_bool* Get_Reloading() {
+		return &m_bReloading;
+	}
 
 
 private: // Camera 
@@ -156,26 +194,38 @@ private:
 	float					m_fRun_EightDirection{};
 	_float					m_fReload_Charging = 0.f;
 	_float3					m_vecTargetPos{};
-#pragma region  ºôµå ¸ğµå 
+	#pragma region  ë¹Œë“œ ëª¨ë“œ 
 private:
-	_bool					m_bBuildMode = false;		// ºôµå ¸ğµå
-	_bool					m_bBuild_Gauging = false;  // E ´­·¯¼­ ºôµå ÁßÀÓÀ» ¾Ë·ÁÁÖ´Â º¯¼ö
+	_bool					m_bBuildMode = false;		// ë¹Œë“œ ëª¨ë“œ
+	_bool					m_bBuild_Gauging = false;  // E ëˆŒëŸ¬ì„œ ë¹Œë“œ ì¤‘ì„ì„ ì•Œë ¤ì£¼ëŠ” ë³€ìˆ˜
 	_bool					m_bCharging = false;
 	_bool					m_bBuild_Able = false;
 
-	_bool* m_bRoundStart = { nullptr }; // ºôµå ¸ğµå°¡ ³¡³ª°í ¶ó¿îµå°¡ ½ÃÀÛÇßÀ½À» ¾Ë¸®´Â  Æ÷ÀÎÅÍ
-	_uint* m_iRound = { nullptr };
+	_bool* m_bRoundStart = {nullptr}; // ë¹Œë“œ ëª¨ë“œê°€ ëë‚˜ê³  ë¼ìš´ë“œê°€ ì‹œì‘í–ˆìŒì„ ì•Œë¦¬ëŠ”  í¬ì¸í„°
+	_uint* m_iRound = {nullptr};
 public:
-	void	Set_Build_Able(_bool bAble) { m_bBuild_Able = bAble; }
-	void	Set_BuildMode(_bool bMode) { m_bBuildMode = bMode; }
-	_bool* Get_BuildMode() { return &m_bBuildMode; }
-	_bool	Get_Build_Gauging() { return m_bBuild_Gauging; }
+	void	Set_Build_Able(_bool bAble) {
+		m_bBuild_Able = bAble;
+	}
+	void	Set_BuildMode(_bool bMode) {
+		m_bBuildMode = bMode;
+	}
+	_bool* Get_BuildMode() {
+		return &m_bBuildMode;
+	}
+	_bool	Get_Build_Gauging() {
+		return m_bBuild_Gauging;
+	}
 
-#pragma endregion  ºôµå ¸ğµå 
+	#pragma endregion  ë¹Œë“œ ëª¨ë“œ 
 
-public:  // ÃÑ¾Ë
-	_uint* Get_CurrentBullet() { return m_pWaepon->Get_CurrentBullet(); }
-	_uint* Get_FullBullet() { return m_pWaepon->Get_FullBullet(); }
+public:  // ì´ì•Œ
+	_uint* Get_CurrentBullet() {
+		return m_pWaepon->Get_CurrentBullet();
+	}
+	_uint* Get_FullBullet() {
+		return m_pWaepon->Get_FullBullet();
+	}
 
 public:
 	_float m_fRotation_Value{};
@@ -188,15 +238,15 @@ private:
 	CNavigation* m_pNavigationCom = nullptr;
 
 private:
-	_float	m_fHeight{};		// Á¡ÇÁ ³ôÀÌ
-	_float m_fPower{};			// Á¡ÇÁ Èû
+	_float	m_fHeight{};		// ì í”„ ë†’ì´
+	_float m_fPower{};			// ì í”„ í˜
 	_float	m_fHeight_Store{};
-	_float	m_fInvincibleTime{}; // ¹«Àû½Ã°£
-	
-	_vector	m_vecPos{}, m_vecDir{}, m_vecDir2{};
+	_float	m_fInvincibleTime{}; // ë¬´ì ì‹œê°„
+
+	_vector	m_vecPos{},m_vecDir{},m_vecDir2{};
 
 private:
-	_float					m_fMouseSensor = { 0.f };
+	_float					m_fMouseSensor = {0.f};
 	_float					m_fHpTiem{};
 	_vector					m_vecPivotPos{};
 
@@ -219,33 +269,55 @@ private:
 	void Player_Movement(_float fTimeDelta);
 
 public:
-	_vector Get_Position() { return m_vecPos; }
-	_vector Get_PivotPostion() { return m_vecPivotPos; }
-	_uint	Get_CurrentCellIdx() { return m_pNavigationCom->Get_CurrentCell_Index(); }
-	void	Set_EquipNumber(_uint iEquipNum) { m_iWeaponState = iEquipNum; }
+	_vector Get_Position() {
+		return m_vecPos;
+	}
+	_vector Get_PivotPostion() {
+		return m_vecPivotPos;
+	}
+	_uint	Get_CurrentCellIdx() {
+		return m_pNavigationCom->Get_CurrentCell_Index();
+	}
+	void	Set_EquipNumber(_uint iEquipNum) {
+		m_iWeaponState = iEquipNum;
+	}
 
 
-	_bool	Set_Charging(_bool bCharge) { m_bCharging = bCharge; }
+	_bool	Set_Charging(_bool bCharge) {
+		m_bCharging = bCharge;
+	}
 
-#pragma region ¹èÅÍ¸®
+	#pragma region ë°°í„°ë¦¬
 public:
 	void	PickUp_Battery(_uint iEquipNum)
 	{
-		m_iPrev_WeaponState = m_iWeaponState; // Áö±İ µé°í ÀÖ´Â ¹«±â¸¦ ÀúÀåÇØµÒ, ³ªÁß¿¡ °ÇÀüÁö ³»·Á³õ¾ÒÀ» ¶§ ÀÌ°Å ´Ù½Ã µé¾î¾ßÇÔ
-		m_iWeaponState = iEquipNum; // ¹«±â ¹èÅÍ¸®·Î º¯°æ
+		m_iPrev_WeaponState = m_iWeaponState; // ì§€ê¸ˆ ë“¤ê³  ìˆëŠ” ë¬´ê¸°ë¥¼ ì €ì¥í•´ë‘ , ë‚˜ì¤‘ì— ê±´ì „ì§€ ë‚´ë ¤ë†“ì•˜ì„ ë•Œ ì´ê±° ë‹¤ì‹œ ë“¤ì–´ì•¼í•¨
+		m_iWeaponState = iEquipNum; // ë¬´ê¸° ë°°í„°ë¦¬ë¡œ ë³€ê²½
 	}
 	void	Insert_Battery()
 	{
 		m_iWeaponState = m_iPrev_WeaponState;
 	}
-	_vector* Get_BatteryPos() { return &m_vecBatteryPos; }
-	_bool* Get_Visible_Battery() { return &m_bVisible_Battery; }
+	_vector* Get_BatteryPos() {
+		return &m_vecBatteryPos;
+	}
+	_bool* Get_Visible_Battery() {
+		return &m_bVisible_Battery;
+	}
 
-	_vector* Get_TrackerPos() { return &m_vecTrackerPos; }
-	_bool* Get_Visible_Tracker() { return &m_bVisible_Tracker; }
+	_vector* Get_TrackerPos() {
+		return &m_vecTrackerPos;
+	}
+	_bool* Get_Visible_Tracker() {
+		return &m_bVisible_Tracker;
+	}
 
-	void	Set_Explosion(_bool bExplo) { m_bMissile_Explosion = bExplo; }
-	_bool	Get_Explosion() { return m_bMissile_Explosion; }
+	void	Set_Explosion(_bool bExplo) {
+		m_bMissile_Explosion = bExplo;
+	}
+	_bool	Get_Explosion() {
+		return m_bMissile_Explosion;
+	}
 private:
 	_uint					m_iPrev_WeaponState = WEAPON_RIFLE;
 	_vector					m_vecBatteryPos{};
@@ -253,23 +325,31 @@ private:
 	_bool					m_bVisible_Battery = true;
 	_bool					m_bVisible_Tracker = false;
 	_bool					m_bMissile_Explosion = false;
-#pragma endregion ¹èÅÍ¸®
+	#pragma endregion ë°°í„°ë¦¬
 
-#pragma region ¾ÆÀÌÅÛ
+	#pragma region ì•„ì´í…œ
 public:
-	void Set_PickUp_CollectItem() { ++m_iItem_Collector_Count; }
+	void Set_PickUp_CollectItem() {
+		++m_iItem_Collector_Count;
+	}
 
-	_uint Get_CollectItem() { return m_iItem_Collector_Count; }
+	_uint Get_CollectItem() {
+		return m_iItem_Collector_Count;
+	}
 private:
 	_uint m_iItem_Collector_Count = 0;
-#pragma endregion ¾ÆÀÌÅÛ
+	#pragma endregion ì•„ì´í…œ
 
 public:
-	_float* Get_PlayerHP() { return &m_fHp; }
-	_float* Get_PlayerEnergy() { return &m_fEnergy; }
+	_float* Get_PlayerHP() {
+		return &m_fHp;
+	}
+	_float* Get_PlayerEnergy() {
+		return &m_fEnergy;
+	}
 
 public:
-	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPlayer* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

@@ -3,267 +3,260 @@
 
 #include "GameInstance.h"
 
-CTracker::CTracker(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject{ pDevice, pContext }
-{
-}
+CTracker::CTracker(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CTracker::CTracker(const CTracker& Prototype)
-    : CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CTracker::Initialize_Prototype()
 {
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CTracker::Initialize(void* pArg)
 {
-    TRACKER_DESC* pTracker = static_cast<TRACKER_DESC*>(pArg);
-    m_eLevel = pTracker->eID;
-    m_iRound = pTracker->iRound;
-    m_pPlayer = pTracker->pPlayer;
-    if (FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
-    if (FAILED(Add_Components()))
-        return E_FAIL;
+	TRACKER_DESC* pTracker = static_cast<TRACKER_DESC*>(pArg);
+	m_eLevel = pTracker->eID;
+	m_iRound = pTracker->iRound;
+	m_pPlayer = pTracker->pPlayer;
+	if(FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+	if(FAILED(Add_Components()))
+		return E_FAIL;
 
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(pTracker->fPosition.x, pTracker->fPosition.y, pTracker->fPosition.z, 1.f));
-    m_pTransformCom->Set_Scaling(pTracker->fScale.x, pTracker->fScale.y, pTracker->fScale.z);
-    m_fTimer = 100.f;
-    m_bPickUp_Player = m_pPlayer->Get_Visible_Tracker();
- 
-    
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(pTracker->fPosition.x,pTracker->fPosition.y,pTracker->fPosition.z,1.f));
+	m_pTransformCom->Set_Scaling(pTracker->fScale.x,pTracker->fScale.y,pTracker->fScale.z);
+	m_fTimer = 100.f;
+	m_bPickUp_Player = m_pPlayer->Get_Visible_Tracker();
 
 
-    return S_OK;
+
+
+	return S_OK;
 }
 
 void CTracker::Priority_Update(_float fTimeDelta)
 {
-    m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-    if (m_bMissile_Fall == true)
-    {   // ¹Ì»çÀÏ ¶³¾îÁö¸é ÇÃ·¹ÀÌ¾î ¼Õ¿¡¼­ ³õ±â
-        *m_bPickUp_Player = false;
-        if(*m_pPlayer->Get_WeaponState() == CPlayer::TRACKER)
-        {
-            m_pPlayer->Set_Explosion(true);
-        }
-        m_bMissile_Fall = false;
-    }
+	if(m_bMissile_Fall == true)
+	{   // ë¯¸ì‚¬ì¼ ë–¨ì–´ì§€ë©´ í”Œë ˆì´ì–´ ì†ì—ì„œ ë†“ê¸°
+		*m_bPickUp_Player = false;
+		if(*m_pPlayer->Get_WeaponState() == CPlayer::TRACKER)
+		{
+			m_pPlayer->Set_Explosion(true);
+		}
+		m_bMissile_Fall = false;
+	}
 
-    _vector vecPlayerPos = m_pPlayer->Get_Position();
-    if (*m_bPickUp_Player == true) // ÇÃ·¹ÀÌ¾î°¡ µé¾úÀ» ¶§ À§Ä¡°ª º¯°æ
-    {
-        m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPlayerPos); // µå´Â ¼ø°£ ÇÃ·¹ÀÌ¾î À§Ä¡·Î º¯°æ
-    }
-    else  // ÇÃ·¹ÀÌ¾î°¡ ³»·Á³õ¾ÒÀ» ¶§(È¤Àº Ã³À½ ½ÃÀÛÇÒ ¶§ ) ¶³¾îÁö±â
-    {
-      if(*m_iRound == MISSILEROUND)
-      {
-          if (XMVectorGetY(m_vecPosition) > 0.f)
-          {
-              m_vecPosition = XMVectorSetY(m_vecPosition, XMVectorGetY(m_vecPosition) - (fTimeDelta * m_fFallingSpeed));
-              m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
-              m_fFallingSpeed += 1.f;
-          }
-          else
-          {
-              m_fFallingSpeed = 10.f;
-              m_vecPosition = XMVectorSetY(m_vecPosition, 0.f);
-              m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
-          }
-      }
-    }
-    if (m_pTransformCom->Cal_Distance_vec(vecPlayerPos, m_vecPosition) <= 80.f) // ÇÃ·¹ÀÌ¾î¿Í »óÈ£ÀÛ¿ë
-    {
-        // µé±â ¼º°ø
-        if (m_fPickUpTimer >= 1.f)
-        {
-            m_bInteraction = false;
-            m_fPickUpTimer = 0.f;
-            m_pPlayer->PickUp_Battery(CPlayer::TRACKER); // 12¹ø, °°Àº ÇÔ¼ö¶ó Àç»ç¿ëÇÔ, ÇÃ·¹ÀÌ¾î°¡ µå´Â ¹«±â Tracker·Î º¯°æ
-            *m_bPickUp_Player = true; // µé¾ú´Ù!! 
-        }
+	_vector vecPlayerPos = m_pPlayer->Get_Position();
+	if(*m_bPickUp_Player == true) // í”Œë ˆì´ì–´ê°€ ë“¤ì—ˆì„ ë•Œ ìœ„ì¹˜ê°’ ë³€ê²½
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,vecPlayerPos); // ë“œëŠ” ìˆœê°„ í”Œë ˆì´ì–´ ìœ„ì¹˜ë¡œ ë³€ê²½
+	} else  // í”Œë ˆì´ì–´ê°€ ë‚´ë ¤ë†“ì•˜ì„ ë•Œ(í˜¹ì€ ì²˜ìŒ ì‹œìž‘í•  ë•Œ ) ë–¨ì–´ì§€ê¸°
+	{
+		if(*m_iRound == MISSILEROUND)
+		{
+			if(XMVectorGetY(m_vecPosition) > 0.f)
+			{
+				m_vecPosition = XMVectorSetY(m_vecPosition,XMVectorGetY(m_vecPosition) - (fTimeDelta * m_fFallingSpeed));
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION,m_vecPosition);
+				m_fFallingSpeed += 1.f;
+			} else
+			{
+				m_fFallingSpeed = 10.f;
+				m_vecPosition = XMVectorSetY(m_vecPosition,0.f);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION,m_vecPosition);
+			}
+		}
+	}
+	if(m_pTransformCom->Cal_Distance_vec(vecPlayerPos,m_vecPosition) <= 80.f) // í”Œë ˆì´ì–´ì™€ ìƒí˜¸ìž‘ìš©
+	{
+		// ë“¤ê¸° ì„±ê³µ
+		if(m_fPickUpTimer >= 1.f)
+		{
+			m_bInteraction = false;
+			m_fPickUpTimer = 0.f;
+			m_pPlayer->PickUp_Battery(CPlayer::TRACKER); // 12ë²ˆ, ê°™ì€ í•¨ìˆ˜ë¼ ìž¬ì‚¬ìš©í•¨, í”Œë ˆì´ì–´ê°€ ë“œëŠ” ë¬´ê¸° Trackerë¡œ ë³€ê²½
+			*m_bPickUp_Player = true; // ë“¤ì—ˆë‹¤!! 
+		}
 
-        if(*m_bPickUp_Player == false)
-        {
-            // ±ÙÃ³¿¡ ÀÖÀ» ¶§ »óÈ£ÀÛ¿ë
-            if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
-            {
-                m_bInteraction = true;
-                m_fPickUpTimer += fTimeDelta;
-            }
-            else
-            {
-                m_bInteraction = false;
-                m_fPickUpTimer = 0.f;
-            }
-        }
-    }
-    else
-        m_bInteraction = false;
+		if(*m_bPickUp_Player == false)
+		{
+			// ê·¼ì²˜ì— ìžˆì„ ë•Œ ìƒí˜¸ìž‘ìš©
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
+			{
+				m_bInteraction = true;
+				m_fPickUpTimer += fTimeDelta;
+			} else
+			{
+				m_bInteraction = false;
+				m_fPickUpTimer = 0.f;
+			}
+		}
+	} else
+		m_bInteraction = false;
 
-    if (*m_iRound == MISSILEROUND && m_bOnce == false) // ¹Ì»çÀÏ ¶ó¿îµå ½ÃÀÛ
-    {
-        m_bOnce = true;
-        m_eTrackerState = TRACKER_TURN_OFF;
-        m_fMissileTimer = 0.f;
-    }
-    else if (*m_iRound != MISSILEROUND)    // ¹Ì»çÀÏ ¶ó¿îµå°¡ ¾Æ´Ò ¶§ ¾È±×¸®±â & ÀÛµ¿ ¾ÈÇÔ
-    {
-        m_eTrackerState = TRACKER_IDLE;
-    }
+	if(*m_iRound == MISSILEROUND && m_bOnce == false) // ë¯¸ì‚¬ì¼ ë¼ìš´ë“œ ì‹œìž‘
+	{
+		m_bOnce = true;
+		m_eTrackerState = TRACKER_TURN_OFF;
+		m_fMissileTimer = 0.f;
+	} else if(*m_iRound != MISSILEROUND)    // ë¯¸ì‚¬ì¼ ë¼ìš´ë“œê°€ ì•„ë‹ ë•Œ ì•ˆê·¸ë¦¬ê¸° & ìž‘ë™ ì•ˆí•¨
+	{
+		m_eTrackerState = TRACKER_IDLE;
+	}
 
-    if (m_eTrackerState == TRACKER_TURN_OFF) // ¹Ì»çÀÏ ¶³¾îÁö°í Tracker »õ À§Ä¡·Î ³«ÇÏ
-    {
+	if(m_eTrackerState == TRACKER_TURN_OFF) // ë¯¸ì‚¬ì¼ ë–¨ì–´ì§€ê³  Tracker ìƒˆ ìœ„ì¹˜ë¡œ ë‚™í•˜
+	{
 
-        // ³«ÇÏ ½Ã°£ ±â´Ù·ÁÁÖ±â À§ÇÔ
-        m_fMissileTimer += fTimeDelta;
-        if (m_fMissileTimer >= 5.f)
-        {
-            m_fMissileTimer = 0.f;
-            m_eTrackerState = TRACKER_TURN_ON;
-        }
-    }
+		// ë‚™í•˜ ì‹œê°„ ê¸°ë‹¤ë ¤ì£¼ê¸° ìœ„í•¨
+		m_fMissileTimer += fTimeDelta;
+		if(m_fMissileTimer >= 5.f)
+		{
+			m_fMissileTimer = 0.f;
+			m_eTrackerState = TRACKER_TURN_ON;
+		}
+	}
 }
 
 void CTracker::Update(_float fTimeDelta)
 {
-    // Æ®·¡Ä¿ ÀÛµ¿ ½ÃÀÛ
-    if (TRACKER_TURN_ON == m_eTrackerState)
-    {
-        m_fMissileTimer += fTimeDelta;
-        if (m_fMissileTimer >= 10.f)
-        {
-            m_bStart_Shot = true;
-            m_fMissileTimer = 0.f;
-            m_eTrackerState = TRACKER_TURN_OFF;
+	// íŠ¸ëž˜ì»¤ ìž‘ë™ ì‹œìž‘
+	if(TRACKER_TURN_ON == m_eTrackerState)
+	{
+		m_fMissileTimer += fTimeDelta;
+		if(m_fMissileTimer >= 10.f)
+		{
+			m_bStart_Shot = true;
+			m_fMissileTimer = 0.f;
+			m_eTrackerState = TRACKER_TURN_OFF;
 
-        }
-    }
+		}
+	}
 
-    // ÀüÃ¼ ½Ã°£ ÁÙ¾îµé±â
-    if (TRACKER_TURN_ON == m_eTrackerState || TRACKER_TURN_OFF == m_eTrackerState)
-    {
-        m_fTimer -= fTimeDelta;
-    }
+	// ì „ì²´ ì‹œê°„ ì¤„ì–´ë“¤ê¸°
+	if(TRACKER_TURN_ON == m_eTrackerState || TRACKER_TURN_OFF == m_eTrackerState)
+	{
+		m_fTimer -= fTimeDelta;
+	}
 
 }
 
 void CTracker::Late_Update(_float fTimeDelta)
 {
-    // ¹Ì»çÀÏ ¶ó¿îµåÀÏ ¶§¸¸ ±×¸®±â, ´Ü, ÇÃ·¹ÀÌ¾î°¡ µé°í ÀÖÀ» ¶© ¾È±×¸²
-    if(*m_iRound == MISSILEROUND)
-    {
-        if(*m_bPickUp_Player == false)
-        {
-            if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
-                return;
-        }
-    }
+	// ë¯¸ì‚¬ì¼ ë¼ìš´ë“œì¼ ë•Œë§Œ ê·¸ë¦¬ê¸°, ë‹¨, í”Œë ˆì´ì–´ê°€ ë“¤ê³  ìžˆì„ ë• ì•ˆê·¸ë¦¼
+	if(*m_iRound == MISSILEROUND)
+	{
+		if(*m_bPickUp_Player == false)
+		{
+			if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
+				return;
+		}
+	}
 }
 
 HRESULT CTracker::Render()
 {
-    if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
+	if(FAILED(Bind_ShaderResources()))
+		return E_FAIL;
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-    for (size_t i = 0; i < iNumMeshes; i++)
-    {
-        if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-            return E_FAIL;
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
 
-        m_pModelCom->Render(i);
-    }
+		m_pModelCom->Render(i);
+	}
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CTracker::Add_Components()
 {
-    /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-        return E_FAIL;
+	/* For.Com_Shader */
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
 
-    const _wstring Model_Component = TEXT("Prototype_Component_Model_Bullet");
-    const _wstring Model_Component_Result = Model_Component + to_wstring(5);
-    /* For.Com_Model */
-    if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-        TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-        return E_FAIL;
+	const _wstring Model_Component = TEXT("Prototype_Component_Model_Bullet");
+	const _wstring Model_Component_Result = Model_Component + to_wstring(5);
+	/* For.Com_Model */
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
+		return E_FAIL;
 
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CTracker::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
+		return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
-        return E_FAIL;
-    _float fFar = m_pGameInstance->Get_CameraFar();
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
-        return E_FAIL;
-   /* if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
+		return E_FAIL;
+	/* if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		 return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
+	 const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+	 if (nullptr == pLightDesc)
+		 return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
+	 if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+		 return E_FAIL;
+	 if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+		 return E_FAIL;
+	 if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+		 return E_FAIL;
+	 if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+		 return E_FAIL;*/
 
-    return S_OK;
+	return S_OK;
 }
 
-CTracker* CTracker::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTracker* CTracker::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-    CTracker* pInstance = new CTracker(pDevice, pContext);
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX("Failed to Created : CTracker");
-        Safe_Release(pInstance);
-    }
-    return pInstance;
+	CTracker* pInstance = new CTracker(pDevice,pContext);
+	if(FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CTracker");
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
 CGameObject* CTracker::Clone(void* pArg)
 {
-    CTracker* pInstance = new CTracker(*this);
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX("Failed to Created : CTracker");
-        Safe_Release(pInstance);
-    }
+	CTracker* pInstance = new CTracker(*this);
+	if(FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Created : CTracker");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CTracker::Free()
 {
-    __super::Free();
+	__super::Free();
 
-    Safe_Release(m_pModelCom);
-    Safe_Release(m_pShaderCom);
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
 }

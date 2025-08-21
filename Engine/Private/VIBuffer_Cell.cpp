@@ -1,56 +1,54 @@
 #include "..\Public\VIBuffer_Cell.h"
 
-CVIBuffer_Cell::CVIBuffer_Cell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CVIBuffer{ pDevice, pContext }
-{
-}
+CVIBuffer_Cell::CVIBuffer_Cell(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CVIBuffer{pDevice,pContext}
+{}
 
 CVIBuffer_Cell::CVIBuffer_Cell(const CVIBuffer_Cell& Prototype)
-	: CVIBuffer{ Prototype }
-{
-}
+	: CVIBuffer{Prototype}
+{}
 
 HRESULT CVIBuffer_Cell::Initialize_Prototype(const _float3* pPoints)
 {
 	m_iVertexStride = sizeof(VTXPOS);
 	m_iNumVertices = 3;
 	m_iIndexStride = sizeof(_ushort);
-	m_iNumIndices = 4; // Á¡ 4°³¸¦ ¹Þ¾Æ ¿¬°áÇØ¼­ »ï°¢ÇüÀ» ±×¸°´Ù.
+	m_iNumIndices = 4; // ì  4ê°œë¥¼ ë°›ì•„ ì—°ê²°í•´ì„œ ì‚¼ê°í˜•ì„ ê·¸ë¦°ë‹¤.
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
 
 
 
-#pragma region VERTEX_BUFFER
-	/* dx9 : Á¤Á¡¹öÆÛ¸¦ ÇÒ´çÇÏ°í -> ¶ô¾ð¶ôÇØ¼­ Á¤Á¡¹öÆÛ¿¡ ÃÊ±â°ªÀ» Ã¤¿î´Ù. */
-	/* dx9 : Á¤Á¡¹öÆÛ¿¡ ÃÊ±â°ªÀ» Ã¤¿ì¸é¼­ Á¤Á¡¹öÆÛ¸¦ ÇÒ´çÇÑ´Ù*/
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	#pragma region VERTEX_BUFFER
+	/* dx9 : ì •ì ë²„í¼ë¥¼ í• ë‹¹í•˜ê³  -> ë½ì–¸ë½í•´ì„œ ì •ì ë²„í¼ì— ì´ˆê¸°ê°’ì„ ì±„ìš´ë‹¤. */
+	/* dx9 : ì •ì ë²„í¼ì— ì´ˆê¸°ê°’ì„ ì±„ìš°ë©´ì„œ ì •ì ë²„í¼ë¥¼ í• ë‹¹í•œë‹¤*/
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);
 
-	/* ÇÒ´çÇÏ°íÀÚÇÏ´Â ¸Þ¸ð¸®°ø°£ÀÇ Å©±â(Byte)*/
+	/* í• ë‹¹í•˜ê³ ìží•˜ëŠ” ë©”ëª¨ë¦¬ê³µê°„ì˜ í¬ê¸°(Byte)*/
 	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
 
-	/* ¹öÆÛÀÇ ¼Ó¼º (Á¤Àû, µ¿Àû) */
+	/* ë²„í¼ì˜ ì†ì„± (ì •ì , ë™ì ) */
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);
 	VTXPOS* pVertices = new VTXPOS[m_iNumVertices];
-	memcpy(pVertices, pPoints, sizeof(VTXPOS) * 3);
+	memcpy(pVertices,pPoints,sizeof(VTXPOS) * 3);
 
 	m_InitialDesc.pSysMem = pVertices;
 
-	if (FAILED(__super::Create_Buffer(&m_pVB)))
+	if(FAILED(__super::Create_Buffer(&m_pVB)))
 		return E_FAIL;
 
-#pragma endregion
+	#pragma endregion
 
-#pragma region INDEX_BUFFER
+	#pragma region INDEX_BUFFER
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -59,7 +57,7 @@ HRESULT CVIBuffer_Cell::Initialize_Prototype(const _float3* pPoints)
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);
 	_ushort* pIndices = new _ushort[m_iNumIndices];
 
 	pIndices[0] = 0;
@@ -69,10 +67,10 @@ HRESULT CVIBuffer_Cell::Initialize_Prototype(const _float3* pPoints)
 
 	m_InitialDesc.pSysMem = pIndices;
 
-	if (FAILED(__super::Create_Buffer(&m_pIB)))
+	if(FAILED(__super::Create_Buffer(&m_pIB)))
 		return E_FAIL;
 
-#pragma endregion
+	#pragma endregion
 
 	Safe_Delete_Array(pVertices);
 	Safe_Delete_Array(pIndices);
@@ -85,11 +83,11 @@ HRESULT CVIBuffer_Cell::Initialize(void* pArg)
 	return S_OK;
 }
 
-CVIBuffer_Cell* CVIBuffer_Cell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints)
+CVIBuffer_Cell* CVIBuffer_Cell::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _float3* pPoints)
 {
-	CVIBuffer_Cell* pInstance = new CVIBuffer_Cell(pDevice, pContext);
+	CVIBuffer_Cell* pInstance = new CVIBuffer_Cell(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pPoints)))
+	if(FAILED(pInstance->Initialize_Prototype(pPoints)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Cell");
 		Safe_Release(pInstance);
@@ -102,7 +100,7 @@ CComponent* CVIBuffer_Cell::Clone(void* pArg)
 {
 	CVIBuffer_Cell* pInstance = new CVIBuffer_Cell(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Cell");
 		Safe_Release(pInstance);
@@ -113,5 +111,5 @@ CComponent* CVIBuffer_Cell::Clone(void* pArg)
 
 void CVIBuffer_Cell::Free()
 {
- 	__super::Free();
+	__super::Free();
 }

@@ -3,7 +3,7 @@
 #include "GameObject.h"
 
 CPicking_Manager::CPicking_Manager()
-	: m_pGameInstance{ CGameInstance::GetInstance() }
+	: m_pGameInstance{CGameInstance::GetInstance()}
 {
 	Safe_AddRef(m_pGameInstance);
 
@@ -14,195 +14,195 @@ HRESULT CPicking_Manager::Initialize()
 	return S_OK;
 }
 
-// ∫‰∆˜∆Æø°º≠ ≈ıøµ±Ó¡ˆ
-_float3 CPicking_Manager::Get_MousePos_NDC(HWND hWnd, const unsigned int g_iWinSizeX, const unsigned int	g_iWinSizeY)
+// Î∑∞Ìè¨Ìä∏ÏóêÏÑú Ìà¨ÏòÅÍπåÏßÄ
+_float3 CPicking_Manager::Get_MousePos_NDC(HWND hWnd,const unsigned int g_iWinSizeX,const unsigned int	g_iWinSizeY)
 {
 
-    GetCursorPos(&m_ptMouse);
-    ScreenToClient(hWnd, &m_ptMouse);
+	GetCursorPos(&m_ptMouse);
+	ScreenToClient(hWnd,&m_ptMouse);
 
-    // NDC ∞ËªÍ, ¡§±‘»≠µ» ¿Âƒ° 
-    m_vMousePos.x = _float(m_ptMouse.x / (g_iWinSizeX * 0.5f) - 1.f);
-    m_vMousePos.y = _float(m_ptMouse.y / -(g_iWinSizeY * 0.5f) + 1.f);
+	// NDC Í≥ÑÏÇ∞, Ï†ïÍ∑úÌôîÎêú Ïû•Ïπò 
+	m_vMousePos.x = _float(m_ptMouse.x / (g_iWinSizeX * 0.5f) - 1.f);
+	m_vMousePos.y = _float(m_ptMouse.y / -(g_iWinSizeY * 0.5f) + 1.f);
 	m_vMousePos.z = 0.f;
-    return m_vMousePos;
+	return m_vMousePos;
 }
 
-_float4 CPicking_Manager::Object_NDC_Cal(_float2 fPos, _float fSizeX, _float fSizeY, const unsigned int g_iWinSizeX, const unsigned int g_iWinSizeY)
+_float4 CPicking_Manager::Object_NDC_Cal(_float2 fPos,_float fSizeX,_float fSizeY,const unsigned int g_iWinSizeX,const unsigned int g_iWinSizeY)
 {
 
 	_float4 fObjectRange;
-	// ø¿∫Í¡ß∆Æ¿« π¸¿ß ∞ËªÍ 
+	// Ïò§Î∏åÏ†ùÌä∏Ïùò Î≤îÏúÑ Í≥ÑÏÇ∞ 
 	fObjectRange.w = fPos.x - (fSizeX / 2);
 	fObjectRange.x = fPos.x + (fSizeX / 2);
 
 	fObjectRange.y = fPos.y - (fSizeY / 2);
 	fObjectRange.z = fPos.y + (fSizeY / 2);
 
-	// NDC ∑Œ ∫Ø»Ø
+	// NDC Î°ú Î≥ÄÌôò
 	_float4 fResult;
-	fResult.w = fObjectRange.w / (g_iWinSizeX * 0.5f) - 1.f; // øﬁ
-	fResult.x = fObjectRange.x / (g_iWinSizeX * 0.5f) - 1.f; // ø¿
+	fResult.w = fObjectRange.w / (g_iWinSizeX * 0.5f) - 1.f; // Ïôº
+	fResult.x = fObjectRange.x / (g_iWinSizeX * 0.5f) - 1.f; // Ïò§
 
-	fResult.y = (fObjectRange.y / -(g_iWinSizeY * 0.5f) + 1.f); // ¿ß
-	fResult.z = (fObjectRange.z / -(g_iWinSizeY * 0.5f) + 1.f); // æ∆∑°
+	fResult.y = (fObjectRange.y / -(g_iWinSizeY * 0.5f) + 1.f); // ÏúÑ
+	fResult.z = (fObjectRange.z / -(g_iWinSizeY * 0.5f) + 1.f); // ÏïÑÎûò
 
 	return fResult;
 }
 
-void CPicking_Manager::Get_MouseRayDirection(_float3 fPosition,  XMMATRIX invProj, XMMATRIX invView, XMVECTOR* RayPos_Output, XMVECTOR* RayDir_Output)
+void CPicking_Manager::Get_MouseRayDirection(_float3 fPosition,XMMATRIX invProj,XMMATRIX invView,XMVECTOR* RayPos_Output,XMVECTOR* RayDir_Output)
 {
 
-    _vector vMousePos = XMLoadFloat3(&fPosition);
-    vMousePos = XMVectorSetW(vMousePos, 1.f);
+	_vector vMousePos = XMLoadFloat3(&fPosition);
+	vMousePos = XMVectorSetW(vMousePos,1.f);
 
-    vMousePos = XMVector3TransformCoord(vMousePos, invProj);
+	vMousePos = XMVector3TransformCoord(vMousePos,invProj);
 
-    _vector		vRayDir, vRayPos;
-    vRayPos = { 0.f, 0.f, 0.f };
-    vRayDir = vMousePos - vRayPos;
-    
-    vRayPos = XMVector3TransformCoord(vRayPos, invView);
-    vRayDir = XMVector3TransformNormal(vRayDir, invView);
-    
- 
-    *RayPos_Output = vRayPos;
-    *RayDir_Output = vRayDir;
- 
-   //  ∑π¿Ã πÊ«‚ ¿ßƒ° »Æ¿Œ
-    _float3 fRayPos, fRayDir;
-     XMStoreFloat3(&fRayPos, vRayPos);
-   XMStoreFloat3(&fRayDir, vRayDir);
-   if(GetKeyState(VK_NUMPAD6))
-       cout <<"∑π¿Ã ¿ßƒ°" << fRayPos.x << " " << fRayPos.y << " " << fRayPos.z << endl;
-    
+	_vector		vRayDir,vRayPos;
+	vRayPos = {0.f,0.f,0.f};
+	vRayDir = vMousePos - vRayPos;
+
+	vRayPos = XMVector3TransformCoord(vRayPos,invView);
+	vRayDir = XMVector3TransformNormal(vRayDir,invView);
+
+
+	*RayPos_Output = vRayPos;
+	*RayDir_Output = vRayDir;
+
+	//  Î†àÏù¥ Î∞©Ìñ• ÏúÑÏπò ÌôïÏù∏
+	_float3 fRayPos,fRayDir;
+	XMStoreFloat3(&fRayPos,vRayPos);
+	XMStoreFloat3(&fRayDir,vRayDir);
+	if(GetKeyState(VK_NUMPAD6))
+		cout <<"Î†àÏù¥ ÏúÑÏπò" << fRayPos.x << " " << fRayPos.y << " " << fRayPos.z << endl;
+
 
 }
 
-_float3 CPicking_Manager::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ)
+_float3 CPicking_Manager::Picking_Terrain(XMVECTOR RayPos,XMVECTOR RayDir,const _float3* VtxPos,_uint VtxCountX,_uint VtxCountZ)
 {
-    const _float3* pTerrainVtx = VtxPos;
-    _ulong dwVtxIdx[3]{};
-    float closestDist = 0.f;  // ∞°¿Â ∞°±ÓøÓ √Êµπ ∞≈∏Æ∏¶ ¿˙¿Â«“ ∫Øºˆ
-    _float3 hitPoint = _float3(0.f, 0.f, 0.f);  // √Êµπ ¡ˆ¡°¿ª ¿˙¿Â«“ ∫Øºˆ
+	const _float3* pTerrainVtx = VtxPos;
+	_ulong dwVtxIdx[3]{};
+	float closestDist = 0.f;  // Í∞ÄÏû• Í∞ÄÍπåÏö¥ Ï∂©Îèå Í±∞Î¶¨Î•º Ï†ÄÏû•Ìï† Î≥ÄÏàò
+	_float3 hitPoint = _float3(0.f,0.f,0.f);  // Ï∂©Îèå ÏßÄÏ†êÏùÑ Ï†ÄÏû•Ìï† Î≥ÄÏàò
 
-    RayDir = XMVector3Normalize(RayDir);  
-  
-    for (_ulong i = 0; i < VtxCountZ - 1; ++i)
-    {
-        for (_ulong j = 0; j < VtxCountX - 1; ++j)
-        {
-            _ulong dwIndex = i * VtxCountX + j;
-           
-            dwVtxIdx[0] = dwIndex + VtxCountX;
-            dwVtxIdx[1] = dwIndex + VtxCountX + 1;
-            dwVtxIdx[2] = dwIndex + 1;
+	RayDir = XMVector3Normalize(RayDir);
 
-            _float3 v0 = pTerrainVtx[dwVtxIdx[0]];
-            _float3 v1 = pTerrainVtx[dwVtxIdx[1]];
-            _float3 v2 = pTerrainVtx[dwVtxIdx[2]];
+	for(_ulong i = 0; i < VtxCountZ - 1; ++i)
+	{
+		for(_ulong j = 0; j < VtxCountX - 1; ++j)
+		{
+			_ulong dwIndex = i * VtxCountX + j;
 
-            float dist = 0.0f;
-            // √Êµπ ∞ÀªÁ
-            if (DirectX::TriangleTests::Intersects(
-                RayPos,
-                RayDir,  
-                XMLoadFloat3(&v0),
-                XMLoadFloat3(&v1),
-                XMLoadFloat3(&v2),
-                dist))
-            {
-                XMVECTOR xmHitPoint = RayPos + RayDir * dist;
-                XMStoreFloat3(&hitPoint, xmHitPoint);
-                return hitPoint;
-   //             cout << "1 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
-            }
+			dwVtxIdx[0] = dwIndex + VtxCountX;
+			dwVtxIdx[1] = dwIndex + VtxCountX + 1;
+			dwVtxIdx[2] = dwIndex + 1;
 
-            dwVtxIdx[0] = dwIndex + VtxCountX;
-            dwVtxIdx[1] = dwIndex + 1;
-            dwVtxIdx[2] = dwIndex;
+			_float3 v0 = pTerrainVtx[dwVtxIdx[0]];
+			_float3 v1 = pTerrainVtx[dwVtxIdx[1]];
+			_float3 v2 = pTerrainVtx[dwVtxIdx[2]];
 
-            v0 = pTerrainVtx[dwVtxIdx[0]];
-            v1 = pTerrainVtx[dwVtxIdx[1]];
-            v2 = pTerrainVtx[dwVtxIdx[2]];
+			float dist = 0.0f;
+			// Ï∂©Îèå Í≤ÄÏÇ¨
+			if(DirectX::TriangleTests::Intersects(
+				RayPos,
+				RayDir,
+				XMLoadFloat3(&v0),
+				XMLoadFloat3(&v1),
+				XMLoadFloat3(&v2),
+				dist))
+			{
+				XMVECTOR xmHitPoint = RayPos + RayDir * dist;
+				XMStoreFloat3(&hitPoint,xmHitPoint);
+				return hitPoint;
+				//             cout << "1 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
+			}
 
-            dist = 0.0f;
-            if (DirectX::TriangleTests::Intersects(
-                RayPos,
-                RayDir,  // ¡§±‘»≠µ» πÊ«‚ ∫§≈Õ ªÁøÎ
-                XMLoadFloat3(&v0),
-                XMLoadFloat3(&v1),
-                XMLoadFloat3(&v2),
-                dist))
-            {
-                XMVECTOR xmHitPoint = RayPos + RayDir * dist;
-                XMStoreFloat3(&hitPoint, xmHitPoint);
-                return hitPoint;
-     //           cout << "2 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
-            }
-        }
-    }
+			dwVtxIdx[0] = dwIndex + VtxCountX;
+			dwVtxIdx[1] = dwIndex + 1;
+			dwVtxIdx[2] = dwIndex;
 
-    return hitPoint;  // ∞°¿Â ∞°±ÓøÓ √Êµπ ¡ˆ¡°¿ª π›»Ø
+			v0 = pTerrainVtx[dwVtxIdx[0]];
+			v1 = pTerrainVtx[dwVtxIdx[1]];
+			v2 = pTerrainVtx[dwVtxIdx[2]];
+
+			dist = 0.0f;
+			if(DirectX::TriangleTests::Intersects(
+				RayPos,
+				RayDir,  // Ï†ïÍ∑úÌôîÎêú Î∞©Ìñ• Î≤°ÌÑ∞ ÏÇ¨Ïö©
+				XMLoadFloat3(&v0),
+				XMLoadFloat3(&v1),
+				XMLoadFloat3(&v2),
+				dist))
+			{
+				XMVECTOR xmHitPoint = RayPos + RayDir * dist;
+				XMStoreFloat3(&hitPoint,xmHitPoint);
+				return hitPoint;
+				//           cout << "2 : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
+			}
+		}
+	}
+
+	return hitPoint;  // Í∞ÄÏû• Í∞ÄÍπåÏö¥ Ï∂©Îèå ÏßÄÏ†êÏùÑ Î∞òÌôò
 }
 
-_float3 CPicking_Manager::Picking_Terrain_Quad(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ)
+_float3 CPicking_Manager::Picking_Terrain_Quad(XMVECTOR RayPos,XMVECTOR RayDir,const _float3* VtxPos,_uint VtxCountX,_uint VtxCountZ)
 {
-    const _float3* pTerrainVtx = VtxPos;
-    _ulong dwVtxIdx[3]{};
-    float closestDist = 0.f;  // ∞°¿Â ∞°±ÓøÓ √Êµπ ∞≈∏Æ∏¶ ¿˙¿Â«“ ∫Øºˆ
-    _float3 hitPoint = _float3(0.f, 0.f, 0.f);  // √Êµπ ¡ˆ¡°¿ª ¿˙¿Â«“ ∫Øºˆ
-    RayDir = XMVector3Normalize(RayDir);
+	const _float3* pTerrainVtx = VtxPos;
+	_ulong dwVtxIdx[3]{};
+	float closestDist = 0.f;  // Í∞ÄÏû• Í∞ÄÍπåÏö¥ Ï∂©Îèå Í±∞Î¶¨Î•º Ï†ÄÏû•Ìï† Î≥ÄÏàò
+	_float3 hitPoint = _float3(0.f,0.f,0.f);  // Ï∂©Îèå ÏßÄÏ†êÏùÑ Ï†ÄÏû•Ìï† Î≥ÄÏàò
+	RayDir = XMVector3Normalize(RayDir);
 
-    return hitPoint;
+	return hitPoint;
 }
 
-_float3 CPicking_Manager::Picking_Box_FAILED(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos)
+_float3 CPicking_Manager::Picking_Box_FAILED(XMVECTOR RayPos,XMVECTOR RayDir,const _float3* VtxPos)
 {
-    const _float3* pBoxVtx = VtxPos;
-    float closestDist = 0.f;  // ∞°¿Â ∞°±ÓøÓ √Êµπ ∞≈∏Æ∏¶ ¿˙¿Â«“ ∫Øºˆ
-    _float3 hitPoint = _float3(0.f, 0.f, 0.f);  // √Êµπ ¡ˆ¡°¿ª ¿˙¿Â«“ ∫Øºˆ
-    RayDir = XMVector3Normalize(RayDir);
+	const _float3* pBoxVtx = VtxPos;
+	float closestDist = 0.f;  // Í∞ÄÏû• Í∞ÄÍπåÏö¥ Ï∂©Îèå Í±∞Î¶¨Î•º Ï†ÄÏû•Ìï† Î≥ÄÏàò
+	_float3 hitPoint = _float3(0.f,0.f,0.f);  // Ï∂©Îèå ÏßÄÏ†êÏùÑ Ï†ÄÏû•Ìï† Î≥ÄÏàò
+	RayDir = XMVector3Normalize(RayDir);
 
-    for (_ulong i = 0; i < 12; ++i)
-    {
-            _ulong dwIndex = i * 3;
+	for(_ulong i = 0; i < 12; ++i)
+	{
+		_ulong dwIndex = i * 3;
 
-            _float3 v0 = pBoxVtx[dwIndex];
-            _float3 v1 = pBoxVtx[dwIndex + 1];
-            _float3 v2 = pBoxVtx[dwIndex + 2];
+		_float3 v0 = pBoxVtx[dwIndex];
+		_float3 v1 = pBoxVtx[dwIndex + 1];
+		_float3 v2 = pBoxVtx[dwIndex + 2];
 
-            float dist = 0.0f;
-            // √Êµπ ∞ÀªÁ
-            if (DirectX::TriangleTests::Intersects(
-                RayPos,
-                RayDir,
-                XMLoadFloat3(&v0),
-                XMLoadFloat3(&v1),
-                XMLoadFloat3(&v2),
-                dist))
-            {
-                XMVECTOR xmHitPoint = RayPos + RayDir * dist;
-                XMStoreFloat3(&hitPoint, xmHitPoint);
- //                 cout << "√Êµπ ¿ßƒ° : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
-            }
-    }
-    return hitPoint;  // ∞°¿Â ∞°±ÓøÓ √Êµπ ¡ˆ¡°¿ª π›»Ø
+		float dist = 0.0f;
+		// Ï∂©Îèå Í≤ÄÏÇ¨
+		if(DirectX::TriangleTests::Intersects(
+			RayPos,
+			RayDir,
+			XMLoadFloat3(&v0),
+			XMLoadFloat3(&v1),
+			XMLoadFloat3(&v2),
+			dist))
+		{
+			XMVECTOR xmHitPoint = RayPos + RayDir * dist;
+			XMStoreFloat3(&hitPoint,xmHitPoint);
+			//                 cout << "Ï∂©Îèå ÏúÑÏπò : " << hitPoint.x << "  " << hitPoint.z << "  " << hitPoint.y << endl;
+		}
+	}
+	return hitPoint;  // Í∞ÄÏû• Í∞ÄÍπåÏö¥ Ï∂©Îèå ÏßÄÏ†êÏùÑ Î∞òÌôò
 }
 
-void CPicking_Manager::CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint)
+void CPicking_Manager::CreateBoundingBox(const _float3& center,const _float3& size,_float3& fMinPoint,_float3& fMaxPoint)
 {
-    fMinPoint = _float3(center.x - size.x * 0.5f, center.y - size.y * 0.5f, center.z - size.z * 0.5f); 
-    fMaxPoint = _float3(center.x + size.x * 0.5f, center.y + size.y * 0.5f, center.z + size.z * 0.5f);
+	fMinPoint = _float3(center.x - size.x * 0.5f,center.y - size.y * 0.5f,center.z - size.z * 0.5f);
+	fMaxPoint = _float3(center.x + size.x * 0.5f,center.y + size.y * 0.5f,center.z + size.z * 0.5f);
 }
-bool CPicking_Manager::Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box)
+bool CPicking_Manager::Picking_Box(const _vector& rayOrigin,const _vector& rayDirection,const _float3& fMinPoint,const _float3& fMaxPoint,float& distance,DirectX::BoundingBox box)
 {
-    // ≥–¿Ã
-    box.Extents = _float3((fMaxPoint.x - fMinPoint.x), (fMaxPoint.y - fMinPoint.y) , (fMaxPoint.z - fMinPoint.z) );
-    // ¡ﬂ¡°
-    box.Center = _float3((fMaxPoint.x + fMinPoint.x) * 0.5f, (fMaxPoint.y + fMinPoint.y) * 0.5f, (fMaxPoint.z + fMinPoint.z) * 0.5f);
+	// ÎÑìÏù¥
+	box.Extents = _float3((fMaxPoint.x - fMinPoint.x),(fMaxPoint.y - fMinPoint.y),(fMaxPoint.z - fMinPoint.z));
+	// Ï§ëÏ†ê
+	box.Center = _float3((fMaxPoint.x + fMinPoint.x) * 0.5f,(fMaxPoint.y + fMinPoint.y) * 0.5f,(fMaxPoint.z + fMinPoint.z) * 0.5f);
 
-    return box.Intersects(rayOrigin, rayDirection, distance);
+	return box.Intersects(rayOrigin,rayDirection,distance);
 }
 
 
@@ -211,7 +211,7 @@ CPicking_Manager* CPicking_Manager::Create()
 {
 	CPicking_Manager* pInstance = new CPicking_Manager();
 
-	if (FAILED(pInstance->Initialize()))
+	if(FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CPicking_Manager");
 		Safe_Release(pInstance);

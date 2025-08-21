@@ -65,7 +65,7 @@ struct PS_IN
 
 struct PS_OUT
 {
-	/* º¯¼ö¿¡ ´ëÇÑ ½Ã¸àÆ½À» Á¤ÀÇÇÑ´Ù. */
+	/* ë³€ìˆ˜ì— ëŒ€í•œ ì‹œë©˜í‹±ì„ ì •ì˜í•œë‹¤. */
     vector vDiffuse : SV_TARGET0;
     vector vNormal : SV_TARGET1;
     vector vDepth : SV_TARGET2;
@@ -150,10 +150,10 @@ PS_OUT PS_MAIN_Weapon(PS_IN In)
 	
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     vMtrlDiffuse.a = 1.f;
-    vector vDir =    g_vCamPosition - In.vWorldPos;
+    vector vDir = g_vCamPosition - In.vWorldPos;
     float3 normalizedCamDir = normalize(vDir);
     float Rim = 1.f - saturate(dot(normalizedCamDir, In.vNormal));
-    Rim = pow(Rim,1.f);
+    Rim = pow(Rim, 1.f);
     float3 color = { 0.8f, 0.3f, 0.f };
     float3 RimLight = Rim * color;
 
@@ -173,10 +173,10 @@ PS_OUT PS_Rader(PS_IN In)
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, UV);
    
-    float gradientAlpha = saturate(In.vTexcoord.y); 
-    vMtrlDiffuse.a = gradientAlpha * 0.7f; 
+    float gradientAlpha = saturate(In.vTexcoord.y);
+    vMtrlDiffuse.a = gradientAlpha * 0.7f;
 
-    // ¾ËÆÄ °ªÀÌ ³Ê¹« ÀÛÀ¸¸é ÇÈ¼¿ Æó±â
+    // ì•ŒíŒŒ ê°’ì´ ë„ˆë¬´ ì‘ìœ¼ë©´ í”½ì…€ íê¸°
     if (vMtrlDiffuse.a <= 0.1f)
         discard;
 
@@ -191,11 +191,11 @@ PS_OUT PS_Rader(PS_IN In)
 
 PS_OUT PS_EFFECT(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT)0;
+    PS_OUT Out = (PS_OUT) 0;
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     Out.vDiffuse.a = g_fAlpha;
-    Out.vDiffuse.rgb = vMtrlDiffuse.rgb * float3(0.f,0.5f, g_fAlpha + 0.2f) * 3.f;
+    Out.vDiffuse.rgb = vMtrlDiffuse.rgb * float3(0.f, 0.5f, g_fAlpha + 0.2f) * 3.f;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
     Out.vPickDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 1.f);
@@ -204,7 +204,7 @@ PS_OUT PS_EFFECT(PS_IN In)
 
 PS_OUT PS_EFFECT2(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT)0;
+    PS_OUT Out = (PS_OUT) 0;
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
@@ -320,7 +320,7 @@ PS_OUT PS_BULB_SPOTLIGHT(PS_IN In)
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
     Out.vDiffuse = vMtrlDiffuse * float4(1.f, 1.f, 1.f, 1.f) * 6.f;
-    Out.vDiffuse.a =  3.f;
+    Out.vDiffuse.a = 3.f;
     
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.f, 0.f);
@@ -331,7 +331,7 @@ PS_OUT PS_BULB_SPOTLIGHT(PS_IN In)
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass // ¹«Á¶°Ç ±×¸²
+    pass DefaultPass // ë¬´ì¡°ê±´ ê·¸ë¦¼
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -341,7 +341,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-    pass DefaultPass1 // ±íÀÌ ¾ÈÇÔ
+    pass DefaultPass1 // ê¹Šì´ ì•ˆí•¨
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -351,7 +351,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-    pass DefaultPass2 // cull  ¾ÈÇÔ
+    pass DefaultPass2 // cull  ì•ˆí•¨
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -361,7 +361,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-    pass DefaultPass3 // ¾ËÆÄ°ª¿¡ µû¶ó discard
+    pass DefaultPass3 // ì•ŒíŒŒê°’ì— ë”°ë¼ discard
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -371,7 +371,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN2();
     }
-    pass DefaultPass4 // ¹«±â
+    pass DefaultPass4 // ë¬´ê¸°
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -381,7 +381,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-    pass DefaultPass5 // ¹«±â
+    pass DefaultPass5 // ë¬´ê¸°
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -392,7 +392,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass HeightPass  // 6
+    pass HeightPass // 6
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -415,7 +415,7 @@ technique11 DefaultTechnique
     }
 
 
-    pass DefaultPass8 // 8 ÃÑ¾Ë
+    pass DefaultPass8 // 8 ì´ì•Œ
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -425,7 +425,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN3();
     }
-    pass DefaultPass9 // ¾ËÆÄ°ª¿¡ µû¶ó discard
+    pass DefaultPass9 // ì•ŒíŒŒê°’ì— ë”°ë¼ discard
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -446,7 +446,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_Rader();
     }
-    pass DefaultPass11 // 11 ÀÌÆåÆ®
+    pass DefaultPass11 // 11 ì´í™íŠ¸
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -456,7 +456,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_EFFECT();
     }
-    pass DefaultPass12 // 12 ÀÌÆåÆ®
+    pass DefaultPass12 // 12 ì´í™íŠ¸
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);
@@ -467,7 +467,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_EFFECT2();
     }
 
-    pass DefaultPass13 // 13 ¹Ì»çÀÏÀÌÆåÆ®
+    pass DefaultPass13 // 13 ë¯¸ì‚¬ì¼ì´í™íŠ¸
     {
         SetRasterizerState(RS_CULLNONE);
         SetDepthStencilState(DSS_Default, 0);

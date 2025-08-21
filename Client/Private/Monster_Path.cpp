@@ -6,69 +6,68 @@
 #include "Monster.h"
 #include "Level_Loading.h"
 
-CMonster_Path::CMonster_Path(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLevel{ pDevice, pContext }
-{
-}
+CMonster_Path::CMonster_Path(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CLevel{pDevice,pContext}
+{}
 
 HRESULT CMonster_Path::Initialize()
 {
 	m_eTargetID = LEVEL_GAMEPLAY;
 
 	ShowCursor(true);
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// ƒ´∏ﬁ∂Û ª˝º∫
-	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// ¡ˆ«¸ ª˝º∫
-	if (FAILED(Ready_Lights()))										return E_FAIL;	// ∫˚
-	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// ∑Œµ˘ ¥›±‚
+	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// Ïπ¥Î©îÎùº ÏÉùÏÑ±
+	if(FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// ÏßÄÌòï ÏÉùÏÑ±
+	if(FAILED(Ready_Lights()))										return E_FAIL;	// Îπõ
+	if(FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// Î°úÎî© Îã´Í∏∞
 	Load_Map();
 
-	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_MONSTERSPAWN, TEXT("Layer_Terrain"), TEXT("Com_VIBuffer")));
+	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_MONSTERSPAWN,TEXT("Layer_Terrain"),TEXT("Com_VIBuffer")));
 
-	// ¿˙¿Â ∑ŒµÂ πˆ∆∞(¿ÃπÃ¡ˆ πˆ∆∞)
+	// Ï†ÄÏû• Î°úÎìú Î≤ÑÌäº(Ïù¥ÎØ∏ÏßÄ Î≤ÑÌäº)
 	Create_ImageButton();
-	m_iLevel = m_eTargetID;  // ¬Ô¿ª ∂ß µ∆˙∆Æ ∞™(ø¯«œ¥¬ ∑π∫ß)
+	m_iLevel = m_eTargetID;  // Ï∞çÏùÑ Îïå ÎîîÌè¥Ìä∏ Í∞í(ÏõêÌïòÎäî Î†àÎ≤®)
 	m_iCellIndex = 0;
 	m_iRound = 0;
-	
+
 	return S_OK;
 }
 
 void CMonster_Path::Update(_float fTimeDelta)
 {
 
-	if(m_bOnce == false)	
-	{	// ≥◊∫Ò¿« ¡ﬂ∞£ ƒ›∏Æ¿¸ π⁄Ω∫ ∆˜¿Œ≈Õ∏¶ ¥„¿∫ ∫§≈Õ
+	if(m_bOnce == false)
+	{	// ÎÑ§ÎπÑÏùò Ï§ëÍ∞Ñ ÏΩúÎ¶¨Ï†Ñ Î∞ïÏä§ Ìè¨Ïù∏ÌÑ∞Î•º Îã¥ÏùÄ Î≤°ÌÑ∞
 		m_vecCollisionCenter = m_pTerrain->Get_Collision_Center();
 		m_bOnce = true;
 	}
 	__super::Update(fTimeDelta);
-	Picking_Create(); // ≈¨∏Ø«— ¿ßƒ°ø° ª˝º∫
-	
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
+	Picking_Create(); // ÌÅ¥Î¶≠Ìïú ÏúÑÏπòÏóê ÏÉùÏÑ±
+
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN))
 	{
 		m_bAdd = true;
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_F1))	// 1∂ÛøÓµÂ ¿˙¿Â
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_F1))	// 1ÎùºÏö¥Îìú Ï†ÄÏû•
 	{
 		Save_FirstRound();
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_F2))	// 2∂ÛøÓµÂ ¿˙¿Â
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_F2))	// 2ÎùºÏö¥Îìú Ï†ÄÏû•
 	{
 		Save_SecondRound();
 	}
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_F3))	// 3∂ÛøÓµÂ ¿˙¿Â
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_F3))	// 3ÎùºÏö¥Îìú Ï†ÄÏû•
 	{
 		Save_ThirdRound();
 	}
-	// µ•¿Ã≈Õ √ﬂ∞°
+	// Îç∞Ïù¥ÌÑ∞ Ï∂îÍ∞Ä
 	if(m_bAdd == true)
 	{
 		Add_Data();
 		m_bAdd = false;
 	}
 
-	// ∫“∑Øø¿±‚
-	if (m_bLoad == true)
+	// Î∂àÎü¨Ïò§Í∏∞
+	if(m_bLoad == true)
 	{
 		Load();
 		m_bLoad = false;
@@ -79,33 +78,33 @@ void CMonster_Path::Update(_float fTimeDelta)
 HRESULT CMonster_Path::Render()
 {
 	__super::Render();
-	
-	ImGui::SetNextWindowSize(ImVec2(400, 600)); // ∞°∑Œ 400, ºº∑Œ 600 ≈©±‚∑Œ º≥¡§
-	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(800, 600)); // √÷º“ ≈©±‚ 200x200, √÷¥Î ≈©±‚ 800x600
-	ImGui::Begin("ParentWindow", nullptr, ImGuiWindowFlags_None); // √¢ ¿Ãµø ∞°¥…
+
+	ImGui::SetNextWindowSize(ImVec2(400,600)); // Í∞ÄÎ°ú 400, ÏÑ∏Î°ú 600 ÌÅ¨Í∏∞Î°ú ÏÑ§Ï†ï
+	ImGui::SetNextWindowSizeConstraints(ImVec2(200,200),ImVec2(800,600)); // ÏµúÏÜå ÌÅ¨Í∏∞ 200x200, ÏµúÎåÄ ÌÅ¨Í∏∞ 800x600
+	ImGui::Begin("ParentWindow",nullptr,ImGuiWindowFlags_None); // Ï∞Ω Ïù¥Îèô Í∞ÄÎä•
 
 	const char* pText = "Monster Spawn";
 	ImGui::Text("0Round is BreakTime");
-	ImGui::Text("F1 F2 F3 -> Save");  // ∞¢ ∂ÛøÓµÂ∫∞ ¿˙¿Â
+	ImGui::Text("F1 F2 F3 -> Save");  // Í∞Å ÎùºÏö¥ÎìúÎ≥Ñ Ï†ÄÏû•
 
 	ImGui::Text(pText);
 	ImGui::Text(" ");
 
 	ImGui::Text("Level Data");
-	// GameplayLevel¿∫ 3
-	ImGui::InputInt("Level", &m_iLevel);
+	// GameplayLevelÏùÄ 3
+	ImGui::InputInt("Level",&m_iLevel);
 
 	ImGui::Text("Round Data");
-	ImGui::Text("Round 0¿∫ æ»µ ");
-	ImGui::InputInt("Round", &m_iRound);
-	
+	ImGui::Text("Round 0ÏùÄ ÏïàÎê®");
+	ImGui::InputInt("Round",&m_iRound);
+
 	ImGui::Text("Position Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
-	ImGui::Text("Cell Index: %d", m_iCellIndex);
-	ImGui::Text("Model Index: %d", m_iModelIndex);
+	ImGui::DragFloat3("Position",Position,0.1f,-200.f,3000.f);
+	ImGui::Text("Cell Index: %d",m_iCellIndex);
+	ImGui::Text("Model Index: %d",m_iModelIndex);
 	ButtonImage_List();
 	ImGui::End();
-	
+
 	return S_OK;
 }
 
@@ -114,16 +113,16 @@ HRESULT CMonster_Path::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID = LEVEL_MONSTERSPAWN;
 	pDesc.eTargetID = m_eTargetID;
-	m_pTerrain = static_cast<CTerrain*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN, pLayerTag, TEXT("Prototype_GameObject_Terrain"), &pDesc));
-		
+	m_pTerrain = static_cast<CTerrain*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN,pLayerTag,TEXT("Prototype_GameObject_Terrain"),&pDesc));
+
 	return S_OK;
 }
 
 HRESULT CMonster_Path::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC			Desc{};
-	Desc.vEye = _float4(0.f, 10.f, -5.f, 1.f);
-	Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	Desc.vEye = _float4(0.f,10.f,-5.f,1.f);
+	Desc.vAt = _float4(0.f,0.f,0.f,1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
 	Desc.fFar = 500.f;
@@ -132,8 +131,8 @@ HRESULT CMonster_Path::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 	Desc.fMouseSensor = 0.05f;
 	Desc.eLevel = LEVEL_MONSTERSPAWN;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_MONSTERSPAWN, pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free"), &Desc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_MONSTERSPAWN,pLayerTag,
+		TEXT("Prototype_GameObject_Camera_Free"),&Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -144,12 +143,12 @@ HRESULT CMonster_Path::Ready_Lights()
 	LIGHT_DESC	LightDesc{};
 
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vDirection = _float4(1.f,-1.f,1.f,0.f);
+	LightDesc.vDiffuse = _float4(1.f,1.f,1.f,1.f);
+	LightDesc.vAmbient = _float4(1.f,1.f,1.f,1.f);
+	LightDesc.vSpecular = _float4(1.f,1.f,1.f,1.f);
 
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -159,150 +158,148 @@ HRESULT CMonster_Path::Ready_Lights()
 
 void CMonster_Path::Save_FirstRound()
 {
-	_ulong		dwByte = { 0 };
+	_ulong		dwByte = {0};
 	_wstring strLast = TEXT(".dat");
 	_wstring strPath{};
-	switch (m_eTargetID)
+	switch(m_eTargetID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		strPath = TEXT("../Bin/Data/Gameplay_Monster");
-		break;
+	strPath = TEXT("../Bin/Data/Gameplay_Monster");
+	break;
 	case Client::LEVEL_YARD:
-		strPath = TEXT("../Bin/Data/Yard_Monster");
-		break;
+	strPath = TEXT("../Bin/Data/Yard_Monster");
+	break;
 	default:
-		break;
+	break;
 	}
-	
+
 	_wstring Path_Result = strPath + to_wstring(1) + strLast;
-	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
+	HANDLE		hFile = CreateFile(Path_Result.c_str(),GENERIC_WRITE,0,nullptr,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
+	if(0 == hFile)
 		return;
 
 
-	for (auto& pMonster : m_vecMonsterSpawn[m_eTargetID][1])
+	for(auto& pMonster : m_vecMonsterSpawn[m_eTargetID][1])
 	{
 		_float3 fPos = pMonster.fPos;
 		_uint	iModelIdx = pMonster.iModel_Idx;
 		_uint	iCellIdx = pMonster.iCellIdx;
-		WriteFile(hFile, &iModelIdx, sizeof(_uint), &dwByte, nullptr);
-		WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		WriteFile(hFile, &iCellIdx, sizeof(_uint), &dwByte, nullptr);
+		WriteFile(hFile,&iModelIdx,sizeof(_uint),&dwByte,nullptr);
+		WriteFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		WriteFile(hFile,&iCellIdx,sizeof(_uint),&dwByte,nullptr);
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Monster1Round Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL,L"Monster1Round Saved Successfully",L"Success",MB_OK);
 }
 
 void CMonster_Path::Save_SecondRound()
 {
-	_ulong		dwByte = { 0 };
+	_ulong		dwByte = {0};
 	_wstring strLast = TEXT(".dat");
 	_wstring strPath{};
-	switch (m_eTargetID)
+	switch(m_eTargetID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		strPath = TEXT("../Bin/Data/Gameplay_Monster");
-		break;
+	strPath = TEXT("../Bin/Data/Gameplay_Monster");
+	break;
 	case Client::LEVEL_YARD:
-		strPath = TEXT("../Bin/Data/Yard_Monster");
-		break;
+	strPath = TEXT("../Bin/Data/Yard_Monster");
+	break;
 	default:
-		break;
+	break;
 	}
 	_wstring Path_Result = strPath + to_wstring(2) + strLast;
-	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
+	HANDLE		hFile = CreateFile(Path_Result.c_str(),GENERIC_WRITE,0,nullptr,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
+	if(0 == hFile)
 		return;
-	for (auto& pMonster : m_vecMonsterSpawn[m_eTargetID][2])
+	for(auto& pMonster : m_vecMonsterSpawn[m_eTargetID][2])
 	{
 		_float3 fPos = pMonster.fPos;
 		_uint	iModelIdx = pMonster.iModel_Idx;
 		_uint	iCellIdx = pMonster.iCellIdx;
-		WriteFile(hFile, &iModelIdx, sizeof(_uint), &dwByte, nullptr);
-		WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		WriteFile(hFile, &iCellIdx, sizeof(_uint), &dwByte, nullptr);
+		WriteFile(hFile,&iModelIdx,sizeof(_uint),&dwByte,nullptr);
+		WriteFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		WriteFile(hFile,&iCellIdx,sizeof(_uint),&dwByte,nullptr);
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Monster2Round Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL,L"Monster2Round Saved Successfully",L"Success",MB_OK);
 }
 
 void CMonster_Path::Save_ThirdRound()
 {
-	_ulong		dwByte = { 0 };
+	_ulong		dwByte = {0};
 	_wstring strLast = TEXT(".dat");
 	_wstring strPath{};
-	switch (m_eTargetID)
+	switch(m_eTargetID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		strPath = TEXT("../Bin/Data/Gameplay_Monster");
-		break;
+	strPath = TEXT("../Bin/Data/Gameplay_Monster");
+	break;
 	case Client::LEVEL_YARD:
-		strPath = TEXT("../Bin/Data/Yard_Monster");
-		break;
+	strPath = TEXT("../Bin/Data/Yard_Monster");
+	break;
 	default:
-		break;
+	break;
 	}
 	_wstring Path_Result = strPath + to_wstring(3) + strLast;
-	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
+	HANDLE		hFile = CreateFile(Path_Result.c_str(),GENERIC_WRITE,0,nullptr,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0);
+	if(0 == hFile)
 		return;
-	for (auto& pMonster : m_vecMonsterSpawn[m_eTargetID][3])
+	for(auto& pMonster : m_vecMonsterSpawn[m_eTargetID][3])
 	{
 		_float3 fPos = pMonster.fPos;
 		_uint	iModelIdx = pMonster.iModel_Idx;
 		_uint	iCellIdx = pMonster.iCellIdx;
-		WriteFile(hFile, &iModelIdx, sizeof(_uint), &dwByte, nullptr);
-		WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		WriteFile(hFile, &iCellIdx, sizeof(_uint), &dwByte, nullptr);
+		WriteFile(hFile,&iModelIdx,sizeof(_uint),&dwByte,nullptr);
+		WriteFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		WriteFile(hFile,&iCellIdx,sizeof(_uint),&dwByte,nullptr);
 	}
 	CloseHandle(hFile);
-	MessageBox(NULL, L"Monster3Round Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL,L"Monster3Round Saved Successfully",L"Success",MB_OK);
 }
 
 void CMonster_Path::Load()
-{
-}
+{}
 
 void CMonster_Path::Add_Data()
 {
-	if (m_iRound != 0)
+	if(m_iRound != 0)
 	{
 		MONSTER_SPAWN_DESC pDesc{};
-		pDesc.fPos = { Position[0],Position[1],Position[2] };
+		pDesc.fPos = {Position[0],Position[1],Position[2]};
 		pDesc.iModel_Idx = m_iModelIndex;
 		pDesc.iCellIdx = m_iCellIndex;
-		// ∑π∫ß∞˙ ∂ÛøÓµÂ∑Œ µ•¿Ã≈Õ ∆ƒ¿œ ¿Ã∏ß¿ª ±∏∫–«“ ∞Õ¿”
+		// Î†àÎ≤®Í≥º ÎùºÏö¥ÎìúÎ°ú Îç∞Ïù¥ÌÑ∞ ÌååÏùº Ïù¥Î¶ÑÏùÑ Íµ¨Î∂ÑÌï† Í≤ÉÏûÑ
 		pDesc.iLevel = m_iLevel;
 		pDesc.iRound = m_iRound;
-		// 0¿∫ Ω¨¥¬ Ω√∞£ , 123 ¿Ã Ω«¡¶ ∂ÛøÓµÂ
-		cout << "√ﬂ∞° : " << m_iModelIndex << ",    Cell π¯»£ :" << m_iCellIndex << "     ∑π∫ß : " << m_iLevel << "  ∂ÛøÓµÂ : " << m_iRound << endl;
+		// 0ÏùÄ Ïâ¨Îäî ÏãúÍ∞Ñ , 123 Ïù¥ Ïã§Ï†ú ÎùºÏö¥Îìú
+		cout << "Ï∂îÍ∞Ä : " << m_iModelIndex << ",    Cell Î≤àÌò∏ :" << m_iCellIndex << "     Î†àÎ≤® : " << m_iLevel << "  ÎùºÏö¥Îìú : " << m_iRound << endl;
 		m_vecMonsterSpawn[m_iLevel][m_iRound].push_back(pDesc);
-	}
-	else
-		cout << "0∂ÛøÓµÂ¥Ÿ " << endl;
+	} else
+		cout << "0ÎùºÏö¥ÎìúÎã§ " << endl;
 }
 
 void CMonster_Path::Picking_Create()
 {
-	if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)))
+	if((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)))
 	{
-		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-		XMVECTOR RayPos, RayDir;
+		XMVECTOR RayPos,RayDir;
 
-		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+		m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
 
 		RayDir = XMVector3Normalize(RayDir);
 		_bool bPickCheck = false;
-		for (auto& pCollisionBox : m_vecCollisionCenter)
+		for(auto& pCollisionBox : m_vecCollisionCenter)
 		{
-			XMFLOAT3 fBoxPos{}, fMinPoint{}, fMaxPoint{};
+			XMFLOAT3 fBoxPos{},fMinPoint{},fMaxPoint{};
 			fBoxPos = pCollisionBox->Get_PickingPos();
-			m_pGameInstance->CreateBoundingBox(fBoxPos, { 0.3f,0.3f, 0.3f }, fMinPoint, fMaxPoint);
+			m_pGameInstance->CreateBoundingBox(fBoxPos,{0.3f,0.3f,0.3f},fMinPoint,fMaxPoint);
 
 			float distance;
-			if (m_pGameInstance->Picking_Box(RayPos, RayDir, fMinPoint, fMaxPoint, distance, pCollisionBox->Get_BoundingBox()))
+			if(m_pGameInstance->Picking_Box(RayPos,RayDir,fMinPoint,fMaxPoint,distance,pCollisionBox->Get_BoundingBox()))
 			{
 				bPickCheck = true;
 				m_fPickingPos = fBoxPos;
@@ -313,14 +310,14 @@ void CMonster_Path::Picking_Create()
 		}
 
 
-		// π⁄Ω∫ √Êµπ¿Ã æ»µ«∏È ≈Õ∑π¿Œ ««≈∑«— ¿ßƒ°∑Œ π›»Ø
-		const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 πËø≠¿« Ω√¿€ ¡÷º“ π›»Ø
+		// Î∞ïÏä§ Ï∂©ÎèåÏù¥ ÏïàÎêòÎ©¥ ÌÑ∞Î†àÏù∏ ÌîºÌÇπÌïú ÏúÑÏπòÎ°ú Î∞òÌôò
+		const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 Î∞∞Ïó¥Ïùò ÏãúÏûë Ï£ºÏÜå Î∞òÌôò
 		_uint VtxCountX = pVIBuffer_Terrain->Get_VtxCountX();
 		_uint VtxCountZ = pVIBuffer_Terrain->Get_VtxCountZ();
 
 
-		m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
-		if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+		m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos,RayDir,VtxPos,VtxCountX,VtxCountZ);
+		if(m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
 			return;
 
 		Position[0] = m_fPickingPos.x;		Position[1] = m_fPickingPos.y;		Position[2] = m_fPickingPos.z;
@@ -331,52 +328,52 @@ void CMonster_Path::Picking_Create()
 void CMonster_Path::Load_Map()
 {
 	HANDLE hFile{};
-	switch (m_eTargetID)
+	switch(m_eTargetID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Environment.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Environment File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Environment_Yard File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Environment_Yard File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_uint iImGuiMode{};
 	_int  iModelIndex{};
-	_float3 fPos{}, fCollisionBoxScale{}, fScale{};
-	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	_float3 fPos{},fCollisionBoxScale{},fScale{};
+	_vector	vRight{},vUp{},vLook{},vecCollisionPos{};
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
 
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_MONSTERSPAWN;
@@ -384,57 +381,57 @@ void CMonster_Path::Load_Map()
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
 		}
 	}
 	CloseHandle(hFile);
 
-	
-	
-	switch (m_eTargetID)
+
+
+	switch(m_eTargetID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Build.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Build File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Build_Yard File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Build_Yard File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
 
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_MONSTERSPAWN;
@@ -442,12 +439,12 @@ void CMonster_Path::Load_Map()
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		CGameObject* pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_MONSTERSPAWN,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
 		}
 	}
 
@@ -456,10 +453,10 @@ void CMonster_Path::Load_Map()
 
 void CMonster_Path::Create_ImageButton()
 {
-	m_pSave = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Save.jpg"));
-	m_pLoad = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Load.jpg"));
-	m_pMonster = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/ImGui/Button/Monster%d.png"), MONSTER_EA);
-	// ªÁ¡¯¿« ∏Æº“Ω∫∫‰ ∞°¡Æø¿±‚
+	m_pSave = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Save.jpg"));
+	m_pLoad = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Load.jpg"));
+	m_pMonster = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/ImGui/Button/Monster%d.png"),MONSTER_EA);
+	// ÏÇ¨ÏßÑÏùò Î¶¨ÏÜåÏä§Î∑∞ Í∞ÄÏ†∏Ïò§Í∏∞
 	my_Savetexture = *m_pSave->Get_SRV().begin();
 	my_Loadtexture = *m_pLoad->Get_SRV().begin();
 }
@@ -469,35 +466,35 @@ void CMonster_Path::ButtonImage_List()
 	ImGui::BeginChild("Choose Monster");
 	int iButton = 0;
 	auto& SRVs = m_pMonster->Get_SRV();
-	for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+	for(auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
 	{
-		if (iButton % 4 != 0)
+		if(iButton % 4 != 0)
 			ImGui::SameLine();
 		string tag = "Monster" + to_string(iButton);
-		if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+		if(ImGui::ImageButton(tag.c_str(),*iter,ImVec2(50,50),ImVec2(0,0)))
 		{
-			switch (iButton)
+			switch(iButton)
 			{
 			case 0:
-				m_iModelIndex = ANIM_TANK;
-				break;
+			m_iModelIndex = ANIM_TANK;
+			break;
 			case 1:
-				m_iModelIndex = ANIM_HELICOPTER;
-				break;
+			m_iModelIndex = ANIM_HELICOPTER;
+			break;
 			case 2:
-				m_iModelIndex = ANIM_ALIEN;
-				break;
+			m_iModelIndex = ANIM_ALIEN;
+			break;
 			case 3:
-				m_iModelIndex = ANIM_PONY;
-				break;
+			m_iModelIndex = ANIM_PONY;
+			break;
 			case 4:
-				m_iModelIndex = ANIM_RIFLEMAN;
-				break;
+			m_iModelIndex = ANIM_RIFLEMAN;
+			break;
 			case 5:
-				m_iModelIndex = ANIM_BLIMP;
-				break;
+			m_iModelIndex = ANIM_BLIMP;
+			break;
 			default:
-				break;
+			break;
 			}
 		}
 		iButton++;
@@ -505,11 +502,11 @@ void CMonster_Path::ButtonImage_List()
 	ImGui::EndChild();
 }
 
-CMonster_Path* CMonster_Path::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMonster_Path* CMonster_Path::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CMonster_Path* pInstance = new CMonster_Path(pDevice, pContext);
+	CMonster_Path* pInstance = new CMonster_Path(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if(FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CMonster_Path");
 		Safe_Release(pInstance);
@@ -524,5 +521,5 @@ void CMonster_Path::Free()
 	Safe_Release(m_pSave);
 	Safe_Release(m_pLoad);
 	Safe_Release(m_pMonster);
-	
+
 }

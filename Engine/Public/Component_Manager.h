@@ -11,9 +11,9 @@
 #include "VIBuffer_Particle_Rect.h"
 #include "VIBuffer_Particle_Point.h"
 #include "VIBuffer_Grass.h"
-/* º¸°üÇÏ´Â¿ªÈ°. */
-/* ÄÄÆ÷³ÍÆ® ¿øÇüÀ» º¸°üÇÑ´Ù. */
-/* ÄÄÆ÷³ÍÆ® ¿øÇüÀº °´Ã¼ ¿øÇü°ú ´Ş¸® µ¢Ä¡°¡ Å©´Ù. ·¹º§º°·Î ±¸ºĞÇÏ¿© ÀúÀåÇÒ²². */
+/* ë³´ê´€í•˜ëŠ”ì—­í™œ. */
+/* ì»´í¬ë„ŒíŠ¸ ì›í˜•ì„ ë³´ê´€í•œë‹¤. */
+/* ì»´í¬ë„ŒíŠ¸ ì›í˜•ì€ ê°ì²´ ì›í˜•ê³¼ ë‹¬ë¦¬ ë©ì¹˜ê°€ í¬ë‹¤. ë ˆë²¨ë³„ë¡œ êµ¬ë¶„í•˜ì—¬ ì €ì¥í• ê»˜. */
 
 #pragma region ETC
 #include "Bounding_AABB.h"
@@ -24,7 +24,7 @@
 
 BEGIN(Engine)
 
-class CComponent_Manager final : public CBase
+class CComponent_Manager final: public CBase
 {
 private:
 	CComponent_Manager();
@@ -32,23 +32,23 @@ private:
 
 public:
 	HRESULT Initialize(_uint iNumLevels);
-	HRESULT Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, class CComponent* pPrototype);
-	class CComponent* Clone_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg);
+	HRESULT Add_Prototype(_uint iLevelIndex,const _wstring& strPrototypeTag,class CComponent* pPrototype);
+	class CComponent* Clone_Component(_uint iLevelIndex,const _wstring& strPrototypeTag,void* pArg);
 	void Clear(_uint iLevelIndex);
 
 
 
 
 private:
-	_uint											m_iNumLevels = { 0 };
+	_uint											m_iNumLevels = {0};
 
 
-	map<const _wstring, class CComponent*>* m_pPrototypes = { nullptr };
-	typedef map<const _wstring, class CComponent*>	PROTOTYPES;
+	map<const _wstring,class CComponent*>* m_pPrototypes = {nullptr};
+	typedef map<const _wstring,class CComponent*>	PROTOTYPES;
 
 
 public:
-	class CComponent* Find_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag);
+	class CComponent* Find_Prototype(_uint iLevelIndex,const _wstring& strPrototypeTag);
 
 public:
 	static CComponent_Manager* Create(_uint iNumLevels);

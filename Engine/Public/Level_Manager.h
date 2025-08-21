@@ -2,28 +2,28 @@
 
 #include "Base.h"
 
-/* ÇöÀç È­¸é¿¡ º¸¿©Áà¾ßÇÒ ·¹º§ÀÇ ÁÖ¼Ò¸¦ µé°í ÀÖ´Â´Ù. */
-/* È°¼ºÈ­µÈ ·¹º§ÀÇ ¹İº¹ÀûÀÎ ¾÷µ¥ÀÌÆ® ·»´õÈ£ÃâÀÇ ¿ªÈ°. */
-/* ·¹º§ ±³Ã¼ÀÇ ±â´ÉÀ» ¼öÇàÇÑ´Ù.(ÁÖ¼Ò±³Ã¼ & ±âÁ¸·¹º§ »èÁ¦ & ±âÁ¸·¹º§¿ë ÀÚ¿øÀ» ÆÄ±«)*/
+/* í˜„ì¬ í™”ë©´ì— ë³´ì—¬ì¤˜ì•¼í•  ë ˆë²¨ì˜ ì£¼ì†Œë¥¼ ë“¤ê³  ìˆëŠ”ë‹¤. */
+/* í™œì„±í™”ëœ ë ˆë²¨ì˜ ë°˜ë³µì ì¸ ì—…ë°ì´íŠ¸ ë Œë”í˜¸ì¶œì˜ ì—­í™œ. */
+/* ë ˆë²¨ êµì²´ì˜ ê¸°ëŠ¥ì„ ìˆ˜í–‰í•œë‹¤.(ì£¼ì†Œêµì²´ & ê¸°ì¡´ë ˆë²¨ ì‚­ì œ & ê¸°ì¡´ë ˆë²¨ìš© ìì›ì„ íŒŒê´´)*/
 
 BEGIN(Engine)
 
-class CLevel_Manager final : public CBase
+class CLevel_Manager final: public CBase
 {
 private:
 	CLevel_Manager();
 	virtual ~CLevel_Manager() = default;
 
 public:
-	HRESULT Open_Level(_uint iCurrentLevelID, class CLevel* pNewLevel);
+	HRESULT Open_Level(_uint iCurrentLevelID,class CLevel* pNewLevel);
 	HRESULT Close_Level(_uint iCurrentLevelID);
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
-	/*ÇöÀç °ÔÀÓ¿¡ º¸¿©ÁÙ ·¹º§°´Ã¼ÀÇ ÁÖ¼Ò¸¦ ÀúÀåÇÑ´Ù. */
+	/*í˜„ì¬ ê²Œì„ì— ë³´ì—¬ì¤„ ë ˆë²¨ê°ì²´ì˜ ì£¼ì†Œë¥¼ ì €ì¥í•œë‹¤. */
 private:
-	class CGameInstance* m_pGameInstance = { nullptr };
-	class CLevel* m_pCurrentLevel = { nullptr };
+	class CGameInstance* m_pGameInstance = {nullptr};
+	class CLevel* m_pCurrentLevel = {nullptr};
 	_uint					m_iCurrentLevelID = {};
 
 public:

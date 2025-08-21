@@ -11,19 +11,18 @@ END
 
 BEGIN(Client)
 
-class CEffect_Explosion final : public CEffect
+class CEffect_Explosion final: public CEffect
 {
 public:
-	typedef struct : public CEffect::EFFECT_DESC
-	{
-	}EFFECT_EXPLOSION_DESC;
+	typedef struct: public CEffect::EFFECT_DESC
+	{}EFFECT_EXPLOSION_DESC;
 private:
-	CEffect_Explosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CEffect_Explosion(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CEffect_Explosion(const CEffect_Explosion& Prototype);
 	virtual ~CEffect_Explosion() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
@@ -32,19 +31,19 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CTexture* m_pTextureCom = {nullptr};
+	CVIBuffer_Rect* m_pVIBufferCom = {nullptr};
 
 private:
-	_float						m_fFrame = { 0.f };
+	_float						m_fFrame = {0.f};
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CEffect_Explosion* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CEffect_Explosion* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

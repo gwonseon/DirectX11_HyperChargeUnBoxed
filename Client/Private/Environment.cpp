@@ -4,15 +4,13 @@
 #include "GameInstance.h"
 #include "VIBuffer_Terrain.h"
 
-CEnvironment::CEnvironment(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
-{
-}
+CEnvironment::CEnvironment(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CGameObject{pDevice,pContext}
+{}
 
 CEnvironment::CEnvironment(const CEnvironment& Prototype)
-	: CGameObject{ Prototype }
-{
-}
+	: CGameObject{Prototype}
+{}
 
 HRESULT CEnvironment::Initialize_Prototype()
 {
@@ -27,35 +25,35 @@ HRESULT CEnvironment::Initialize(void* pArg)
 	Desc.fPosition = pDesc->fPosition;
 	Desc.fScale = pDesc->fScale;
 	m_fScale = pDesc->fScale;
-	XMFLOAT4 Position = { pDesc->fPosition.x, pDesc->fPosition.y, pDesc->fPosition.z, 1.0f };
+	XMFLOAT4 Position = {pDesc->fPosition.x,pDesc->fPosition.y,pDesc->fPosition.z,1.0f};
 	_fvector vPosition = XMLoadFloat4(&Position);
 	m_iModelIndex = pDesc->iModelComponentIndex;
 	m_eLevel = pDesc->eID;
 	Desc.eID = m_eLevel;
 	Desc.fRotationPerSec = 2.f;
 	m_pPlayer = pDesc->pPlayer;
-	
-	if (FAILED(__super::Initialize(&Desc)))
+
+	if(FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,vPosition);
 
-		m_pTransformCom->Set_Scaling(pDesc->fScale.x, pDesc->fScale.y, pDesc->fScale.z);
+	m_pTransformCom->Set_Scaling(pDesc->fScale.x,pDesc->fScale.y,pDesc->fScale.z);
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	if(m_eLevel == LEVEL_IMGUI)
 	{
-		// ƒ›∏Æ¿¸π⁄Ω∫ √ ±‚∞™ ºº∆√
+		// ÏΩúÎ¶¨Ï†ÑÎ∞ïÏä§ Ï¥àÍ∏∞Í∞í ÏÑ∏ÌåÖ
 		CCollisionBox::COLLISIONBOX_DESC CollisionDesc{};
 		CollisionDesc.iImGuiMode = pDesc->iImGuiMode;
 		CollisionDesc.eLevel = LEVEL_IMGUI;
-		m_pCollisionBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Collision"), TEXT("Prototype_GameObject_Collision_Box"), &CollisionDesc);
+		m_pCollisionBox = m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Collision"),TEXT("Prototype_GameObject_Collision_Box"),&CollisionDesc);
 		m_fCollisionBoxScale = m_fScale;
 		m_vecCollisionBoxPos = vPosition;
 	}
-#endif
+	#endif
 	return S_OK;
 }
 
@@ -68,11 +66,11 @@ void CEnvironment::Priority_Update(_float fTimeDelta)
 
 void CEnvironment::Update(_float fTimeDelta)
 {
-	if (m_bDead)
+	if(m_bDead)
 	{
 		#ifdef _DEBUG
 
-		if (m_eLevel == LEVEL_IMGUI)
+		if(m_eLevel == LEVEL_IMGUI)
 			static_cast<CCollisionBox*>(m_pCollisionBox)->Set_Dead();
 		#endif
 
@@ -82,7 +80,7 @@ void CEnvironment::Update(_float fTimeDelta)
 
 void CEnvironment::Late_Update(_float fTimeDelta)
 {
-	if (
+	if(
 		m_iModelIndex == 123 + ENVIRONMENT_EA ||
 		m_iModelIndex == 128 + ENVIRONMENT_EA ||
 		m_iModelIndex == 129 + ENVIRONMENT_EA ||
@@ -98,32 +96,32 @@ void CEnvironment::Late_Update(_float fTimeDelta)
 		m_iModelIndex == 33  + ENVIRONMENT_EA ||
 		m_iModelIndex == 34  + ENVIRONMENT_EA ||
 		m_iModelIndex == 35  + ENVIRONMENT_EA ||
-		true == m_pGameInstance->isIn_Frustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 120.f))
+		true == m_pGameInstance->isIn_Frustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION),120.f))
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 			return;
-		if (m_eLevel == LEVEL_YARD || m_eLevel == LEVEL_GAMEPLAY)
+		if(m_eLevel == LEVEL_YARD || m_eLevel == LEVEL_GAMEPLAY)
 		{
 
-			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+			if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT,this)))
 				return;
-		
+
 		}
 	}
 }
 
 HRESULT CEnvironment::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
 			return E_FAIL;
-		if (
+		if(
 			m_iModelIndex == 84		+	ENVIRONMENT_EA ||
 			m_iModelIndex == 91		+	ENVIRONMENT_EA ||
 			m_iModelIndex == 92		+	ENVIRONMENT_EA ||
@@ -131,13 +129,12 @@ HRESULT CEnvironment::Render()
 			m_iModelIndex == 142	+	ENVIRONMENT_EA ||
 			m_iModelIndex == 143	+	ENVIRONMENT_EA ||
 			m_iModelIndex == 156	+ ENVIRONMENT_EA ||
-			m_iModelIndex == 152	+	ENVIRONMENT_EA		
+			m_iModelIndex == 152	+	ENVIRONMENT_EA
 			)
 		{
-			if (FAILED(m_pShaderCom->Begin(2)))
+			if(FAILED(m_pShaderCom->Begin(2)))
 				return E_FAIL;
-		}
-		else if (
+		} else if(
 			m_iModelIndex == 93 + ENVIRONMENT_EA ||
 			m_iModelIndex == 94 + ENVIRONMENT_EA ||
 			m_iModelIndex == 98 + ENVIRONMENT_EA ||
@@ -148,12 +145,11 @@ HRESULT CEnvironment::Render()
 			m_iModelIndex == 115 + ENVIRONMENT_EA
 			)
 		{
-			if (FAILED(m_pShaderCom->Begin(3)))
+			if(FAILED(m_pShaderCom->Begin(3)))
 				return E_FAIL;
-		}
-		else
+		} else
 		{
-			if (FAILED(m_pShaderCom->Begin(0)))
+			if(FAILED(m_pShaderCom->Begin(0)))
 				return E_FAIL;
 		}
 
@@ -167,7 +163,7 @@ HRESULT CEnvironment::Render()
 HRESULT CEnvironment::Render_Height()
 {
 
-	if (
+	if(
 		m_iModelIndex == 93 + ENVIRONMENT_EA ||
 		m_iModelIndex == 94 + ENVIRONMENT_EA ||
 		m_iModelIndex == 98 + ENVIRONMENT_EA ||
@@ -188,7 +184,7 @@ HRESULT CEnvironment::Render_Height()
 		m_iModelIndex == 113 + ENVIRONMENT_EA ||
 		m_iModelIndex == 114 + ENVIRONMENT_EA ||
 		m_iModelIndex == 115 + ENVIRONMENT_EA ||
-		//m_iModelIndex == 116 + ENVIRONMENT_EA || ≈Ÿ∆Æ
+		//m_iModelIndex == 116 + ENVIRONMENT_EA || ÌÖêÌä∏
 		m_iModelIndex == 128 + ENVIRONMENT_EA ||
 		m_iModelIndex == 123 + ENVIRONMENT_EA ||
 		m_iModelIndex == 129 + ENVIRONMENT_EA ||
@@ -214,39 +210,39 @@ HRESULT CEnvironment::Render_Height()
 		m_iModelIndex == 52 + ENVIRONMENT_EA ||
 		m_iModelIndex == 58 + ENVIRONMENT_EA ||
 		m_iModelIndex == 59 + ENVIRONMENT_EA ||
-		m_iModelIndex == 64 + ENVIRONMENT_EA 
-	//	m_iModelIndex == 92 + ENVIRONMENT_EA ∆ƒ∂Ûº÷
+		m_iModelIndex == 64 + ENVIRONMENT_EA
+	//	m_iModelIndex == 92 + ENVIRONMENT_EA ÌååÎùºÏÜî
 		)
 		return S_OK;
 
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
 
-	_float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 
 	// XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(64.5f, 20.f, 64.5f, 1.f), XMVectorSet(64.5f, 0.f, 64.5f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 	_vector PlayerPos = m_pPlayer->Get_Position();
 	_matrix			matView = XMMatrixIdentity();
-	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
-	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), XMVectorGetY(PlayerPos) + 6.f, XMVectorGetZ(PlayerPos), 1.f);
+	matView.r[0] = XMVectorSet(1.f,0.f,0.f,0.f);
+	matView.r[1] = XMVectorSet(0.f,0.f,1.f,0.f);
+	matView.r[2] = XMVectorSet(0.f,-1.f,0.f,0.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos),XMVectorGetY(PlayerPos) + 6.f,XMVectorGetZ(PlayerPos),1.f);
 
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixInverse(nullptr,matView));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixOrthographicLH(200.f,200.f,0.f,30.f));
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&ViewMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&ProjMatrix)))
 		return E_FAIL;
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pShaderCom->Begin(6))) // π´¡∂∞« ±◊∏≤
+		if(FAILED(m_pShaderCom->Begin(6))) // Î¨¥Ï°∞Í±¥ Í∑∏Î¶º
 			return E_FAIL;
 		m_pModelCom->Render(i);
 	}
@@ -275,7 +271,7 @@ HRESULT CEnvironment::Render_Height()
 //	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 //	for (size_t i = 0; i < iNumMeshes; i++)
 //	{
-//		if (FAILED(m_pShaderCom->Begin(7))) // π´¡∂∞« ±◊∏≤
+//		if (FAILED(m_pShaderCom->Begin(7))) // Î¨¥Ï°∞Í±¥ Í∑∏Î¶º
 //			return E_FAIL;
 //		m_pModelCom->Render(i);
 //	}
@@ -285,30 +281,30 @@ HRESULT CEnvironment::Render_Height()
 
 void CEnvironment::Picking()
 {
-#ifdef _DEBUG
-	if (m_eLevel == LEVEL_IMGUI)
+	#ifdef _DEBUG
+	if(m_eLevel == LEVEL_IMGUI)
 	{
-		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_Position(m_vecCollisionBoxPos); // π⁄Ω∫ ¡ﬂΩ… ¿ßƒ°
-		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_PickingCheck(m_bChecking);	// π⁄Ω∫ º±≈√ µ∆¥¬¡ˆ √º≈©
-		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_Scale(m_fCollisionBoxScale);	// π⁄Ω∫ ªÁ¿Ã¡Ó 
+		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_Position(m_vecCollisionBoxPos); // Î∞ïÏä§ Ï§ëÏã¨ ÏúÑÏπò
+		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_PickingCheck(m_bChecking);	// Î∞ïÏä§ ÏÑ†ÌÉù ÎêêÎäîÏßÄ Ï≤¥ÌÅ¨
+		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_Scale(m_fCollisionBoxScale);	// Î∞ïÏä§ ÏÇ¨Ïù¥Ï¶à 
 		static_cast<CCollisionBox*>(m_pCollisionBox)->Set_ImGuiMode(m_iCurrentImGuiMode);
 	}
-#endif
+	#endif
 }
 
 HRESULT CEnvironment::Add_Components()
 {
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
-	
+
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	return S_OK;
@@ -316,24 +312,24 @@ HRESULT CEnvironment::Add_Components()
 
 HRESULT CEnvironment::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
-	
+
 	return S_OK;
 }
 
-CEnvironment* CEnvironment::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CEnvironment* CEnvironment::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CEnvironment* pInstance = new CEnvironment(pDevice, pContext);
-	if (FAILED(pInstance->Initialize_Prototype()))
+	CEnvironment* pInstance = new CEnvironment(pDevice,pContext);
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CEnvironment");
 		Safe_Release(pInstance);
@@ -344,9 +340,9 @@ CEnvironment* CEnvironment::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 CGameObject* CEnvironment::Clone(void* pArg)
 {
 	CEnvironment* pInstance = new CEnvironment(*this);
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
- 		MSG_BOX("Failed to Created : CEnvironment");
+		MSG_BOX("Failed to Created : CEnvironment");
 		Safe_Release(pInstance);
 	}
 
@@ -357,5 +353,8 @@ void CEnvironment::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pShaderCom);   
+	#ifdef _DEBUG
+		Safe_Release(m_pCollisionBox);
+	#endif
 }

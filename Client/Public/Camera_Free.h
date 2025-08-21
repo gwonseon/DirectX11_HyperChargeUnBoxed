@@ -4,10 +4,10 @@
 
 BEGIN(Client)
 
-class CCamera_Free final : public CCamera
+class CCamera_Free final: public CCamera
 {
 public:
-	typedef struct : public CCamera::CAMERA_DESC
+	typedef struct: public CCamera::CAMERA_DESC
 	{
 		LEVELID eLevel{};
 		_float	fMouseSensor{};
@@ -17,24 +17,24 @@ public:
 		_vector* m_vecWeaponPos{};
 		_vector* m_vecWeaponDir{};
 
-		_bool* bShotStart{}; // ÃÑ ½î´Â ½ÃÀÛ Å¸ÀÌ¹Ö
-		_bool* bShotNow{}; // ÃÑ ½î´Â ¸ð¼ÇÀÇ ÀüÃ¼½Ã°£
+		_bool* bShotStart{}; // ì´ ì˜ëŠ” ì‹œìž‘ íƒ€ì´ë°
+		_bool* bShotNow{}; // ì´ ì˜ëŠ” ëª¨ì…˜ì˜ ì „ì²´ì‹œê°„
 		_uint* iViewState{};
 		_uint* iWeaponState{};
 		_uint* iUpperMotion{};
-		const _float4x4* matPlayerWorld = { nullptr };
+		const _float4x4* matPlayerWorld = {nullptr};
 	}CAMERA_FREE_DESC;
 private:
-	CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCamera_Free(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CCamera_Free(const CCamera_Free& Prototype);
 	virtual ~CCamera_Free() = default;
 
 public:
-	/* ¿øÇü»ý¼º½Ã È£Ãâ : »ý¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆÐÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹ížˆ ë¬´ê±°ìš´ ìž‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ìž…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆÐÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Þ¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºÐ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ìž…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…ížˆ ì¡´ìž¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ìž¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -42,20 +42,30 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	void	Set_PlayerPos(_vector vPos) { m_vecPos = vPos; }
-	void	Set_Rotation(_float fX, _float fY, _float fZ) {
-		m_pTransformCom->Rotation(fX, fY, fZ);
+	void	Set_PlayerPos(_vector vPos) {
+		m_vecPos = vPos;
 	}
-	void	Set_Direction(_vector vDirect) { m_vecDir = vDirect; }
+	void	Set_Rotation(_float fX,_float fY,_float fZ) {
+		m_pTransformCom->Rotation(fX,fY,fZ);
+	}
+	void	Set_Direction(_vector vDirect) {
+		m_vecDir = vDirect;
+	}
 
 
-	_vector Get_Dir() { return m_pTransformCom->Get_State(CTransform::STATE_LOOK); }
-	_vector* Get_Camera_At() { return &vAt; }
-	_vector* Get_Camera_Pos() { return &m_vecPos; }
+	_vector Get_Dir() {
+		return m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	}
+	_vector* Get_Camera_At() {
+		return &vAt;
+	}
+	_vector* Get_Camera_Pos() {
+		return &m_vecPos;
+	}
 
 
 private:
-	_float					m_fMouseSensor = { 0.f };
+	_float					m_fMouseSensor = {0.f};
 	_bool					m_bMouseLock = true;
 	_vector					m_vecDir{};
 
@@ -67,7 +77,7 @@ private:
 	_vector					vAt{};
 	_vector					m_vecPos{};
 private:
-	const _float4x4* m_matPlayerWorld = { nullptr };
+	const _float4x4* m_matPlayerWorld = {nullptr};
 
 private:
 	_float					m_fRotationPerSec{};
@@ -76,13 +86,13 @@ private:
 
 private:
 	_vector* m_vecTPSPos = {nullptr};
-	_vector* m_vecFPSPos = { nullptr };
-	_vector* m_vecWeaponPos = { nullptr };
-	_vector* m_vecWeaponDir = { nullptr };
+	_vector* m_vecFPSPos = {nullptr};
+	_vector* m_vecWeaponPos = {nullptr};
+	_vector* m_vecWeaponDir = {nullptr};
 
-	_bool* m_pShotNow = { nullptr };
-	_bool* m_pShotStart = { nullptr };
-	_uint* m_pWeaponState = { nullptr };
+	_bool* m_pShotNow = {nullptr};
+	_bool* m_pShotStart = {nullptr};
+	_uint* m_pWeaponState = {nullptr};
 	_uint* m_iUpperMotion = {nullptr};
 
 	XMMATRIX RotationMatrix{};
@@ -90,7 +100,7 @@ private:
 
 	_float m_fStore_RandomValue{};
 public:
-	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CCamera_Free* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

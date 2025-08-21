@@ -15,11 +15,15 @@
 #include "Battery.h"
 #include "InGameUI.h"
 #include "Missile_Truck.h"
+#include <BatteryGage.h>
+#include <BatteryUI.h>
+#include <Ending_UI.h>
+#include <Missile_TimeUI.h>
 
 BEGIN(Client)
 
 class CYard_Round;
-class CLevel_Yard : public CLevel
+class CLevel_Yard: public CLevel
 {
 public:
 	enum TEXT_STATE_YARD
@@ -33,9 +37,9 @@ public:
 		STATE_PROVOKE = 0x00000040,
 
 	};
-	
+
 protected:
-	CLevel_Yard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLevel_Yard(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CLevel_Yard() = default;
 
 public:
@@ -71,63 +75,63 @@ private:
 	void RoundMgr_And_MonsterSpawn(_float fTimeDelta);
 	void Conversation_Draw(_bool bDraw);
 private:
-	CCamera_Free*		m_pCamera					= { nullptr };
-	CPlayer*			m_pPlayer						= { nullptr };
-	CUI_CircleGuage*	m_pGuage				= { nullptr };
-	CBrainCore*			m_pBrain					= { nullptr };
-	CEnergy_Machine*	m_pEnergyMachine		= { nullptr };
-	CEnergy_Cap*		m_pEnergyMachine_Cap		= { nullptr };
-	CBattery*			m_pBattery						= { nullptr };
-	CInGameUI*			m_pBatteryUI						= { nullptr };
-	CInGameUI*			m_pBatteryGaugeUI				= { nullptr };
-	CInGameUI*			m_pConversationBox				= { nullptr };
-	CInGameUI*			m_pCharacter						= { nullptr };
-	CInGameUI*			m_pMissile_Timer					= { nullptr };
-	CInGameUI*			m_pEnding = { nullptr };
+	CCamera_Free*		m_pCamera					= {nullptr};
+	CPlayer*			m_pPlayer						= {nullptr};
+	CUI_CircleGuage*	m_pGuage				= {nullptr};
+	CBrainCore*			m_pBrain					= {nullptr};
+	CEnergy_Machine*	m_pEnergyMachine		= {nullptr};
+	CEnergy_Cap*		m_pEnergyMachine_Cap		= {nullptr};
+	CBattery*			m_pBattery						= {nullptr};
+	CBatteryUI*			m_pBatteryUI						= {nullptr};
+	CBatteryGage*		m_pBatteryGaugeUI		= {nullptr};
+	CInGameUI*			m_pConversationBox				= {nullptr};
+	CInGameUI*			m_pCharacter						= {nullptr};
+	CInGameUI*			m_pMissile_Timer					= {nullptr};
+	CEnding_UI*			m_pEnding					= {nullptr};
 
 	CWeapon_Item*		m_pWeaponItem[2];
-	CMissile_Truck*		m_pMissile_Truck			= { nullptr };
+	CMissile_Truck*		m_pMissile_Truck			= {nullptr};
 
 
 	_float	m_fDelay{};
 	_float  m_fConversation_Draw_Timer{};
 	_bool m_bOnce = false;
 	_bool m_bVictory = false;
-	// Ãæµ¹¿ë
+	// ÃƒÃ¦ÂµÂ¹Â¿Ã«
 private:
-	CLayer* pPlayerLayer = { nullptr };
-	CLayer* pNearMonsterLayer = { nullptr };
-	CLayer* pFarMonsterLayer = { nullptr };
-	CLayer* pCoin = { nullptr };
-	CLayer* pTrap = { nullptr };
-	CLayer* pTrap_Shield = { nullptr };
-	CLayer* pMonsterBullet = { nullptr };
-	CLayer* pCircleUI = { nullptr };
-	CLayer* pItem = { nullptr };
-	CLayer* pExplosion = { nullptr };
-	CLayer* pExplosion_Player = { nullptr };
-	CLayer* pBuild = { nullptr };
-	CLayer* pTruck = { nullptr };
+	CLayer* pPlayerLayer = {nullptr};
+	CLayer* pNearMonsterLayer = {nullptr};
+	CLayer* pFarMonsterLayer = {nullptr};
+	CLayer* pCoin = {nullptr};
+	CLayer* pTrap = {nullptr};
+	CLayer* pTrap_Shield = {nullptr};
+	CLayer* pMonsterBullet = {nullptr};
+	CLayer* pCircleUI = {nullptr};
+	CLayer* pItem = {nullptr};
+	CLayer* pExplosion = {nullptr};
+	CLayer* pExplosion_Player = {nullptr};
+	CLayer* pBuild = {nullptr};
+	CLayer* pTruck = {nullptr};
 
-	_bool* m_pReloading = { nullptr };
+	_bool* m_pReloading = {nullptr};
 	_uint	m_iCurrentRound = 0;
 	_uint	m_iPreviousRound = 0;
-	_float XPos{}, ZPos{};
+	_float XPos{},ZPos{};
 	_float m_fTimerMissile{};
 
 private:
 	vector<CTrap_Marks*> m_vecTrapMark;
 
-	// ¶ó¿îµå
+	// Â¶Ã³Â¿Ã®ÂµÃ¥
 private:
 	_float	m_fSkipTimer{};
-	CYard_Round* m_pRound[3] = { nullptr };
+	CYard_Round* m_pRound[3] = {nullptr};
 	_bool		m_bRoundStart = false;
 
 	_uint m_eTextState = STATE_DONT_DRAW;
 	_uint m_iDrawNumber = 99;
 public:
-	static CLevel_Yard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLevel_Yard* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 };
 END

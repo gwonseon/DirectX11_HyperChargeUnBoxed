@@ -1,104 +1,102 @@
 #include "..\Public\VIBuffer_Terrain.h"
 
-CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CVIBuffer{ pDevice, pContext }
+CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CVIBuffer{pDevice,pContext}
 
-{
-}
+{}
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain& Prototype)
-	: CVIBuffer{ Prototype }
+	: CVIBuffer{Prototype}
 
-{
-}
+{}
 
 HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath)
 {
-	_ulong			dwByte = { 0 };
+	_ulong			dwByte = {0};
 
-	// CreateFile : ÆÄÀÏÀ» ¿­°Å³ª »õ·Î ¸¸µç´Ù. pHeightMapFilePathÀÇ °æ·Î¿¡ ÀÖ´Â ÆÄÀÏÀ» GENERIC_READ ÀÐ±â Àü¿ëÀ¸·Î ¿¬´Ù.
-	// OPEN_EXISTING : ÀÌ¹Ì Á¸ÀçÇÏ´Â ÆÄÀÏÀ» ¿¬´Ù	if (0 == hFile)
-	// ³ôÀÌ¸Ê ÆÄÀÏ °æ·Î ¹Þ¾Æ¿Â´Ù
-	HANDLE			hFile = CreateFile(pHeightMapFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	// CreateFile : íŒŒì¼ì„ ì—´ê±°ë‚˜ ìƒˆë¡œ ë§Œë“ ë‹¤. pHeightMapFilePathì˜ ê²½ë¡œì— ìžˆëŠ” íŒŒì¼ì„ GENERIC_READ ì½ê¸° ì „ìš©ìœ¼ë¡œ ì—°ë‹¤.
+	// OPEN_EXISTING : ì´ë¯¸ ì¡´ìž¬í•˜ëŠ” íŒŒì¼ì„ ì—°ë‹¤	if (0 == hFile)
+	// ë†’ì´ë§µ íŒŒì¼ ê²½ë¡œ ë°›ì•„ì˜¨ë‹¤
+	HANDLE			hFile = CreateFile(pHeightMapFilePath,GENERIC_READ,0,nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
 
-	if (0 == hFile)
+	if(0 == hFile)
 		return E_FAIL;
 
 
-	// BMP ÆÄÀÏ Çì´õ¿Í Á¤º¸ Çì´õ ÀÐ±â
-	// ÆÄÀÏ Å¸ÀÔ, Å©±â, µ¥ÀÌÅÍ ½ÃÀÛ À§Ä¡¸¦ °¡Áö°í ÀÖ´Ù
+	// BMP íŒŒì¼ í—¤ë”ì™€ ì •ë³´ í—¤ë” ì½ê¸°
+	// íŒŒì¼ íƒ€ìž…, í¬ê¸°, ë°ì´í„° ì‹œìž‘ ìœ„ì¹˜ë¥¼ ê°€ì§€ê³  ìžˆë‹¤
 	BITMAPFILEHEADER			fh{};
-	// ÀÌ¹ÌÁöÀÇ ³Êºñ, ³ôÀÌ, ºñÆ® ±íÀÌ µî BMP ÀÌ¹ÌÁöÀÇ »ó¼¼ Á¤º¸¸¦ °¡Áö°í ÀÖ´Ù.
+	// ì´ë¯¸ì§€ì˜ ë„ˆë¹„, ë†’ì´, ë¹„íŠ¸ ê¹Šì´ ë“± BMP ì´ë¯¸ì§€ì˜ ìƒì„¸ ì •ë³´ë¥¼ ê°€ì§€ê³  ìžˆë‹¤.
 	BITMAPINFOHEADER			ih{};
 
-	// ReadFile : ÆÄÀÏ·ÎºÎÅÍ µ¥ÀÌÅÍ¸¦ ÀÐ´Â´Ù.
-	ReadFile(hFile, &fh, sizeof(fh), &dwByte, nullptr);
-	ReadFile(hFile, &ih, sizeof(ih), &dwByte, nullptr);
+	// ReadFile : íŒŒì¼ë¡œë¶€í„° ë°ì´í„°ë¥¼ ì½ëŠ”ë‹¤.
+	ReadFile(hFile,&fh,sizeof(fh),&dwByte,nullptr);
+	ReadFile(hFile,&ih,sizeof(ih),&dwByte,nullptr);
 
-	// ÀÌ¹ÌÁöÀÇ ³Êºñ¿Í ³ôÀÌ¸¦ °öÇØ ÇÈ¼¿ÀÇ ÃÑ ¼ö¸¦ °è»êÇÑ´Ù.
-	// ÇÊ¿äÇÑ ¸Þ¸ð¸®¸¦ µ¿ÀûÀ¸·Î ÇÒ´çÇÑ´Ù.
+	// ì´ë¯¸ì§€ì˜ ë„ˆë¹„ì™€ ë†’ì´ë¥¼ ê³±í•´ í”½ì…€ì˜ ì´ ìˆ˜ë¥¼ ê³„ì‚°í•œë‹¤.
+	// í•„ìš”í•œ ë©”ëª¨ë¦¬ë¥¼ ë™ì ìœ¼ë¡œ í• ë‹¹í•œë‹¤.
 	_uint* pPixel = new _uint[ih.biWidth * ih.biHeight];
 	m_iSizePixel = sizeof(_uint) * ih.biWidth * ih.biHeight;
-	// ReadFile ÇÔ¼ö¸¦ ÀÌ¿ëÇØ ÆÄÀÏ¿¡¼­ ÇÈ¼¿ µ¥ÀÌÅÍ¸¦ ÀÐ¾î¼­ ¾Õ¿¡¼­ ÇÒ´çÇÑ ¸Þ¸ð¸®¸¦ À§ÀÇ ¹è¿­¿¡ ÀúÀåÇÑ´Ù.
-	ReadFile(hFile, pPixel, m_iSizePixel, &dwByte, nullptr);
+	// ReadFile í•¨ìˆ˜ë¥¼ ì´ìš©í•´ íŒŒì¼ì—ì„œ í”½ì…€ ë°ì´í„°ë¥¼ ì½ì–´ì„œ ì•žì—ì„œ í• ë‹¹í•œ ë©”ëª¨ë¦¬ë¥¼ ìœ„ì˜ ë°°ì—´ì— ì €ìž¥í•œë‹¤.
+	ReadFile(hFile,pPixel,m_iSizePixel,&dwByte,nullptr);
 
-	// CreateFileÀ» ÅëÇØ »ý¼ºµÈ ÇÚµéÀ» ´Ý´Â´Ù.
-	// ´õÀÌ»ó ÆÄÀÏ¿¡ ´ëÇÑ ÀÐ±â ¾²±â°¡ ºÒ°¡´É
-	// ´ÝÁö ¾ÊÀ¸¸é ½Ã½ºÅÛ ¸®¼Ò½º ´©¼ö°¡ ¹ß»ýÇÒ ¼ö ÀÖ´Ù. ÀÌ°æ¿ì ÇÁ·Î±×·¥ÀÌ ´õ ¸¹Àº ¸Þ¸ð¸®¿Í ¸®¼Ò½º¸¦ »ç¿ëÇÏ°Ô µÇ¾î ¼º´É ÀúÇÏ³ª ½Ã½ºÅÛ ºÒ¾ÈÁ¤¼ºÀÌ ¹ß»ýÇÒ ¼ö ÀÖ´Ù.
+	// CreateFileì„ í†µí•´ ìƒì„±ëœ í•¸ë“¤ì„ ë‹«ëŠ”ë‹¤.
+	// ë”ì´ìƒ íŒŒì¼ì— ëŒ€í•œ ì½ê¸° ì“°ê¸°ê°€ ë¶ˆê°€ëŠ¥
+	// ë‹«ì§€ ì•Šìœ¼ë©´ ì‹œìŠ¤í…œ ë¦¬ì†ŒìŠ¤ ëˆ„ìˆ˜ê°€ ë°œìƒí•  ìˆ˜ ìžˆë‹¤. ì´ê²½ìš° í”„ë¡œê·¸ëž¨ì´ ë” ë§Žì€ ë©”ëª¨ë¦¬ì™€ ë¦¬ì†ŒìŠ¤ë¥¼ ì‚¬ìš©í•˜ê²Œ ë˜ì–´ ì„±ëŠ¥ ì €í•˜ë‚˜ ì‹œìŠ¤í…œ ë¶ˆì•ˆì •ì„±ì´ ë°œìƒí•  ìˆ˜ ìžˆë‹¤.
 	CloseHandle(hFile);
 
-	m_iNumVerticesX = ih.biWidth * 7;// ¹öÅØ½º °¡·Î °³¼ö = ÀÌ¹ÌÁöÀÇ °¡·Î ÇÈ¼¿ ¼ö
-	m_iNumVerticesZ = ih.biHeight * 7;	// ¹öÅØ½º ¼¼·Î °³¼ö = ÀÌ¹ÌÁö ¼¼·Î ÇÈ¼¿ ¼ö
-	m_iVertexStride = sizeof(VTXNORTEX);// »çÀÌÁî´Â ±¸Á¶Ã¼ »çÀÌÁî
-	m_iNumVertices = m_iNumVerticesX * m_iNumVerticesZ;// ¹öÅØ½º °³¼ö´Â °¡·Î °³¼ö X ¼¼·Î °³¼ö
-	m_iIndexStride = sizeof(_uint);	// ÀÎµ¦½º »çÀÌÁî = 4¹ÙÀÌÆ® ( int »çÀÌÁî )
-	m_iNumIndices = (m_iNumVerticesX - 1) * (m_iNumVerticesZ - 1) * 2 * 3;// ÀÎµ¦½º °³¼ö  = (¹öÅØ½º °¡·Î°³¼ö - 1) X (¹öÅØ½º ¼¼·Î °³¼ö -1) X 2 X 3
+	m_iNumVerticesX = ih.biWidth * 7;// ë²„í…ìŠ¤ ê°€ë¡œ ê°œìˆ˜ = ì´ë¯¸ì§€ì˜ ê°€ë¡œ í”½ì…€ ìˆ˜
+	m_iNumVerticesZ = ih.biHeight * 7;	// ë²„í…ìŠ¤ ì„¸ë¡œ ê°œìˆ˜ = ì´ë¯¸ì§€ ì„¸ë¡œ í”½ì…€ ìˆ˜
+	m_iVertexStride = sizeof(VTXNORTEX);// ì‚¬ì´ì¦ˆëŠ” êµ¬ì¡°ì²´ ì‚¬ì´ì¦ˆ
+	m_iNumVertices = m_iNumVerticesX * m_iNumVerticesZ;// ë²„í…ìŠ¤ ê°œìˆ˜ëŠ” ê°€ë¡œ ê°œìˆ˜ X ì„¸ë¡œ ê°œìˆ˜
+	m_iIndexStride = sizeof(_uint);	// ì¸ë±ìŠ¤ ì‚¬ì´ì¦ˆ = 4ë°”ì´íŠ¸ ( int ì‚¬ì´ì¦ˆ )
+	m_iNumIndices = (m_iNumVerticesX - 1) * (m_iNumVerticesZ - 1) * 2 * 3;// ì¸ë±ìŠ¤ ê°œìˆ˜  = (ë²„í…ìŠ¤ ê°€ë¡œê°œìˆ˜ - 1) X (ë²„í…ìŠ¤ ì„¸ë¡œ ê°œìˆ˜ -1) X 2 X 3
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	// m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST; // ±×¸®µå
+	// m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST; // ê·¸ë¦¬ë“œ
 	m_fVertexPos = new _float3[m_iNumVertices];
-#pragma region VERTEX_BUFFER
-	// Á¤Á¡ ¹è¿­ ¸Þ¸ð¸® µ¿Àû ÇÒ´ç
-	// VTXNORTEX ±¸Á¶Ã¼°¡ Æ÷ÇÔÇÏ°í ÀÖ´Â µ¥ÀÌÅÍ¸¦ ÀÌ¿ëÇÔ	
-	
+	#pragma region VERTEX_BUFFER
+	// ì •ì  ë°°ì—´ ë©”ëª¨ë¦¬ ë™ì  í• ë‹¹
+	// VTXNORTEX êµ¬ì¡°ì²´ê°€ í¬í•¨í•˜ê³  ìžˆëŠ” ë°ì´í„°ë¥¼ ì´ìš©í•¨	
 
-	//size_t modify_i = 10; // ¼öÁ¤ÇÏ·Á´Â ¼¼·Î À§Ä¡
-	//size_t modify_j = 15; // ¼öÁ¤ÇÏ·Á´Â °¡·Î À§Ä¡
+
+	//size_t modify_i = 10; // ìˆ˜ì •í•˜ë ¤ëŠ” ì„¸ë¡œ ìœ„ì¹˜
+	//size_t modify_j = 15; // ìˆ˜ì •í•˜ë ¤ëŠ” ê°€ë¡œ ìœ„ì¹˜
 	//size_t modify_index = modify_i * m_iNumVerticesX + modify_j;
-	// pPixel[modify_index] = (pPixel[modify_index] & 0xffffff00) | (3000 & 0xff); // »õ·Î¿î ³ôÀÌ¸¦ 20À¸·Î ¼³Á¤
+	// pPixel[modify_index] = (pPixel[modify_index] & 0xffffff00) | (3000 & 0xff); // ìƒˆë¡œìš´ ë†’ì´ë¥¼ 20ìœ¼ë¡œ ì„¤ì •
 
-	// 2D Á¤Á¡ ÁÂÇ¥ ¼³Á¤ 
-	// i : ³ôÀÌ j : ³Êºñ
+	// 2D ì •ì  ì¢Œí‘œ ì„¤ì • 
+	// i : ë†’ì´ j : ë„ˆë¹„
 
 	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
-	for (size_t i = 0; i < m_iNumVerticesZ; i++)
+	for(size_t i = 0; i < m_iNumVerticesZ; i++)
 	{
-		for (size_t j = 0; j < m_iNumVerticesX; j++)
+		for(size_t j = 0; j < m_iNumVerticesX; j++)
 		{
 			_uint			iIndex = i * m_iNumVerticesX + j;
-			// ³ôÀÌ°ª °è»êÀ» À§ÇØ 0x000000ff 16Áø¼ö ARGB ¿¡¼­ B °ªÀ» ¹Þ¾Æ¿Â´Ù.
-			// Á¤Á¡ÀÇ À§Ä¡¸¦ ¼³Á¤ÇÑ´Ù. 15·Î ³ª´©´Â °ÍÀº ³ôÀÌ ½ºÄÉÀÏ Á¶Á¤ÇÏ´Â°Í
-		
-			pVertices[iIndex].vPosition = _float3(j,0.f, i); // 15 ³ª´« °ªÀ¸·Î ³ôÀÌ ½ºÄÉÀÏ Á¶Á¤
-		
-			pVertices[iIndex].vNormal = _float3(0.0f, 0.f, 0.f); // Á¤Á¡ÀÇ ¹ý¼± º¤ÅÍ ÃÊ±âÈ­
-			pVertices[iIndex].vTexcoord = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f)); // ÅØ½ºÃ³ ÁÂÇ¥ ¼³Á¤
+			// ë†’ì´ê°’ ê³„ì‚°ì„ ìœ„í•´ 0x000000ff 16ì§„ìˆ˜ ARGB ì—ì„œ B ê°’ì„ ë°›ì•„ì˜¨ë‹¤.
+			// ì •ì ì˜ ìœ„ì¹˜ë¥¼ ì„¤ì •í•œë‹¤. 15ë¡œ ë‚˜ëˆ„ëŠ” ê²ƒì€ ë†’ì´ ìŠ¤ì¼€ì¼ ì¡°ì •í•˜ëŠ”ê²ƒ
+
+			pVertices[iIndex].vPosition = _float3(j,0.f,i); // 15 ë‚˜ëˆˆ ê°’ìœ¼ë¡œ ë†’ì´ ìŠ¤ì¼€ì¼ ì¡°ì •
+
+			pVertices[iIndex].vNormal = _float3(0.0f,0.f,0.f); // ì •ì ì˜ ë²•ì„  ë²¡í„° ì´ˆê¸°í™”
+			pVertices[iIndex].vTexcoord = _float2(j / (m_iNumVerticesX - 1.f),i / (m_iNumVerticesZ - 1.f)); // í…ìŠ¤ì²˜ ì¢Œí‘œ ì„¤ì •
 			m_fVertexPos[iIndex] = pVertices[iIndex].vPosition;
 
 		}
 	}
-#pragma endregion
+	#pragma endregion
 
-#pragma region INDEX_BUFFER
-	// ÀÎµ¦½º ¹è¿­ ¸Þ¸ð¸® µ¿Àû ÇÒ´ç ¹× ÃÊ±âÈ­
+	#pragma region INDEX_BUFFER
+	// ì¸ë±ìŠ¤ ë°°ì—´ ë©”ëª¨ë¦¬ ë™ì  í• ë‹¹ ë° ì´ˆê¸°í™”
 	_uint* pIndices = new _uint[m_iNumIndices];
-	_uint			iNumIndices = { 0 };
-	
-	// »ï°¢Çü ¸®½ºÆ® ±¸¼º ¹× ¹ý¼± º¤ÅÍ °è»ê
-	for (size_t i = 0; i < m_iNumVerticesZ - 1; i++)
+	_uint			iNumIndices = {0};
+
+	// ì‚¼ê°í˜• ë¦¬ìŠ¤íŠ¸ êµ¬ì„± ë° ë²•ì„  ë²¡í„° ê³„ì‚°
+	for(size_t i = 0; i < m_iNumVerticesZ - 1; i++)
 	{
-		for (size_t j = 0; j < m_iNumVerticesX - 1; j++)
+		for(size_t j = 0; j < m_iNumVerticesX - 1; j++)
 		{
 			_uint			iIndex = i * m_iNumVerticesX + j;
 
@@ -113,79 +111,79 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 			pIndices[iNumIndices++] = iIndices[1];
 			pIndices[iNumIndices++] = iIndices[2];
 
-			// Ã¹ ¹øÂ° »ï°¢Çü¿¡ ´ëÇÑ ¹ý¼± º¤ÅÍÀÇ °è»ê
-			// vSour, vDest´Â »ï°¢ÇüÀÇ µÎ º¯À» ³ªÅ¸³½´Ù.
-			// XMVector3Cross : µÎ º¤ÅÍÀÇ ¿ÜÀûÀ» ÀÌ¿ëÇØ ¹ý¼± º¤ÅÍ(vNormal) À» ±¸ÇÑ´Ù.
-			// XMVector3Normalize : ¹ý¼± º¤ÅÍ¸¦ Á¤±ÔÈ­ÇÏ¿© Å©±â 1·Î ¸¸µç´Ù.
-			_vector			vSour, vDest, vNormal;
+			// ì²« ë²ˆì§¸ ì‚¼ê°í˜•ì— ëŒ€í•œ ë²•ì„  ë²¡í„°ì˜ ê³„ì‚°
+			// vSour, vDestëŠ” ì‚¼ê°í˜•ì˜ ë‘ ë³€ì„ ë‚˜íƒ€ë‚¸ë‹¤.
+			// XMVector3Cross : ë‘ ë²¡í„°ì˜ ì™¸ì ì„ ì´ìš©í•´ ë²•ì„  ë²¡í„°(vNormal) ì„ êµ¬í•œë‹¤.
+			// XMVector3Normalize : ë²•ì„  ë²¡í„°ë¥¼ ì •ê·œí™”í•˜ì—¬ í¬ê¸° 1ë¡œ ë§Œë“ ë‹¤.
+			_vector			vSour,vDest,vNormal;
 
 			vSour = XMLoadFloat3(&pVertices[iIndices[1]].vPosition) - XMLoadFloat3(&pVertices[iIndices[0]].vPosition);
 			vDest = XMLoadFloat3(&pVertices[iIndices[2]].vPosition) - XMLoadFloat3(&pVertices[iIndices[1]].vPosition);
-			vNormal = XMVector3Normalize(XMVector3Cross(vSour, vDest));
+			vNormal = XMVector3Normalize(XMVector3Cross(vSour,vDest));
 
-			// °è»êµÈ ¹ý¼± º¤ÅÍ¸¦ »ï°¢ÇüÀÇ ¼¼ Á¤Á¡¿¡ ´õÇØÁØ´Ù.
-			// ¿©·¯ »ï°¢ÇüÀÌ ÇÏ³ªÀÇ Á¤Á¡À» °øÀ¯ÇÏ´Â °æ¿ì ¹ý¼± º¤ÅÍ¸¦ ´õÇØ Æò±ÕÀûÀÎ ¹ý¼± º¤ÅÍ°¡ ±¸ÇØÁø´Ù.
-			XMStoreFloat3(&pVertices[iIndices[0]].vNormal, XMLoadFloat3(&pVertices[iIndices[0]].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[iIndices[1]].vNormal, XMLoadFloat3(&pVertices[iIndices[1]].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[iIndices[2]].vNormal, XMLoadFloat3(&pVertices[iIndices[2]].vNormal) + vNormal);
+			// ê³„ì‚°ëœ ë²•ì„  ë²¡í„°ë¥¼ ì‚¼ê°í˜•ì˜ ì„¸ ì •ì ì— ë”í•´ì¤€ë‹¤.
+			// ì—¬ëŸ¬ ì‚¼ê°í˜•ì´ í•˜ë‚˜ì˜ ì •ì ì„ ê³µìœ í•˜ëŠ” ê²½ìš° ë²•ì„  ë²¡í„°ë¥¼ ë”í•´ í‰ê· ì ì¸ ë²•ì„  ë²¡í„°ê°€ êµ¬í•´ì§„ë‹¤.
+			XMStoreFloat3(&pVertices[iIndices[0]].vNormal,XMLoadFloat3(&pVertices[iIndices[0]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[1]].vNormal,XMLoadFloat3(&pVertices[iIndices[1]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[2]].vNormal,XMLoadFloat3(&pVertices[iIndices[2]].vNormal) + vNormal);
 
-			// µÎ ¹øÂ° »ï°¢Çü¿¡ ´ëÇÑ °è»ê
+			// ë‘ ë²ˆì§¸ ì‚¼ê°í˜•ì— ëŒ€í•œ ê³„ì‚°
 			pIndices[iNumIndices++] = iIndices[0];
 			pIndices[iNumIndices++] = iIndices[2];
 			pIndices[iNumIndices++] = iIndices[3];
 
 			vSour = XMLoadFloat3(&pVertices[iIndices[2]].vPosition) - XMLoadFloat3(&pVertices[iIndices[0]].vPosition);
 			vDest = XMLoadFloat3(&pVertices[iIndices[3]].vPosition) - XMLoadFloat3(&pVertices[iIndices[2]].vPosition);
-			vNormal = XMVector3Normalize(XMVector3Cross(vSour, vDest));
+			vNormal = XMVector3Normalize(XMVector3Cross(vSour,vDest));
 
-			XMStoreFloat3(&pVertices[iIndices[0]].vNormal, XMLoadFloat3(&pVertices[iIndices[0]].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[iIndices[2]].vNormal, XMLoadFloat3(&pVertices[iIndices[2]].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[iIndices[3]].vNormal, XMLoadFloat3(&pVertices[iIndices[3]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[0]].vNormal,XMLoadFloat3(&pVertices[iIndices[0]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[2]].vNormal,XMLoadFloat3(&pVertices[iIndices[2]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[3]].vNormal,XMLoadFloat3(&pVertices[iIndices[3]].vNormal) + vNormal);
 		}
 	}
-	// ¹ý¼± º¤ÅÍÀÇ ÃÖÁ¾ Á¤±ÔÈ­
-	// ¹ý¼± º¤ÅÍÀÇ Å©±â¸¦ 1·Î ¸ÂÃçÁØ´Ù.
-	for (size_t i = 0; i < m_iNumVertices; i++)
-		XMStoreFloat3(&pVertices[i].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[i].vNormal)));
+	// ë²•ì„  ë²¡í„°ì˜ ìµœì¢… ì •ê·œí™”
+	// ë²•ì„  ë²¡í„°ì˜ í¬ê¸°ë¥¼ 1ë¡œ ë§žì¶°ì¤€ë‹¤.
+	for(size_t i = 0; i < m_iNumVertices; i++)
+		XMStoreFloat3(&pVertices[i].vNormal,XMVector3Normalize(XMLoadFloat3(&pVertices[i].vNormal)));
 
-#pragma endregion
-	/* dx9 : Á¤Á¡¹öÆÛ¸¦ ÇÒ´çÇÏ°í -> ¶ô¾ð¶ôÇØ¼­ Á¤Á¡¹öÆÛ¿¡ ÃÊ±â°ªÀ» Ã¤¿î´Ù. */
-	/* dx9 : Á¤Á¡¹öÆÛ¿¡ ÃÊ±â°ªÀ» Ã¤¿ì¸é¼­ Á¤Á¡¹öÆÛ¸¦ ÇÒ´çÇÑ´Ù*/
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);// 0ÃÊ±âÈ­
+	#pragma endregion
+	/* dx9 : ì •ì ë²„í¼ë¥¼ í• ë‹¹í•˜ê³  -> ë½ì–¸ë½í•´ì„œ ì •ì ë²„í¼ì— ì´ˆê¸°ê°’ì„ ì±„ìš´ë‹¤. */
+	/* dx9 : ì •ì ë²„í¼ì— ì´ˆê¸°ê°’ì„ ì±„ìš°ë©´ì„œ ì •ì ë²„í¼ë¥¼ í• ë‹¹í•œë‹¤*/
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);// 0ì´ˆê¸°í™”
 
-	/* ÇÒ´çÇÏ°íÀÚÇÏ´Â ¸Þ¸ð¸®°ø°£ÀÇ Å©±â(Byte)*/
-	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices; // ¹öÅØ½º »çÀÌÁî X ¹öÅØ½º °³¼ö
+	/* í• ë‹¹í•˜ê³ ìží•˜ëŠ” ë©”ëª¨ë¦¬ê³µê°„ì˜ í¬ê¸°(Byte)*/
+	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices; // ë²„í…ìŠ¤ ì‚¬ì´ì¦ˆ X ë²„í…ìŠ¤ ê°œìˆ˜
 
-	/* ¹öÆÛÀÇ ¼Ó¼º (Á¤Àû, µ¿Àû) */
-	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC; // D3D11_USAGE_DEFAULT : GPU¿¡¼­ ÀÐ±â¿Í ¾²±â¸¦ ÇÑ´Ù. ÀÌ¸¦ ÅëÇØ ¼º´É°ú ¸Þ¸ð¸® È¿À²¼ºÀ» ÃÖÀûÈ­ÇÑ´Ù.
-	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;// Á¤Á¡ ¹öÆÛ·Î »ç¿ëµÉ °ÍÀÓÀ» ÁöÁ¤ÇÑ´Ù. GPU°¡ ÀÌ ¹öÆÛ¸¦ Á¤Á¡ µ¥ÀÌÅÍ¸¦ ÀÐ´Âµ¥ »ç¿ëÇÑ´Ù.
-	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;// CPU°¡ ÀÌ ¹öÆÛ¿¡ Á÷Á¢ Á¢±ÙÇÒ ¼ö ¾ø´Ù.
-	m_BufferDesc.MiscFlags = 0;// Æ¯º°ÇÑ Ãß°¡ ¼Ó¼ºÀÌ ¾ø´Ù.
+	/* ë²„í¼ì˜ ì†ì„± (ì •ì , ë™ì ) */
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC; // D3D11_USAGE_DEFAULT : GPUì—ì„œ ì½ê¸°ì™€ ì“°ê¸°ë¥¼ í•œë‹¤. ì´ë¥¼ í†µí•´ ì„±ëŠ¥ê³¼ ë©”ëª¨ë¦¬ íš¨ìœ¨ì„±ì„ ìµœì í™”í•œë‹¤.
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;// ì •ì  ë²„í¼ë¡œ ì‚¬ìš©ë  ê²ƒìž„ì„ ì§€ì •í•œë‹¤. GPUê°€ ì´ ë²„í¼ë¥¼ ì •ì  ë°ì´í„°ë¥¼ ì½ëŠ”ë° ì‚¬ìš©í•œë‹¤.
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;// CPUê°€ ì´ ë²„í¼ì— ì§ì ‘ ì ‘ê·¼í•  ìˆ˜ ì—†ë‹¤.
+	m_BufferDesc.MiscFlags = 0;// íŠ¹ë³„í•œ ì¶”ê°€ ì†ì„±ì´ ì—†ë‹¤.
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);// m_InitialDesc ÃÊ±âÈ­ÇÑ´Ù
-	m_InitialDesc.pSysMem = pVertices;// pVertices¿¡ ÀúÀåµÈ Á¤Á¡ µ¥ÀÌÅÍÀÇ Æ÷ÀÎÅÍ¸¦ ÇÒ´çÇÏ¿© GPU°¡ ÀÌ µ¥ÀÌÅÍ·Î Á¤Á¡ ¹öÆÛ¸¦ ÃÊ±âÈ­ÇÏµµ·Ï ÇÑ´Ù.
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);// m_InitialDesc ì´ˆê¸°í™”í•œë‹¤
+	m_InitialDesc.pSysMem = pVertices;// pVerticesì— ì €ìž¥ëœ ì •ì  ë°ì´í„°ì˜ í¬ì¸í„°ë¥¼ í• ë‹¹í•˜ì—¬ GPUê°€ ì´ ë°ì´í„°ë¡œ ì •ì  ë²„í¼ë¥¼ ì´ˆê¸°í™”í•˜ë„ë¡ í•œë‹¤.
 
-	if (FAILED(__super::Create_Buffer(&m_pVB)))// GPU¿¡ ½ÇÁ¦·Î ¹öÆÛ¸¦ »ý¼ºÇÑ´Ù
+	if(FAILED(__super::Create_Buffer(&m_pVB)))// GPUì— ì‹¤ì œë¡œ ë²„í¼ë¥¼ ìƒì„±í•œë‹¤
 		return E_FAIL;
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);// m_BufferDesc ÃÊ±âÈ­
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);// m_BufferDesc ì´ˆê¸°í™”
 
-	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;// ÀÎµ¦½º ¹öÆÛÀÇ Å©±â¸¦ ¹ÙÀÌÆ® ´ÜÀ§·Î ÁöÁ¤ÇÑ´Ù. ÀÎµ¦½º Å©±â X ÀÎµ¦½º °³¼ö
-	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;// GPU¸¦ ±âº»ÀûÀÎ »ç¿ë ¹æ½ÄÀ¸·Î µ¿ÀÛÇÏ°Ô ÇÑ´Ù.
-	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;// GPU°¡ ÀÌ ¹öÆÛ¸¦ ÀÎµ¦½º µ¥ÀÌÅÍ¸¦ ÀÐ´Âµ¥ »ç¿ëÇÏµµ·Ï ÇÑ´Ù.
-	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;// CPU Á¢±Ù ³ñ
-	m_BufferDesc.MiscFlags = 0;// Ãß°¡ ¼Ó¼º ³ñ
-	m_BufferDesc.StructureByteStride = 0;// ÀÎµ¦½º´Â ±¸Á¶Ã¼½ºÆ®¶óÀÌµå ÇÊ¿ä¾øÀ½
+	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;// ì¸ë±ìŠ¤ ë²„í¼ì˜ í¬ê¸°ë¥¼ ë°”ì´íŠ¸ ë‹¨ìœ„ë¡œ ì§€ì •í•œë‹¤. ì¸ë±ìŠ¤ í¬ê¸° X ì¸ë±ìŠ¤ ê°œìˆ˜
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;// GPUë¥¼ ê¸°ë³¸ì ì¸ ì‚¬ìš© ë°©ì‹ìœ¼ë¡œ ë™ìž‘í•˜ê²Œ í•œë‹¤.
+	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;// GPUê°€ ì´ ë²„í¼ë¥¼ ì¸ë±ìŠ¤ ë°ì´í„°ë¥¼ ì½ëŠ”ë° ì‚¬ìš©í•˜ë„ë¡ í•œë‹¤.
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;// CPU ì ‘ê·¼ ë†‰
+	m_BufferDesc.MiscFlags = 0;// ì¶”ê°€ ì†ì„± ë†‰
+	m_BufferDesc.StructureByteStride = 0;// ì¸ë±ìŠ¤ëŠ” êµ¬ì¡°ì²´ìŠ¤íŠ¸ë¼ì´ë“œ í•„ìš”ì—†ìŒ
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);// m_InitialDesc ÃÊ±âÈ­
-	m_InitialDesc.pSysMem = pIndices;// pSysMem  ¿¡ ÀÎµ¦½º µ¥ÀÌÅÍ¸¦ °¡¸®Å°´Â Æ÷ÀÎÅÍ ÇÒ´ç
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);// m_InitialDesc ì´ˆê¸°í™”
+	m_InitialDesc.pSysMem = pIndices;// pSysMem  ì— ì¸ë±ìŠ¤ ë°ì´í„°ë¥¼ ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„° í• ë‹¹
 
 
-	if (FAILED(__super::Create_Buffer(&m_pIB)))// GPU¿¡ ÀÎµ¦½º¹öÆÛ »ý¼º
+	if(FAILED(__super::Create_Buffer(&m_pIB)))// GPUì— ì¸ë±ìŠ¤ë²„í¼ ìƒì„±
 		return E_FAIL;
 
-	// ÇÒ´çµÈ ¸Þ¸ð¸® ÇØÁ¦
+	// í• ë‹¹ëœ ë©”ëª¨ë¦¬ í•´ì œ
 	Safe_Delete_Array(pVertices);
 	Safe_Delete_Array(pIndices);
 	Safe_Delete_Array(pPixel);
@@ -204,11 +202,11 @@ HRESULT CVIBuffer_Terrain::Initialize(void* pArg)
 
 
 
-CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pHeightMapFilePath)
+CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _tchar* pHeightMapFilePath)
 {
-	CVIBuffer_Terrain* pInstance = new CVIBuffer_Terrain(pDevice, pContext);
+	CVIBuffer_Terrain* pInstance = new CVIBuffer_Terrain(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pHeightMapFilePath)))
+	if(FAILED(pInstance->Initialize_Prototype(pHeightMapFilePath)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Terrain");
 		Safe_Release(pInstance);
@@ -221,7 +219,7 @@ CComponent* CVIBuffer_Terrain::Clone(void* pArg)
 {
 	CVIBuffer_Terrain* pInstance = new CVIBuffer_Terrain(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Terrain");
 		Safe_Release(pInstance);
@@ -234,6 +232,6 @@ CComponent* CVIBuffer_Terrain::Clone(void* pArg)
 void CVIBuffer_Terrain::Free()
 {
 	__super::Free();
-	
+
 
 }

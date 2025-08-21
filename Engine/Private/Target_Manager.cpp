@@ -80,7 +80,48 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencil
 		RTVs[i] = (*pMRTs)[i]->Get_RTV();
 	}
 
-	m_pContext->OMSetRenderTargets(iNumRenderTargets, RTVs, nullptr != pDSView ? pDSView : m_pDSV);
+	for (size_t i = iNumRenderTargets; i < 8; i++)
+	{
+		RTVs[i] = nullptr;
+	}
+
+
+	ID3D11DepthStencilView* pFinalDSV = (pDSView != nullptr) ? pDSView : m_pDSV;
+
+	// 다운샘플링된 RTV의 경우 DSV를 nullptr로 설정
+	if(pFinalDSV != nullptr && iNumRenderTargets > 0)
+	{
+		// RTV의 크기를 확인하여 다운샘플링된 경우 DSV를 nullptr로 설정
+		D3D11_TEXTURE2D_DESC rtvDesc;
+		ID3D11Resource* pRTVResource;
+		RTVs[0]->GetResource(&pRTVResource);
+		ID3D11Texture2D* pRTVTexture = static_cast<ID3D11Texture2D*>(pRTVResource);
+		pRTVTexture->GetDesc(&rtvDesc);
+		Safe_Release(pRTVResource);
+
+		// 메인 해상도보다 작으면 다운샘플링된 것으로 간주
+		if(rtvDesc.Width < 1280 || rtvDesc.Height < 720) // 메인 해상도 기준
+		{
+			pFinalDSV = nullptr;
+		}
+	}
+
+
+
+	// 셰이더가 4개의 출력을 기대하므로 최대 4개까지 바인딩
+	_uint iMaxRenderTargets = min(iNumRenderTargets, 4u);
+	
+	// 모든 slot에 유효한 RTV가 있는지 확인하고, 없으면 첫 번째 RTV로 채움
+	for (size_t i = 0; i < iMaxRenderTargets; i++)
+	{
+		if (RTVs[i] == nullptr && iNumRenderTargets > 0)
+		{
+			RTVs[i] = RTVs[0]; // 첫 번째 RTV로 채움
+		}
+	}
+	
+	m_pContext->OMSetRenderTargets(iMaxRenderTargets, RTVs, pFinalDSV);
+
 
 	return S_OK;
 }

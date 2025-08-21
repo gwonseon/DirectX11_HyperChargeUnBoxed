@@ -3,15 +3,13 @@
 
 #include "GameInstance.h"
 #include "Player.h"
-CPlayer_FPS::CPlayer_FPS(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPartObject{ pDevice, pContext }
-{
-}
+CPlayer_FPS::CPlayer_FPS(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CPartObject{pDevice,pContext}
+{}
 
 CPlayer_FPS::CPlayer_FPS(const CPlayer_FPS& Prototype)
-	: CPartObject{ Prototype }
-{
-}
+	: CPartObject{Prototype}
+{}
 
 const _float4x4* CPlayer_FPS::Get_SocketMatrix(const _char* pBoneName)
 {
@@ -29,11 +27,11 @@ HRESULT CPlayer_FPS::Initialize(void* pArg)
 
 	m_pParentState = pDesc->pParentState;
 	m_eLevelID = pDesc->m_eLevelID;
-	/* Ãß°¡ÀûÀ¸·Î ÃÊ±âÈ­°¡ ÇÊ¿äÇÏ´Ù¸é ¼öÇàÇØÁØ´Ù. */
-	if (FAILED(__super::Initialize(pArg)))
+	/* ì¶”ê°€ì ìœ¼ë¡œ ì´ˆê¸°í™”ê°€ í•„ìš”í•˜ë‹¤ë©´ ìˆ˜í–‰í•´ì¤€ë‹¤. */
+	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
 
 
@@ -41,156 +39,154 @@ HRESULT CPlayer_FPS::Initialize(void* pArg)
 }
 
 void CPlayer_FPS::Priority_Update(_float fTimeDelta)
-{
-}
+{}
 
 void CPlayer_FPS::Update(_float fTimeDelta)
 {
-	if (m_bFPSState == true)
+	if(m_bFPSState == true)
 	{
-		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta, m_bAnimInit);
+		m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta,m_bAnimInit);
 
-		if (m_iJumpState == 0)
+		if(m_iJumpState == 0)
 		{
-			if (*m_pParentState & CPlayer::WALKSTATE_NORTH || *m_pParentState & CPlayer::WALKSTATE_WEST || *m_pParentState & CPlayer::WALKSTATE_SOUTH
+			if(*m_pParentState & CPlayer::WALKSTATE_NORTH || *m_pParentState & CPlayer::WALKSTATE_WEST || *m_pParentState & CPlayer::WALKSTATE_SOUTH
 				|| *m_pParentState & CPlayer::WALKSTATE_EAST || *m_pParentState & CPlayer::WALKSTATE_NORTHWEST || *m_pParentState & CPlayer::WALKSTATE_NORTHEAST
 				|| *m_pParentState & CPlayer::WALKSTATE_SOUTHWEST || *m_pParentState & CPlayer::WALKSTATE_SOUTHEAST)
 			{
-				switch (m_iWeaponState)
+				switch(m_iWeaponState)
 				{
 				case Client::CBody_Player::WEAPON_UNARMED:
-					m_pModelCom->Set_Animation(FPS_FP_EvilWalking1, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_FP_EvilWalking1,true);
+				break;
 				case Client::CBody_Player::WEAPON_RIFLE:
-					m_pModelCom->Set_Animation(FPS_Rifle_Walk, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Walk,true);
+				break;
 				case Client::CBody_Player::WEAPON_SHOTGUN:
-					m_pModelCom->Set_Animation(FPS_Rifle_Walk, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Walk,true);
+				break;
 				case Client::CBody_Player::WEAPON_PULSECANNON:
-					m_pModelCom->Set_Animation(FPS_Smoker_Draw, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Smoker_Draw,true);
+				break;
 				case Client::CBody_Player::WEAPON_TELEPORT:
-					m_pModelCom->Set_Animation(FPS_Rifle_Walk, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Walk,true);
+				break;
 				case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
-					m_pModelCom->Set_Animation(FPS_Rifle_Walk, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Walk,true);
+				break;
 				case Client::CBody_Player::WEAPON_RIFLE_SECOND:
-					m_pModelCom->Set_Animation(FPS_Rifle_Walk, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Walk,true);
+				break;
 				case Client::CBody_Player::WEAPON_KATANA:
-					m_pModelCom->Set_Animation(FPS_Katana_Walk, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Katana_Walk,true);
+				break;
 				default:
-					break;
+				break;
 				}
 
 			}
 
-			if (*m_pParentState & CPlayer::STATE_IDLE)
+			if(*m_pParentState & CPlayer::STATE_IDLE)
 			{
-				switch (m_iWeaponState)
+				switch(m_iWeaponState)
 				{
 				case Client::CBody_Player::WEAPON_UNARMED:
-					m_pModelCom->Set_Animation(FPS_Unarmed_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Unarmed_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_RIFLE:
-					m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_SHOTGUN:
-					m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_PULSECANNON:
-					m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_TELEPORT:
-					m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
-					m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_RIFLE_SECOND:
-					m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
+				break;
 				case Client::CBody_Player::WEAPON_KATANA:
-					m_pModelCom->Set_Animation(FPS_Katana_Idle, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Katana_Idle,true);
+				break;
 				default:
-					break;
+				break;
 				}
 
 			}
 
-			if (*m_pParentState & CPlayer::RUNSTATE_NORTH || *m_pParentState & CPlayer::RUNSTATE_NORTHWEST || *m_pParentState & CPlayer::RUNSTATE_NORTHEAST)
+			if(*m_pParentState & CPlayer::RUNSTATE_NORTH || *m_pParentState & CPlayer::RUNSTATE_NORTHWEST || *m_pParentState & CPlayer::RUNSTATE_NORTHEAST)
 			{
-				switch (m_iWeaponState)
+				switch(m_iWeaponState)
 				{
 				case Client::CBody_Player::WEAPON_UNARMED:
-					m_pModelCom->Set_Animation(FPS_FP_EvilSprint1, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_FP_EvilSprint1,true);
+				break;
 				case Client::CBody_Player::WEAPON_RIFLE:
-					m_pModelCom->Set_Animation(FPS_Rifle_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Sprint,true);
+				break;
 				case Client::CBody_Player::WEAPON_SHOTGUN:
-					m_pModelCom->Set_Animation(FPS_Rifle_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Sprint,true);
+				break;
 				case Client::CBody_Player::WEAPON_PULSECANNON:
-					m_pModelCom->Set_Animation(FPS_Rifle_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Sprint,true);
+				break;
 				case Client::CBody_Player::WEAPON_TELEPORT:
-					m_pModelCom->Set_Animation(FPS_Rifle_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Sprint,true);
+				break;
 				case Client::CBody_Player::WEAPON_LOCKETLAUNCHER:
-					m_pModelCom->Set_Animation(FPS_Rifle_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Sprint,true);
+				break;
 				case Client::CBody_Player::WEAPON_RIFLE_SECOND:
-					m_pModelCom->Set_Animation(FPS_Rifle_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Rifle_Sprint,true);
+				break;
 				case Client::CBody_Player::WEAPON_KATANA:
-					m_pModelCom->Set_Animation(FPS_Katana_Sprint, true);
-					break;
+				m_pModelCom->Set_Animation(FPS_Katana_Sprint,true);
+				break;
 				default:
-					break;
+				break;
 				}
 
 			}
 
-			if (*m_pParentState & CPlayer::RELOADING)
+			if(*m_pParentState & CPlayer::RELOADING)
 			{
-				m_pModelCom->Set_Animation(FPS_Rifle_Reload, true);
+				m_pModelCom->Set_Animation(FPS_Rifle_Reload,true);
 			}
 
-			//Á¡ÇÁ
-			if (*m_pParentState & CPlayer::JUMP_START && m_iJumpState == 0)
+			//ì í”„
+			if(*m_pParentState & CPlayer::JUMP_START && m_iJumpState == 0)
 			{
-				m_pModelCom->Set_Animation(FPS_Rifle_Idle, false);
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,false);
 				m_iJumpState = 1;
 				m_bAnimInit = false;
 			}
-			if (m_bAnimState == true && m_iJumpState == 3 && m_fHeight <= 0.f)
+			if(m_bAnimState == true && m_iJumpState == 3 && m_fHeight <= 0.f)
 			{
 				m_bAnimInit = false;
 				m_iJumpState = 0;
 
 			}
-			if (m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= 0.f)
+			if(m_bAnimState == true && m_iJumpState == 1 && m_fHeight <= 0.f)
 			{
 				m_bAnimInit = false;
 				m_iJumpState = 2;
 
-			}
-			else if (m_bAnimState == false && m_iJumpState == 2 && m_fHeight <= 2.8f && m_fPower <= 0)
+			} else if(m_bAnimState == false && m_iJumpState == 2 && m_fHeight <= 2.8f && m_fPower <= 0)
 			{
 				m_bAnimInit = false;
 				m_iJumpState = 3;
 			}
 
-			if (*m_pParentState & CPlayer::JUMP_LOOP)
-				m_pModelCom->Set_Animation(FPS_Rifle_Idle, true);
+			if(*m_pParentState & CPlayer::JUMP_LOOP)
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,true);
 
-			if (*m_pParentState & CPlayer::JUMP_END)
-				m_pModelCom->Set_Animation(FPS_Rifle_Idle, false);
+			if(*m_pParentState & CPlayer::JUMP_END)
+				m_pModelCom->Set_Animation(FPS_Rifle_Idle,false);
 
 		}
 
@@ -202,10 +198,10 @@ void CPlayer_FPS::Update(_float fTimeDelta)
 }
 void CPlayer_FPS::Late_Update(_float fTimeDelta)
 {
-	XMStoreFloat4x4(&m_WorldMatrix, XMLoadFloat4x4(m_pParentMatrix) * m_pTransformCom->Get_WorldMatrix());
+	XMStoreFloat4x4(&m_WorldMatrix,XMLoadFloat4x4(m_pParentMatrix) * m_pTransformCom->Get_WorldMatrix());
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+	if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 		return;
 }
 
@@ -238,13 +234,13 @@ HRESULT CPlayer_FPS::Render()
 
 HRESULT CPlayer_FPS::Add_Components()
 {
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(m_eLevelID, TEXT("Prototype_Component_Model_Anim6"),
-		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if(FAILED(__super::Add_Component(m_eLevelID,TEXT("Prototype_Component_Model_Anim6"),
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	return S_OK;
@@ -252,15 +248,15 @@ HRESULT CPlayer_FPS::Add_Components()
 
 HRESULT CPlayer_FPS::Bind_ShaderResources()
 {
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix",&m_WorldMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
@@ -283,11 +279,11 @@ HRESULT CPlayer_FPS::Bind_ShaderResources()
 	return S_OK;
 }
 
-CPlayer_FPS* CPlayer_FPS::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPlayer_FPS* CPlayer_FPS::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CPlayer_FPS* pInstance = new CPlayer_FPS(pDevice, pContext);
+	CPlayer_FPS* pInstance = new CPlayer_FPS(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CPlayer_FPS");
 		Safe_Release(pInstance);
@@ -299,7 +295,7 @@ CGameObject* CPlayer_FPS::Clone(void* pArg)
 {
 	CPlayer_FPS* pInstance = new CPlayer_FPS(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CPlayer_FPS");
 		Safe_Release(pInstance);
