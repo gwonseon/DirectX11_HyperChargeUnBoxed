@@ -11,16 +11,16 @@ END
 
 BEGIN(Client)
 
-class CBody_Player final : public CPartObject
+class CBody_Player final: public CPartObject
 {
 public:
-	typedef struct : CPartObject::PARTOBJECT_DESC
+	typedef struct: CPartObject::PARTOBJECT_DESC
 	{
 		LEVELID m_eLevelID{};
-		const _uint* pParentState_Upper = { nullptr };
-		const _uint* pParentState_Lower = { nullptr };
-		_bool* m_bAttackState = { nullptr };
-		
+		const _uint* pParentState_Upper = {nullptr};
+		const _uint* pParentState_Lower = {nullptr};
+		_bool* m_bAttackState = {nullptr};
+
 	}BODY_PLAYER_DESC;
 
 
@@ -160,8 +160,8 @@ public:
 		TELEPORTGUN_FIRE_MOTION,
 		LOCKETLAUNCHER_FIRE_MOTION,
 	};
-private: 
-	CBody_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+private:
+	CBody_Player(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CBody_Player(const CBody_Player& Prototype);
 	virtual ~CBody_Player() = default;
 
@@ -177,65 +177,75 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
-	
+
 public:
 	void UpperBody_Anim(_float fTimeDelta);
 	void LowerBody_Anim(_float fTimeDelta);
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	CCollider* m_pColliderCom = {nullptr};
 
 private:
-	_bool	m_bAnimInit = false;		// ¾Ö´Ï¸ŞÀÌ¼Ç ÃÊ±âÈ­¿ë
-	_bool	m_bAnimState = false;		// ÇÏÃ¼ ¾Ö´Ï¸ŞÀÌ¼Ç ³¡³µ´ÂÁö È®ÀÎ
-	_bool	m_bUpperAnimState = false;	// »óÃ¼ ¾Ö´Ï¸ŞÀÌ¼Ç ³¡³µ´ÂÁö È®ÀÎ
-	_bool	m_bTPSState = false;		// TPSÀÎÁö 
-	_bool	m_bShoot_State = false;		// Idle »óÅÂ¸¦ À§ÇÑ bool ÇÔ¼ö, Idle»óÅÂ = ½î´Â ÀÚ¼¼ Ã¹ ÀÚ¼¼
-	_bool   m_bRunState = false;		// ¶Û ¶§ ¾Ö´Ï¸ŞÀÌ¼Ç ¼Óµµ ´Ù¸£°Ô
+	_bool	m_bAnimInit = false;		// ì• ë‹ˆë©”ì´ì…˜ ì´ˆê¸°í™”ìš©
+	_bool	m_bAnimState = false;		// í•˜ì²´ ì• ë‹ˆë©”ì´ì…˜ ëë‚¬ëŠ”ì§€ í™•ì¸
+	_bool	m_bUpperAnimState = false;	// ìƒì²´ ì• ë‹ˆë©”ì´ì…˜ ëë‚¬ëŠ”ì§€ í™•ì¸
+	_bool	m_bTPSState = false;		// TPSì¸ì§€ 
+	_bool	m_bShoot_State = false;		// Idle ìƒíƒœë¥¼ ìœ„í•œ bool í•¨ìˆ˜, Idleìƒíƒœ = ì˜ëŠ” ìì„¸ ì²« ìì„¸
+	_bool   m_bRunState = false;		// ë›¸ ë•Œ ì• ë‹ˆë©”ì´ì…˜ ì†ë„ ë‹¤ë¥´ê²Œ
 
 	_float3					Rotation{};
 	LEVELID m_eLevelID{};
 
 public:
-	_uint* Get_UpperMotion() {	return &m_iUpperMotion;	}
+	_uint* Get_UpperMotion() {
+		return &m_iUpperMotion;
+	}
 private:
-	_uint	m_iUpperMotion = 0;			// »óÃ¼ ¸ğ¼Ç, ¾Ö´Ï¸ŞÀÌ¼Ç ¸¶´Ù º» À§Ä¡³ª currentPositionÀÌ ´Ş¶óÁü
+	_uint	m_iUpperMotion = 0;			// ìƒì²´ ëª¨ì…˜, ì• ë‹ˆë©”ì´ì…˜ ë§ˆë‹¤ ë³¸ ìœ„ì¹˜ë‚˜ currentPositionì´ ë‹¬ë¼ì§
 
 
-	_uint	m_iShaderPassNum = 0;		// 1ÀÎÄªÀÏ ¶§ º®À» ¶Õ¾îµµ ¸öÀÌ º¸ÀÌ°Ô 
-	_uint	m_iWeaponState = 0;			// ¾î¶² ¹«±â¸¦ µé°í ÀÖ´ÂÁö, 0ÀÌ Idle, 1ÀÌ °ø°İ, 2°¡ Katana °ø°İ
+	_uint	m_iShaderPassNum = 0;		// 1ì¸ì¹­ì¼ ë•Œ ë²½ì„ ëš«ì–´ë„ ëª¸ì´ ë³´ì´ê²Œ 
+	_uint	m_iWeaponState = 0;			// ì–´ë–¤ ë¬´ê¸°ë¥¼ ë“¤ê³  ìˆëŠ”ì§€, 0ì´ Idle, 1ì´ ê³µê²©, 2ê°€ Katana ê³µê²©
 
 	_float	m_fArmAngle{};
-private:		
-	_uint   m_iJumpState = 0;	// Á¡ÇÁ »óÅÂ
-	_float	m_fHeight{};		// Á¡ÇÁ ³ôÀÌ
+private:
+	_uint   m_iJumpState = 0;	// ì í”„ ìƒíƒœ
+	_float	m_fHeight{};		// ì í”„ ë†’ì´
 	_float  m_fMinHeight = 0.f;
-	_float	m_fPower{};			// Á¡ÇÁ Èû
+	_float	m_fPower{};			// ì í”„ í˜
 
 private:
-		const _uint* m_pParentState_Upper = { nullptr };
-		const _uint* m_pParentState_Lower = { nullptr };
-		_uint*		 m_iViewState		  = { nullptr };	// 1ÀÎÄªÀÎÁö 3ÀÎÄªÀÎÁö
+	const _uint* m_pParentState_Upper = {nullptr};
+	const _uint* m_pParentState_Lower = {nullptr};
+	_uint*		 m_iViewState		  = {nullptr};	// 1ì¸ì¹­ì¸ì§€ 3ì¸ì¹­ì¸ì§€
 
 
-public:// Á¡ÇÁ
-	_uint Get_JumpState() { return m_iJumpState; }
-	void  Set_JumpState(_float& fHeight, _float& fPowr, _float& minHeight) {
+public:// ì í”„
+	_uint Get_JumpState() {
+		return m_iJumpState;
+	}
+	void  Set_JumpState(_float& fHeight,_float& fPowr,_float& minHeight) {
 		m_fHeight = fHeight;
 		m_fPower = fPowr;
 		m_fMinHeight = minHeight;
 	}
 
 
-	_bool	Get_UpperBody_AnimState() { return m_bUpperAnimState; }
+	_bool	Get_UpperBody_AnimState() {
+		return m_bUpperAnimState;
+	}
 public:
-	void	Set_PlayerViewState(_bool bTPS) { m_bTPSState = bTPS; }
-	void	Set_WeaponState(_uint iState) { m_iWeaponState = iState; }
+	void	Set_PlayerViewState(_bool bTPS) {
+		m_bTPSState = bTPS;
+	}
+	void	Set_WeaponState(_uint iState) {
+		m_iWeaponState = iState;
+	}
 
 
-	// ÃÑ µô·¹ÀÌ¿ë
+	// ì´ ë”œë ˆì´ìš©
 private:
 	_float					m_fRiflrDelay = 0.1f;
 	_float					m_fShotGunDelay = 1.f;
@@ -244,22 +254,26 @@ private:
 	_float					m_fLocketLauncherDelay = 0.6f;
 	_float					m_fCurrentDelay = 0.f;
 	_float					m_fCheck = 0.f;
-	_bool					m_bShotStart = false;  // ½î´Â ½ÃÀÛÀ» ¾Ë·ÁÁÜ (ÀÌ¶§ ÃÑ¾Ë ¹ß»ç¿Í ¹İµ¿)
-	_bool					m_bShotNow = false;		// ¾Ö´Ï¸ŞÀÌ¼Ç ÀÛµ¿ÀÇ ½ÃÀÛ°ú ³¡À» ¾Ë·ÁÁÜ ( µô·¹ÀÌ °è»ê)
+	_bool					m_bShotStart = false;  // ì˜ëŠ” ì‹œì‘ì„ ì•Œë ¤ì¤Œ (ì´ë•Œ ì´ì•Œ ë°œì‚¬ì™€ ë°˜ë™)
+	_bool					m_bShotNow = false;		// ì• ë‹ˆë©”ì´ì…˜ ì‘ë™ì˜ ì‹œì‘ê³¼ ëì„ ì•Œë ¤ì¤Œ ( ë”œë ˆì´ ê³„ì‚°)
 	_bool					m_bTemp = false;
-	_bool*					m_bAttackState = { nullptr }; // °ø°İ »óÅÂÀÎÁö ¾Æ´ÑÁö Ã¼Å©
+	_bool*					m_bAttackState = {nullptr}; // ê³µê²© ìƒíƒœì¸ì§€ ì•„ë‹Œì§€ ì²´í¬
 public:
 
-	_bool*					Get_ShotNow()	{ return &m_bShotNow; }
-	_bool*					Get_ShotStart() { return &m_bShotStart; }
+	_bool*					Get_ShotNow()	{
+		return &m_bShotNow;
+	}
+	_bool*					Get_ShotStart() {
+		return &m_bShotStart;
+	}
 private:
-	WEAPONSTATE				m_eWeapon{}; // ½ºÀ§Ä¡¹® ÆíÇÏ°Ô ¸¸µå·Á°í ÀÓ½Ã »ı¼º
+	WEAPONSTATE				m_eWeapon{}; // ìŠ¤ìœ„ì¹˜ë¬¸ í¸í•˜ê²Œ ë§Œë“œë ¤ê³  ì„ì‹œ ìƒì„±
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CBody_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBody_Player* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

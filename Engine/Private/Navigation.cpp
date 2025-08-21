@@ -4,100 +4,99 @@
 #include "Shader.h"
 #include "GameInstance.h"
 
-// ¿ùµå ¸ÅÆ®¸¯½º°¡ ½ºÅÂÆ½
-// ³×ºñ ¸Ş½¬¸¦ º¯È¯½ÃÅ³ ¼ö ÀÖ´Â Æ¯Á¤ °´Ã¼°¡ ¾÷µ¥ÀÌÆ®¸¦ ÅëÇØ ¿ùµå ¸ÅÆ®¸¯½º¸¦ ¹İÈ¯½ÃÅ°°í
-// ´Ù¸¥ °´Ã¼µéÀº º¯È¯µÈ ¿ùµå ¸ÅÆ®¸¯½º¸¦ ÅëÇØ ³×ºñ°ÔÀÌ¼Ç ¸Ş½¬¸¦ È°¿ëÇÏ´Â ±¸Á¶
+// ì›”ë“œ ë§¤íŠ¸ë¦­ìŠ¤ê°€ ìŠ¤íƒœí‹±
+// ë„¤ë¹„ ë©”ì‰¬ë¥¼ ë³€í™˜ì‹œí‚¬ ìˆ˜ ìˆëŠ” íŠ¹ì • ê°ì²´ê°€ ì—…ë°ì´íŠ¸ë¥¼ í†µí•´ ì›”ë“œ ë§¤íŠ¸ë¦­ìŠ¤ë¥¼ ë°˜í™˜ì‹œí‚¤ê³ 
+// ë‹¤ë¥¸ ê°ì²´ë“¤ì€ ë³€í™˜ëœ ì›”ë“œ ë§¤íŠ¸ë¦­ìŠ¤ë¥¼ í†µí•´ ë„¤ë¹„ê²Œì´ì…˜ ë©”ì‰¬ë¥¼ í™œìš©í•˜ëŠ” êµ¬ì¡°
 _float4x4 CNavigation::m_WorldMatrix = {};
 
 
-CNavigation::CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CComponent{ pDevice, pContext }
+CNavigation::CNavigation(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CComponent{pDevice,pContext}
 {
-    
+
 }
 
 CNavigation::CNavigation(const CNavigation& Prototype)
-    : CComponent{ Prototype }
-    , m_Cells{ Prototype.m_Cells }
-	, vecResultCell{ Prototype.vecResultCell }
+	: CComponent{Prototype}
+	,m_Cells{Prototype.m_Cells}
+	,vecResultCell{Prototype.vecResultCell}
 
-#ifdef _DEBUG
-    , m_pShader{ Prototype.m_pShader } 
-#endif
+	#ifdef _DEBUG
+	,m_pShader{Prototype.m_pShader}
+	#endif
 {
-    for (auto& pCell : m_Cells)
-        Safe_AddRef(pCell);
-	for (auto& pCell : vecResultCell)
+	for(auto& pCell : m_Cells)
 		Safe_AddRef(pCell);
-#ifdef _DEBUG
-    Safe_AddRef(m_pShader);
-#endif
+	for(auto& pCell : vecResultCell)
+		Safe_AddRef(pCell);
+	#ifdef _DEBUG
+	Safe_AddRef(m_pShader);
+	#endif
 
 }
 
 HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 {
-	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_WorldMatrix,XMMatrixIdentity());
 
 	_ulong				dwByte = {};
-	HANDLE				hFile = CreateFile(pNavigationFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
+	HANDLE				hFile = CreateFile(pNavigationFilePath,GENERIC_READ,0,nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0);
+	if(0 == hFile)
 	{
 
-	}
-	else
+	} else
 	{
-		while (true)
+		while(true)
 		{
 			_float3		vPoints[3];
-			ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
+			ReadFile(hFile,vPoints,sizeof(_float3) * 3,&dwByte,nullptr);
 
-			if (0 == dwByte)
+			if(0 == dwByte)
 				break;
-			_vector vA = XMVectorSet(vPoints[0].x, vPoints[0].y, vPoints[0].z, 1.f);
-			_vector vB = XMVectorSet(vPoints[1].x, vPoints[1].y, vPoints[1].z, 1.f);
-			_vector vC = XMVectorSet(vPoints[2].x, vPoints[2].y, vPoints[2].z, 1.f);
-			_vector vCross = XMVector3Cross(vB - vA, vC - vB);
+			_vector vA = XMVectorSet(vPoints[0].x,vPoints[0].y,vPoints[0].z,1.f);
+			_vector vB = XMVectorSet(vPoints[1].x,vPoints[1].y,vPoints[1].z,1.f);
+			_vector vC = XMVectorSet(vPoints[2].x,vPoints[2].y,vPoints[2].z,1.f);
+			_vector vCross = XMVector3Cross(vB - vA,vC - vB);
 			_float fDot{};
-			_vector vUp = { 0.f,1.f,0.f,0.f };
+			_vector vUp = {0.f,1.f,0.f,0.f};
 
-			XMVECTOR vDot = XMVector3Dot(vCross, vUp);
-			XMStoreFloat(&fDot, vDot);
-			if (fDot < 0)
+			XMVECTOR vDot = XMVector3Dot(vCross,vUp);
+			XMStoreFloat(&fDot,vDot);
+			if(fDot < 0)
 			{
-				_float3 fNewB{}, fNewC{};
-				XMStoreFloat3(&fNewB, vC);
-				XMStoreFloat3(&fNewC, vB);
+				_float3 fNewB{},fNewC{};
+				XMStoreFloat3(&fNewB,vC);
+				XMStoreFloat3(&fNewC,vB);
 				vPoints[1] = fNewB;
 				vPoints[2] = fNewC;
 			}
-			if (vPoints[0].y == 0)
+			if(vPoints[0].y == 0)
 			{
 				vPoints[0].y = 0.1f;
 			}
-			if (vPoints[1].y == 0)
+			if(vPoints[1].y == 0)
 			{
 				vPoints[1].y = 0.1f;
 			}
-			if (vPoints[2].y == 0)
+			if(vPoints[2].y == 0)
 			{
 				vPoints[2].y = 0.1f;
 			}
-			CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size(),CCell::GROUND_TYPE);
-			if (nullptr == pCell)
+			CCell* pCell = CCell::Create(m_pDevice,m_pContext,vPoints,m_Cells.size(),CCell::GROUND_TYPE);
+			if(nullptr == pCell)
 				return E_FAIL;
-			pCell->Set_G(INFINITY); // G °ª ¹«ÇÑ´ë·Î ÃÊ±âÈ­( Astar ¾Ë°í¸®Áò¿¡¼­ ÀÌ¿ô¼¿ÀÇ ºñ±³¸¦ À§ÇÔ)
+			pCell->Set_G(INFINITY); // G ê°’ ë¬´í•œëŒ€ë¡œ ì´ˆê¸°í™”( Astar ì•Œê³ ë¦¬ì¦˜ì—ì„œ ì´ì›ƒì…€ì˜ ë¹„êµë¥¼ ìœ„í•¨)
 			m_Cells.push_back(pCell);
 		}
 		CloseHandle(hFile);
 	}
 
 
-#ifdef _DEBUG
-	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Cell.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements);
-	if (nullptr == m_pShader)
+	#ifdef _DEBUG
+	m_pShader = CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_Cell.hlsl"),VTXPOS::Elements,VTXPOS::iNumElements);
+	if(nullptr == m_pShader)
 		return E_FAIL;
-#endif
+	#endif
 	SetUp_Neighbor();
 
 	return S_OK;
@@ -105,7 +104,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 
 HRESULT CNavigation::Initialize(void* pArg)
 {
-	if (nullptr == pArg)
+	if(nullptr == pArg)
 		return S_OK;
 
 	NAVIGATION_DESC* pDesc = static_cast<NAVIGATION_DESC*>(pArg);
@@ -116,13 +115,13 @@ HRESULT CNavigation::Initialize(void* pArg)
 }
 
 
-void CNavigation::Create_Cell(_float3 vPoints[3], _uint CellType)
+void CNavigation::Create_Cell(_float3 vPoints[3],_uint CellType)
 {
-	CCell* pCell = { nullptr };
+	CCell* pCell = {nullptr};
 	if(CellType == 0)
-		pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size(), CCell::CELL_TYPE::GROUND_TYPE);
+		pCell = CCell::Create(m_pDevice,m_pContext,vPoints,m_Cells.size(),CCell::CELL_TYPE::GROUND_TYPE);
 	else
-		pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size(), CCell::CELL_TYPE::HEIGHT_TYPE);
+		pCell = CCell::Create(m_pDevice,m_pContext,vPoints,m_Cells.size(),CCell::CELL_TYPE::HEIGHT_TYPE);
 
 	m_Cells.push_back(pCell);
 	SetUp_Neighbor();
@@ -133,46 +132,44 @@ void CNavigation::Delete_Cell(_uint iIndex)
 {
 	bool bDel = false;
 
-	for (auto iter = m_Cells.begin(); iter != m_Cells.end();)
+	for(auto iter = m_Cells.begin(); iter != m_Cells.end();)
 	{
 		_uint iCellIndex = (*iter)->Get_CellIndex();
 
-		if (bDel)
+		if(bDel)
 		{
-			(*iter)->Set_CellIndex(iCellIndex - 1); // ÇÏ³ª »èÁ¦µÆÀ¸´Ï±î ±× µÚ¿¡ ¾ÖµéÀº ÀÎµ¦½º 1¾¿ ÁÙ¾î¾ß ÇÔ
-			++iter; // ´ÙÀ½ ¿ä¼Ò·Î ÀÌµ¿
-		}
-		else if (iCellIndex == iIndex)
+			(*iter)->Set_CellIndex(iCellIndex - 1); // í•˜ë‚˜ ì‚­ì œëìœ¼ë‹ˆê¹Œ ê·¸ ë’¤ì— ì• ë“¤ì€ ì¸ë±ìŠ¤ 1ì”© ì¤„ì–´ì•¼ í•¨
+			++iter; // ë‹¤ìŒ ìš”ì†Œë¡œ ì´ë™
+		} else if(iCellIndex == iIndex)
 		{
-			Safe_Release(*iter); // »èÁ¦ÇÒ ¼¿À» ¾ÈÀüÇÏ°Ô ÇØÁ¦
-			iter = m_Cells.erase(iter); // »èÁ¦ ÈÄ ¹İº¹ÀÚ¸¦ Àç¼³Á¤
-			bDel = true; // »èÁ¦°¡ ¿Ï·áµÇ¾úÀ½À» Ç¥½Ã
-		}
-		else
+			Safe_Release(*iter); // ì‚­ì œí•  ì…€ì„ ì•ˆì „í•˜ê²Œ í•´ì œ
+			iter = m_Cells.erase(iter); // ì‚­ì œ í›„ ë°˜ë³µìë¥¼ ì¬ì„¤ì •
+			bDel = true; // ì‚­ì œê°€ ì™„ë£Œë˜ì—ˆìŒì„ í‘œì‹œ
+		} else
 		{
-			++iter; // Á¶°ÇÀÌ ¸ÂÁö ¾ÊÀ¸¸é ´ÙÀ½ ¿ä¼Ò·Î ÀÌµ¿
+			++iter; // ì¡°ê±´ì´ ë§ì§€ ì•Šìœ¼ë©´ ë‹¤ìŒ ìš”ì†Œë¡œ ì´ë™
 		}
 	}
 }
 
 
-void CNavigation::SetUp_Neighbor() // ÀÌ¿ô¼¿ ¼³Á¤
+void CNavigation::SetUp_Neighbor() // ì´ì›ƒì…€ ì„¤ì •
 {
-	for (auto& pSourCell : m_Cells)
+	for(auto& pSourCell : m_Cells)
 	{
-		for (auto& pDestCell : m_Cells)
+		for(auto& pDestCell : m_Cells)
 		{
-			if (pSourCell == pDestCell)
+			if(pSourCell == pDestCell)
 				continue;
 
-			if (true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_A), pSourCell->Get_Point(CCell::POINT_B)))
-				pSourCell->Set_Neighbor(CCell::LINE_AB, pDestCell);
+			if(true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_A),pSourCell->Get_Point(CCell::POINT_B)))
+				pSourCell->Set_Neighbor(CCell::LINE_AB,pDestCell);
 
-			if (true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_B), pSourCell->Get_Point(CCell::POINT_C)))
-				pSourCell->Set_Neighbor(CCell::LINE_BC, pDestCell);
+			if(true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_B),pSourCell->Get_Point(CCell::POINT_C)))
+				pSourCell->Set_Neighbor(CCell::LINE_BC,pDestCell);
 
-			if (true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_C), pSourCell->Get_Point(CCell::POINT_A)))
-				pSourCell->Set_Neighbor(CCell::LINE_CA, pDestCell);
+			if(true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_C),pSourCell->Get_Point(CCell::POINT_A)))
+				pSourCell->Set_Neighbor(CCell::LINE_CA,pDestCell);
 		}
 	}
 }
@@ -183,16 +180,16 @@ void CNavigation::SetUp_Neighbor() // ÀÌ¿ô¼¿ ¼³Á¤
 //	
 //	_int iNeighborIndex = { -1 };
 //
-//	/* ÇöÀç ÀÌµ¿ÇÏ°í ³­ °á°úÀ§Ä¡°¡ ¿ø·¡ Á¸ÀçÇÏ°í ÀÖ´ø ½ì ¹Ù±ùÀ¸·Î ³ª°¬´Ù. */
+//	/* í˜„ì¬ ì´ë™í•˜ê³  ë‚œ ê²°ê³¼ìœ„ì¹˜ê°€ ì›ë˜ ì¡´ì¬í•˜ê³  ìˆë˜ ìŒ ë°”ê¹¥ìœ¼ë¡œ ë‚˜ê°”ë‹¤. */
 //	_bool bNextJump{};
 //	if (false == m_Cells[m_iCurrentCellIndex]->isIn(vLocal_TargetPos, &iNeighborIndex, vSlidePos, true, &bNextJump))
 //	{
-//		// ÀÌ¿ôÀÌ ¾ø´Â °æ¿ì
+//		// ì´ì›ƒì´ ì—†ëŠ” ê²½ìš°
 //		if (-1 == iNeighborIndex) 
 //			return false;
 //		
 //	}
-//	// ´ÙÀ½ ºí·°ÀÌ Á¡ÇÁ ºí·°ÀÌ ¾Æ´Ñ °æ¿ì
+//	// ë‹¤ìŒ ë¸”ëŸ­ì´ ì í”„ ë¸”ëŸ­ì´ ì•„ë‹Œ ê²½ìš°
 //	else
 //	{
 //		if(iNeighborIndex != -1)
@@ -202,7 +199,7 @@ void CNavigation::SetUp_Neighbor() // ÀÌ¿ô¼¿ ¼³Á¤
 //				if (m_Cells[iNeighborIndex]->isIn(vLocal_TargetPos, &iNeighborIndex, vSlidePos, false, &bNextJump))
 //				{
 //
-//					// ÀÌ¹Ì ½½¶óÀÌµå°¡ È®Á¤ µÈ »óÈ²¿¡¼­, ¿À¹öÇÑ ÁöÁ¡¿¡ ´ëÇØ °Ë»çÇß´õ´Ï trueÀÎ °æ¿ì
+//					// ì´ë¯¸ ìŠ¬ë¼ì´ë“œê°€ í™•ì • ëœ ìƒí™©ì—ì„œ, ì˜¤ë²„í•œ ì§€ì ì— ëŒ€í•´ ê²€ì‚¬í–ˆë”ë‹ˆ trueì¸ ê²½ìš°
 //					if (XMVectorGetX(XMVector3Length(*vSlidePos)))
 //					{
 //						vSlidePos = &vLocal_TargetPos;
@@ -210,11 +207,11 @@ void CNavigation::SetUp_Neighbor() // ÀÌ¿ô¼¿ ¼³Á¤
 //						return false;
 //					}
 //
-//					// ÇÑ¹øµµ ½½¶óÀÌµå »óÈ²À» °ŞÁö ¾Ê°í isinÇÑ °æ¿ì,
+//					// í•œë²ˆë„ ìŠ¬ë¼ì´ë“œ ìƒí™©ì„ ê²ªì§€ ì•Šê³  isiní•œ ê²½ìš°,
 //					break;
 //				}
 //
-//				// ±×³É »ï°¢Çü ³»ºÎ¿¡¼­ ½½¶óÀÌµåÇÑ °æ¿ì.
+//				// ê·¸ëƒ¥ ì‚¼ê°í˜• ë‚´ë¶€ì—ì„œ ìŠ¬ë¼ì´ë“œí•œ ê²½ìš°.
 //				if (-1 == iNeighborIndex) { return false; }
 //			}
 //		}
@@ -225,123 +222,125 @@ void CNavigation::SetUp_Neighbor() // ÀÌ¿ô¼¿ ¼³Á¤
 //}
 
 
-_bool CNavigation::isMove(_vector& vWorldPos, _vector vCurrentPos, _vector& vSlidingPos)
+_bool CNavigation::isMove(_vector& vWorldPos,_vector vCurrentPos,_vector& vSlidingPos)
 {
-	_vector vLocalPos = XMVector3Transform(vWorldPos, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
-	_int iNeighborIndex = { -1 };
-	
-	// ÇöÀç ¼¿ ³»¿¡ À§Ä¡ È®ÀÎ, ÇöÀç ¼¿ ¾È¿¡ ÀÖÀ½
-	if (false == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex, vSlidingPos, true))
+	_vector vLocalPos = XMVector3Transform(vWorldPos,XMMatrixInverse(nullptr,XMLoadFloat4x4(&m_WorldMatrix)));
+	_int iNeighborIndex = {-1};
+
+	// í˜„ì¬ ì…€ ë‚´ì— ìœ„ì¹˜ í™•ì¸, í˜„ì¬ ì…€ ì•ˆì— ìˆìŒ
+	if(false == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos,&iNeighborIndex,vSlidingPos,true))
 	{
-		// ³ª°£ ÂÊ ¼±ºĞÀÇ ÀÌ¿ôÀ» »ìÆìº¸ÀÚ 
-		// ±Ùµ¥ ±×ÂÊ ÀÌ¿ôÀÌ ¾ø´Âµ¥?
-		if (-1 == iNeighborIndex)
+		// ë‚˜ê°„ ìª½ ì„ ë¶„ì˜ ì´ì›ƒì„ ì‚´í´ë³´ì 
+		// ê·¼ë° ê·¸ìª½ ì´ì›ƒì´ ì—†ëŠ”ë°?
+		if(-1 == iNeighborIndex)
 			return false;
 
 		_uint iInfinite_Check{};
-		while (true)
+		while(true)
 		{
-			if (m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex, vSlidingPos, false))
+			if(m_Cells[iNeighborIndex]->isIn(vLocalPos,&iNeighborIndex,vSlidingPos,false))
 			{
-				// ÀÌ¹Ì ½½¶óÀÌµå°¡ È®Á¤ µÈ »óÈ²¿¡¼­, ¿À¹öÇÑ ÁöÁ¡¿¡ ´ëÇØ °Ë»çÇß´õ´Ï trueÀÎ °æ¿ì
-				if (XMVectorGetX(XMVector3Length(vSlidingPos)))
+				// ì´ë¯¸ ìŠ¬ë¼ì´ë“œê°€ í™•ì • ëœ ìƒí™©ì—ì„œ, ì˜¤ë²„í•œ ì§€ì ì— ëŒ€í•´ ê²€ì‚¬í–ˆë”ë‹ˆ trueì¸ ê²½ìš°
+				if(XMVectorGetX(XMVector3Length(vSlidingPos)))
 				{
 					vSlidingPos = vLocalPos;
 					m_iCurrentCellIndex = iNeighborIndex;
-					
+
 					return false;
 				}
 
-				// ÇÑ¹øµµ ½½¶óÀÌµå »óÈ²À» °ŞÁö ¾Ê°í isinÇÑ °æ¿ì,
+				// í•œë²ˆë„ ìŠ¬ë¼ì´ë“œ ìƒí™©ì„ ê²ªì§€ ì•Šê³  isiní•œ ê²½ìš°,
 				break;
 			}
 
-			// ±×³É »ï°¢Çü ³»ºÎ¿¡¼­ ½½¶óÀÌµåÇÑ °æ¿ì.
-			if (-1 == iNeighborIndex) { return false; }
+			// ê·¸ëƒ¥ ì‚¼ê°í˜• ë‚´ë¶€ì—ì„œ ìŠ¬ë¼ì´ë“œí•œ ê²½ìš°.
+			if(-1 == iNeighborIndex) {
+				return false;
+			}
 
 			iInfinite_Check++;
-			if (iInfinite_Check > 100) // ¹«ÇÑ·çÇÁ½Ã Á¦ÀÚ¸®
+			if(iInfinite_Check > 100) // ë¬´í•œë£¨í”„ì‹œ ì œìë¦¬
 			{
 				vSlidingPos = vCurrentPos;
 				return false;
 			}
 		}
-		// ÇöÀç ¼¿À» ÀÌ¿ô ¼¿·Î ¾÷µ¥ÀÌÆ®
+		// í˜„ì¬ ì…€ì„ ì´ì›ƒ ì…€ë¡œ ì—…ë°ì´íŠ¸
 		m_iCurrentCellIndex = iNeighborIndex;
 		//cout << m_iCurrentCellIndex << endl;
 		return true;
 	}
-	return true;  // ÇöÀç ¼¿ ³»¿¡ ÀÖÀ» °æ¿ì
+	return true;  // í˜„ì¬ ì…€ ë‚´ì— ìˆì„ ê²½ìš°
 }
-vector<_float3> CNavigation::Find_Path_AStar(_int iStartIndex, _int iTargetIndex)
+vector<_float3> CNavigation::Find_Path_AStar(_int iStartIndex,_int iTargetIndex)
 {
-	vector<CCell*> m_vecOpenList{}; // Å½»öÀÌ ÇÊ¿äÇÑ ¼¿À» ÀúÀå
-	vector<CCell*> m_vecClosedList{}; // Å½»öÀÌ ³¡³­ ¼¿À» ÀúÀå
-	for (auto pCell : m_Cells)
+	vector<CCell*> m_vecOpenList{}; // íƒìƒ‰ì´ í•„ìš”í•œ ì…€ì„ ì €ì¥
+	vector<CCell*> m_vecClosedList{}; // íƒìƒ‰ì´ ëë‚œ ì…€ì„ ì €ì¥
+	for(auto pCell : m_Cells)
 	{
 		pCell->Set_G(INFINITY);
 	}
-	// ½ÃÀÛ ¼¿ ÃÊ±âÈ­
+	// ì‹œì‘ ì…€ ì´ˆê¸°í™”
 	m_Cells[iStartIndex]->Astar_Reset();
-	m_Cells[iStartIndex]->Set_H(Get_Heuristic_Cal(iStartIndex, iTargetIndex));
+	m_Cells[iStartIndex]->Set_H(Get_Heuristic_Cal(iStartIndex,iTargetIndex));
 	m_Cells[iStartIndex]->Set_F(m_Cells[iStartIndex]->Get_G() + m_Cells[iStartIndex]->Get_H());
 	m_vecOpenList.push_back(m_Cells[iStartIndex]);
 
-	while (m_vecOpenList.size() > 0) 
+	while(m_vecOpenList.size() > 0)
 	{
 		auto CurrentCell = Find_LowerCell(m_vecOpenList);
-		if (CurrentCell == m_Cells[iTargetIndex]) {
-		
+		if(CurrentCell == m_Cells[iTargetIndex]) {
+
 			vecResultCell = m_vecClosedList;
-			return PathFind_Reuturn_Result(m_Cells[iStartIndex], m_Cells[iTargetIndex]);
+			return PathFind_Reuturn_Result(m_Cells[iStartIndex],m_Cells[iTargetIndex]);
 		}
 
-		// ¿ÀÇÂ ¸®½ºÆ®¿¡¼­ »©¼­ Å¬·ÎÁîµå ¸®½ºÆ®¿¡ ÇöÀç ¼¿ ³Ö¾îÁÜ
-		m_vecOpenList.erase(remove(m_vecOpenList.begin(), m_vecOpenList.end(), CurrentCell), m_vecOpenList.end());
+		// ì˜¤í”ˆ ë¦¬ìŠ¤íŠ¸ì—ì„œ ë¹¼ì„œ í´ë¡œì¦ˆë“œ ë¦¬ìŠ¤íŠ¸ì— í˜„ì¬ ì…€ ë„£ì–´ì¤Œ
+		m_vecOpenList.erase(remove(m_vecOpenList.begin(),m_vecOpenList.end(),CurrentCell),m_vecOpenList.end());
 		m_vecClosedList.push_back(CurrentCell);
 
-		for (auto pNeighbor : Get_NeighborCell(CurrentCell)) {
-			if (find(m_vecClosedList.begin(), m_vecClosedList.end(), pNeighbor) != m_vecClosedList.end())
+		for(auto pNeighbor : Get_NeighborCell(CurrentCell)) {
+			if(find(m_vecClosedList.begin(),m_vecClosedList.end(),pNeighbor) != m_vecClosedList.end())
 				continue;
 
-			// ÇöÀç ¼¿¿¡¼­ ÀÌ¿ô ¼¿±îÁöÀÇ ºñ¿ë
-			float CurrentCell_GCost = CurrentCell->Get_G() + Get_Heuristic_Cal(CurrentCell->Get_CellIndex(), pNeighbor->Get_CellIndex());
-			// ÀÌ¿ô±îÁöÀÇ ºñ¿ë°ú ºñ±³ÇØ¼­ ÀÌ¿ôÀÇ ºñ¿ëº¸´Ù ÇöÀç ¼¿¿¡¼­ÀÇ ºñ¿ëÀÌ ÀÛÀ¸¸é ¹Ù²Ş
-			if (CurrentCell_GCost < pNeighbor->Get_G())
+			// í˜„ì¬ ì…€ì—ì„œ ì´ì›ƒ ì…€ê¹Œì§€ì˜ ë¹„ìš©
+			float CurrentCell_GCost = CurrentCell->Get_G() + Get_Heuristic_Cal(CurrentCell->Get_CellIndex(),pNeighbor->Get_CellIndex());
+			// ì´ì›ƒê¹Œì§€ì˜ ë¹„ìš©ê³¼ ë¹„êµí•´ì„œ ì´ì›ƒì˜ ë¹„ìš©ë³´ë‹¤ í˜„ì¬ ì…€ì—ì„œì˜ ë¹„ìš©ì´ ì‘ìœ¼ë©´ ë°”ê¿ˆ
+			if(CurrentCell_GCost < pNeighbor->Get_G())
 			{
 				pNeighbor->Set_G(CurrentCell_GCost);
-				pNeighbor->Set_H(Get_Heuristic_Cal(pNeighbor->Get_CellIndex(), m_Cells[iTargetIndex]->Get_CellIndex()));
+				pNeighbor->Set_H(Get_Heuristic_Cal(pNeighbor->Get_CellIndex(),m_Cells[iTargetIndex]->Get_CellIndex()));
 				pNeighbor->Set_F(pNeighbor->Get_G() + pNeighbor->Get_H());
 				pNeighbor->Set_Parent(CurrentCell);
-				// ¿ÀÇÂ ¸®½ºÆ®¿¡ ÀÌ¿ô¼¿ÀÌ ¾øÀ¸¸é ÀÌ¿ô¼¿¿¡ Áı¾î ³Ö°Ú´Ù
-				if (find(m_vecOpenList.begin(), m_vecOpenList.end(), pNeighbor) == m_vecOpenList.end()) 
+				// ì˜¤í”ˆ ë¦¬ìŠ¤íŠ¸ì— ì´ì›ƒì…€ì´ ì—†ìœ¼ë©´ ì´ì›ƒì…€ì— ì§‘ì–´ ë„£ê² ë‹¤
+				if(find(m_vecOpenList.begin(),m_vecOpenList.end(),pNeighbor) == m_vecOpenList.end())
 				{
 					m_vecOpenList.push_back(pNeighbor);
 				}
 			}
 		}
 	}
-	// °æ·Î°¡ ¾øÀ¸¸é ºó º¤ÅÍ ¹İÈ¯
+	// ê²½ë¡œê°€ ì—†ìœ¼ë©´ ë¹ˆ ë²¡í„° ë°˜í™˜
 	return {};
 }
 
-vector<_float3> CNavigation::PathFind_Reuturn_Result(CCell* pStart, CCell* pTarget)
+vector<_float3> CNavigation::PathFind_Reuturn_Result(CCell* pStart,CCell* pTarget)
 {
 	std::vector<_float3> vecCenterPos{};
 	CCell* CurrentCell = pTarget;
 
-	while (CurrentCell != pStart) {
+	while(CurrentCell != pStart && CurrentCell!= nullptr) {
 		vecCenterPos.push_back(CurrentCell->Get_CenterPoints());
 		CurrentCell = CurrentCell->Get_Parent();
 	}
 	vecCenterPos.push_back(pStart->Get_CenterPoints());
-	reverse(vecCenterPos.begin(), vecCenterPos.end());
+	reverse(vecCenterPos.begin(),vecCenterPos.end());
 
 	return vecCenterPos;
 }
 
 
-_float CNavigation::Get_Heuristic_Cal(_int iStartIndex, _int iTargetIndex)
+_float CNavigation::Get_Heuristic_Cal(_int iStartIndex,_int iTargetIndex)
 {
 	_float3 fStartIndex = m_Cells[iStartIndex]->Get_CenterPoints();
 	_float3 fTargetIndex = m_Cells[iTargetIndex]->Get_CenterPoints();
@@ -355,9 +354,9 @@ _float CNavigation::Get_Heuristic_Cal(_int iStartIndex, _int iTargetIndex)
 CCell* CNavigation::Find_LowerCell(vector<CCell*>& OpneList)
 {
 	CCell* LowestCell = *OpneList.begin();
-	for (auto pCell : OpneList)
+	for(auto pCell : OpneList)
 	{
-		if (pCell->Get_F() < LowestCell->Get_F())
+		if(pCell->Get_F() < LowestCell->Get_F())
 		{
 			LowestCell = pCell;
 		}
@@ -366,18 +365,18 @@ CCell* CNavigation::Find_LowerCell(vector<CCell*>& OpneList)
 	return LowestCell;
 }
 
-vector<CCell*> CNavigation::ReFindPath(CCell* pStart, CCell* pTarget)
+vector<CCell*> CNavigation::ReFindPath(CCell* pStart,CCell* pTarget)
 {
 	vector<CCell*> vecPath{};
 	CCell* CurrentCell = pTarget;
 
-	while (CurrentCell != pStart)
+	while(CurrentCell != pStart)
 	{
 		vecPath.push_back(CurrentCell);
 		CurrentCell = CurrentCell->Get_Parent();
 	}
 	vecPath.push_back(pStart);
-	reverse(vecPath.begin(), vecPath.end());
+	reverse(vecPath.begin(),vecPath.end());
 
 	return vecPath;
 }
@@ -385,18 +384,18 @@ vector<CCell*> CNavigation::ReFindPath(CCell* pStart, CCell* pTarget)
 vector<CCell*> CNavigation::Get_NeighborCell(CCell* pCell)
 {
 	vector<CCell*> vecNeighbor{};
-	for (int i = 0; i < CCell::LINE_END; ++i) {
-		
-			int neighborIndex = pCell->Get_NeighborCell(i);
-		
-			if (neighborIndex != -1)
-			{
-				CCell* pNeighbor = m_Cells[neighborIndex];
-				if (pNeighbor) {
-					vecNeighbor.push_back(pNeighbor);
-				}
+	for(int i = 0; i < CCell::LINE_END; ++i) {
 
+		int neighborIndex = pCell->Get_NeighborCell(i);
+
+		if(neighborIndex != -1)
+		{
+			CCell* pNeighbor = m_Cells[neighborIndex];
+			if(pNeighbor) {
+				vecNeighbor.push_back(pNeighbor);
 			}
+
+		}
 	}
 
 	return vecNeighbor;
@@ -406,22 +405,31 @@ vector<CCell*> CNavigation::Get_NeighborCell(CCell* pCell)
 #ifdef _DEBUG
 HRESULT CNavigation::Render()
 {
-	
-	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_L))
+	{
+		if(bRender == false)
+			bRender = true;
+		else
+			bRender = false;
+	}
+	if(!bRender)
+		return S_OK;
+
+	if(FAILED(m_pShader->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShader->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (-1 == m_iCurrentCellIndex)
+	if(-1 == m_iCurrentCellIndex)
 	{
-		if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		if(FAILED(m_pShader->Bind_Matrix("g_WorldMatrix",&m_WorldMatrix)))
 			return E_FAIL;
 		/*_float4 vColorGreen = _float4(0.f, 1.f, 0.f, 1.f);
 		m_pShader->Bind_RawValue("g_vColor", &vColorGreen, sizeof(_float4));
 
 		m_pShader->Begin(0);*/
 
-		for (auto& pCell : m_Cells)
+		for(auto& pCell : m_Cells)
 			pCell->Render();
 	}
 
@@ -429,10 +437,10 @@ HRESULT CNavigation::Render()
 	{
 		_float4x4		WorldMatrix = m_WorldMatrix;
 		WorldMatrix.m[3][1] += 0.1f;
-		if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
+		if(FAILED(m_pShader->Bind_Matrix("g_WorldMatrix",&WorldMatrix)))
 			return E_FAIL;
-		_float4 vColor = _float4(1.f, 0.f, 0.f, 1.f);
-		m_pShader->Bind_RawValue("g_vColor", &vColor, sizeof(_float4));
+		_float4 vColor = _float4(1.f,0.f,0.f,1.f);
+		m_pShader->Bind_RawValue("g_vColor",&vColor,sizeof(_float4));
 
 		m_pShader->Begin(0);
 
@@ -441,18 +449,18 @@ HRESULT CNavigation::Render()
 
 	m_pShader->Begin(0);
 
-	for (auto& pCell : m_Cells)
+	for(auto& pCell : m_Cells)
 		pCell->Render();
 
 	return S_OK;
 }
 #endif
 
-CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath)
+CNavigation* CNavigation::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _tchar* pNavigationFilePath)
 {
-	CNavigation* pInstance = new CNavigation(pDevice, pContext);
+	CNavigation* pInstance = new CNavigation(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pNavigationFilePath)))
+	if(FAILED(pInstance->Initialize_Prototype(pNavigationFilePath)))
 	{
 		MSG_BOX("Failed To Created : CNavigation");
 		Safe_Release(pInstance);
@@ -464,7 +472,7 @@ CComponent* CNavigation::Clone(void* pArg)
 {
 	CNavigation* pInstance = new CNavigation(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed To Cloned : CNavigation");
 		Safe_Release(pInstance);
@@ -476,11 +484,11 @@ void CNavigation::Free()
 {
 	__super::Free();
 
-	for (auto& pCell : m_Cells)
+	for(auto& pCell : m_Cells)
 		Safe_Release(pCell);
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	Safe_Release(m_pShader);
-#endif
+	#endif
 
 }

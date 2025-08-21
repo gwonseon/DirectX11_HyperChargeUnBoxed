@@ -3,44 +3,44 @@
 #include "Component.h"
 
 
-// ¼ÎÀÌ´õ¸¦ °´Ã¼È­ÇÏ¿© ÄÄÆ÷³ÍÆ®·Î ¸¸µé±â À§ÇÑ Å¬·¡½º
-// ¿ÜºÎ ¼ÎÀÌ´õ ÆÄÀÏÀ» ¹Ş¾Æ¿Í °´Ã¼È­ ÇÑ´Ù´Â ´À³¦
-// ¼ÎÀÌ´õ¸¦ ºôµåÇÏ´Â ±â´ÉÀÌ D3D11 ¿¡ ¾ø´Ù. Çì´õ¿Í ¶óÀÌºê·¯¸®¸¦ Ãß°¡ÇØ¾ßÇÑ´Ù.
+// ì…°ì´ë”ë¥¼ ê°ì²´í™”í•˜ì—¬ ì»´í¬ë„ŒíŠ¸ë¡œ ë§Œë“¤ê¸° ìœ„í•œ í´ë˜ìŠ¤
+// ì™¸ë¶€ ì…°ì´ë” íŒŒì¼ì„ ë°›ì•„ì™€ ê°ì²´í™” í•œë‹¤ëŠ” ëŠë‚Œ
+// ì…°ì´ë”ë¥¼ ë¹Œë“œí•˜ëŠ” ê¸°ëŠ¥ì´ D3D11 ì— ì—†ë‹¤. í—¤ë”ì™€ ë¼ì´ë¸ŒëŸ¬ë¦¬ë¥¼ ì¶”ê°€í•´ì•¼í•œë‹¤.
 BEGIN(Engine)
 
-class ENGINE_DLL CShader final : public CComponent
+class ENGINE_DLL CShader final: public CComponent
 {
 private:
-	CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CShader(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CShader(const CShader& Prototype);
 	virtual ~CShader() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements);
+	virtual HRESULT Initialize_Prototype(const _tchar* pShaderFilePath,const D3D11_INPUT_ELEMENT_DESC* pElements,_uint iNumElements);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
 	HRESULT Begin(_uint iPassIndex);
-	HRESULT Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix); // ¸Å°³º¯¼ö·Î ¹ŞÀº ÀÌ¸§À» °¡Áø ¸ÅÆ®¸¯½º¿¡ ´ëÇØ¼­
-	HRESULT Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV);
-	HRESULT Bind_SRVs(const _char* pConstantName, ID3D11ShaderResourceView** ppSRVs, _uint iNumSRVs);
-	HRESULT Bind_RawValue(const _char* pConstantName, const void* pData, _uint iLength);
-	HRESULT Bind_Matrices(const _char* pConstantName, const _float4x4* pMatrix, _uint iNumMatrices);
+	HRESULT Bind_Matrix(const _char* pConstantName,const _float4x4* pMatrix); // ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ì€ ì´ë¦„ì„ ê°€ì§„ ë§¤íŠ¸ë¦­ìŠ¤ì— ëŒ€í•´ì„œ
+	HRESULT Bind_SRV(const _char* pConstantName,ID3D11ShaderResourceView* pSRV);
+	HRESULT Bind_SRVs(const _char* pConstantName,ID3D11ShaderResourceView** ppSRVs,_uint iNumSRVs);
+	HRESULT Bind_RawValue(const _char* pConstantName,const void* pData,_uint iLength);
+	HRESULT Bind_Matrices(const _char* pConstantName,const _float4x4* pMatrix,_uint iNumMatrices);
 
 
-   
+
 
 private:
-	ID3DX11Effect* m_pEffect = { nullptr }; // ½¦ÀÌ´õ¸¦ °ü¸®ÇÏ´Â ÀÎÅÍÆäÀÌ½º
-	vector<ID3D11InputLayout*>		m_InputLayouts; // GPU·Î Àü´ŞµÇ´Â Á¤Á¡ µ¥ÀÌÅÍÀÇ Çü½Ä°ú ±¸Á¶¸¦ ¼³¸íÇÏ¿© ½¦ÀÌ´õÀÇ ÀÔ·Â°ú Á¤Á¡ ¹öÆÛ µ¥ÀÌÅÍ¸¦ ¿¬°áÇÏ´Â ¿ªÇÒ
-	// ¼ÎÀÌ´õ¿¡ pass °¡ ¿©·¯ °³ ÀÖ´Ù. µû¶ó¼­ Input ±¸Á¶Ã¼µµ pass¸¶´Ù ¹Ù²î°Ô µÉ ¼ö ÀÖ´Ù.
-	// ¼ÎÀÌ´õ¿Í Á¤Á¡ µ¥ÀÌÅÍ¸¦ ¿¬°áÇÏ´Â ¿ªÇÒÀ» ÇÏ´Â InputLayOutµµ ¿©·¯ °³°¡ Á¸ÀçÇØ¾ß ÇÑ´Ù.
-	// µû¶ó¼­ D3D11InputLayOut* ¸¦ º¤ÅÍ ÄÁÅ×ÀÌ³Ê¿¡ ´ã¾Æ¼­ °ü¸®ÇÑ´Ù.
+	ID3DX11Effect* m_pEffect = {nullptr}; // ì‰ì´ë”ë¥¼ ê´€ë¦¬í•˜ëŠ” ì¸í„°í˜ì´ìŠ¤
+	vector<ID3D11InputLayout*>		m_InputLayouts; // GPUë¡œ ì „ë‹¬ë˜ëŠ” ì •ì  ë°ì´í„°ì˜ í˜•ì‹ê³¼ êµ¬ì¡°ë¥¼ ì„¤ëª…í•˜ì—¬ ì‰ì´ë”ì˜ ì…ë ¥ê³¼ ì •ì  ë²„í¼ ë°ì´í„°ë¥¼ ì—°ê²°í•˜ëŠ” ì—­í• 
+	// ì…°ì´ë”ì— pass ê°€ ì—¬ëŸ¬ ê°œ ìˆë‹¤. ë”°ë¼ì„œ Input êµ¬ì¡°ì²´ë„ passë§ˆë‹¤ ë°”ë€Œê²Œ ë  ìˆ˜ ìˆë‹¤.
+	// ì…°ì´ë”ì™€ ì •ì  ë°ì´í„°ë¥¼ ì—°ê²°í•˜ëŠ” ì—­í• ì„ í•˜ëŠ” InputLayOutë„ ì—¬ëŸ¬ ê°œê°€ ì¡´ì¬í•´ì•¼ í•œë‹¤.
+	// ë”°ë¼ì„œ D3D11InputLayOut* ë¥¼ ë²¡í„° ì»¨í…Œì´ë„ˆì— ë‹´ì•„ì„œ ê´€ë¦¬í•œë‹¤.
 
 
 	_uint							m_iNumPasses = {};
 public:
-	static CShader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements);
+	static CShader* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _tchar* pShaderFilePath,const D3D11_INPUT_ELEMENT_DESC* pElements,_uint iNumElements);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

@@ -14,21 +14,25 @@
 BEGIN(Client)
 
 
-class CLevel_ImGui final : public CLevel
+class CLevel_ImGui final: public CLevel
 {
 public:
-	typedef struct 
+	typedef struct
 	{
 		LEVELID eID = {};
 		_float3	fPos = {};
 		_uint	iModelNumber = {};
-	}INSTANCING_DESC; 
+	}INSTANCING_DESC;
 
 public:
-	enum IMGUI_TYPE{ IMGUI_OBJECT_NONANIM, IMGUI_OBJECT_ANIM, IMGUI_BUILD, IMGUI_ITEM,IMGUI_GRASS, IMGUI_END};
-	enum IMGUI_MODE{ IMGUI_CREATE, IMGUI_SELECT, MODE_END};
+	enum IMGUI_TYPE{
+		IMGUI_OBJECT_NONANIM,IMGUI_OBJECT_ANIM,IMGUI_BUILD,IMGUI_ITEM,IMGUI_GRASS,IMGUI_END
+	};
+	enum IMGUI_MODE{
+		IMGUI_CREATE,IMGUI_SELECT,MODE_END
+	};
 private:
-	CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLevel_ImGui(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CLevel_ImGui() = default;
 
 public:
@@ -40,11 +44,11 @@ private:
 	CPlayer* m_pPlayer;
 
 private:
-	float Position[3] = { 0,0,0 };
-	float Scale[3] = { 0,0,0 };
+	float Position[3] = {0,0,0};
+	float Scale[3] = {0,0,0};
 
-	float CollisionBox_Scale[3] = { 1,1,1 };
-	float CollisionBox_Pos[3] = { 0,0,0 };
+	float CollisionBox_Scale[3] = {1,1,1};
+	float CollisionBox_Pos[3] = {0,0,0};
 
 	_float3 m_fPickingPos{};
 
@@ -61,7 +65,7 @@ public:
 	HRESULT Ready_Layer_Grass(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Trap(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_PlayerBuild(const _tchar* pLayerTag);
-	
+
 public:
 	void Object_NonAnim_Update(_float fTimeDelta);
 	void Object_Anim_Update(_float fTimeDelta);
@@ -77,7 +81,7 @@ public:
 
 public:
 	HRESULT Picking_Create();
-	
+
 public:
 	HRESULT Environment_Add();
 	HRESULT Environment_DataChange(_float fTimeDelta);
@@ -110,61 +114,61 @@ private:
 	vector<INSTANCING_DESC> m_vecInstancing;
 	vector<CEnvironment*> m_vecInstancing_Environ;
 
-	CGameObject* pGameObj = { nullptr };
+	CGameObject* pGameObj = {nullptr};
 private:
-	_uint		m_iEnvironment_Count = 0; // »ı¼ºÇÑ °³¼ö
-	_uint		m_iBuild_Count = 0;			// »ı¼ºÇÑ °³¼ö
-	_uint		m_iCoin_Count = 0;			// »ı¼ºÇÑ ÄÚÀÎ°³¼ö
-	_uint		m_iGrass_Count = 0;			// »ı¼ºÇÑ ÀÜµğ °³¼ö
+	_uint		m_iEnvironment_Count = 0; // ìƒì„±í•œ ê°œìˆ˜
+	_uint		m_iBuild_Count = 0;			// ìƒì„±í•œ ê°œìˆ˜
+	_uint		m_iCoin_Count = 0;			// ìƒì„±í•œ ì½”ì¸ê°œìˆ˜
+	_uint		m_iGrass_Count = 0;			// ìƒì„±í•œ ì”ë”” ê°œìˆ˜
 
 
-	vector<_int> m_vecModelIndex; // Environment Index ÀúÀå¿ë
-	vector<_int> m_vecBuildIndex; // Build Index ÀúÀå¿ë
+	vector<_int> m_vecModelIndex; // Environment Index ì €ì¥ìš©
+	vector<_int> m_vecBuildIndex; // Build Index ì €ì¥ìš©
 	vector<CTrap_Marks*> m_vecTrapMark;
-	INSTANCING_DESC m_Instance = {  };
-	LEVELID m_eID = LEVEL_GAMEPLAY;   // ÀÌ°Å ¹Ù²ã¼­ ¾î¶² ·¹º§À» ¼öÁ¤ÇÒÁö ¼³Á¤
+	INSTANCING_DESC m_Instance = {};
+	LEVELID m_eID = LEVEL_GAMEPLAY;   // ì´ê±° ë°”ê¿”ì„œ ì–´ë–¤ ë ˆë²¨ì„ ìˆ˜ì •í• ì§€ ì„¤ì •
 
 
-private:// ÀÎ½ºÅÏ½Ì
+private:// ì¸ìŠ¤í„´ì‹±
 	_bool		m_bGrassDelete = false;
 	_bool		m_bInstancing_Model_Choice = false;
-	_float		m_fTimer_for_Instancing_Delete = 0.f; //  ÀÎ½ºÅÏ½Ì¿ë 
-	_float		m_fTimer_for_Instancing_Add = 0.f; //  ÀÎ½ºÅÏ½Ì¿ë 
+	_float		m_fTimer_for_Instancing_Delete = 0.f; //  ì¸ìŠ¤í„´ì‹±ìš© 
+	_float		m_fTimer_for_Instancing_Add = 0.f; //  ì¸ìŠ¤í„´ì‹±ìš© 
 
 
 
 private:
-	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // ÅÍ·¹ÀÎ ÇÇÅ·
+	CVIBuffer_Terrain* pVIBuffer_Terrain = {nullptr}; // í„°ë ˆì¸ í”¼í‚¹
 
-	
+
 private: // ImGui
-	_bool m_bWindowsMove = false; 
-	IMGUI_TYPE	m_eImGui_Type = {}; // ImGuiÃ¢ Å¸ÀÔ ¼±ÅÃ
-	_uint m_iModeSelect = 0; // Create or Select ¸ğµå ¼±ÅÃ
+	_bool m_bWindowsMove = false;
+	IMGUI_TYPE	m_eImGui_Type = {}; // ImGuiì°½ íƒ€ì… ì„ íƒ
+	_uint m_iModeSelect = 0; // Create or Select ëª¨ë“œ ì„ íƒ
 
 
 public:
-	static CLevel_ImGui* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLevel_ImGui* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 
 
-#pragma region ÀÌ¹ÌÁö¹öÆ°
-private:// ÀÌ¹ÌÁö ¹öÆ°
+	#pragma region ì´ë¯¸ì§€ë²„íŠ¼
+private:// ì´ë¯¸ì§€ ë²„íŠ¼
 	void Create_ImageButton();
 	void ButtonImage_List();
-private: // ÀÌ¹ÌÁö¹öÆ°
+private: // ì´ë¯¸ì§€ë²„íŠ¼
 	CTexture* m_pLoad = nullptr;
 	CTexture* m_pSave = nullptr;
-	CTexture* m_pEnviron = { nullptr };
-	CTexture* m_pBuild = { nullptr };
-private:// ÀÌ¹ÌÁö ¹öÆ°
+	CTexture* m_pEnviron = {nullptr};
+	CTexture* m_pBuild = {nullptr};
+private:// ì´ë¯¸ì§€ ë²„íŠ¼
 	ID3D11ShaderResourceView* my_Savetexture = nullptr;
 	ID3D11ShaderResourceView* my_Loadtexture = nullptr;
 	ID3D11ShaderResourceView* pButton;
 private:
 	_int  m_iModelIndex = 0;
-		
-#pragma endregion ÀÌ¹ÌÁö¹öÆ°
+
+	#pragma endregion ì´ë¯¸ì§€ë²„íŠ¼
 
 
 };

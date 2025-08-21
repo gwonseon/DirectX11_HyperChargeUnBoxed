@@ -1,7 +1,7 @@
 #pragma once
 
-// Á¤Á¡ ¹öÆÛ¿Í ÀÎµ¦½º ¹öÆÛ¸¦ °¡Áö´Â ¸ğµç Å¬·¡½ºµéÀÇ ºÎ¸ğ Å¬·¡½º
-// Ãß»ó Å¬·¡½º¶ó Create ÇÔ¼ö´Â µû·Î ¾ø´Ù.
+// ì •ì  ë²„í¼ì™€ ì¸ë±ìŠ¤ ë²„í¼ë¥¼ ê°€ì§€ëŠ” ëª¨ë“  í´ë˜ìŠ¤ë“¤ì˜ ë¶€ëª¨ í´ë˜ìŠ¤
+// ì¶”ìƒ í´ë˜ìŠ¤ë¼ Create í•¨ìˆ˜ëŠ” ë”°ë¡œ ì—†ë‹¤.
 #include "Component.h"
 #include <Shader.h>
 
@@ -10,7 +10,7 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer abstract : public CComponent
 {
 protected:
-	CVIBuffer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CVIBuffer(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CVIBuffer(const CVIBuffer& Prototype);
 	virtual ~CVIBuffer() = default;
 
@@ -23,41 +23,50 @@ public:
 
 	void	Chang_Topology();
 public:
-	virtual HRESULT Bind_Buffers(); // ±×¸®±â À§ÇØ ÇÊ¿äÇÑ °ªµéÀ» ÀåÄ¡¿¡ ¿Ã¸°´Ù.
+	virtual HRESULT Bind_Buffers(); // ê·¸ë¦¬ê¸° ìœ„í•´ í•„ìš”í•œ ê°’ë“¤ì„ ì¥ì¹˜ì— ì˜¬ë¦°ë‹¤.
 	//HRESULT Bind_ShaderResouce(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName);
 protected:
-	ID3D11Buffer*					m_pVB = { nullptr };		// Á¤Á¡À» ÀúÀåÇÏ´Â ¹öÆÛ, Á¤Á¡ µ¥ÀÌÅÍ¸¦ GPU¸Ş¸ğ¸®¿¡ ÀúÀå, ¿¢¼¼½º ÇÒ ¼ö ÀÖ°Ô ÇØÁØ´Ù
-	ID3D11Buffer*					m_pIB = { nullptr };		// ÀÎµ¦½º¸¦ ÀúÀåÇÏ´Â ¹öÆÛ, ÀÎµ¦½º´Â Á¤Á¡ ¹öÆÛ ³»ÀÇ Á¤Á¡µéÀ» ÂüÁ¶ÇÏ¿© È¿À²ÀûÀ¸·Î ·»´õ¸µÇÏ°Ô ÇÑ´Ù.
+	ID3D11Buffer*					m_pVB = {nullptr};		// ì •ì ì„ ì €ì¥í•˜ëŠ” ë²„í¼, ì •ì  ë°ì´í„°ë¥¼ GPUë©”ëª¨ë¦¬ì— ì €ì¥, ì—‘ì„¸ìŠ¤ í•  ìˆ˜ ìˆê²Œ í•´ì¤€ë‹¤
+	ID3D11Buffer*					m_pIB = {nullptr};		// ì¸ë±ìŠ¤ë¥¼ ì €ì¥í•˜ëŠ” ë²„í¼, ì¸ë±ìŠ¤ëŠ” ì •ì  ë²„í¼ ë‚´ì˜ ì •ì ë“¤ì„ ì°¸ì¡°í•˜ì—¬ íš¨ìœ¨ì ìœ¼ë¡œ ë Œë”ë§í•˜ê²Œ í•œë‹¤.
 
-	D3D11_BUFFER_DESC				m_BufferDesc = {};			// ¹öÆÛ »ı¼º½Ã »ç¿ëÇÏ´Â ±¸Á¶Ã¼, ( ¹öÆÛÅ©±â, »ç¿ë¿ëµµ(Á¤Á¡¹öÆÛ, ÀÎµ¦½º¹öÆÛ µî), ¸Ş¸ğ¸® Á¢±Ù¹ı(CPU,GPU) µîÀ» Á¤ÀÇ
-	D3D11_SUBRESOURCE_DATA			m_InitialDesc = {};			// ¹öÆÛ ÃÊ±â µ¥ÀÌÅÍ ³Ñ±â±â À§ÇØ »ç¿ëÇÏ´Â ±¸Á¶Ã¼, GPU ¸Ş¸ğ¸®¿¡ Ã³À½À¸·Î µ¥ÀÌÅÍ º¹»ç °¡´É
+	D3D11_BUFFER_DESC				m_BufferDesc = {};			// ë²„í¼ ìƒì„±ì‹œ ì‚¬ìš©í•˜ëŠ” êµ¬ì¡°ì²´, ( ë²„í¼í¬ê¸°, ì‚¬ìš©ìš©ë„(ì •ì ë²„í¼, ì¸ë±ìŠ¤ë²„í¼ ë“±), ë©”ëª¨ë¦¬ ì ‘ê·¼ë²•(CPU,GPU) ë“±ì„ ì •ì˜
+	D3D11_SUBRESOURCE_DATA			m_InitialDesc = {};			// ë²„í¼ ì´ˆê¸° ë°ì´í„° ë„˜ê¸°ê¸° ìœ„í•´ ì‚¬ìš©í•˜ëŠ” êµ¬ì¡°ì²´, GPU ë©”ëª¨ë¦¬ì— ì²˜ìŒìœ¼ë¡œ ë°ì´í„° ë³µì‚¬ ê°€ëŠ¥
 
 
-	_uint							m_iNumVertexBuffers = {};	// »ç¿ëµÇ´Â Á¤Á¡ ¹öÆÛÀÇ °³¼ö
-	_uint							m_iVertexStride = {};		// Á¤Á¡ ÇÏ³ªÀÇ Å©±â¸¦ ³ªÅ¸³½´Ù.ÇÑ Ä­ÀÇ Å©±â¸¦ Stride ¶ó°í ºÎ¸¥´Ù.
-	_uint							m_iNumVertices = {};		// Á¤Á¡ ¹öÆÛ ÇÏ³ª¿¡ Æ÷ÇÔµÈ Á¤Á¡ÀÇ ÃÑ °³¼ö
-	_uint							m_iIndexStride = {};		// ÀÎµ¦½º ÇÏ³ªÀÇ Å©±â, ÀÏ¹İÀûÀ¸·Î 2byte È¤Àº 4byteÀÇ Å©±â¸¦ °®´Â´Ù.
-	_uint							m_iNumIndices = {};			// ÀÎµ¦½º ¹öÆÛ¿¡ Æ÷ÇÔµÈ ÀÎµ¦½ºÀÇ ÃÑ °³¼ö
+	_uint							m_iNumVertexBuffers = {};	// ì‚¬ìš©ë˜ëŠ” ì •ì  ë²„í¼ì˜ ê°œìˆ˜
+	_uint							m_iVertexStride = {};		// ì •ì  í•˜ë‚˜ì˜ í¬ê¸°ë¥¼ ë‚˜íƒ€ë‚¸ë‹¤.í•œ ì¹¸ì˜ í¬ê¸°ë¥¼ Stride ë¼ê³  ë¶€ë¥¸ë‹¤.
+	_uint							m_iNumVertices = {};		// ì •ì  ë²„í¼ í•˜ë‚˜ì— í¬í•¨ëœ ì •ì ì˜ ì´ ê°œìˆ˜
+	_uint							m_iIndexStride = {};		// ì¸ë±ìŠ¤ í•˜ë‚˜ì˜ í¬ê¸°, ì¼ë°˜ì ìœ¼ë¡œ 2byte í˜¹ì€ 4byteì˜ í¬ê¸°ë¥¼ ê°–ëŠ”ë‹¤.
+	_uint							m_iNumIndices = {};			// ì¸ë±ìŠ¤ ë²„í¼ì— í¬í•¨ëœ ì¸ë±ìŠ¤ì˜ ì´ ê°œìˆ˜
 
-	DXGI_FORMAT						m_eIndexFormat = {};		// ÀÎµ¦½º ¹öÆÛ¿¡¼­ »ç¿ëÇÏ´Â µ¥ÀÌÅÍ Çü½Ä
-	D3D_PRIMITIVE_TOPOLOGY			m_ePrimitiveTopology = {};	// Á¤Á¡µéÀÌ ·»´õ¸µ ÇÒ ±âº» µµÇüÀÇ Á¾·ù¸¦ Á¤ÀÇ
+	DXGI_FORMAT						m_eIndexFormat = {};		// ì¸ë±ìŠ¤ ë²„í¼ì—ì„œ ì‚¬ìš©í•˜ëŠ” ë°ì´í„° í˜•ì‹
+	D3D_PRIMITIVE_TOPOLOGY			m_ePrimitiveTopology = {};	// ì •ì ë“¤ì´ ë Œë”ë§ í•  ê¸°ë³¸ ë„í˜•ì˜ ì¢…ë¥˜ë¥¼ ì •ì˜
 
-	_float3* m_pVertexPositions = { nullptr };
+	_float3* m_pVertexPositions = {nullptr};
 public:
-	const _float3* Get_VtxPos() const { return m_fVertexPos; }
-	_float3*	Get_VtxPosition() { return m_fVertexPos; }
-	_uint	Get_VtxCountX() { return m_iNumVerticesX; }
-	_uint	Get_VtxCountZ() { return m_iNumVerticesZ; }
+	const _float3* Get_VtxPos() const {
+		return m_fVertexPos;
+	}
+	_float3*	Get_VtxPosition() {
+		return m_fVertexPos;
+	}
+	_uint	Get_VtxCountX() {
+		return m_iNumVerticesX;
+	}
+	_uint	Get_VtxCountZ() {
+		return m_iNumVerticesZ;
+	}
 	_uint					m_iNumVerticesX = {};
 	_uint					m_iNumVerticesZ = {};
-	_float3*				m_fVertexPos = { nullptr };
+	_float3*				m_fVertexPos = {nullptr};
 
 
 protected:
 	HRESULT Create_Buffer(ID3D11Buffer** ppOut);
+	HRESULT Create_Buffer_Dynamic(ID3D11Buffer** ppOut);
 
 public:
-	virtual CComponent* Clone(void* pArg) = 0; // ¼ø¼ö °¡»ó ÇÔ¼ö , Ãß»ó Å¬·¡½º°¡ µÇ¾î¹ö·Ç~!!!!!!!
+	virtual CComponent* Clone(void* pArg) = 0; // ìˆœìˆ˜ ê°€ìƒ í•¨ìˆ˜ , ì¶”ìƒ í´ë˜ìŠ¤ê°€ ë˜ì–´ë²„ë ·~!!!!!!!
 	virtual void Free() override;
 
 

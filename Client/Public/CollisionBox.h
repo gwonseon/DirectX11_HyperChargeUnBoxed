@@ -12,10 +12,10 @@ END
 BEGIN(Client)
 
 
-class CCollisionBox final : public CGameObject
+class CCollisionBox final: public CGameObject
 {
 public:
-	typedef struct : CGameObject::GAMEOBJ_DESC
+	typedef struct: CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID eLevel{};
 		_uint iPoint_Number{};
@@ -29,17 +29,17 @@ public:
 
 
 private:
-	CCollisionBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCollisionBox(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CCollisionBox(const CCollisionBox& Prototype);
 	virtual ~CCollisionBox() = default;
 
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -48,35 +48,51 @@ public:
 
 
 public:
-	void	Set_Position(_vector _vPos) { 
+	void	Set_Position(_vector _vPos) {
 		m_vecPosition = _vPos;
-		XMStoreFloat3(&m_fPickingPos, m_vecPosition);
-	
+		XMStoreFloat3(&m_fPickingPos,m_vecPosition);
+
 	}
 	void	Set_Height(_float fHeight)
 	{
-		m_vecPosition = XMVectorSetY(m_vecPosition, fHeight);
+		m_vecPosition = XMVectorSetY(m_vecPosition,fHeight);
 	}
-	float	Get_Height() { return XMVectorGetY(m_vecPosition); }
-	void	Set_PickingCheck(_bool bCheck) { m_bChecking = bCheck; }
-	void	Set_Scale(_float3 fSize) { m_fScale = fSize; }
+	float	Get_Height() {
+		return XMVectorGetY(m_vecPosition);
+	}
+	void	Set_PickingCheck(_bool bCheck) {
+		m_bChecking = bCheck;
+	}
+	void	Set_Scale(_float3 fSize) {
+		m_fScale = fSize;
+	}
 
-	void	Set_ImGuiMode(_uint iMode) { m_iCurrentImGuiMode = iMode; }
+	void	Set_ImGuiMode(_uint iMode) {
+		m_iCurrentImGuiMode = iMode;
+	}
 
 public:
-	void Set_BoundingBos(DirectX::BoundingBox Box) { BoundingBox = Box; }
-	
-	
-	
-	DirectX::BoundingBox Get_BoundingBox() { return BoundingBox; }
-	_uint	Get_CellIdx() { return m_iCellIdx; }
-	_uint   Get_CellType() { return m_iCellType; }
+	void Set_BoundingBos(DirectX::BoundingBox Box) {
+		BoundingBox = Box;
+	}
+
+
+
+	DirectX::BoundingBox Get_BoundingBox() {
+		return BoundingBox;
+	}
+	_uint	Get_CellIdx() {
+		return m_iCellIdx;
+	}
+	_uint   Get_CellType() {
+		return m_iCellType;
+	}
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CVIBuffer_Box* m_pVIBufferCom = { nullptr };
-	const _float4x4* m_pSocketMatrix = { nullptr };
-	const _uint* m_pParentState = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	CVIBuffer_Box* m_pVIBufferCom = {nullptr};
+	const _float4x4* m_pSocketMatrix = {nullptr};
+	const _uint* m_pParentState = {nullptr};
 	_float3* VtxPos{};
 
 
@@ -93,19 +109,25 @@ private:
 	_uint m_iCellIdx{};
 	// navigation
 private:
-	_uint m_iPointNumber{};  // ¹è¿­¿¡ µé¾î°¡´Â ÀÎµ¦½º ³Ñ¹ö
-	_uint m_iIndexNumber{};	 // ³×ºñ¿¡¼­ ÂïÀº ÀüÃ¼ Æ÷ÀÎÆ® Áß¿¡¼­ ÀÎµ¦½º ³Ñ¹ö
+	_uint m_iPointNumber{};  // ë°°ì—´ì— ë“¤ì–´ê°€ëŠ” ì¸ë±ìŠ¤ ë„˜ë²„
+	_uint m_iIndexNumber{};	 // ë„¤ë¹„ì—ì„œ ì°ì€ ì „ì²´ í¬ì¸íŠ¸ ì¤‘ì—ì„œ ì¸ë±ìŠ¤ ë„˜ë²„
 	LEVELID	m_eLevel{};
 	_bool m_bnavigationMode = false;
 	_bool m_bChecking = false;
 	_bool m_bBouncing = false;
 public:
-	_uint Get_IndexNumber() { return m_iIndexNumber; } // ÀüÃ¼ ÀÎµ¦½º ¹øÈ£ 
-	_uint Get_ArrayNumber() { return m_iPointNumber; } // ¹è¿­ ÀÎµ¦½º ¹øÈ£ 
+	_uint Get_IndexNumber() {
+		return m_iIndexNumber;
+	} // ì „ì²´ ì¸ë±ìŠ¤ ë²ˆí˜¸ 
+	_uint Get_ArrayNumber() {
+		return m_iPointNumber;
+	} // ë°°ì—´ ì¸ë±ìŠ¤ ë²ˆí˜¸ 
 
 
 
-	void Set_IndexNumber(_uint iIndex) { m_iIndexNumber = iIndex; } // ÀüÃ¼ ÀÎµ¦½º ¹øÈ£
+	void Set_IndexNumber(_uint iIndex) {
+		m_iIndexNumber = iIndex;
+	} // ì „ì²´ ì¸ë±ìŠ¤ ë²ˆí˜¸
 
 
 private:
@@ -117,7 +139,7 @@ private:
 
 
 public:
-	static CCollisionBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CCollisionBox* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

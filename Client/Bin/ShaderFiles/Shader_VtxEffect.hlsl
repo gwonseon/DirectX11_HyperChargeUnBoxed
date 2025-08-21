@@ -1,18 +1,18 @@
 #include "Engine_Shader_Defines.hlsli"
-//      Àü¿ªº¯¼öµé : ÄÁ½ºÅÏÆ® Å×ÀÌºí
+//      ì „ì—­ë³€ìˆ˜ë“¤ : ì»¨ìŠ¤í„´íŠ¸ í…Œì´ë¸”
 
 
-vector              g_vCamPosition;
-matrix              g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+vector g_vCamPosition;
+matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-texture2D           g_Texture;
-texture2D           g_MaskTexture;
-texture2D           g_DepthTexture;
+texture2D g_Texture;
+texture2D g_MaskTexture;
+texture2D g_DepthTexture;
 
-float               g_fFar;
-float2              g_Index;
-float2              g_ImageEA;
-float               g_fTex_Move;
+float g_fFar;
+float2 g_Index;
+float2 g_ImageEA;
+float g_fTex_Move;
 
 
 struct VS_IN
@@ -25,7 +25,7 @@ struct VS_IN
 struct VS_OUT
 {
 
-    float4 vPosition : SV_POSITION;   
+    float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
     float4 vProjPos : TEXCOORD1;
 
@@ -34,7 +34,7 @@ struct VS_OUT
 
 
 
-VS_OUT VS_MAIN(VS_IN In) // ÁøÀÔÁ¡ ÇÔ¼ö ( ³»°¡ ¿øÇÏ´Â ÀÌ¸§À¸·Î ¸¸µé ¼ö ÀÖ´Ù)
+VS_OUT VS_MAIN(VS_IN In) // ì§„ìž…ì  í•¨ìˆ˜ ( ë‚´ê°€ ì›í•˜ëŠ” ì´ë¦„ìœ¼ë¡œ ë§Œë“¤ ìˆ˜ ìžˆë‹¤)
 {
     VS_OUT Out = (VS_OUT) 0;
     vector vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
@@ -44,7 +44,7 @@ VS_OUT VS_MAIN(VS_IN In) // ÁøÀÔÁ¡ ÇÔ¼ö ( ³»°¡ ¿øÇÏ´Â ÀÌ¸§À¸·Î ¸¸µé ¼ö ÀÖ´Ù)
     
     Out.vPosition = vPosition;
     Out.vTexcoord = In.vTexcoord;
-    Out.vProjPos = vPosition; // ÀÌ °ªÀÌ ÇÈ¼¿ ¼ÎÀÌ´õ¿¡ µé¾î°¥ ¶§´Â º¸°£µÈ Åõ¿µ ÁÂÇ¥(z³ª´©±â ¾ÈµÈ »óÅÂ) °¡ µé¾î°¥ °ÍÀÌ´Ù.
+    Out.vProjPos = vPosition; // ì´ ê°’ì´ í”½ì…€ ì…°ì´ë”ì— ë“¤ì–´ê°ˆ ë•ŒëŠ” ë³´ê°„ëœ íˆ¬ì˜ ì¢Œí‘œ(zë‚˜ëˆ„ê¸° ì•ˆëœ ìƒíƒœ) ê°€ ë“¤ì–´ê°ˆ ê²ƒì´ë‹¤.
     return Out;
     
 }
@@ -61,7 +61,7 @@ struct PS_IN
 
 struct PS_OUT
 {
-	/* º¯¼ö¿¡ ´ëÇÑ ½Ã¸àÆ½À» Á¤ÀÇÇÑ´Ù. */
+	/* ë³€ìˆ˜ì— ëŒ€í•œ ì‹œë©˜í‹±ì„ ì •ì˜í•œë‹¤. */
     vector vColor : SV_TARGET0;
 
 };
@@ -73,7 +73,7 @@ PS_OUT PS_MAIN_SOFT(PS_IN In)
 
     vector vMtrl = g_Texture.Sample(PointSampler, In.vTexcoord);
 
-    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // °¢ ÇÁ·¹ÀÓÀÇ UV Å©±â
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // ê° í”„ë ˆìž„ì˜ UV í¬ê¸°
     float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
     float2 UV = fStart + fSize * In.vTexcoord;
 
@@ -96,7 +96,7 @@ PS_OUT PS_MAIN_SOFT(PS_IN In)
     if (Out.vColor.a > newAlpha)
         Out.vColor.a = newAlpha;
     
-    if (Out.vColor.a == 0.f )
+    if (Out.vColor.a == 0.f)
         discard;
     if (Out.vColor.r <= 0.1f && Out.vColor.g <= 0.1f && Out.vColor.b <= 0.1f)
         discard;
@@ -104,13 +104,13 @@ PS_OUT PS_MAIN_SOFT(PS_IN In)
     return Out;
 }
 
-PS_OUT    PS_MAIN_SOFT2(PS_IN In)
+PS_OUT PS_MAIN_SOFT2(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
     vector vMtrl = g_Texture.Sample(PointSampler, In.vTexcoord);
 
-    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // °¢ ÇÁ·¹ÀÓÀÇ UV Å©±â
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // ê° í”„ë ˆìž„ì˜ UV í¬ê¸°
     float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
     float2 UV = fStart + fSize * In.vTexcoord;
 
@@ -123,6 +123,9 @@ PS_OUT    PS_MAIN_SOFT2(PS_IN In)
     vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
     vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
 
+    if (Out.vColor.r <= 0.1f && Out.vColor.g <= 0.1f && Out.vColor.b <= 0.1f)
+        discard;
+    
     float4 vDepth = g_DepthTexture.Sample(LinearSampler, vTexcoord);
     float fOldZ = vDepth.y * g_fFar;
     float fViewZ = In.vProjPos.w;
@@ -142,7 +145,7 @@ PS_OUT PS_MAIN3(PS_IN In)
 
     vector vMtrl = g_Texture.Sample(LinearSampler, In.vTexcoord);
 
-    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // °¢ ÇÁ·¹ÀÓÀÇ UV Å©±â
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // ê° í”„ë ˆìž„ì˜ UV í¬ê¸°
     float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
     float2 UV = fStart + fSize * In.vTexcoord;
 
@@ -166,7 +169,7 @@ PS_OUT PS_PLAYER_FLAME(PS_IN In)
 
     vector vMtrl = g_Texture.Sample(LinearSampler, In.vTexcoord);
 
-    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // °¢ ÇÁ·¹ÀÓÀÇ UV Å©±â
+    float2 fSize = float2(1.0 / g_ImageEA.x, 1.0 / g_ImageEA.y); // ê° í”„ë ˆìž„ì˜ UV í¬ê¸°
     float2 fStart = float2(g_Index.x * fSize.x, g_Index.y * fSize.y);
     float2 UV = fStart + fSize * In.vTexcoord;
 
@@ -184,21 +187,21 @@ PS_OUT PS_PLAYER_FLAME(PS_IN In)
 
 PS_OUT PS_MAIN_SOFT4(PS_IN In)
 {
-   PS_OUT         Out = (PS_OUT)0;
-   Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
-   float2      vTexcoord;
-   vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
-   vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+    PS_OUT Out = (PS_OUT) 0;
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    float2 vTexcoord;
+    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
 
-   float4      vDepth = g_DepthTexture.Sample(LinearSampler, vTexcoord);
+    float4 vDepth = g_DepthTexture.Sample(LinearSampler, vTexcoord);
     float fOldZ = vDepth.y * g_fFar;
-   float      fViewZ = In.vProjPos.w;
+    float fViewZ = In.vProjPos.w;
     if (fOldZ < fViewZ)
         return Out;
     float newAlpha = Out.vColor.a * (fOldZ - fViewZ);
     if (Out.vColor.a > newAlpha)
         Out.vColor.a = newAlpha;
-   return Out;
+    return Out;
 }
 
 PS_OUT PS_LIGHTNING(PS_IN In)
@@ -226,14 +229,14 @@ PS_OUT PS_LIGHTNING(PS_IN In)
 
 PS_OUT PS_MISSILE_FLAME(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT)0;
+    PS_OUT Out = (PS_OUT) 0;
 
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
     return Out;
 }
 
-technique11 DefaultTechnique 
+technique11 DefaultTechnique
 {
     pass AlphaBlend // 0
     {

@@ -2,59 +2,62 @@
 
 #include "Base.h"
 
-/* ¿ÀºêÁ§Æ® ¸Å´ÏÁ®°¡ °ÔÀÓ³»¿¡ ÇÊ¿äÇÑ °´Ã¼µéÀ» °¡Áö°í ÀÖ°í °´Ã¼µéÀÇ ¾÷µ¥ÀÌÆ® ·»´õ¸¦ ¸ğµÎ ¼öÇàÇß¾úÁö¸¸,
-ÀÌÁ¦´Â ·»´õÀÇ ±â´ÉÀ» ·»´õ·¯·Î µû·Î º¸°ü°ü¸®ÇÑ´Ù. */
-/* ¿ÀºêÁ§Æ® ¸Å´ÏÁ®°¡ °¡Áö°í ÀÖ´Â °´Ã¼µéÀº »ç¿ëÀÚ°¡ ÇÊ¿äÇÏµû¶ó¼­ ±×·ìÀ¸·Î ¹­¾î¼­ °ü¸®ÇÏ°í ÀÖ±â¶§¹®¿¡ ´õÇØ¼­ ·»´õ¼ø¼­±îÁö °ü¸®ÇØÁÖ±â¿¡´Â ¹ö°Ì´Ù. */
-/* °´Ã¼µéÀÇ ·»´õ ¼ø¼­¸¦ °ü¸®ÇÏ¿© Á¤ÇØÁø ¼ø¼­´ë·Î ±×¸± ¼ö ÀÖµµ·Ï ÇÏ±âÀ§ÇØ ·»´õ·¯ Å¬·¡½º¸¦ Á¦ÀÛÇÏ¿© »ç¿ëÇÑ´Ù. */
+/* ì˜¤ë¸Œì íŠ¸ ë§¤ë‹ˆì ¸ê°€ ê²Œì„ë‚´ì— í•„ìš”í•œ ê°ì²´ë“¤ì„ ê°€ì§€ê³  ìˆê³  ê°ì²´ë“¤ì˜ ì—…ë°ì´íŠ¸ ë Œë”ë¥¼ ëª¨ë‘ ìˆ˜í–‰í–ˆì—ˆì§€ë§Œ,
+ì´ì œëŠ” ë Œë”ì˜ ê¸°ëŠ¥ì„ ë Œë”ëŸ¬ë¡œ ë”°ë¡œ ë³´ê´€ê´€ë¦¬í•œë‹¤. */
+/* ì˜¤ë¸Œì íŠ¸ ë§¤ë‹ˆì ¸ê°€ ê°€ì§€ê³  ìˆëŠ” ê°ì²´ë“¤ì€ ì‚¬ìš©ìê°€ í•„ìš”í•˜ë”°ë¼ì„œ ê·¸ë£¹ìœ¼ë¡œ ë¬¶ì–´ì„œ ê´€ë¦¬í•˜ê³  ìˆê¸°ë•Œë¬¸ì— ë”í•´ì„œ ë Œë”ìˆœì„œê¹Œì§€ ê´€ë¦¬í•´ì£¼ê¸°ì—ëŠ” ë²„ê²ë‹¤. */
+/* ê°ì²´ë“¤ì˜ ë Œë” ìˆœì„œë¥¼ ê´€ë¦¬í•˜ì—¬ ì •í•´ì§„ ìˆœì„œëŒ€ë¡œ ê·¸ë¦´ ìˆ˜ ìˆë„ë¡ í•˜ê¸°ìœ„í•´ ë Œë”ëŸ¬ í´ë˜ìŠ¤ë¥¼ ì œì‘í•˜ì—¬ ì‚¬ìš©í•œë‹¤. */
 
-/* °ÔÀÓ³»¿¡ ±×·ÁÁ®¾ßÇÒ °´Ã¼µéÀÇ ³»°¡ Á¤ÇØ³õÀº ±×·ìº° ¼ø¼­¿¡ ÀÇÇØ¼­ ·»´õÇÔ¼ö¸¦ È£ÃâÇØÁØ´Ù. */
-/* 3D¿¡¼­´Â ±íÀÌ Å×½ºÆ®¿¡ ÀÇÇØ ±×·ÁÁ®¾ßÇÒ ÇÈ¼¿µéÀÇ Â÷Æó¿¡ ´ëÇÑ °ü¸®´Â ¼öÇàÀÌµÈ´Ù.(NONBLEND)  */
-/* ±íÀÌ Å×½ºÆ®¶ó´Â °³³ä¶§¹®¿¡ »ı±â´Â ¹®Á¦°¡ ÀÖ´Ù. ½ºÄ«ÀÌ¹Ú½º, À¯¾ÆÀÌ, ºí·»µå */
+/* ê²Œì„ë‚´ì— ê·¸ë ¤ì ¸ì•¼í•  ê°ì²´ë“¤ì˜ ë‚´ê°€ ì •í•´ë†“ì€ ê·¸ë£¹ë³„ ìˆœì„œì— ì˜í•´ì„œ ë Œë”í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•´ì¤€ë‹¤. */
+/* 3Dì—ì„œëŠ” ê¹Šì´ í…ŒìŠ¤íŠ¸ì— ì˜í•´ ê·¸ë ¤ì ¸ì•¼í•  í”½ì…€ë“¤ì˜ ì°¨íì— ëŒ€í•œ ê´€ë¦¬ëŠ” ìˆ˜í–‰ì´ëœë‹¤.(NONBLEND)  */
+/* ê¹Šì´ í…ŒìŠ¤íŠ¸ë¼ëŠ” ê°œë…ë•Œë¬¸ì— ìƒê¸°ëŠ” ë¬¸ì œê°€ ìˆë‹¤. ìŠ¤ì¹´ì´ë°•ìŠ¤, ìœ ì•„ì´, ë¸”ë Œë“œ */
 
-/* ½ºÄ«ÀÌ¹Ú½º : ½ºÄ«ÀÌ¹Ú½º´Â ¸ğµÎ¿¡°Ô µ¤¿©¼­ ±×·ÁÁ®¾ßÇÑ´Ù. ½ºÄ«ÀÌ¹Ú½ºÀÇ ÇÈ¼¿ ´ç ±íÀÌ¸¦ ´Ù¸¥ °´Ã¼µéÀÇ ±íÀÌ¿Í ºñ±³ ¸øÇÏ°Ô ÇØ¾ßÇÒ ÇÊ¿ä°¡ ÀÖ¾ú´Ù. */
-/* 2°¡Áö : 1¹øÂ° ¹æ¹ı ½ºÄ«ÀÌ¹Ú½º¸¦ °¡Àå ¸¶Áö¸·¿¡±×¸®¸é¼­ ±íÀÌ ºñ±³¸¦ ²ô´Â ¹æ¹ı.±íÀÌºñ±³¸¦ ²ô°í ±×¸®¸é ¹«Á¶°Ç µ¤°í ±×¸°´Ù. => ÇÏ´ÃÀÌ ´Ù¸¥¾ÖµéÀ» ´Ù µ¤´Â´Ù. (X) */
-/* 2°¡Áö : 2¹øÂ° ¹æ¹ı ½ºÄ«ÀÌ¹Ú½º¸¦ °¡Àå ¸ÕÀú ±×¸®¸é¼­ ±íÀÌ¸¦ ±â·ÏÇØ³õÁö ¾Ê´Â ¹æ¹ı (O) */
-/* ºí·»µå : ¸ğµç ºÒÅõ¸íÇÑ ¾Öµé ´ÙÀ½¿¡ ±×¸°´Ù. ºí·»µå(ÀÌ¹Ì ±×·ÁÁ®ÀÖ´ø ÇÈ¼¿ÀÇ »ö°ú ±×¸±·Á°íÇÏ´Â ÇÈ¼¿ÀÇ »öÀ» ¼¯´Â´Ù.)±×·ìÀÇ °´Ã¼µéÀ» ±×¸®±âÀü¿¡ ¸ğµç ºÒÅõ¸íÇÑ °´Ã¼µéÀ» ±×·Á³ù¾î¾ß Àß ¼¯ÀÎ´Ù.  */
-/* UI : ¸ğµç ÇÈ¼¿À» ´Ù µ¤°í ±×·Á³½´Ù. °¡±ŞÀû °¡Àå ¸¶Áö¸·¿¡ ±×·Á³»µÇ ±íÀÌºñ±³¸¦ ²ô°í ±×¸°´Ù. »ïÂ÷¿ø°ø°£¿¡ ÀÖ´Â À¯¾ÆÀÌ´Ù? ±íÀÌÅ×½ºÆ®°¡ ÇÊ¿äÇØÁú¼ö ÀÖ¾î. ³íºí·»µå ±×·ìÀ¸·Î °¡¼­ ±×·ÁÁö¸éµÈ´Ù. */
+/* ìŠ¤ì¹´ì´ë°•ìŠ¤ : ìŠ¤ì¹´ì´ë°•ìŠ¤ëŠ” ëª¨ë‘ì—ê²Œ ë®ì—¬ì„œ ê·¸ë ¤ì ¸ì•¼í•œë‹¤. ìŠ¤ì¹´ì´ë°•ìŠ¤ì˜ í”½ì…€ ë‹¹ ê¹Šì´ë¥¼ ë‹¤ë¥¸ ê°ì²´ë“¤ì˜ ê¹Šì´ì™€ ë¹„êµ ëª»í•˜ê²Œ í•´ì•¼í•  í•„ìš”ê°€ ìˆì—ˆë‹¤. */
+/* 2ê°€ì§€ : 1ë²ˆì§¸ ë°©ë²• ìŠ¤ì¹´ì´ë°•ìŠ¤ë¥¼ ê°€ì¥ ë§ˆì§€ë§‰ì—ê·¸ë¦¬ë©´ì„œ ê¹Šì´ ë¹„êµë¥¼ ë„ëŠ” ë°©ë²•.ê¹Šì´ë¹„êµë¥¼ ë„ê³  ê·¸ë¦¬ë©´ ë¬´ì¡°ê±´ ë®ê³  ê·¸ë¦°ë‹¤. => í•˜ëŠ˜ì´ ë‹¤ë¥¸ì• ë“¤ì„ ë‹¤ ë®ëŠ”ë‹¤. (X) */
+/* 2ê°€ì§€ : 2ë²ˆì§¸ ë°©ë²• ìŠ¤ì¹´ì´ë°•ìŠ¤ë¥¼ ê°€ì¥ ë¨¼ì € ê·¸ë¦¬ë©´ì„œ ê¹Šì´ë¥¼ ê¸°ë¡í•´ë†“ì§€ ì•ŠëŠ” ë°©ë²• (O) */
+/* ë¸”ë Œë“œ : ëª¨ë“  ë¶ˆíˆ¬ëª…í•œ ì• ë“¤ ë‹¤ìŒì— ê·¸ë¦°ë‹¤. ë¸”ë Œë“œ(ì´ë¯¸ ê·¸ë ¤ì ¸ìˆë˜ í”½ì…€ì˜ ìƒ‰ê³¼ ê·¸ë¦´ë ¤ê³ í•˜ëŠ” í”½ì…€ì˜ ìƒ‰ì„ ì„ëŠ”ë‹¤.)ê·¸ë£¹ì˜ ê°ì²´ë“¤ì„ ê·¸ë¦¬ê¸°ì „ì— ëª¨ë“  ë¶ˆíˆ¬ëª…í•œ ê°ì²´ë“¤ì„ ê·¸ë ¤ë†¨ì–´ì•¼ ì˜ ì„ì¸ë‹¤.  */
+/* UI : ëª¨ë“  í”½ì…€ì„ ë‹¤ ë®ê³  ê·¸ë ¤ë‚¸ë‹¤. ê°€ê¸‰ì  ê°€ì¥ ë§ˆì§€ë§‰ì— ê·¸ë ¤ë‚´ë˜ ê¹Šì´ë¹„êµë¥¼ ë„ê³  ê·¸ë¦°ë‹¤. ì‚¼ì°¨ì›ê³µê°„ì— ìˆëŠ” ìœ ì•„ì´ë‹¤? ê¹Šì´í…ŒìŠ¤íŠ¸ê°€ í•„ìš”í•´ì§ˆìˆ˜ ìˆì–´. ë…¼ë¸”ë Œë“œ ê·¸ë£¹ìœ¼ë¡œ ê°€ì„œ ê·¸ë ¤ì§€ë©´ëœë‹¤. */
 
 BEGIN(Engine)
 
-class CRenderer final : public CBase
+class CRenderer final: public CBase
 {
 public:
 	enum SIZE
 	{
 		SIZE_ORIGINAL,
 		SIZE_DOWN_4,
-		SIZE_DOWN_44,
-		SIZE_DOWN_444,
+		SIZE_DOWN_8,
+		//SIZE_DOWN_44,
+		//SIZE_DOWN_444,
 		SIZE_SHADOW,
 		SIZE_END,
 	};
 
-	enum RENDERGROUP { RG_PRIORITY, RG_SHADOW, RG_HEIGHT,RG_NONBLEND, RG_BLOOM, RG_NONLIGHT,  RG_LAST, RG_BLEND, RG_UI,RG_UI_LAST, RG_END };
+	enum RENDERGROUP {
+		RG_PRIORITY,RG_SHADOW,RG_HEIGHT,RG_NONBLEND,RG_BLOOM,RG_NONLIGHT,RG_LAST,RG_BLEND,RG_UI,RG_UI_LAST,RG_END
+	};
 private:
-	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CRenderer(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
 
 public:
 	HRESULT Initialize();
-	HRESULT Add_RenderGameObject(RENDERGROUP eRenderGroup, class CGameObject* pRenderGameObject);
+	HRESULT Add_RenderGameObject(RENDERGROUP eRenderGroup,class CGameObject* pRenderGameObject);
 	HRESULT Add_DebugComponents(class CComponent* pComponent);
 	HRESULT Draw();
 	void	RenderList_Clear();
 private:
-	class CGameInstance* m_pGameInstance = { nullptr };
+	class CGameInstance* m_pGameInstance = {nullptr};
 
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
 
-	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
-	class CShader* m_pShader = { nullptr };
+	class CVIBuffer_Rect* m_pVIBuffer = {nullptr};
+	class CShader* m_pShader = {nullptr};
 
-	ID3D11DepthStencilView* m_LightDepthStencilView = { nullptr };
+	ID3D11DepthStencilView* m_LightDepthStencilView = {nullptr};
 
-	_float4x4					m_WorldMatrix, m_ViewMatrix{}, m_ProjMatrix{};
+	_float4x4					m_WorldMatrix,m_ViewMatrix{},m_ProjMatrix{};
 
 
 private:
@@ -62,12 +65,14 @@ private:
 	list<class CComponent*>		m_DebugComponents;
 
 public:
-	RENDERGROUP Get_RenderGroup() { return m_eNowRenderGroup; }
+	RENDERGROUP Get_RenderGroup() {
+		return m_eNowRenderGroup;
+	}
 	D3D11_VIEWPORT m_ViewPortDescs[SIZE_END]{};
 
-	void Set_Fog(_bool bFog, float fEnd)
+	void Set_Fog(_bool bFog,float fEnd)
 	{
-		m_bFog = bFog; 
+		m_bFog = bFog;
 		m_fEnd = fEnd;
 	}
 
@@ -83,8 +88,8 @@ private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_Height();
-	HRESULT Render_NonBlend(); 
-	
+	HRESULT Render_NonBlend();
+
 	HRESULT Render_Lights();
 	HRESULT Render_Final();
 	HRESULT Render_BrightExtraction();
@@ -101,10 +106,10 @@ private:
 	HRESULT Render_UI();
 	HRESULT Render_UI_Last();
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
-#endif
+	#endif
 
 
 private:
@@ -112,7 +117,7 @@ private:
 	float m_fEnd = 1.2f;
 
 public:
-	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CRenderer* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 };
 

@@ -1,30 +1,32 @@
 #pragma once
 
-/* ¾Ö°ß, °ÔÀÓ(·Ñ), ¼ú(2~3º´), ³ë·¡(ÄÚÀÎ), ¿îµ¿(Ãà±¸, Å¬¶óÀÌ¹Ö, Çï½º), Ã¥, À¯Æ©ºê, ¿µÈ­(¿¬ÀÎ?), ¿ä¸®(º£ÀÌÄ¿¸® µîµî) */
-/* ´Ï³× °¡Áö°í´Â ¾ÈµÇ°Ú´Ù. */
+/* ì• ê²¬, ê²Œì„(ë¡¤), ìˆ (2~3ë³‘), ë…¸ë˜(ì½”ì¸), ìš´ë™(ì¶•êµ¬, í´ë¼ì´ë°, í—¬ìŠ¤), ì±…, ìœ íŠœë¸Œ, ì˜í™”(ì—°ì¸?), ìš”ë¦¬(ë² ì´ì»¤ë¦¬ ë“±ë“±) */
+/* ë‹ˆë„¤ ê°€ì§€ê³ ëŠ” ì•ˆë˜ê² ë‹¤. */
 
 #include "Base.h"
 
-/* ´Ù¾çÇÑ ÄÄÆ÷³ÍÆ®µéÀÇ ºÎ¸ğ°¡ µÇ´Â Å¬·¡½º. */
+/* ë‹¤ì–‘í•œ ì»´í¬ë„ŒíŠ¸ë“¤ì˜ ë¶€ëª¨ê°€ ë˜ëŠ” í´ë˜ìŠ¤. */
 BEGIN(Engine)
 
 class ENGINE_DLL CComponent abstract : public CBase
 {
 protected:
-	CComponent(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CComponent(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CComponent(const CComponent& Prototype);
 	virtual ~CComponent() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
-	virtual HRESULT Render() { return S_OK; }
+	virtual HRESULT Render() {
+		return S_OK;
+	}
 protected:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
-	class CGameInstance* m_pGameInstance = { nullptr };
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
+	class CGameInstance* m_pGameInstance = {nullptr};
 
-	_bool						m_isCloned = { false };
+	_bool						m_isCloned = {false};
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

@@ -1,6 +1,6 @@
 #pragma once
 
-/* ´ÙÀ½ ·¹º§¿¡ ´ëÇÑ ÀÚ¿øÀ» ÁØºñÇÑ´Ù. */
+/* ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½Øºï¿½ï¿½Ñ´ï¿½. */
 #include "Client_Defines.h"
 #include "Base.h"
 
@@ -49,7 +49,6 @@ private:
 	_float						m_fPersent = {};
 	_bool						m_isFinished = { false };
 
-
 private:
 	_uint m_iGrass_Count[4];
 	vector<_float3> m_vecGrassPos[4];
@@ -80,6 +79,7 @@ private:
 	HRESULT Loading_DataFile_For_Instancing_YardLevel();
 	HRESULT Loading_DataFile_For_Instancing_ImGuiLevel();
 
+	HRESULT Loading_UI();
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);
 	virtual void Free() override;

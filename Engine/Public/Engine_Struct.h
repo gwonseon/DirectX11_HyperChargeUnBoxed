@@ -3,181 +3,183 @@
 namespace Engine
 {
 
-	typedef struct
-	{
-		HINSTANCE		hInstance;
-		HWND			hWnd;
-		unsigned int	iWinSizeX, iWinSizeY;
-		bool			isWindowed;
-		unsigned int	iNumLevels;
-	}ENGINE_DESC;
+typedef struct
+{
+	HINSTANCE		hInstance;
+	HWND			hWnd;
+	unsigned int	iWinSizeX,iWinSizeY;
+	bool			isWindowed;
+	unsigned int	iNumLevels;
+}ENGINE_DESC;
 
 
 
-	typedef struct
-	{
-		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_SPOT,TYPE_END  };
+typedef struct
+{
+	enum TYPE {
+		TYPE_DIRECTIONAL,TYPE_POINT,TYPE_SPOT,TYPE_END
+	};
 
-		TYPE		eType;
-		XMFLOAT4	vDirection;
-		XMFLOAT4	vPosition;
-		float		fRange;
+	TYPE		eType;
+	XMFLOAT4	vDirection;
+	XMFLOAT4	vPosition;
+	float		fRange;
 
-		XMFLOAT4	vDiffuse;
-		XMFLOAT4	vAmbient;
-		XMFLOAT4	vSpecular;
-		float		fAngle;
-	}LIGHT_DESC;
+	XMFLOAT4	vDiffuse;
+	XMFLOAT4	vAmbient;
+	XMFLOAT4	vSpecular;
+	float		fAngle;
+}LIGHT_DESC;
 
-	typedef struct
-	{
-		XMFLOAT4	vDiffuse;
-		XMFLOAT4	vAmbient;
-		XMFLOAT4	vSpecular;
-		XMFLOAT4	vEmissive;
+typedef struct
+{
+	XMFLOAT4	vDiffuse;
+	XMFLOAT4	vAmbient;
+	XMFLOAT4	vSpecular;
+	XMFLOAT4	vEmissive;
 
-	}MATERIAL;
+}MATERIAL;
 
-	//0 1 0 1		
-	//1 0 0 1 
- // = 0 0 0 1
-	//Light.Diffuse * Mtrl.Diffuse
-
-
-
-	typedef struct
-	{
-		XMFLOAT3		vScale;
-		XMFLOAT4		vRotation;
-		XMFLOAT3		vPosition;
-		float			fTrackPosition;
-	}KEYFRAME;
-
-	typedef struct ENGINE_DLL
-	{
-		/* Á¤Á¡ÀÇ À§Ä¡ (Position)*/
-		XMFLOAT3		vPosition;
-
-		static const unsigned int		iNumElements = 1;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[1];
-	}VTXPOS;
+//0 1 0 1		
+//1 0 0 1 
+// = 0 0 0 1
+   //Light.Diffuse * Mtrl.Diffuse
 
 
-	typedef struct ENGINE_DLL
-	{
-		/* Á¤Á¡ÀÇ À§Ä¡ (Position)*/
-		XMFLOAT3		vPosition;
-		/* ÅØ½ºÃÄÀÇ »öÀ» °¡Á®¿À±âÀ§ÇÑ ÁÂÇ¥.(Texcoord) */
-		XMFLOAT2		vTexcoord;
 
-		static const unsigned int		iNumElements = 2;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
-	}VTXPOSTEX;
+typedef struct
+{
+	XMFLOAT3		vScale;
+	XMFLOAT4		vRotation;
+	XMFLOAT3		vPosition;
+	float			fTrackPosition;
+}KEYFRAME;
 
-	typedef struct ENGINE_DLL
-	{
-		XMFLOAT3		vPosition;
-		XMFLOAT2		vPSize;
+typedef struct ENGINE_DLL
+{
+	/* ì •ì ì˜ ìœ„ì¹˜ (Position)*/
+	XMFLOAT3		vPosition;
 
-		static const unsigned int		iNumElements = 2;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
-	}VTXPOINT;
+	static const unsigned int		iNumElements = 1;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[1];
+}VTXPOS;
 
 
-	typedef struct ENGINE_DLL
-	{
-		XMFLOAT3		vPosition;
-		XMFLOAT3		vTexcoord;
+typedef struct ENGINE_DLL
+{
+	/* ì •ì ì˜ ìœ„ì¹˜ (Position)*/
+	XMFLOAT3		vPosition;
+	/* í…ìŠ¤ì³ì˜ ìƒ‰ì„ ê°€ì ¸ì˜¤ê¸°ìœ„í•œ ì¢Œí‘œ.(Texcoord) */
+	XMFLOAT2		vTexcoord;
 
-		static const unsigned int		iNumElements = 2;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
-	}VTXCUBE;
+	static const unsigned int		iNumElements = 2;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
+}VTXPOSTEX;
 
+typedef struct ENGINE_DLL
+{
+	XMFLOAT3		vPosition;
+	XMFLOAT2		vPSize;
 
-	typedef struct ENGINE_DLL
-	{
-		/* Á¤Á¡ÀÇ À§Ä¡ (Position)*/
-		XMFLOAT3		vPosition;
-
-		XMFLOAT3		vNormal;
-		/* ÅØ½ºÃÄÀÇ »öÀ» °¡Á®¿À±âÀ§ÇÑ ÁÂÇ¥.(Texcoord) */
-		XMFLOAT2		vTexcoord;
-
-		static const unsigned int		iNumElements = 3;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
-	}VTXNORTEX;
+	static const unsigned int		iNumElements = 2;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
+}VTXPOINT;
 
 
-	typedef struct ENGINE_DLL
-	{
-		XMFLOAT3		vPosition;
-		XMFLOAT3		vNormal;
-		XMFLOAT2		vTexcoord;
-		// XMFLOAT2		vTexcoord1;
+typedef struct ENGINE_DLL
+{
+	XMFLOAT3		vPosition;
+	XMFLOAT3		vTexcoord;
 
-		XMFLOAT3		vTangent;
-
-		static const unsigned int		iNumElements = 4;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
-	}VTXMESH;
+	static const unsigned int		iNumElements = 2;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[2];
+}VTXCUBE;
 
 
-	typedef struct ENGINE_DLL
-	{
-		XMFLOAT3		vPosition;
-		XMFLOAT3		vNormal;
-		XMFLOAT2		vTexcoord;
-		XMFLOAT3		vTangent;
+typedef struct ENGINE_DLL
+{
+	/* ì •ì ì˜ ìœ„ì¹˜ (Position)*/
+	XMFLOAT3		vPosition;
 
-		/* ÀÌ Á¤Á¡ÀÌ ¿µÇâÀ» ¹Ş¾Æ¾ßÇÒ »ÀµéÀÇ ÀÎµ¦½º */
-		XMUINT4			vBlendIndex;
+	XMFLOAT3		vNormal;
+	/* í…ìŠ¤ì³ì˜ ìƒ‰ì„ ê°€ì ¸ì˜¤ê¸°ìœ„í•œ ì¢Œí‘œ.(Texcoord) */
+	XMFLOAT2		vTexcoord;
 
-		/* ¿µÇâÀ» ¹Ş¾Æ¾ßÇÏ´Â »ÀµéÀÇ °¡ÁßÄ¡. */
-		XMFLOAT4		vBlendWeight;
-
-		static const unsigned int		iNumElements = 6;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
-	}VTXANIMMESH;
+	static const unsigned int		iNumElements = 3;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+}VTXNORTEX;
 
 
-	typedef struct
-	{
-		XMFLOAT4		vRight;
-		XMFLOAT4		vUp;
-		XMFLOAT4		vLook;
-		XMFLOAT4		vTranslation;
-		XMFLOAT2		vLifeTime;
-	}VTXMATRIX;
+typedef struct ENGINE_DLL
+{
+	XMFLOAT3		vPosition;
+	XMFLOAT3		vNormal;
+	XMFLOAT2		vTexcoord;
+	// XMFLOAT2		vTexcoord1;
+
+	XMFLOAT3		vTangent;
+
+	static const unsigned int		iNumElements = 4;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+}VTXMESH;
 
 
-	typedef struct ENGINE_DLL
-	{
-		static const unsigned int		iNumElements = 7;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
-	}VTXPARTICLE_RECT;
+typedef struct ENGINE_DLL
+{
+	XMFLOAT3		vPosition;
+	XMFLOAT3		vNormal;
+	XMFLOAT2		vTexcoord;
+	XMFLOAT3		vTangent;
 
-	typedef struct ENGINE_DLL
-	{
-		static const unsigned int		iNumElements = 7;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
-	}VTXPARTICLE_POINT;
+	/* ì´ ì •ì ì´ ì˜í–¥ì„ ë°›ì•„ì•¼í•  ë¼ˆë“¤ì˜ ì¸ë±ìŠ¤ */
+	XMUINT4			vBlendIndex;
 
-	typedef struct ENGINE_DLL
-	{
-		static const unsigned int		iNumElements = 9;
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
-	}VTXPARTICLE_MESH;
+	/* ì˜í–¥ì„ ë°›ì•„ì•¼í•˜ëŠ” ë¼ˆë“¤ì˜ ê°€ì¤‘ì¹˜. */
+	XMFLOAT4		vBlendWeight;
+
+	static const unsigned int		iNumElements = 6;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+}VTXANIMMESH;
+
+
+typedef struct
+{
+	XMFLOAT4		vRight;
+	XMFLOAT4		vUp;
+	XMFLOAT4		vLook;
+	XMFLOAT4		vTranslation;
+	XMFLOAT2		vLifeTime;
+}VTXMATRIX;
+
+
+typedef struct ENGINE_DLL
+{
+	static const unsigned int		iNumElements = 7;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+}VTXPARTICLE_RECT;
+
+typedef struct ENGINE_DLL
+{
+	static const unsigned int		iNumElements = 7;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+}VTXPARTICLE_POINT;
+
+typedef struct ENGINE_DLL
+{
+	static const unsigned int		iNumElements = 9;
+	static const D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+}VTXPARTICLE_MESH;
 
 }
 
 
-// XMFLOAT3  : ÀúÀå¿ë º¤ÅÍ Å¸ÀÔ, ¿¬»êÀÚ ¿À¹ö·ÎµùÀÌ ¾ÈµÇ¾î ÀÖ´Ù.
+// XMFLOAT3  : ì €ì¥ìš© ë²¡í„° íƒ€ì…, ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì´ ì•ˆë˜ì–´ ìˆë‹¤.
 // 
-// ±¸Á¶Ã¼°¡ Elements¿Í Á¤Á¡ÀÇ °³¼ö±îÁö °¡Áö°í ÀÖ°Ô ¸¸µé¾ú´Ù
-// ±¸Á¶Ã¼°¡ ºÎ°¡ Á¤º¸ÀÎ num°ú Elements¿¡ ´ëÇÑ ¿ë·®±îÁö Â÷ÁöÇÏ¸é ¾ÈµÇ±â¿¡ staticÀ¸·Î ¼±¾ğÇÑ´Ù.
-// Á¤Á¡º¯¼öÀÇ °æ¿ì Çì´õ¸¦ Include ÇÒ ¶§¸¶´Ù ÀçÁ¤ÀÇ ÇÏ´Ï±î const·Î ¹æÁöÇÏ°í
-// cpp¿¡¼­ ´Ù½Ã ±¸ÇöÇÑ´Ù.
-// ÀÌÁ¦ Á¤Àû ¸â¹ö¿¡ ´ëÇÑ ¼±¾ğºÎ´Â Engine_Struct.h ¿¡ 
-// ±¸ÇöºÎ´Â Engine_Struct.cpp¿¡ Á¸ÀçÇÑ´Ù.
-// ÇÏÁö¸¸ cpp¿¡ ´ëÇÑ Á¤º¸¸¦ Å¬¶óÀÌ¾ğÆ®°¡ ¸ğ¸£´Ï ¹öÅØ½º ±¸Á¶Ã¼¸¦ ENGINE_DLL·Î ¸¸µé¾î¼­ ¶óÀÌºê·¯¸® ÆÄÀÏ·Î µé¾î°¡°Ô ¸¸µç´Ù.
-// ¶óÀÌºê·¯¸® ÆÄÀÏ·Î µé¾î°¡°Ô ¸¸µé¸é Å¬¶óÀÌ¾ğÆ®¿¡¼­µµ ¿£Áø¿¡ Á¤ÀÇµÈ cpp ÆÄÀÏ¿¡¼­ elements ¸¦ ÃÊ±âÈ­ÇÏ´Â ºÎºĞ¿¡ Á¢±ÙÇÒ ¼ö ÀÖ°Ô µÈ´Ù.
+// êµ¬ì¡°ì²´ê°€ Elementsì™€ ì •ì ì˜ ê°œìˆ˜ê¹Œì§€ ê°€ì§€ê³  ìˆê²Œ ë§Œë“¤ì—ˆë‹¤
+// êµ¬ì¡°ì²´ê°€ ë¶€ê°€ ì •ë³´ì¸ numê³¼ Elementsì— ëŒ€í•œ ìš©ëŸ‰ê¹Œì§€ ì°¨ì§€í•˜ë©´ ì•ˆë˜ê¸°ì— staticìœ¼ë¡œ ì„ ì–¸í•œë‹¤.
+// ì •ì ë³€ìˆ˜ì˜ ê²½ìš° í—¤ë”ë¥¼ Include í•  ë•Œë§ˆë‹¤ ì¬ì •ì˜ í•˜ë‹ˆê¹Œ constë¡œ ë°©ì§€í•˜ê³ 
+// cppì—ì„œ ë‹¤ì‹œ êµ¬í˜„í•œë‹¤.
+// ì´ì œ ì •ì  ë©¤ë²„ì— ëŒ€í•œ ì„ ì–¸ë¶€ëŠ” Engine_Struct.h ì— 
+// êµ¬í˜„ë¶€ëŠ” Engine_Struct.cppì— ì¡´ì¬í•œë‹¤.
+// í•˜ì§€ë§Œ cppì— ëŒ€í•œ ì •ë³´ë¥¼ í´ë¼ì´ì–¸íŠ¸ê°€ ëª¨ë¥´ë‹ˆ ë²„í…ìŠ¤ êµ¬ì¡°ì²´ë¥¼ ENGINE_DLLë¡œ ë§Œë“¤ì–´ì„œ ë¼ì´ë¸ŒëŸ¬ë¦¬ íŒŒì¼ë¡œ ë“¤ì–´ê°€ê²Œ ë§Œë“ ë‹¤.
+// ë¼ì´ë¸ŒëŸ¬ë¦¬ íŒŒì¼ë¡œ ë“¤ì–´ê°€ê²Œ ë§Œë“¤ë©´ í´ë¼ì´ì–¸íŠ¸ì—ì„œë„ ì—”ì§„ì— ì •ì˜ëœ cpp íŒŒì¼ì—ì„œ elements ë¥¼ ì´ˆê¸°í™”í•˜ëŠ” ë¶€ë¶„ì— ì ‘ê·¼í•  ìˆ˜ ìˆê²Œ ëœë‹¤.

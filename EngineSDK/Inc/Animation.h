@@ -2,12 +2,12 @@
 
 #include "Base.h"
 
-/* æÓ∂≤ ª¿µÈ¿ª øÚ¡˜ø©æﬂ«œ¥¬∞°? */
-/* «ÿ¥Á ª¿µÈ¿∫ Ω√∞£ø° µ˚∂Û æÓ∂≤ ªÛ≈¬∫Ø»≠∏¶ ∞°¡ˆ¥¬∞°? */
+/* Ïñ¥Îñ§ ÎºàÎì§ÏùÑ ÏõÄÏßÅÏó¨ÏïºÌïòÎäîÍ∞Ä? */
+/* Ìï¥Îãπ ÎºàÎì§ÏùÄ ÏãúÍ∞ÑÏóê Îî∞Îùº Ïñ¥Îñ§ ÏÉÅÌÉúÎ≥ÄÌôîÎ•º Í∞ÄÏßÄÎäîÍ∞Ä? */
 
 BEGIN(Engine)
 
-class CAnimation final : public CBase
+class CAnimation final: public CBase
 {
 private:
 	CAnimation();
@@ -15,18 +15,18 @@ private:
 	virtual ~CAnimation() = default;
 
 public:
-	HRESULT Initialize(class CModel* pModel, HANDLE hFileRead);
-	_bool Update_TransformationMatrix(const vector<class CBone*>& Bones, _bool isLoop,  _float fTimeDelta, _bool bPlay = true);
-	_bool Update_TransformationMatrix_Player(const vector<class CBone*>& Bones, _bool isLoop, _float fTimeDelta, _bool bUpper, _uint iUpperMotion, _bool& bShot);
+	HRESULT Initialize(class CModel* pModel,HANDLE hFileRead);
+	_bool Update_TransformationMatrix(const vector<class CBone*>& Bones,_bool isLoop,_float fTimeDelta,_bool bPlay = true);
+	_bool Update_TransformationMatrix_Player(const vector<class CBone*>& Bones,_bool isLoop,_float fTimeDelta,_bool bUpper,_uint iUpperMotion,_bool& bShot);
 
 private:
 	_char					m_szName[MAX_PATH] = {};
-	_float					m_fDuration = { 0.f };
-	_float					m_fTickPerSecond = { 0.f };
-	_float					m_fCurrentPosition = { 0.f };
-	_float					m_fCurrentPosition_UpperBody = { 0.f };
-	_float					m_fCurrentPosition_LowerBody = { 0.f };
-	_float m_fLerptime{ 0 };
+	_float					m_fDuration = {0.f};
+	_float					m_fTickPerSecond = {0.f};
+	_float					m_fCurrentPosition = {0.f};
+	_float					m_fCurrentPosition_UpperBody = {0.f};
+	_float					m_fCurrentPosition_LowerBody = {0.f};
+	_float m_fLerptime{0};
 
 	_uint					m_iNumChannels = {};
 	vector<class CChannel*>	m_Channels;
@@ -35,15 +35,23 @@ private:
 
 
 public:
-	KEYFRAME*& Get_PrevKeyFrame() { return LastKeyFrame; }
-	KEYFRAME*& Get_PrevKeyFrame_UpperBody() { return LastKeyFrame_UpperBody; }
-	KEYFRAME*& Get_PrevKeyFrame_LowerBody() { return LastKeyFrame_LowerBody; }
+	KEYFRAME*& Get_PrevKeyFrame() {
+		return LastKeyFrame;
+	}
+	KEYFRAME*& Get_PrevKeyFrame_UpperBody() {
+		return LastKeyFrame_UpperBody;
+	}
+	KEYFRAME*& Get_PrevKeyFrame_LowerBody() {
+		return LastKeyFrame_LowerBody;
+	}
 
-	_bool	  Update_LinearInterPolation(KEYFRAME* _PrevKeyFrame, const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta);
-	_bool	  Update_LinearInterPolation_Player(KEYFRAME* _PrevKeyFrame, const vector<class CBone*>& Bones, vector<string> szName, _float fTimeDelta, _bool bUpper);
+	_bool	  Update_LinearInterPolation(KEYFRAME* _PrevKeyFrame,const vector<class CBone*>& Bones,vector<string> szName,_float fTimeDelta);
+	_bool	  Update_LinearInterPolation_Player(KEYFRAME* _PrevKeyFrame,const vector<class CBone*>& Bones,vector<string> szName,_float fTimeDelta,_bool bUpper);
 
 	//_char** Get_szName() { return m_szPrevChannelName; }
-	_uint	Get_PrevNumChannel() { return m_iPrevNumChannels; }
+	_uint	Get_PrevNumChannel() {
+		return m_iPrevNumChannels;
+	}
 	const vector<string>& Get_ChannelNames() const {
 		return m_vecName;
 	}
@@ -64,27 +72,29 @@ private:
 	//string	m_strName;
 	_uint	m_iPrevNumChannels{};
 public:
-	static CAnimation* Create(class CModel* pModel, HANDLE hFileRead);
+	static CAnimation* Create(class CModel* pModel,HANDLE hFileRead);
 	virtual void Free() override;
 	CAnimation* Clone();
-	
-//	// √— µÙ∑π¿Ã
-//private:
-//	_float					m_fRiflrDelay = 0.1f;
-//	_float					m_fShotGunDelay = 1.f;
-//	_float					m_fPulseCannonDelay = 2.f;
-//	_float					m_fTeleportDelay = 2.f;
-//	_float					m_fLocketLauncherDelay = 2.f;
-//	_float					m_fCurrentDelay = 0.f;
+
+	//	// Ï¥ù ÎîúÎ†àÏù¥
+	//private:
+	//	_float					m_fRiflrDelay = 0.1f;
+	//	_float					m_fShotGunDelay = 1.f;
+	//	_float					m_fPulseCannonDelay = 2.f;
+	//	_float					m_fTeleportDelay = 2.f;
+	//	_float					m_fLocketLauncherDelay = 2.f;
+	//	_float					m_fCurrentDelay = 0.f;
 
 
 
 public:
-	void CurrentPosition_Init(const vector<class CBone*>& Bones );
+	void CurrentPosition_Init(const vector<class CBone*>& Bones);
 	void CurrentPosition_UpperBody_Init(const vector<class CBone*>& Bones);
 	void CurrentPosition_LowerBody_Init(const vector<class CBone*>& Bones);
 
-	void CurrentPosition_Init() { m_fCurrentPosition = 0.f; };
+	void CurrentPosition_Init() {
+		m_fCurrentPosition = 0.f;
+	};
 
 private:
 	DWORD			dwByte = 0;

@@ -2,101 +2,98 @@
 #include "GameInstance.h"
 
 CRound_Manager::CRound_Manager()
-    : m_pGameInstance{ CGameInstance::GetInstance() }
+	: m_pGameInstance{CGameInstance::GetInstance()}
 {
-    Safe_AddRef(m_pGameInstance);
+	Safe_AddRef(m_pGameInstance);
 }
 
 HRESULT CRound_Manager::Initialize()
 {
-    return S_OK;
+	return S_OK;
 }
 
-void CRound_Manager::Update(_float fTimeDelta, _uint& iCurrentRound ,_bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far, _bool& bRoundStart, _float& SkipTimer)
+void CRound_Manager::Update(_float fTimeDelta,_uint& iCurrentRound,_bool& bBuildMode,CLayer* Monster_Near,CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer)
 {
-    SkipTimer = m_fBreakTimeSkip_Timer;
-    if (iCurrentRound == BREAKTIME_ROUND && bBuildMode == true && bRoundStart == false) // ½¬´Â ½Ã°£
-    {
-     //   cout << "½¬´Â ½Ã°£ ½ÃÀÛ " << m_fBreakTime_Timer << endl;
-        m_fBreakTime_Timer += fTimeDelta; // ½¬´Â ½Ã°£ Å¸ÀÌ¸Ó 
-        if (m_fBreakTime_Timer >= 60.f)
-        {
-            // ½Ã°£ µÇ¸é ¶ó¿îµå ³Ñ¾î°¨
-            ++m_iCurrent_Round;
-            m_fBreakTime_Timer = 0.f;
-            iCurrentRound = m_iCurrent_Round;
-            bRoundStart = true; // ¶ó¿îµå ½ÃÀÛ
-            bBuildMode = false; // ºôµå ¸ğµå ¾Æ´Ô ( ÃÑ)
-          //  cout << "ÀÌ¹ø ¶ó¿îµå : " << m_iCurrent_Round << endl;
-        }
-    }
-    else if (iCurrentRound == BREAKTIME_ROUND && bBuildMode == false && bRoundStart == false)
-    {
-        // cout << "½ºÅµ ½ÃÀÛ " << endl;
-        m_fBreakTimeSkip_Timer -= fTimeDelta; // ½¬´Â ½Ã°£ ½ºÅµ ½ÃÀÛ
-        
-        if (m_fBreakTimeSkip_Timer <= 0.f) // ½¬´Â ½Ã°£ ½ºÅµ
-        {
-            ++m_iCurrent_Round;
-            m_fBreakTimeSkip_Timer = 5.f;
-            iCurrentRound = m_iCurrent_Round; 
-            bBuildMode = false; // ºôµå ¸ğµå ¾Æ´Ô ( ÃÑ)
-            bRoundStart = true; // ¶ó¿îµå ½ÃÀÛ
+	SkipTimer = m_fBreakTimeSkip_Timer;
+	if(iCurrentRound == BREAKTIME_ROUND && bBuildMode == true && bRoundStart == false) // ì‰¬ëŠ” ì‹œê°„
+	{
+		//   cout << "ì‰¬ëŠ” ì‹œê°„ ì‹œì‘ " << m_fBreakTime_Timer << endl;
+		m_fBreakTime_Timer += fTimeDelta; // ì‰¬ëŠ” ì‹œê°„ íƒ€ì´ë¨¸ 
+		if(m_fBreakTime_Timer >= 60.f)
+		{
+			// ì‹œê°„ ë˜ë©´ ë¼ìš´ë“œ ë„˜ì–´ê°
+			++m_iCurrent_Round;
+			m_fBreakTime_Timer = 0.f;
+			iCurrentRound = m_iCurrent_Round;
+			bRoundStart = true; // ë¼ìš´ë“œ ì‹œì‘
+			bBuildMode = false; // ë¹Œë“œ ëª¨ë“œ ì•„ë‹˜ ( ì´)
+			//  cout << "ì´ë²ˆ ë¼ìš´ë“œ : " << m_iCurrent_Round << endl;
+		}
+	} else if(iCurrentRound == BREAKTIME_ROUND && bBuildMode == false && bRoundStart == false)
+	{
+		// cout << "ìŠ¤í‚µ ì‹œì‘ " << endl;
+		m_fBreakTimeSkip_Timer -= fTimeDelta; // ì‰¬ëŠ” ì‹œê°„ ìŠ¤í‚µ ì‹œì‘
 
-            //cout << "ÀÌ¹ø ¶ó¿îµå(½ºÅµÇÔ) : " << m_iCurrent_Round << endl;
-        }
-    }
-    else
-    {
-        _int iMonster_Far{};
-        _int iMonster_Near{};
-  
-        if(Monster_Far != nullptr)
-             iMonster_Far = Monster_Far->Get_GameObjectList_Size();
-        if (Monster_Near != nullptr)
-             iMonster_Near = Monster_Near->Get_GameObjectList_Size();
-        m_fBreakTimeSkip_Timer = 5.f; // ½¬´Â ½Ã°£ ½ºÅµ Å¸ÀÌ¸Ó ÃÊ±âÈ­
-        m_fBreakTime_Timer = 0.f;       // ½¬´Â ½Ã°£ Å¸ÀÌ¸Ó ÃÊ±âÈ­
-        m_iMonster_Count = iMonster_Near + iMonster_Far;
+		if(m_fBreakTimeSkip_Timer <= 0.f) // ì‰¬ëŠ” ì‹œê°„ ìŠ¤í‚µ
+		{
+			++m_iCurrent_Round;
+			m_fBreakTimeSkip_Timer = 5.f;
+			iCurrentRound = m_iCurrent_Round;
+			bBuildMode = false; // ë¹Œë“œ ëª¨ë“œ ì•„ë‹˜ ( ì´)
+			bRoundStart = true; // ë¼ìš´ë“œ ì‹œì‘
+
+			//cout << "ì´ë²ˆ ë¼ìš´ë“œ(ìŠ¤í‚µí•¨) : " << m_iCurrent_Round << endl;
+		}
+	} else
+	{
+		_int iMonster_Far{};
+		_int iMonster_Near{};
+
+		if(Monster_Far != nullptr)
+			iMonster_Far = Monster_Far->Get_GameObjectList_Size();
+		if(Monster_Near != nullptr)
+			iMonster_Near = Monster_Near->Get_GameObjectList_Size();
+		m_fBreakTimeSkip_Timer = 5.f; // ì‰¬ëŠ” ì‹œê°„ ìŠ¤í‚µ íƒ€ì´ë¨¸ ì´ˆê¸°í™”
+		m_fBreakTime_Timer = 0.f;       // ì‰¬ëŠ” ì‹œê°„ íƒ€ì´ë¨¸ ì´ˆê¸°í™”
+		m_iMonster_Count = iMonster_Near + iMonster_Far;
 
 
 
-        // ¹Ì»çÀÏ ¶ó¿îµå Á¾·á ( ÀüÃ¼ Á¾·áÀÓ )
-        if (iCurrentRound == 3 && m_iLevel == 4 && m_iMonster_Count <= 0 && m_bMissile_Broken == true)
-        {
-            cout << "¹Ì»çÀÏ ¶ó¿îµå Á¾·á, ½¬´Â ½Ã°£ ¸ó½ºÅÍ ´Ù ÀâÀ½ : " << m_iMonster_Count << endl;
-            iCurrentRound = 0;     // 0¹ø ¶ó¿îµå°¡ ½¬´Â ½Ã°£
-            bBuildMode = true;   // ºôµå ¸ğµå
-            bRoundStart = false; // ¶ó¿îµå ³¡³²
+		// ë¯¸ì‚¬ì¼ ë¼ìš´ë“œ ì¢…ë£Œ ( ì „ì²´ ì¢…ë£Œì„ )
+		if(iCurrentRound == 3 && m_iLevel == 4 && m_iMonster_Count <= 0 && m_bMissile_Broken == true)
+		{
+			cout << "ë¯¸ì‚¬ì¼ ë¼ìš´ë“œ ì¢…ë£Œ, ì‰¬ëŠ” ì‹œê°„ ëª¬ìŠ¤í„° ë‹¤ ì¡ìŒ : " << m_iMonster_Count << endl;
+			iCurrentRound = 0;     // 0ë²ˆ ë¼ìš´ë“œê°€ ì‰¬ëŠ” ì‹œê°„
+			bBuildMode = true;   // ë¹Œë“œ ëª¨ë“œ
+			bRoundStart = false; // ë¼ìš´ë“œ ëë‚¨
 
-        }
-        else if(m_iMonster_Count <= 0 ) // ÀÏ¹İ ¶ó¿îµå¿¡¼± ¸ó½ºÅÍ ¼ö°¡ 0ÀÏ ¶§ ¶ó¿îµå ³Ñ¾î°¨
-        {
-            cout << "½¬´Â ½Ã°£ ¸ó½ºÅÍ ´Ù ÀâÀ½ : " << m_iMonster_Count << endl;
-            iCurrentRound = 0;     // 0¹ø ¶ó¿îµå°¡ ½¬´Â ½Ã°£
-            bBuildMode = true;   // ºôµå ¸ğµå
-            bRoundStart = false; // ¶ó¿îµå ³¡³²
-        }
-    }
+		} else if(m_iMonster_Count <= 0) // ì¼ë°˜ ë¼ìš´ë“œì—ì„  ëª¬ìŠ¤í„° ìˆ˜ê°€ 0ì¼ ë•Œ ë¼ìš´ë“œ ë„˜ì–´ê°
+		{
+			cout << "ì‰¬ëŠ” ì‹œê°„ ëª¬ìŠ¤í„° ë‹¤ ì¡ìŒ : " << m_iMonster_Count << endl;
+			iCurrentRound = 0;     // 0ë²ˆ ë¼ìš´ë“œê°€ ì‰¬ëŠ” ì‹œê°„
+			bBuildMode = true;   // ë¹Œë“œ ëª¨ë“œ
+			bRoundStart = false; // ë¼ìš´ë“œ ëë‚¨
+		}
+	}
 }
 
 
 CRound_Manager* CRound_Manager::Create()
 {
-    CRound_Manager* pInstance = new CRound_Manager();
+	CRound_Manager* pInstance = new CRound_Manager();
 
-    if (FAILED(pInstance->Initialize()))
-    {
-        MSG_BOX("Failed to Created : CRound_Manager");
-        Safe_Release(pInstance);
-    }
+	if(FAILED(pInstance->Initialize()))
+	{
+		MSG_BOX("Failed to Created : CRound_Manager");
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CRound_Manager::Free()
 {
-    __super::Free();
-    Safe_Release(m_pGameInstance);
+	__super::Free();
+	Safe_Release(m_pGameInstance);
 
 }

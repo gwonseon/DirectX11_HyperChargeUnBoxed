@@ -4,8 +4,7 @@
 
 
 CCollisionMgr::CCollisionMgr()
-{
-}
+{}
 
 HRESULT CCollisionMgr::Initialize()
 {
@@ -13,28 +12,27 @@ HRESULT CCollisionMgr::Initialize()
 }
 
 
-_bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos,  _bool* bShot, _float fDamage, _uint iTargetPartObjID)
+_bool CCollisionMgr::Collision_Bullet(CLayer* Target,const _wstring& strTargetComponentTag,_vector vRayDir,_vector vRayPos,_bool* bShot,_float fDamage,_uint iTargetPartObjID)
 {
 	_bool Collision{};
 	if(Target != nullptr)
 	{
-		for (auto& pTarget : Target->Get_GameObject_List())
+		for(auto& pTarget : Target->Get_GameObject_List())
 		{
-			CCollider* pTargetCollider = static_cast<CCollider*>(pTarget->Find_Component(strTargetComponentTag, iTargetPartObjID));
+			CCollider* pTargetCollider = static_cast<CCollider*>(pTarget->Find_Component(strTargetComponentTag,iTargetPartObjID));
 			_float3 fCenter = pTargetCollider->Get_Center();
 			float fRadius = pTargetCollider->Get_Radius();
 			_float fDistance{};
-			Collision = pTargetCollider->Intersect_Mouse(vRayPos, vRayDir, fDistance);
-			if (Collision == true)
+			Collision = pTargetCollider->Intersect_Mouse(vRayPos,vRayDir,fDistance);
+			if(Collision == true)
 			{
 				pTarget->Set_CollisionChecking(true);
-				if (*bShot == true)
+				if(*bShot == true)
 				{
 					pTarget->Set_Damaged(fDamage);
 				}
 				break;
-			}
-			else
+			} else
 			{
 				pTarget->Set_CollisionChecking(false);
 			}
@@ -43,49 +41,48 @@ _bool CCollisionMgr::Collision_Bullet(CLayer* Target, const _wstring& strTargetC
 	return Collision;
 }
 
-void CCollisionMgr::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CCollisionMgr::Collision_Layer(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
 
 	if(pSrcLayer != nullptr && pDstLayer != nullptr)
 	{
-		for (auto& pSrc : pSrcLayer->Get_GameObject_List())
+		for(auto& pSrc : pSrcLayer->Get_GameObject_List())
 		{
-			// ´çÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-			CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag, iSrcPartObjID));
+			// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+			CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag,iSrcPartObjID));
 
-			// ´çÇÏ´Â ¿ÀºêÁ§Æ® À§Ä¡ °¡Á®¿À±â
+			// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 			CTransform* m_pTrans = pSrc->Get_Transform();
 			_vector vPos = m_pTrans->Get_State(CTransform::STATE_POSITION);
 			_float3 fPos{};
-			XMStoreFloat3(&fPos, vPos);
+			XMStoreFloat3(&fPos,vPos);
 
-			for (auto& pDst : pDstLayer->Get_GameObject_List())
+			for(auto& pDst : pDstLayer->Get_GameObject_List())
 			{
-				// °¡ÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ À§Ä¡ °¡Á®¿À±â
+				// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 				_vector vTargetPos = pDst->Get_Transform()->Get_State(CTransform::STATE_POSITION);
 				_float3 fTargetPos{};
-				XMStoreFloat3(&fTargetPos, vTargetPos);
+				XMStoreFloat3(&fTargetPos,vTargetPos);
 
-				// À§Ä¡ ºñ±³ÇØ¼­ ¾È¿¡ µé¾î¿Â ¾Öµé¸¸ °Ë»çÇĞ±â && °ø°İ »óÅÂÀÏ ¶§¸¸ È®ÀÎÇÏ±â 
-				if (m_pTrans->Cal_Distance(fPos, fTargetPos) < 500.f && pDst->Get_AttackState() == true && pSrc->Get_CanAttacked() == true)
+				// ìœ„ì¹˜ ë¹„êµí•´ì„œ ì•ˆì— ë“¤ì–´ì˜¨ ì• ë“¤ë§Œ ê²€ì‚¬í•™ê¸° && ê³µê²© ìƒíƒœì¼ ë•Œë§Œ í™•ì¸í•˜ê¸° 
+				if(m_pTrans->Cal_Distance(fPos,fTargetPos) < 500.f && pDst->Get_AttackState() == true && pSrc->Get_CanAttacked() == true)
 				{
-					// °¡ÇÏ´Â ¿ÀºêÁ§Æ® Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-					CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag, iDstPartObjID));
-					// Ãæµ¹ ºñ±³
-					if (pSrcCol->Intersect(pTarget))
+					// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+					CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag,iDstPartObjID));
+					// ì¶©ëŒ ë¹„êµ
+					if(pSrcCol->Intersect(pTarget))
 					{
-						pSrc->Set_Attacked(true); // °ø°İ ´çÇßÀ½À» ¾Ë¸²
-						pSrc->Set_Damaged(pDst->Get_Attack()); // °¡ÇØÀÚ °ø°İ·Â¸¸Å­ ÇÇ ±ğÀ½(Set_Damage ³»ºÎ¿¡¼­ ¿¡³ÊÁö·®¿¡ µû¶ó µ¥¹ÌÁö ÀÔÈû)
+						pSrc->Set_Attacked(true); // ê³µê²© ë‹¹í–ˆìŒì„ ì•Œë¦¼
+						pSrc->Set_Damaged(pDst->Get_Attack()); // ê°€í•´ì ê³µê²©ë ¥ë§Œí¼ í”¼ ê¹ìŒ(Set_Damage ë‚´ë¶€ì—ì„œ ì—ë„ˆì§€ëŸ‰ì— ë”°ë¼ ë°ë¯¸ì§€ ì…í˜)
 						pSrc->Set_CanAttacked(false);
-						// HP°¡ 0ÀÏ ¶§
-						if (pSrc->Get_Hp() <= 0.f)
+						// HPê°€ 0ì¼ ë•Œ
+						if(pSrc->Get_Hp() <= 0.f)
 						{
-							// »èÁ¦ÇÏ¸é ¾ÈµÇ´Â °´Ã¼´Â ³Ë´Ù¿îÀ¸·Î µû·Î Ã³¸®
-							if (pSrc->Get_DontDestroyAble() == true)
+							// ì‚­ì œí•˜ë©´ ì•ˆë˜ëŠ” ê°ì²´ëŠ” ë„‰ë‹¤ìš´ìœ¼ë¡œ ë”°ë¡œ ì²˜ë¦¬
+							if(pSrc->Get_DontDestroyAble() == true)
 							{
 								pSrc->Set_knockdown(true);
-							}
-							else // »èÁ¦ÇÏ´Â ¾ÖµéÀº µ¥µå½ÃÅ´
+							} else // ì‚­ì œí•˜ëŠ” ì• ë“¤ì€ ë°ë“œì‹œí‚´
 								pSrc->Set_Dead();
 						}
 						break;
@@ -96,90 +93,90 @@ void CCollisionMgr::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const 
 	}
 }
 
-// ¾ÕÀÌ ÇÃ·¹ÀÌ¾î µÚ°¡ ÄÚÀÎ
-void CCollisionMgr::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+// ì•ì´ í”Œë ˆì´ì–´ ë’¤ê°€ ì½”ì¸
+void CCollisionMgr::Collision_Layer_Coin(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	for (auto& pSrc : pSrcLayer->Get_GameObject_List())
+	for(auto& pSrc : pSrcLayer->Get_GameObject_List())
 	{
-		// ´çÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-		CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag, iSrcPartObjID));
+		// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+		CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag,iSrcPartObjID));
 
-		// ´çÇÏ´Â ¿ÀºêÁ§Æ® À§Ä¡ °¡Á®¿À±â
+		// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 		CTransform* m_pTrans = pSrc->Get_Transform();
 		_vector vPos = m_pTrans->Get_State(CTransform::STATE_POSITION);
 		_float3 fPos{};
-		XMStoreFloat3(&fPos, vPos);
+		XMStoreFloat3(&fPos,vPos);
 
-		for (auto& pDst : pDstLayer->Get_GameObject_List())
+		for(auto& pDst : pDstLayer->Get_GameObject_List())
 		{
-			// °¡ÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ À§Ä¡ °¡Á®¿À±â
+			// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 			_vector vTargetPos = pDst->Get_Transform()->Get_State(CTransform::STATE_POSITION);
 			_float3 fTargetPos{};
-			XMStoreFloat3(&fTargetPos, vTargetPos);
+			XMStoreFloat3(&fTargetPos,vTargetPos);
 
-			// À§Ä¡ ºñ±³ÇØ¼­ ¾È¿¡ µé¾î¿Â ¾Öµé¸¸ °Ë»çÇĞ±â && °ø°İ »óÅÂÀÏ ¶§¸¸ È®ÀÎÇÏ±â 
-			if (m_pTrans->Cal_Distance(fPos, fTargetPos) < 500.f)
+			// ìœ„ì¹˜ ë¹„êµí•´ì„œ ì•ˆì— ë“¤ì–´ì˜¨ ì• ë“¤ë§Œ ê²€ì‚¬í•™ê¸° && ê³µê²© ìƒíƒœì¼ ë•Œë§Œ í™•ì¸í•˜ê¸° 
+			if(m_pTrans->Cal_Distance(fPos,fTargetPos) < 500.f)
 			{
-				// °¡ÇÏ´Â ¿ÀºêÁ§Æ® Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-				CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag, iDstPartObjID));
-				// Ãæµ¹ ºñ±³
-				if (pSrcCol->Intersect(pTarget))
+				// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+				CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag,iDstPartObjID));
+				// ì¶©ëŒ ë¹„êµ
+				if(pSrcCol->Intersect(pTarget))
 				{
 
-					pDst->Set_PickUp_Coin(pSrc->Get_Coin()); // ÄÚÀÎ ¾òÀ½
-					pSrc->Set_Dead();// µ¿Àü »èÁ¦ 
-					
+					pDst->Set_PickUp_Coin(pSrc->Get_Coin()); // ì½”ì¸ ì–»ìŒ
+					pSrc->Set_Dead();// ë™ì „ ì‚­ì œ 
+
 				}
 			}
 		}
 	}
 }
 
-void CCollisionMgr::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CCollisionMgr::Collision_Trap(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	if (pSrcLayer != nullptr && pDstLayer != nullptr)
+	if(pSrcLayer != nullptr && pDstLayer != nullptr)
 	{
-		for (auto& pSrc : pSrcLayer->Get_GameObject_List())
+		for(auto& pSrc : pSrcLayer->Get_GameObject_List())
 		{
-			// ´çÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-			CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag, iSrcPartObjID));
+			// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+			CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag,iSrcPartObjID));
 
-			// ´çÇÏ´Â ¿ÀºêÁ§Æ® À§Ä¡ °¡Á®¿À±â
+			// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 			CTransform* m_pTrans = pSrc->Get_Transform();
 			_vector vPos = m_pTrans->Get_State(CTransform::STATE_POSITION);
 			_float3 fPos{};
-			XMStoreFloat3(&fPos, vPos);
+			XMStoreFloat3(&fPos,vPos);
 
-			for (auto& pDst : pDstLayer->Get_GameObject_List())
+			for(auto& pDst : pDstLayer->Get_GameObject_List())
 			{
-				// °¡ÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ À§Ä¡ °¡Á®¿À±â
+				// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 				_vector vTargetPos = pDst->Get_Transform()->Get_State(CTransform::STATE_POSITION);
 				_float3 fTargetPos{};
-				XMStoreFloat3(&fTargetPos, vTargetPos);
-				// À§Ä¡ ºñ±³ÇØ¼­ ¾È¿¡ µé¾î¿Â ¾Öµé¸¸ °Ë»çÇĞ±â && °ø°İ »óÅÂÀÏ ¶§¸¸ È®ÀÎÇÏ±â 
-				if (m_pTrans->Cal_Distance(fPos, fTargetPos) < 500.f && pSrc->Get_knockdown()==false )
+				XMStoreFloat3(&fTargetPos,vTargetPos);
+				// ìœ„ì¹˜ ë¹„êµí•´ì„œ ì•ˆì— ë“¤ì–´ì˜¨ ì• ë“¤ë§Œ ê²€ì‚¬í•™ê¸° && ê³µê²© ìƒíƒœì¼ ë•Œë§Œ í™•ì¸í•˜ê¸° 
+				if(m_pTrans->Cal_Distance(fPos,fTargetPos) < 500.f && pSrc->Get_knockdown()==false)
 				{
-					// °¡ÇÏ´Â ¿ÀºêÁ§Æ® Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-					CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag, iDstPartObjID));
-					// Ãæµ¹ ºñ±³
-					if (pSrcCol->Intersect(pTarget))
+					// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+					CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag,iDstPartObjID));
+					// ì¶©ëŒ ë¹„êµ
+					if(pSrcCol->Intersect(pTarget))
 					{
 						if(pDst->Get_CanAttacked() == true)
 						{
-							pSrc->Set_Damaged(pDst->Get_Attack()); // °¡ÇØÀÚ °ø°İ·Â¸¸Å­ ÇÇ ±ğÀ½(Set_Damage ³»ºÎ¿¡¼­ ¿¡³ÊÁö·®¿¡ µû¶ó µ¥¹ÌÁö ÀÔÈû)
+							pSrc->Set_Damaged(pDst->Get_Attack()); // ê°€í•´ì ê³µê²©ë ¥ë§Œí¼ í”¼ ê¹ìŒ(Set_Damage ë‚´ë¶€ì—ì„œ ì—ë„ˆì§€ëŸ‰ì— ë”°ë¼ ë°ë¯¸ì§€ ì…í˜)
 							pDst->Set_CanAttacked(false);
 						}
-						pSrc->Set_Attacked(true); // °ø°İ ´çÇßÀ½À» ¾Ë¸²
-						// ÃÑ¾Ë ÀÏ ¶§
+						pSrc->Set_Attacked(true); // ê³µê²© ë‹¹í–ˆìŒì„ ì•Œë¦¼
+						// ì´ì•Œ ì¼ ë•Œ
 						if(pDst->Get_IsBullet() == true)
 						{
-							pDst->Set_Damaged(100.f); // ÃÑ¾Ë ¾ø¾Ú
+							pDst->Set_Damaged(100.f); // ì´ì•Œ ì—†ì•°
 						}
-						// HP°¡ 0ÀÏ ¶§
-						if (pSrc->Get_Hp() <= 0.f)
+						// HPê°€ 0ì¼ ë•Œ
+						if(pSrc->Get_Hp() <= 0.f)
 						{
-							// »èÁ¦ÇÏ¸é ¾ÈµÇ´Â °´Ã¼´Â ³Ë´Ù¿îÀ¸·Î µû·Î Ã³¸®
-							if (pSrc->Get_DontDestroyAble() == true)
+							// ì‚­ì œí•˜ë©´ ì•ˆë˜ëŠ” ê°ì²´ëŠ” ë„‰ë‹¤ìš´ìœ¼ë¡œ ë”°ë¡œ ì²˜ë¦¬
+							if(pSrc->Get_DontDestroyAble() == true)
 							{
 								pSrc->Set_knockdown(true);
 							}
@@ -192,50 +189,50 @@ void CCollisionMgr::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _
 	}
 }
 
-void CCollisionMgr::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iCount, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CCollisionMgr::Collision_Explosion(CLayer* pExplosionLayer,CLayer* pAttackedLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iCount,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	if (pExplosionLayer != nullptr && pAttackedLayer != nullptr)
+	if(pExplosionLayer != nullptr && pAttackedLayer != nullptr)
 	{
-		for (auto& pExplosion : pExplosionLayer->Get_GameObject_List())
+		for(auto& pExplosion : pExplosionLayer->Get_GameObject_List())
 		{
-			CCollider* pExplosionCol = static_cast<CCollider*>(pExplosion->Find_Component(strSrcComponentTag, iSrcPartObjID));
-			// ´çÇÏ´Â ¿ÀºêÁ§Æ® À§Ä¡ °¡Á®¿À±â
+			CCollider* pExplosionCol = static_cast<CCollider*>(pExplosion->Find_Component(strSrcComponentTag,iSrcPartObjID));
+			// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 			CTransform* m_pExplosionTrans = pExplosion->Get_Transform();
 			_vector vExplosionPos = m_pExplosionTrans->Get_State(CTransform::STATE_POSITION);
 			_float3 fExplosionPos{};
-			XMStoreFloat3(&fExplosionPos, vExplosionPos);
+			XMStoreFloat3(&fExplosionPos,vExplosionPos);
 			if(pExplosion->Get_AttackState() == true)
 			{
-				for (auto& pAttacked : pAttackedLayer->Get_GameObject_List())
+				for(auto& pAttacked : pAttackedLayer->Get_GameObject_List())
 				{
 					_vector vAttackedTargetPos = pAttacked->Get_Transform()->Get_State(CTransform::STATE_POSITION);
 					_float3 fAttackedTargetPos{};
-					XMStoreFloat3(&fAttackedTargetPos, vAttackedTargetPos);
-					// À§Ä¡ ºñ±³ÇØ¼­ ¾È¿¡ µé¾î¿Â ¾Öµé¸¸ °Ë»ç
-					if (!(m_pExplosionTrans->Cal_Distance(fExplosionPos, fAttackedTargetPos) < 2000.f))
+					XMStoreFloat3(&fAttackedTargetPos,vAttackedTargetPos);
+					// ìœ„ì¹˜ ë¹„êµí•´ì„œ ì•ˆì— ë“¤ì–´ì˜¨ ì• ë“¤ë§Œ ê²€ì‚¬
+					if(!(m_pExplosionTrans->Cal_Distance(fExplosionPos,fAttackedTargetPos) < 2000.f))
 						continue;
-					 // Æ®·¦ ¿ÀºêÁ§Æ® Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-					CCollider* pAttackedCol = static_cast<CCollider*>(pAttacked->Find_Component(strDstComponentTag, iDstPartObjID));
-					if (pAttackedCol == nullptr)
+					// íŠ¸ë© ì˜¤ë¸Œì íŠ¸ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+					CCollider* pAttackedCol = static_cast<CCollider*>(pAttacked->Find_Component(strDstComponentTag,iDstPartObjID));
+					if(pAttackedCol == nullptr)
 						continue;
-					// Ãæµ¹ ºñ±³
-					if (pAttacked->Get_Affected() == false)
+					// ì¶©ëŒ ë¹„êµ
+					if(pAttacked->Get_Affected() == false)
 						continue;
-					if (pExplosionCol->Intersect(pAttackedCol))
+					if(pExplosionCol->Intersect(pAttackedCol))
 					{
-						pAttacked->Set_Damaged(pExplosion->Get_Attack()); // °¡ÇØÀÚ °ø°İ·Â¸¸Å­ ÇÇ ±ğÀ½(Set_Damage ³»ºÎ¿¡¼­ ¿¡³ÊÁö·®¿¡ µû¶ó µ¥¹ÌÁö ÀÔÈû
-						// HP°¡ 0ÀÏ ¶§
-						if (pAttacked->Get_Hp() <= 0.f)
+						pAttacked->Set_Damaged(pExplosion->Get_Attack()); // ê°€í•´ì ê³µê²©ë ¥ë§Œí¼ í”¼ ê¹ìŒ(Set_Damage ë‚´ë¶€ì—ì„œ ì—ë„ˆì§€ëŸ‰ì— ë”°ë¼ ë°ë¯¸ì§€ ì…í˜
+						// HPê°€ 0ì¼ ë•Œ
+						if(pAttacked->Get_Hp() <= 0.f)
 						{
-							// »èÁ¦ÇÏ¸é ¾ÈµÇ´Â °´Ã¼´Â ³Ë´Ù¿îÀ¸·Î µû·Î Ã³¸®
-							if (pAttacked->Get_DontDestroyAble() == true)
+							// ì‚­ì œí•˜ë©´ ì•ˆë˜ëŠ” ê°ì²´ëŠ” ë„‰ë‹¤ìš´ìœ¼ë¡œ ë”°ë¡œ ì²˜ë¦¬
+							if(pAttacked->Get_DontDestroyAble() == true)
 								pAttacked->Set_knockdown(true);
-							else // »èÁ¦ÇÏ´Â ¾ÖµéÀº µ¥µå½ÃÅ´
+							else // ì‚­ì œí•˜ëŠ” ì• ë“¤ì€ ë°ë“œì‹œí‚´
 								pAttacked->Set_Dead();
 						}
 					}
 				}
-				
+
 			}
 			pExplosion->Set_Count();
 			if(pExplosion->Get_Count() == iCount)
@@ -247,33 +244,33 @@ void CCollisionMgr::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttack
 	}
 }
 
-void CCollisionMgr::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CCollisionMgr::Anti_OverLapping(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	if (pSrcLayer == nullptr || pDstLayer == nullptr)
+	if(pSrcLayer == nullptr || pDstLayer == nullptr)
 		return;
-	for (auto& pSrc : pSrcLayer->Get_GameObject_List())
+	for(auto& pSrc : pSrcLayer->Get_GameObject_List())
 	{
-		// ´çÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-		CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag, iSrcPartObjID));
+		// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+		CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag,iSrcPartObjID));
 		_bool bCol = false;
-		// ´çÇÏ´Â ¿ÀºêÁ§Æ® À§Ä¡ °¡Á®¿À±â
+		// ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 		CTransform* m_pTrans = pSrc->Get_Transform();
 		_vector vPos = m_pTrans->Get_State(CTransform::STATE_POSITION);
 		_float3 fPos{};
-		XMStoreFloat3(&fPos, vPos);
-		for (auto& pDst : pDstLayer->Get_GameObject_List())
+		XMStoreFloat3(&fPos,vPos);
+		for(auto& pDst : pDstLayer->Get_GameObject_List())
 		{
-			// °¡ÇÏ´Â ¿ÀºêÁ§Æ®ÀÇ À§Ä¡ °¡Á®¿À±â
+			// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ì˜ ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
 			_vector vTargetPos = pDst->Get_Transform()->Get_State(CTransform::STATE_POSITION);
 			_float3 fTargetPos{};
-			XMStoreFloat3(&fTargetPos, vTargetPos);
-			// À§Ä¡ ºñ±³ÇØ¼­ ¾È¿¡ µé¾î¿Â ¾Öµé¸¸ °Ë»ç
-			if (m_pTrans->Cal_Distance(fPos, fTargetPos) < 500.f)
+			XMStoreFloat3(&fTargetPos,vTargetPos);
+			// ìœ„ì¹˜ ë¹„êµí•´ì„œ ì•ˆì— ë“¤ì–´ì˜¨ ì• ë“¤ë§Œ ê²€ì‚¬
+			if(m_pTrans->Cal_Distance(fPos,fTargetPos) < 500.f)
 			{
-				// °¡ÇÏ´Â ¿ÀºêÁ§Æ® Collider ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
-				CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag, iDstPartObjID));
-				// Ãæµ¹ ºñ±³
-				if (pSrcCol->Intersect(pTarget))
+				// ê°€í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ Collider ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸°
+				CCollider* pTarget = static_cast<CCollider*>(pDst->Find_Component(strDstComponentTag,iDstPartObjID));
+				// ì¶©ëŒ ë¹„êµ
+				if(pSrcCol->Intersect(pTarget))
 				{
 					_vector vDir = vTargetPos - vPos;
 					vDir = XMVector3Normalize(vDir);
@@ -283,44 +280,44 @@ void CCollisionMgr::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const
 					pSrc->Set_Direction(vDir);
 					bCol = true;
 				}
-				
-			
+
+
 			}
 		}
 		pSrc->Set_OverLap_DifferentLayer(bCol);
 	}
 }
 
-void CCollisionMgr::Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring& strSrcComponentTag, _uint iSrcPartObjID)
+void CCollisionMgr::Anti_OverLapping_SameLayer(CLayer* pSrcLayer,const _wstring& strSrcComponentTag,_uint iSrcPartObjID)
 {
-	if (pSrcLayer == nullptr)
+	if(pSrcLayer == nullptr)
 		return;
 	_uint iSrcCount = 1;
-	for (auto& pSrc : pSrcLayer->Get_GameObject_List())
+	for(auto& pSrc : pSrcLayer->Get_GameObject_List())
 	{
 		_bool bCol = false;
 		_uint iDstCount = 0;
 		CTransform* m_pSrcTrans = pSrc->Get_Transform();
 		_vector vSrcPos = m_pSrcTrans->Get_State(CTransform::STATE_POSITION);
-		for (auto& pDst : pSrcLayer->Get_GameObject_List())
+		for(auto& pDst : pSrcLayer->Get_GameObject_List())
 		{
-			// ÀÌ¹Ì °Ë»çÇÑ °´Ã¼¿¡ ´ëÇÑ ºñ±³¶ó °Ç³Ê¶Ü
-			if (iDstCount < iSrcCount)
+			// ì´ë¯¸ ê²€ì‚¬í•œ ê°ì²´ì— ëŒ€í•œ ë¹„êµë¼ ê±´ë„ˆëœ€
+			if(iDstCount < iSrcCount)
 			{
 				++iDstCount;
 				continue;
 			}
-			// °Å¸®°¡ ¸Ö °æ¿ì °Ë»ç ¾ÈÇÔ
+			// ê±°ë¦¬ê°€ ë©€ ê²½ìš° ê²€ì‚¬ ì•ˆí•¨
 			CTransform* m_pDstTrans = pDst->Get_Transform();
 			_vector vDstPos = m_pSrcTrans->Get_State(CTransform::STATE_POSITION);
-			_float fDistnace = m_pDstTrans->Cal_Distance_vec(vDstPos, vSrcPos);
-			if (fDistnace > 800.f)
+			_float fDistnace = m_pDstTrans->Cal_Distance_vec(vDstPos,vSrcPos);
+			if(fDistnace > 800.f)
 				continue;
 
 
-			CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag, iSrcPartObjID));
-			CCollider* pDstCol = static_cast<CCollider*>(pDst->Find_Component(strSrcComponentTag, iSrcPartObjID));
-			if (pSrcCol->Intersect(pDstCol))
+			CCollider* pSrcCol = static_cast<CCollider*>(pSrc->Find_Component(strSrcComponentTag,iSrcPartObjID));
+			CCollider* pDstCol = static_cast<CCollider*>(pDst->Find_Component(strSrcComponentTag,iSrcPartObjID));
+			if(pSrcCol->Intersect(pDstCol))
 			{
 				_vector vDir = vDstPos - vSrcPos;
 				vDir = XMVector3Normalize(vDir);
@@ -332,7 +329,7 @@ void CCollisionMgr::Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring
 			}
 		}
 		++iSrcCount;
-		// ÇÑ ¹øÀÌ¶óµµ Ãæµ¹µÇ¾úÀ» ¶§ 
+		// í•œ ë²ˆì´ë¼ë„ ì¶©ëŒë˜ì—ˆì„ ë•Œ 
 		pSrc->Set_OverLap_SameLayer(bCol);
 	}
 }

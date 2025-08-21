@@ -214,6 +214,15 @@
     <Filter Include="01. Utility\98. Manager\SoundMgr">
       <UniqueIdentifier>{19d4f20a-9e30-4aaa-b4ea-091a691b5363}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\98. Manager\07. ThreadMgr">
+      <UniqueIdentifier>{fbccac6a-ac04-4902-bfc1-cf83c41cbb9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\12. Threadpool">
+      <UniqueIdentifier>{51a33cb6-9efe-4846-9e9d-2b8172628e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\VIBuffer_Trail">
+      <UniqueIdentifier>{adb333d1-8a79-46bf-9f71-fe3ef17029b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -407,6 +416,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\SoundMgr.cpp">
       <Filter>01. Utility\98. Manager\SoundMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ThreadMgr.cpp">
+      <Filter>01. Utility\98. Manager\07. ThreadMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ThreadPool.cpp">
+      <Filter>01. Utility\12. Threadpool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Trail.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\VIBuffer_Trail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -613,6 +631,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\SoundMgr.h">
       <Filter>01. Utility\98. Manager\SoundMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ThreadPool.h">
+      <Filter>01. Utility\12. Threadpool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ThreadMgr.h">
+      <Filter>01. Utility\98. Manager\07. ThreadMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Trail.h">
+      <Filter>01. Utility\04. Component\VIBuffer\VIBuffer_Trail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

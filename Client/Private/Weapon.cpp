@@ -6,19 +6,17 @@
 #include <Bullet.h>
 #include <Effect_Flare_Rifle.h>
 
-CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPartObject{ pDevice, pContext }
-{
-}
+CWeapon::CWeapon(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CPartObject{pDevice,pContext}
+{}
 
 CWeapon::CWeapon(const CWeapon& Prototype)
-	: CPartObject{ Prototype }
-{
-}
+	: CPartObject{Prototype}
+{}
 
 HRESULT CWeapon::Initialize_Prototype()
 {
-	/* ÆĞÅ¶, ÆÄÀÏÀÔ¤·Ãâ·ÂÀ» ÅëÇÑ ÃÊ±âÈ­. */
+	/* íŒ¨í‚·, íŒŒì¼ì…ã…‡ì¶œë ¥ì„ í†µí•œ ì´ˆê¸°í™”. */
 
 	return S_OK;
 }
@@ -36,25 +34,25 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_pReloading_Time = pDesc->fReloadingTime;
 	m_iViewState = pDesc->m_iViewState;
 	m_vecTargetPos = pDesc->vTargetPos;
-	if (FAILED(__super::Initialize(pArg)))
+	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
-	
-	Position = {-0.86f, 0.12f, -0.39f };
-	Scale = { 2.3f };
-	Rotation = { 8.87969f, -115.2f, 6.4f };
 
-	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
-	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
-	
-	// ÃÑ¾Ë
-	m_bBulletIn = false; 
-	m_iFull_Bullet = m_iRifle_Bullet; 
+	Position = {-0.86f,0.12f,-0.39f};
+	Scale = {2.3f};
+	Rotation = {8.87969f,-115.2f,6.4f};
+
+	m_pTransformCom->Set_Scaling(Scale,Scale,Scale);
+	m_pTransformCom->Rotation(XMConvertToRadians(Rotation.x),XMConvertToRadians(Rotation.y),XMConvertToRadians(Rotation.z));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(Position.x,Position.y,Position.z,1.f));
+
+	// ì´ì•Œ
+	m_bBulletIn = false;
+	m_iFull_Bullet = m_iRifle_Bullet;
 	m_iCurrent_Bullet = m_iFull_Bullet;
-	
+
 	return S_OK;
 }
 
@@ -62,130 +60,128 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 {
 
 
-	if (m_bBulletIn == true) // ÀåÀü ¿Ï·á
+	if(m_bBulletIn == true) // ì¥ì „ ì™„ë£Œ
 	{
-		m_iCurrent_Bullet = m_iFull_Bullet; // ³ªÁß¿¡ ÃÑ¿¡ µû¶ó ³ª´©±â
+		m_iCurrent_Bullet = m_iFull_Bullet; // ë‚˜ì¤‘ì— ì´ì— ë”°ë¼ ë‚˜ëˆ„ê¸°
 		m_bBulletIn = false;
 	}
 
-	if (m_iCurrent_Bullet <= 0 && *m_bReloading == false)
+	if(m_iCurrent_Bullet <= 0 && *m_bReloading == false)
 	{
 		*m_bReloading = true;
 		*m_pReloading_Time = 0.f;
 	}
 
 
-	if (*m_pParentState & CPlayer::MELEE || *m_pParentState & CPlayer::RELOADING)
+	if(*m_pParentState & CPlayer::MELEE || *m_pParentState & CPlayer::RELOADING)
 	{
-		m_pTransformCom->Rotation(XMConvertToRadians(8.87969f), XMConvertToRadians(-115.2f), XMConvertToRadians(6.4f));
-	}
-	else
+		m_pTransformCom->Rotation(XMConvertToRadians(8.87969f),XMConvertToRadians(-115.2f),XMConvertToRadians(6.4f));
+	} else
 	{
-	if (m_bTPSState == false)
-	{
-		_long MouseMoveY = { 0 };
-		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+		if(m_bTPSState == false)
 		{
-			if (m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
-				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
-			if (m_fAngle_Y > 60.f)
-				m_fAngle_Y = 60.f;
-			if (m_fAngle_Y < -60.f)
-				m_fAngle_Y = -60.f;
-		}
-		m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
-	//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
-	}
-	else
-	{
-		_long MouseMoveY = { 0 };
-		if (MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+			_long MouseMoveY = {0};
+			if(MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+			{
+				if(m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
+					m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
+				if(m_fAngle_Y > 60.f)
+					m_fAngle_Y = 60.f;
+				if(m_fAngle_Y < -60.f)
+					m_fAngle_Y = -60.f;
+			}
+			m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y),XMConvertToRadians(Rotation.y),XMConvertToRadians(Rotation.z));
+			//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
+		} else
 		{
-			if (m_fAngle_Y <= 35.f && m_fAngle_Y >= -50.f)
-				m_fAngle_Y += fTimeDelta * MouseMoveY * 3.f;
-			if (m_fAngle_Y > 35.f)
-				m_fAngle_Y = 35.f;
-			if (m_fAngle_Y < -50.f)
-				m_fAngle_Y = -50.f;
-		}	
-		m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
+			_long MouseMoveY = {0};
+			if(MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
+			{
+				if(m_fAngle_Y <= 35.f && m_fAngle_Y >= -50.f)
+					m_fAngle_Y += fTimeDelta * MouseMoveY * 3.f;
+				if(m_fAngle_Y > 35.f)
+					m_fAngle_Y = 35.f;
+				if(m_fAngle_Y < -50.f)
+					m_fAngle_Y = -50.f;
+			}
+			m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y),XMConvertToRadians(Rotation.y),XMConvertToRadians(Rotation.z));
 
-	//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
+			//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
+		}
 	}
-	}
-	
+
 
 	CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
 	CBullet::BULLET_DESC Desc{};
-	switch (m_iWeaponState)
+	switch(m_iWeaponState)
 	{
 	case Client::CWeapon::WEAPON_UNARMED:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_RIFLE:
-		// ÃÑ¾Ë ¹ß»ç
-		if (*m_bShotStart == true && *m_bReloading == false)
-		{
-			m_pGameInstance->StopSound(PLAYER_FIRE);
-			m_pGameInstance->PlaySoundW(L"FE_Soldier_ShockTrooper_Xenon_Bullet_Impact_01.wav", Engine::CHANNELID::PLAYER_FIRE, 0.7f);
-			--m_iCurrent_Bullet;
-			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // ÃÑ±¸ÂÊ¿¡¼­ »ı¼º
-			_vector vTarget =  XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
-			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// ¸ñÇ¥±îÁöÀÇ ¹æÇâ, ÃÑ±¸ ¹æÇâ°ú ´Ù¸§ ÁÖÀÇ
-			Desc.m_vecCameraPos = *m_vecCameraPos;
-			Desc.m_vecCameraAt = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z,1.f);							// ÃÑ¾Ë ±ËÀûÀ» À§ÇÔ
-			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-			Desc.eID = m_eLevelID;
-			Desc.eType = CBullet::BULLET_RIFLE;
-			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
+	// ì´ì•Œ ë°œì‚¬
+	if(*m_bShotStart == true && *m_bReloading == false)
+	{
+		m_pGameInstance->StopSound(PLAYER_FIRE);
+		m_pGameInstance->PlaySoundW(L"FE_Soldier_ShockTrooper_Xenon_Bullet_Impact_01.wav",Engine::CHANNELID::PLAYER_FIRE,0.7f);
+		--m_iCurrent_Bullet;
+		Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // ì´êµ¬ìª½ì—ì„œ ìƒì„±
+		_vector vTarget =  XMVectorSet(m_vecTargetPos->x,m_vecTargetPos->y,m_vecTargetPos->z,1.f);
+		Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// ëª©í‘œê¹Œì§€ì˜ ë°©í–¥, ì´êµ¬ ë°©í–¥ê³¼ ë‹¤ë¦„ ì£¼ì˜
+		Desc.m_vecCameraPos = *m_vecCameraPos;
+		Desc.m_vecCameraAt = XMVectorSet(m_vecTargetPos->x,m_vecTargetPos->y,m_vecTargetPos->z,1.f);							// ì´ì•Œ ê¶¤ì ì„ ìœ„í•¨
+		Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		Desc.eID = m_eLevelID;
+		Desc.eType = CBullet::BULLET_RIFLE;
+		static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID,TEXT("Bullet_Layer"),TEXT("Prototype_GameObject_Bullet"),&Desc));
 
-			if(m_bTPSState == true)
-				pFlare.fScale = { 1.6f,1.6f,1.6f };
-			else
-				pFlare.fScale = { 0.8f,0.8f,0.8f };
+		if(m_bTPSState == true)
+			pFlare.fScale = {1.6f,1.6f,1.6f};
+		else
+			pFlare.fScale = {0.8f,0.8f,0.8f};
 
-			
-			pFlare.eLevel = m_eLevelID;
-			pFlare.eType = CEffect_Flare_Rifle::FLARE_PLAYER;
-			pFlare.vecCamPos = m_vecCameraPos;
-			pFlare.vecWeaponPos = &m_vecFlarePos;
-			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Effect"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
 
-		}
-		break;
+		pFlare.eLevel = m_eLevelID;
+		pFlare.eType = CEffect_Flare_Rifle::FLARE_PLAYER;
+		pFlare.vecCamPos = m_vecCameraPos;
+		pFlare.vecWeaponPos = &m_vecFlarePos;
+		static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID,TEXT("Effect"),TEXT("Prototype_GameObject_Rifle_Flare"),&pFlare));
+
+	}
+	break;
 	case Client::CWeapon::WEAPON_SHOTGUN:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_PULSECANNON:
 
-		break;
+	break;
 	case Client::CWeapon::WEAPON_TELEPORT:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_LOCKETLAUNCHER:
-		if (*m_bShotStart == true && *m_bReloading == false)
-		{
-			--m_iCurrent_Bullet;
-			Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // ÃÑ±¸ÂÊ¿¡¼­ »ı¼º
-			_vector vTarget = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);
-			Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// ¸ñÇ¥±îÁöÀÇ ¹æÇâ, ÃÑ±¸ ¹æÇâ°ú ´Ù¸§ ÁÖÀÇ
-			Desc.m_vecCameraPos = *m_vecCameraPos;
-			Desc.m_vecCameraAt = XMVectorSet(m_vecTargetPos->x, m_vecTargetPos->y, m_vecTargetPos->z, 1.f);								// ÃÑ¾Ë ±ËÀûÀ» À§ÇÔ
-			Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-			Desc.eID = m_eLevelID;
-			Desc.eType = CBullet::BULLET_LOCKET;
-			static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID, TEXT("Bullet_Layer"), TEXT("Prototype_GameObject_Bullet"), &Desc));
-			break;
-		}
+	if(*m_bShotStart == true && *m_bReloading == false)
+	{
+		--m_iCurrent_Bullet;
+		Desc.m_vecWeaponPos = m_vecWeaponPos + (m_vecWeaponDir * 0.3f); // ì´êµ¬ìª½ì—ì„œ ìƒì„±
+		_vector vTarget = XMVectorSet(m_vecTargetPos->x,m_vecTargetPos->y,m_vecTargetPos->z,1.f);
+		Desc.m_vecWeaponDir = (vTarget - Desc.m_vecWeaponPos);	// ëª©í‘œê¹Œì§€ì˜ ë°©í–¥, ì´êµ¬ ë°©í–¥ê³¼ ë‹¤ë¦„ ì£¼ì˜
+		Desc.m_vecCameraPos = *m_vecCameraPos;
+		Desc.m_vecCameraAt = XMVectorSet(m_vecTargetPos->x,m_vecTargetPos->y,m_vecTargetPos->z,1.f);								// ì´ì•Œ ê¶¤ì ì„ ìœ„í•¨
+		Desc.m_vecWeaponRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		Desc.eID = m_eLevelID;
+		Desc.eType = CBullet::BULLET_LOCKET;
+		static_cast<CBullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevelID,TEXT("Bullet_Layer"),TEXT("Prototype_GameObject_Bullet"),&Desc));
+		break;
+	}
 	case Client::CWeapon::WEAPON_RIFLE_SECOND:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_KATANA:
-		break;
+	break;
 	case Client::CWeapon::BATTERY:
-		break;
+	break;
 	case Client::CWeapon::TRACKER:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_END:
-		break;
+	break;
 	default:
-		break;
+	break;
 	}
 
 }
@@ -193,41 +189,39 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 void CWeapon::Update(_float fTimeDelta)
 {
 
-	
 
 
-	m_pTransformCom->Set_Scaling(Scale, Scale, Scale);
+
+	m_pTransformCom->Set_Scaling(Scale,Scale,Scale);
 
 	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
-	for (size_t i = 0; i < 3; i++)
+	for(size_t i = 0; i < 3; i++)
 		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
-	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-	m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1.f);
-	m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31, m_WorldMatrix._32, m_WorldMatrix._33, 0.f);
-	// ÃÑ±¸ À§Ä¡
+	XMStoreFloat4x4(&m_WorldMatrix,m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
+	m_vecWeaponPos = XMVectorSet(m_WorldMatrix._41,m_WorldMatrix._42,m_WorldMatrix._43,1.f);
+	m_vecWeaponDir = XMVectorSet(m_WorldMatrix._31,m_WorldMatrix._32,m_WorldMatrix._33,0.f);
+	// ì´êµ¬ ìœ„ì¹˜
 	m_vecFlarePos = m_vecWeaponPos + (m_vecWeaponDir * 0.38f);
-	m_vecFlarePos = XMVectorSetY(m_vecFlarePos, XMVectorGetY(m_vecFlarePos) + 0.23f);
+	m_vecFlarePos = XMVectorSetY(m_vecFlarePos,XMVectorGetY(m_vecFlarePos) + 0.23f);
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
 {
-	if (m_eLevelID == LEVEL_GAMEPLAY)
+	if(m_eLevelID == LEVEL_GAMEPLAY)
 	{
-		if (*m_iViewState != PLAYER_FPS_VIEW)
+		if(*m_iViewState != PLAYER_FPS_VIEW)
 		{
-			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+			if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
+				return;
+		} else
+		{
+			if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST,this)))
 				return;
 		}
-		else
-		{
-			if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
-				return;
-		}
-	}
-	else
+	} else
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_LAST,this)))
 			return;
 	}
 
@@ -238,14 +232,13 @@ void CWeapon::Late_Update(_float fTimeDelta)
 
 HRESULT CWeapon::Render()
 {
-	if (*m_iViewState == PLAYER_FPS_VIEW)
+	if(*m_iViewState == PLAYER_FPS_VIEW)
 	{
 		m_iShaderPassNum = 4;
-	}
-	else
+	} else
 		m_iShaderPassNum = 5;
 
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 	Weapon_Exchange();
 
@@ -254,22 +247,22 @@ HRESULT CWeapon::Render()
 
 HRESULT CWeapon::Render_Shadow()
 {
-	
+
 	m_iShaderPassNum = 7;
 
-	_float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(400.f - 6.f, 60.f, 400.f - 6.f, 1.f), XMVectorSet(400.f, fPlayerPos.y, 400.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixLookAtLH(XMVectorSet(400.f - 6.f,60.f,400.f - 6.f,1.f),XMVectorSet(400.f,fPlayerPos.y,400.f,1.f),XMVectorSet(0.f,1.f,0.f,0.f)));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f),(_float)1280.f / 720.f,0.1f,fFar));
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix",&m_WorldMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&ViewMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&ProjMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 	Weapon_Exchange();
@@ -280,13 +273,13 @@ HRESULT CWeapon::Render_Shadow()
 
 HRESULT CWeapon::Add_Components()
 {
-	/* ¸â¹öº¯¼ö·Î Á÷Á¢ ÂüÁ¶¸¦ ÇÏ°ÔµÇ¸é */
-	/* 1. ³»°¡ ³» ÄÄÆ÷³ÍÆ®¸¦ ÀÌ¿ëÇÏ°íÀÚÇÒ ¶§ ±»ÀÌ °Ë»öÀÌ ÇÊ¿ä¾øÀÌ Æ¯Á¤ ¸â¹öº¯¼ö·Î ¹Ù·Î ±â´ÉÀ» ÀÌ¿ëÇÏ¸é µÈ´Ù. */
-	/* 2. ´Ù¸¥ °´Ã¼°¡ ³» ÄÄÆ÷³ÍÆ®¸¦ °Ë»öÇÏ°íÀÚ ÇÒ¶§ ½ºÀ§Ä¡ÄÉÀÌ½º°¡ °Ì³ª ´Ã¾î³ª´Â »óÈ². */
+	/* ë©¤ë²„ë³€ìˆ˜ë¡œ ì§ì ‘ ì°¸ì¡°ë¥¼ í•˜ê²Œë˜ë©´ */
+	/* 1. ë‚´ê°€ ë‚´ ì»´í¬ë„ŒíŠ¸ë¥¼ ì´ìš©í•˜ê³ ìí•  ë•Œ êµ³ì´ ê²€ìƒ‰ì´ í•„ìš”ì—†ì´ íŠ¹ì • ë©¤ë²„ë³€ìˆ˜ë¡œ ë°”ë¡œ ê¸°ëŠ¥ì„ ì´ìš©í•˜ë©´ ëœë‹¤. */
+	/* 2. ë‹¤ë¥¸ ê°ì²´ê°€ ë‚´ ì»´í¬ë„ŒíŠ¸ë¥¼ ê²€ìƒ‰í•˜ê³ ì í• ë•Œ ìŠ¤ìœ„ì¹˜ì¼€ì´ìŠ¤ê°€ ê²ë‚˜ ëŠ˜ì–´ë‚˜ëŠ” ìƒí™©. */
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 	const _wstring Weapon_Component = TEXT("Prototype_Component_Model_Weapon");
 	const _wstring WeaponComponentTag = TEXT("Com_Model");
@@ -296,8 +289,8 @@ HRESULT CWeapon::Add_Components()
 		const _wstring WeaponNumber = Weapon_Component + to_wstring(i);
 		const _wstring WeaponComponentTag_Result = WeaponComponentTag + to_wstring(i);
 
-		if (FAILED(__super::Add_Component(m_eLevelID, WeaponNumber,
-			WeaponComponentTag_Result, reinterpret_cast<CComponent**>(&m_pModelCom[i]))))
+		if(FAILED(__super::Add_Component(m_eLevelID,WeaponNumber,
+			WeaponComponentTag_Result,reinterpret_cast<CComponent**>(&m_pModelCom[i]))))
 			return E_FAIL;
 	}
 
@@ -308,29 +301,29 @@ HRESULT CWeapon::Bind_ShaderResources()
 	/*if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;*/
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix",&m_WorldMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition",m_pGameInstance->Get_CamPosition(),sizeof(_float4))))
 		return E_FAIL;
-	
+
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 
 
 	return S_OK;
 }
-CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CWeapon* CWeapon::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CWeapon* pInstance = new CWeapon(pDevice, pContext);
+	CWeapon* pInstance = new CWeapon(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CWeapon");
 		Safe_Release(pInstance);
@@ -342,7 +335,7 @@ CGameObject* CWeapon::Clone(void* pArg)
 {
 	CWeapon* pInstance = new CWeapon(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CWeapon");
 		Safe_Release(pInstance);
@@ -360,111 +353,111 @@ void CWeapon::Free()
 HRESULT CWeapon::Weapon_Exchange()
 {
 	_uint		iNumMeshes{};
-	switch (m_iWeaponState)
+	switch(m_iWeaponState)
 	{
 	case Client::CWeapon::WEAPON_UNARMED:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_RIFLE:
-		iNumMeshes = m_pModelCom[m_iWeaponState]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom[m_iWeaponState]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
+	iNumMeshes = m_pModelCom[m_iWeaponState]->Get_NumMeshes();
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom[m_iWeaponState]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
 
-			m_pModelCom[0]->Render(i);
-			m_pModelCom[1]->Render(i);
-			m_pModelCom[WEAPONPARTS_RIFLE]->Render(i);
-		}
+		m_pModelCom[0]->Render(i);
+		m_pModelCom[1]->Render(i);
+		m_pModelCom[WEAPONPARTS_RIFLE]->Render(i);
+	}
 
-		break;
+	break;
 	case Client::CWeapon::WEAPON_SHOTGUN:
-		iNumMeshes = m_pModelCom[WEAPONPARTS_SHOTGUN]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom[WEAPONPARTS_SHOTGUN]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
+	iNumMeshes = m_pModelCom[WEAPONPARTS_SHOTGUN]->Get_NumMeshes();
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom[WEAPONPARTS_SHOTGUN]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
 
-			m_pModelCom[0]->Render(i);
-			m_pModelCom[1]->Render(i);
-			m_pModelCom[WEAPONPARTS_SHOTGUN]->Render(i);
-		}
-		break;
+		m_pModelCom[0]->Render(i);
+		m_pModelCom[1]->Render(i);
+		m_pModelCom[WEAPONPARTS_SHOTGUN]->Render(i);
+	}
+	break;
 	case Client::CWeapon::WEAPON_PULSECANNON:
-		iNumMeshes = m_pModelCom[WEAPONPARTS_PULSE]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom[WEAPONPARTS_PULSE]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
+	iNumMeshes = m_pModelCom[WEAPONPARTS_PULSE]->Get_NumMeshes();
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom[WEAPONPARTS_PULSE]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
 
-			m_pModelCom[0]->Render(i);
-			m_pModelCom[1]->Render(i);
-			m_pModelCom[WEAPONPARTS_PULSE]->Render(i);
-		}
-		break;
+		m_pModelCom[0]->Render(i);
+		m_pModelCom[1]->Render(i);
+		m_pModelCom[WEAPONPARTS_PULSE]->Render(i);
+	}
+	break;
 	case Client::CWeapon::WEAPON_TELEPORT:
-		iNumMeshes = m_pModelCom[WEAPONPARTS_TELEPORT]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom[WEAPONPARTS_TELEPORT]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
+	iNumMeshes = m_pModelCom[WEAPONPARTS_TELEPORT]->Get_NumMeshes();
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom[WEAPONPARTS_TELEPORT]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
 
-			m_pModelCom[0]->Render(i);
-			m_pModelCom[1]->Render(i);
-			m_pModelCom[WEAPONPARTS_TELEPORT]->Render(i);
-		}
-		break;
+		m_pModelCom[0]->Render(i);
+		m_pModelCom[1]->Render(i);
+		m_pModelCom[WEAPONPARTS_TELEPORT]->Render(i);
+	}
+	break;
 	case Client::CWeapon::WEAPON_LOCKETLAUNCHER:
-		iNumMeshes = m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
+	iNumMeshes = m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Get_NumMeshes();
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
 
-			m_pModelCom[0]->Render(i);
-			m_pModelCom[1]->Render(i);
-			m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Render(i);
-		}
-		break;
+		m_pModelCom[0]->Render(i);
+		m_pModelCom[1]->Render(i);
+		m_pModelCom[WEAPONPARTS_LOCKETLAUNCHER]->Render(i);
+	}
+	break;
 	case Client::CWeapon::WEAPON_RIFLE_SECOND:
-		break;
+	break;
 	case Client::CWeapon::WEAPON_KATANA:
-		break;
+	break;
 	case Client::CWeapon::BATTERY:
-		iNumMeshes = m_pModelCom[BATTERY]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
-		{
-			if (FAILED(m_pModelCom[BATTERY]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
-				return E_FAIL;
-			m_pModelCom[BATTERY]->Render(i);
-		}
-		break;
+	iNumMeshes = m_pModelCom[BATTERY]->Get_NumMeshes();
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom[BATTERY]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			return E_FAIL;
+		m_pModelCom[BATTERY]->Render(i);
+	}
+	break;
 	case Client::CWeapon::TRACKER:
 	{
 		iNumMeshes = m_pModelCom[TRACKER]->Get_NumMeshes();
-		for (size_t i = 0; i < iNumMeshes; i++)
+		for(size_t i = 0; i < iNumMeshes; i++)
 		{
-			if (FAILED(m_pModelCom[TRACKER]->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+			if(FAILED(m_pModelCom[TRACKER]->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
+			if(FAILED(m_pShaderCom->Begin(m_iShaderPassNum)))
 				return E_FAIL;
 			m_pModelCom[TRACKER]->Render(i);
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 	return S_OK;

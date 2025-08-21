@@ -4,15 +4,13 @@
 
 #include "GameInstance.h"
 #include "Player.h"
-CPivot::CPivot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPartObject{ pDevice, pContext }
-{
-}
+CPivot::CPivot(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CPartObject{pDevice,pContext}
+{}
 
 CPivot::CPivot(const CPivot& Prototype)
-	: CPartObject{ Prototype }
-{
-}
+	: CPartObject{Prototype}
+{}
 
 HRESULT CPivot::Initialize_Prototype()
 {
@@ -26,16 +24,16 @@ HRESULT CPivot::Initialize(void* pArg)
 	m_pParentState = pDesc->pParentState;
 	m_pSocketMatrix = pDesc->pSocketMatrix;
 
-	/* Ãß°¡ÀûÀ¸·Î ÃÊ±âÈ­°¡ ÇÊ¿äÇÏ´Ù¸é ¼öÇàÇØÁØ´Ù. */
-	if (FAILED(__super::Initialize(pArg)))
+	/* ì¶”ê°€ì ìœ¼ë¡œ ì´ˆê¸°í™”ê°€ í•„ìš”í•˜ë‹¤ë©´ ìˆ˜í–‰í•´ì¤€ë‹¤. */
+	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
 
 	// Position = { -0.329998,-0.729998,1.74475 };
-	Position = { -0.439998f,-0.109998f,1.84475 };
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(Position.x, Position.y, Position.z, 1.f));
+	Position = {-0.439998f,-0.109998f,1.84475};
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(Position.x,Position.y,Position.z,1.f));
 
 
 	return S_OK;
@@ -46,16 +44,16 @@ void CPivot::Priority_Update(_float fTimeDelta)
 {
 	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
-	for (size_t i = 0; i < 3; i++)
+	for(size_t i = 0; i < 3; i++)
 		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
 
-	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
-	m_vecTPS_CamPos = XMVectorSet(m_WorldMatrix._41 , m_WorldMatrix._42, m_WorldMatrix._43,1.f);
+	XMStoreFloat4x4(&m_WorldMatrix,m_pTransformCom->Get_WorldMatrix() * SocketMatrix * XMLoadFloat4x4(m_pParentMatrix));
+	m_vecTPS_CamPos = XMVectorSet(m_WorldMatrix._41,m_WorldMatrix._42,m_WorldMatrix._43,1.f);
 }
 
 void CPivot::Update(_float fTimeDelta)
 {
-	
+
 	/*if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_1))
 	{
 		Position.x += 0.01f;
@@ -118,7 +116,7 @@ void CPivot::Update(_float fTimeDelta)
 void CPivot::Late_Update(_float fTimeDelta)
 {
 
-	if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+	if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 		return;
 }
 
@@ -146,8 +144,8 @@ HRESULT CPivot::Render()
 HRESULT CPivot::Add_Components()
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	///* For.Com_Model */
@@ -161,39 +159,39 @@ HRESULT CPivot::Add_Components()
 
 HRESULT CPivot::Bind_ShaderResources()
 {
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix",&m_WorldMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition",m_pGameInstance->Get_CamPosition(),sizeof(_float4))))
 		return E_FAIL;
 
 	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
+	if(nullptr == pLightDesc)
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir",&pLightDesc->vDirection,sizeof(_float4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse",&pLightDesc->vDiffuse,sizeof(_float4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient",&pLightDesc->vAmbient,sizeof(_float4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular",&pLightDesc->vSpecular,sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;
 
 }
 
-CPivot* CPivot::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPivot* CPivot::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CPivot* pInstance = new CPivot(pDevice, pContext);
+	CPivot* pInstance = new CPivot(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CPivot");
 		Safe_Release(pInstance);
@@ -206,7 +204,7 @@ CGameObject* CPivot::Clone(void* pArg)
 {
 	CPivot* pInstance = new CPivot(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CPivot");
 		Safe_Release(pInstance);

@@ -11,17 +11,19 @@ END
 
 BEGIN(Client)
 
-class CTrap_Marks final : public CPlayer_Build
+class CTrap_Marks final: public CPlayer_Build
 {
-public:	
-	enum Trap_Type { BRICKS_TRAP, TANK_TRAP, TRAP_TYPE_END };
-	typedef struct : public CPlayer_Build::PLAYER_BUILD_DESC
+public:
+	enum Trap_Type {
+		BRICKS_TRAP,TANK_TRAP,TRAP_TYPE_END
+	};
+	typedef struct: public CPlayer_Build::PLAYER_BUILD_DESC
 	{
 		Trap_Type eType{};
-		 
+
 	}TRAP_MARKS_DESC;
 private:
-	CTrap_Marks(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTrap_Marks(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CTrap_Marks(const CTrap_Marks& Prototype);
 	virtual ~CTrap_Marks() = default;
 
@@ -34,42 +36,56 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	_bool	Get_BuildAble() { return m_bBuild_PreView; } // Æ®·¦À» ¸¸µé ¼ö ÀÖ´Ù
-	_bool	Get_Build_Done() { return m_bBuild; }  //  Æ®·¦ÀÌ ¿Ï¼º µÇ¾ú´Ù
-	_bool	Get_CanBuy() { return m_pBricks->Get_CanBuy(); }
-	_vector Get_TrapPos() { return m_vecPos; }
-	_uint	Get_Privce() { return m_pBricks->Get_Coin(); }
-	void	Set_ReBuild()  // °Ç¹°ÀÌ ºÎ½¤Á³À» ¶§ ´Ù½Ã ¸¸µé ¼ö ÀÖµµ·Ï °ª ÃÊ±âÈ­ÇØÁÜ
-	{ 
+	_bool	Get_BuildAble() {
+		return m_bBuild_PreView;
+	} // íŠ¸ë©ì„ ë§Œë“¤ ìˆ˜ ìˆë‹¤
+	_bool	Get_Build_Done() {
+		return m_bBuild;
+	}  //  íŠ¸ë©ì´ ì™„ì„± ë˜ì—ˆë‹¤
+	_bool	Get_CanBuy() {
+		return m_pBricks->Get_CanBuy();
+	}
+	_vector Get_TrapPos() {
+		return m_vecPos;
+	}
+	_uint	Get_Privce() {
+		return m_pBricks->Get_Coin();
+	}
+	void	Set_ReBuild()  // ê±´ë¬¼ì´ ë¶€ìˆ´ì¡Œì„ ë•Œ ë‹¤ì‹œ ë§Œë“¤ ìˆ˜ ìˆë„ë¡ ê°’ ì´ˆê¸°í™”í•´ì¤Œ
+	{
 		m_bDraw = true;
 		m_bBuild = false;
 		m_pBricks->Set_ReBuild();
 	}
-	_bool	Get_Bricks_KnockDown() { return m_pBricks->Get_knockdown(); } // ºí·°ÀÌ ³Ë´Ù¿î µÇ¾ú´ÂÁö 
-	void	Set_Build_Done(_bool bDone) { m_bBuild = bDone; } // Æ®·¦ ¿Ï¼º µÇ¾ú´Â°¡¸¦ ¹Ş¾Æ¿È
+	_bool	Get_Bricks_KnockDown() {
+		return m_pBricks->Get_knockdown();
+	} // ë¸”ëŸ­ì´ ë„‰ë‹¤ìš´ ë˜ì—ˆëŠ”ì§€ 
+	void	Set_Build_Done(_bool bDone) {
+		m_bBuild = bDone;
+	} // íŠ¸ë© ì™„ì„± ë˜ì—ˆëŠ”ê°€ë¥¼ ë°›ì•„ì˜´
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
 private:
-	CPlayer* m_pPlayer = { nullptr };
-	CTrap_Bricks* m_pBricks = { nullptr };
+	CPlayer* m_pPlayer = {nullptr};
+	CTrap_Bricks* m_pBricks = {nullptr};
 
 private:
-	_uint	m_iModel_Idx{}; 
+	_uint	m_iModel_Idx{};
 	LEVELID m_eLevel{};
 	float	m_fDistance = 0.f;
 	_vector m_vecPos{};
 
-	Trap_Type	m_eType{};		// Æ®·¦ Á¾·ù
-	_bool	m_bBuild = false;	// Æ®·¦ °Ç¼³ ¿©ºÎ
-	_bool	m_bBuild_PreView = false; // Æ®·¦ °Ç¼³ °¡´É ¿©ºÎ
+	Trap_Type	m_eType{};		// íŠ¸ë© ì¢…ë¥˜
+	_bool	m_bBuild = false;	// íŠ¸ë© ê±´ì„¤ ì—¬ë¶€
+	_bool	m_bBuild_PreView = false; // íŠ¸ë© ê±´ì„¤ ê°€ëŠ¥ ì—¬ë¶€
 public:
-	static CTrap_Marks* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTrap_Marks* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

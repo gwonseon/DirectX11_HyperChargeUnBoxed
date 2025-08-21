@@ -9,543 +9,553 @@
 #include "Effect_Electricity.h"
 
 
-CRifleMan::CRifleMan(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CMonster{ pDevice, pContext }
-    
-{
-}
+CRifleMan::CRifleMan(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CMonster{pDevice,pContext}
+
+{}
 
 CRifleMan::CRifleMan(const CRifleMan& Prototype)
-    : CMonster{ Prototype }
-    , m_pCurrentState(new CRifleMan_Move())
-{
-}
+	: CMonster{Prototype}
+	,m_pCurrentState(new CRifleMan_Move())
+{}
 
 HRESULT CRifleMan::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CRifleMan::Initialize(void* pArg)
 {
-    RIFLEMAN_DESC* pDesc = static_cast<RIFLEMAN_DESC*>(pArg);
-    m_vecTargetPos = pDesc->vecTargetPos;
-    m_vecStoreTargetPos = *m_vecTargetPos;
-    m_pTrapLayer = pDesc->pTrapLayer;
-    m_iCell_Idx = pDesc->iCell_Idx;
-    m_pPlayer = pDesc->pPlayer;
-    m_eLevel = pDesc->eID;
-    m_matPlayerWorld = pDesc->matPlayerWorld;
-    m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
-    m_pBuild = pDesc->m_pBuild;
-    m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
-    m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel, TEXT("Layer_PlayerBuild"), TEXT("Com_Collider_AABB")));
-    m_pCamera = pDesc->pCamera;
-    pDesc->fScale = _float3(2.5f, 2.5f, 2.5f);
-    pDesc->fSpeedPerSec = 5.f;
+	RIFLEMAN_DESC* pDesc = static_cast<RIFLEMAN_DESC*>(pArg);
+	m_vecTargetPos = pDesc->vecTargetPos;
+	m_vecStoreTargetPos = *m_vecTargetPos;
+	m_pTrapLayer = pDesc->pTrapLayer;
+	m_iCell_Idx = pDesc->iCell_Idx;
+	m_pPlayer = pDesc->pPlayer;
+	m_eLevel = pDesc->eID;
+	m_matPlayerWorld = pDesc->matPlayerWorld;
+	m_matBrainCoreWorld = pDesc->matBrainCoreWorld;
+	m_pBuild = pDesc->m_pBuild;
+	m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
+	m_pTargetCollider = dynamic_cast<CCollider*>(m_pGameInstance->Get_Component(m_eLevel,TEXT("Layer_PlayerBuild"),TEXT("Com_Collider_AABB")));
+	m_pCamera = pDesc->pCamera;
+	pDesc->fScale = _float3(2.5f,2.5f,2.5f);
+	pDesc->fSpeedPerSec = 5.f;
 
-    if (FAILED(__super::Initialize(pDesc)))
-        return E_FAIL;
+	if(FAILED(__super::Initialize(pDesc)))
+		return E_FAIL;
 
-    if (FAILED(Add_Components()))
-        return E_FAIL;
-    m_fDeadPower = { 5.f, 40.f };
-    m_fPrevHp= m_fHp = 50.f;
-    m_fEnergy = 0.f;
-    m_fAttack = 0.f;
+	if(FAILED(Add_Components()))
+		return E_FAIL;
+	m_fDeadPower = {5.f,40.f};
+	m_fPrevHp= m_fHp = 50.f;
+	m_fEnergy = 0.f;
+	m_fAttack = 0.f;
 
-    return S_OK;
+	return S_OK;
 }
 
 void CRifleMan::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
-    if (m_bDeadState == true)
-        return;
+	__super::Priority_Update(fTimeDelta);
+	if(m_bDeadState == true)
+		return;
 
-    m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-    m_vecPosition = XMVectorSetY(m_vecPosition, 0.f);
-    XMStoreFloat3(&m_fPos, m_vecPosition);
-   
-    vPlayerPos = XMVectorSet(m_matPlayerWorld->_41, m_matPlayerWorld->_42, m_matPlayerWorld->_43, 1.0f);
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	m_vecPosition = XMVectorSetY(m_vecPosition,0.f);
+	XMStoreFloat3(&m_fPos,m_vecPosition);
 
-    m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
+	vPlayerPos = XMVectorSet(m_matPlayerWorld->_41,m_matPlayerWorld->_42,m_matPlayerWorld->_43,1.0f);
+
+	m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
 
 }
 
 void CRifleMan::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
-    if (m_bDead == true)
-        return;
-    if (m_bDeadState == true)
-    {
-        if(m_bSoundOnce == false)
-        {
-            m_pGameInstance->StopSound(SOUND_RIFLEMAN_DEDA);
-            m_pGameInstance->PlaySoundW(L"FE_Grunt_Death_12.wav", Engine::CHANNELID::SOUND_RIFLEMAN_DEDA, m_fSound);
-            m_bSoundOnce = true;
-        }
+	__super::Update(fTimeDelta);
+	if(m_bDead == true)
+		return;
+	if(m_bDeadState == true)
+	{
+		if(m_bSoundOnce == false)
+		{
+			m_pGameInstance->StopSound(SOUND_RIFLEMAN_DEDA);
+			m_pGameInstance->PlaySoundW(L"FE_Grunt_Death_12.wav",Engine::CHANNELID::SOUND_RIFLEMAN_DEDA,m_fSound);
+			m_bSoundOnce = true;
+		}
 
-        Dead_Motion(fTimeDelta);
-        if (m_fDissolve >= 1.f)
-            m_bDead = true;
-        if(m_bDissolveStart == true)
-            m_fDissolve += fTimeDelta;
+		Dead_Motion(fTimeDelta);
+		if(m_fDissolve >= 1.f)
+			m_bDead = true;
+		if(m_bDissolveStart == true)
+			m_fDissolve += fTimeDelta;
 
-        return;
-    }
+		return;
+	}
 
-    // ƒ›∂Û¿Ã¥ı æ˜µ•¿Ã∆Æ
-    m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-    // ªÛ≈¬∆–≈œ æ˜µ•¿Ã∆Æ
-    m_pCurrentState->Update(this, fTimeDelta);
-    
-    vPlayerPos = XMVectorSetY(vPlayerPos, XMVectorGetY(vPlayerPos) + 2.f);
-    _float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos, m_vecPosition);
-    // ªÁ¡§∞≈∏Æ æ»ø° «√∑π¿ÃæÓ∞° æ¯¿∏∏È 
-    if (fDistance > 1500.f)
-    {
-        if (m_bFind_Path == false)
-        {
-            Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_pNavigationCom->Get_CurrentCell_Index(), m_iBraincore_CellNumber);
-            m_bFind_Path = true;
-        }
-        if (m_fTime_For_Target >= 3.f) // «◊ªÛ ∞ÀªÁ«œ±‚ø£ ∞ÀªÁ∑Æ¿Ã ∏πæ∆º≠ ∞ÀªÁ ∫Ûµµºˆ∏¶ ¡Ÿø©¡‹
-        {
-            m_fTime_For_Target = 0.f;
-            _int iCheck_Count = 0;
-            // ∆Æ∑¶∏∂¥Ÿ ¿ßƒ° ∞ÀªÁ«ÿº≠ ∞°±Ó¿Ãø° ¿÷¿∏∏È ∆Æ∑¶¿ª «‚«ÿ ∞¯∞› ¡¯«‡
-            for (auto pTrap : m_pTrapLayer->Get_GameObject_List())
-            {
-                if (static_cast<CTrap_Marks*>(pTrap)->Get_Build_Done() == true)
-                {
-                    m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
-                    // ±Ÿ¡¢ ∞¯∞›¿Ã±‚ ∂ßπÆø° ∏’∞≈∏Æø°º≠ ∆Æ∑¶¿ª √£¿ª « ø‰¥¬ æ¯¿Ω
-                    if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, m_vecPosition) <= 2500 && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
-                    {
-                        // ªı ≈∏∞Ÿ¿∏∑Œ πŸ≤„¡‹
-                        m_vecTargetPos = &m_vecNewTargetPos;
-                        break;
-                    }
-                }
-                ++iCheck_Count;
-            }
-            // ªı∑ŒøÓ ≈∏∞Ÿ¿Ã ±Ÿ√≥ø° æ¯¿∏∏È ±‚∑œ«ÿµ◊¥¯ ∫Í∑π¿Œ ƒ⁄æÓ ∞¯∞›
-            if (iCheck_Count == m_pTrapLayer->Get_GameObjectList_Size())
-            {
-                m_vecTargetPos = &m_vecStoreTargetPos;
-            }
-        }
-            // ªÁ¡§∞≈∏Æ æ»ø° µÈæÓ∞°∏È
-        if (m_pTransformCom->Cal_Distance_vec(m_vecPosition, *m_vecTargetPos) <= 800.f)
-        {
-            _vector vecTargetPos = *m_vecTargetPos;
-            vecTargetPos = XMVectorSetY(vecTargetPos, 1.f);
-            m_pTransformCom->LookAt(vecTargetPos);
-            // √—æÀ ª˝º∫
-            if (m_fShot_Time_Delay >= 4.f)
-            {
-                m_fShotTimer += fTimeDelta;
-                if (m_pModelCom->Play_Animation(fTimeDelta, false, m_bShot))
-                    m_bShot = false;
-                // æ÷¥œ∏ﬁ¿Ãº« ∫Ø∞Ê
-                if (m_iShot_Count < 3  )
-                {
-                    if(m_fShotTimer >= 0.2f)
-                    {
-                        m_fShotTimer = 0.f;
-                        m_bShot = true;
-                        // æ÷¥œ∏ﬁ¿Ãº« ∫Ø∞Ê
-                        m_pCurrentState->Fire(this);
-                        CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
-                        Desc.eID = m_eLevel;
-                        _float3 fBulletPos = m_fPos;
-                        fBulletPos.y = 3.f;
-                        Desc.fPosition = fBulletPos;
-                        Desc.m_iModelNumber = 1;
-                        Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
-                        Desc.vDir = XMVector3Normalize(vecTargetPos - m_vecPosition);
-                        Desc.m_pBuild = m_pBuild;
-                        Desc.pPlayer = m_pPlayer;
-                        static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
-                       
-                        // πﬂªÁ ∫“≤…
-                        CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
-                        pFlare.eLevel = m_eLevel;
-                        pFlare.eType = CEffect_Flare_Rifle::FLARE_RIFLEMAN;
-                        pFlare.fScale = { 1.f,1.f,1.f };
-                        pFlare.vecWeaponPos = &m_vecPosition;
-                        pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
-                        pFlare.vecTargetPos = m_vecTargetPos;
-                        static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+	// ÏΩúÎùºÏù¥Îçî ÏóÖÎç∞Ïù¥Ìä∏
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	// ÏÉÅÌÉúÌå®ÌÑ¥ ÏóÖÎç∞Ïù¥Ìä∏
+	m_pCurrentState->Update(this,fTimeDelta);
 
-                        m_pGameInstance->StopSound(SOUND_RIFLEMAN_FLARE);
-                        m_pGameInstance->PlaySoundW(L"FE_Soldier_Pistol_Fire_Far_03.wav", Engine::CHANNELID::SOUND_RIFLEMAN_FLARE, m_fSound);
+	vPlayerPos = XMVectorSetY(vPlayerPos,XMVectorGetY(vPlayerPos) + 2.f);
+	_float fDistance = m_pTransformCom->Cal_Distance_vec(vPlayerPos,m_vecPosition);
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_O))
+	{
+		if(m_fDistnace < 400.f)
+			m_fDistnace = 1500.f;
+		else
+			m_fDistnace = 0.5f;
+	}
+	// ÏÇ¨Ï†ïÍ±∞Î¶¨ ÏïàÏóê ÌîåÎ†àÏù¥Ïñ¥Í∞Ä ÏóÜÏúºÎ©¥ 
+	if(fDistance > 	 m_fDistnace)
+	{
+		if(m_bFind_Path == false && m_bRequest_Path == false)
+		{
+			m_bRequest_Path = true;
+			m_vecFindingPath = m_pGameInstance->Get_ptrThreadpool()->enqueue([=]() {
+				cout << "Í∏∏ Ï∞æÍ∏∞ ÏãúÏûëÌï®" <<  endl;
+				return m_pTransformCom->PathFind(0.f,m_pNavigationCom,m_pNavigationCom->Get_CurrentCell_Index(),m_iBraincore_CellNumber);
+			});
+		}
+		if(m_bRequest_Path == true && m_vecFindingPath.valid() && m_vecFindingPath.wait_for(chrono::seconds(0)) == future_status::ready)
+		{
+			// Í∏∏ Ï∞æÏïòÏùå
+			Path = m_vecFindingPath.get();
+			m_bFind_Path = true;
+			m_bRequest_Path = false;
+		}
+		if(m_fTime_For_Target >= 3.f) // Ìï≠ÏÉÅ Í≤ÄÏÇ¨ÌïòÍ∏∞Ïóî Í≤ÄÏÇ¨ÎüâÏù¥ ÎßéÏïÑÏÑú Í≤ÄÏÇ¨ ÎπàÎèÑÏàòÎ•º Ï§ÑÏó¨Ï§å
+		{
+			m_fTime_For_Target = 0.f;
+			_int iCheck_Count = 0;
+			// Ìä∏Îû©ÎßàÎã§ ÏúÑÏπò Í≤ÄÏÇ¨Ìï¥ÏÑú Í∞ÄÍπåÏù¥Ïóê ÏûàÏúºÎ©¥ Ìä∏Îû©ÏùÑ Ìñ•Ìï¥ Í≥µÍ≤© ÏßÑÌñâ
+			for(auto pTrap : m_pTrapLayer->Get_GameObject_List())
+			{
+				if(static_cast<CTrap_Marks*>(pTrap)->Get_Build_Done() == true)
+				{
+					m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
+					// Í∑ºÏ†ë Í≥µÍ≤©Ïù¥Í∏∞ ÎïåÎ¨∏Ïóê Î®ºÍ±∞Î¶¨ÏóêÏÑú Ìä∏Îû©ÏùÑ Ï∞æÏùÑ ÌïÑÏöîÎäî ÏóÜÏùå
+					if(m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos,m_vecPosition) <= 2500 && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
+					{
+						// ÏÉà ÌÉÄÍ≤üÏúºÎ°ú Î∞îÍøîÏ§å
+						m_vecTargetPos = &m_vecNewTargetPos;
+						break;
+					}
+				}
+				++iCheck_Count;
+			}
+			// ÏÉàÎ°úÏö¥ ÌÉÄÍ≤üÏù¥ Í∑ºÏ≤òÏóê ÏóÜÏúºÎ©¥ Í∏∞Î°ùÌï¥ÎíÄÎçò Î∏åÎ†àÏù∏ ÏΩîÏñ¥ Í≥µÍ≤©
+			if(iCheck_Count == m_pTrapLayer->Get_GameObjectList_Size())
+			{
+				m_vecTargetPos = &m_vecStoreTargetPos;
+			}
+		}
+		// ÏÇ¨Ï†ïÍ±∞Î¶¨ ÏïàÏóê Îì§Ïñ¥Í∞ÄÎ©¥
+		if(m_pTransformCom->Cal_Distance_vec(m_vecPosition,*m_vecTargetPos) <= 800.f)
+		{
+			_vector vecTargetPos = *m_vecTargetPos;
+			vecTargetPos = XMVectorSetY(vecTargetPos,1.f);
+			m_pTransformCom->LookAt(vecTargetPos);
+			// Ï¥ùÏïå ÏÉùÏÑ±
+			if(m_fShot_Time_Delay >= 4.f)
+			{
+				m_fShotTimer += fTimeDelta;
+				if(m_pModelCom->Play_Animation(fTimeDelta,false,m_bShot))
+					m_bShot = false;
+				// Ïï†ÎãàÎ©îÏù¥ÏÖò Î≥ÄÍ≤Ω
+				if(m_iShot_Count < 3)
+				{
+					if(m_fShotTimer >= 0.2f)
+					{
+						m_fShotTimer = 0.f;
+						m_bShot = true;
+						// Ïï†ÎãàÎ©îÏù¥ÏÖò Î≥ÄÍ≤Ω
+						m_pCurrentState->Fire(this);
+						CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
+						Desc.eID = m_eLevel;
+						_float3 fBulletPos = m_fPos;
+						fBulletPos.y = 3.f;
+						Desc.fPosition = fBulletPos;
+						Desc.m_iModelNumber = 1;
+						Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
+						Desc.vDir = XMVector3Normalize(vecTargetPos - m_vecPosition);
+						Desc.m_pBuild = m_pBuild;
+						Desc.pPlayer = m_pPlayer;
+						static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("MonsterBullet_Layer"),TEXT("Prototype_GameObject_MonsterBullet"),&Desc));
 
-                        m_iShot_Count++;
-                    }
-                }
-                else
-                {
-                    m_fShot_Time_Delay = 0.f;
-                    m_iShot_Count = 0;
-                }
-            }
-            m_fShot_Time_Delay += fTimeDelta;
-        }
-        else // ªÁ¡§∞≈∏Æ π€¿œ ∂ß øÚ¡˜¿”
-        {
-            // ±Ê√£±‚ ºˆ«‡
-            if (m_pTransformCom->Cal_Distance(Path.front(), m_fPos) <= 100.f)
-            {
-                if (Path.size() > 1)
-                    Path.erase(Path.begin());
-            }
-            m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
-            m_pCurrentState->Move(this);
-            //  øÚ¡˜¿” 
-            if (m_pModelCom->Play_Animation(fTimeDelta, false))
-            {// æ÷¥œ∏ﬁ¿Ãº« ≥°≥™∏È √ ±‚»≠
-                m_fMoveSpeed = 0.f;
-                m_fMoveTime = 0.f;
-            }
-            else
-            {
-                // øÚ¡˜¿” ∞ËªÍ
-                m_fMoveTime += fTimeDelta;
-                _float fRatio = m_fMoveTime / 2.f;
-                m_fMoveSpeed = 10.f * sin(fRatio * 3.141592f);
-                if (m_fMoveSpeed < 0)
-                    m_fMoveSpeed = 0;
-                _vector vMovePos = m_vecPosition + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
-                m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta, vMovePos, m_pNavigationCom);
-            }
-        }
-    
-    }
-    else
-    {
-        _vector vecTarget = vPlayerPos;
-        vecTarget = XMVectorSetY(vecTarget, 0.f);
-        m_pTransformCom->LookAt(vecTarget);
-        m_bFind_Path = false;
-        // ªÁ¡§∞≈∏Æ π€ø° ¿÷¿∏∏È
-        if (fDistance > 700.f)
-        {
-            m_pCurrentState->Move(this);
-            //  øÚ¡˜¿” 
-            if (m_pModelCom->Play_Animation(fTimeDelta, false))
-            {// æ÷¥œ∏ﬁ¿Ãº« ≥°≥™∏È √ ±‚»≠
-                m_fMoveSpeed = 0.f;
-                m_fMoveTime = 0.f;
-            }
-            else
-            {
-                // øÚ¡˜¿” ∞ËªÍ
-                m_fMoveTime += fTimeDelta;
-                _float fRatio = m_fMoveTime / 2.f;
-                m_fMoveSpeed = 10.f * sin(fRatio * 3.141592f);
-                if (m_fMoveSpeed < 0)
-                    m_fMoveSpeed = 0;
-                _vector vMovePos = m_vecPosition + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
-                m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta, vMovePos, m_pNavigationCom);
-            }
-        }
-        else // «√∑π¿ÃæÓ∞° ªÁ¡§∞≈∏Æ æ»ø° ¿÷¿∏∏È
-        {
-            
-            if (m_pModelCom->Play_Animation(fTimeDelta,false, m_bShot))
-                m_bShot = false;
-            // √—æÀ ª˝º∫
-            if (m_fShot_Time_Delay >= 4.f)
-            {            
-                m_fShotTimer += fTimeDelta;
-                // æ÷¥œ∏ﬁ¿Ãº« ∫Ø∞Ê
-                if (m_iShot_Count < 3  )
-                {
-                    if(m_fShotTimer >= 0.2f)
-                    {
-                        m_fShotTimer = 0.f;
-                        m_bShot = true;
-                        m_pCurrentState->Fire(this);
-                        CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
-                        Desc.eID = m_eLevel;
-                        _float3 fBulletPos = m_fPos;
-                        fBulletPos.y = 3.f;
-                        Desc.fPosition = fBulletPos;
-                        Desc.m_iModelNumber = 1;
-                        Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
-                        Desc.vDir = XMVector3Normalize(vPlayerPos - m_vecPosition);
-                        Desc.m_pBuild = m_pBuild;
-                        Desc.pPlayer = m_pPlayer;
-                        static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
-                        
-                        // πﬂªÁ ∫“≤…
-                        CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
-                        pFlare.eLevel = m_eLevel;
-                        pFlare.eType = CEffect_Flare_Rifle::FLARE_RIFLEMAN;
-                        pFlare.fScale = { 1.f,1.f,1.f };
-                        pFlare.vecWeaponPos = &m_vecPosition;
-                        pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
-                        pFlare.vecTargetPos = &vPlayerPos;
-                        static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
+						// Î∞úÏÇ¨ Î∂àÍΩÉ
+						CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
+						pFlare.eLevel = m_eLevel;
+						pFlare.eType = CEffect_Flare_Rifle::FLARE_RIFLEMAN;
+						pFlare.fScale = {1.f,1.f,1.f};
+						pFlare.vecWeaponPos = &m_vecPosition;
+						pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
+						pFlare.vecTargetPos = m_vecTargetPos;
+						static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Effect_Layer"),TEXT("Prototype_GameObject_Rifle_Flare"),&pFlare));
 
-                        m_pGameInstance->StopSound(SOUND_RIFLEMAN_FLARE);
-                        m_pGameInstance->PlaySoundW(L"FE_Soldier_Pistol_Fire_Far_03.wav", Engine::CHANNELID::SOUND_RIFLEMAN_FLARE, m_fSound);
+						m_pGameInstance->StopSound(SOUND_RIFLEMAN_FLARE);
+						m_pGameInstance->PlaySoundW(L"FE_Soldier_Pistol_Fire_Far_03.wav",Engine::CHANNELID::SOUND_RIFLEMAN_FLARE,m_fSound);
 
-                        m_iShot_Count++;
-                    }
-                }
-                else
-                {
-                    m_fShot_Time_Delay = 0.f;
-                    m_iShot_Count = 0;
-                }
-            }
-            m_fShot_Time_Delay += fTimeDelta;
-        }
-    }
+						m_iShot_Count++;
+					}
+				} else
+				{
+					m_fShot_Time_Delay = 0.f;
+					m_iShot_Count = 0;
+				}
+			}
+			m_fShot_Time_Delay += fTimeDelta;
+		} else // ÏÇ¨Ï†ïÍ±∞Î¶¨ Î∞ñÏùº Îïå ÏõÄÏßÅÏûÑ
+		{
+			if(Path.size() > 0 && m_bRequest_Path== false)
+			{
+				// Í∏∏Ï∞æÍ∏∞ ÏàòÌñâ
+				if(m_pTransformCom->Cal_Distance(Path.front(),m_fPos) <= 100.f)
+				{
+					if(Path.size() > 1)
+						Path.erase(Path.begin());
+				}
+				m_pTransformCom->LookAt(XMVectorSet(Path.front().x,Path.front().y,Path.front().z,1.f));
+			}
+			m_pCurrentState->Move(this);
+			//  ÏõÄÏßÅÏûÑ 
+			if(m_pModelCom->Play_Animation(fTimeDelta,false))
+			{// Ïï†ÎãàÎ©îÏù¥ÏÖò ÎÅùÎÇòÎ©¥ Ï¥àÍ∏∞Ìôî
+				m_fMoveSpeed = 0.f;
+				m_fMoveTime = 0.f;
+			} else
+			{
+				// ÏõÄÏßÅÏûÑ Í≥ÑÏÇ∞
+				m_fMoveTime += fTimeDelta;
+				_float fRatio = m_fMoveTime / 2.f;
+				m_fMoveSpeed = 10.f * sin(fRatio * 3.141592f);
+				if(m_fMoveSpeed < 0)
+					m_fMoveSpeed = 0;
+				_vector vMovePos = m_vecPosition + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
+				m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta,vMovePos,m_pNavigationCom);
+			}
+		}
 
-    // ¿¸√º ¡¯«‡ Ω√∞£ø°º≠ «ˆ¿Á Ω√∞£ ≥™¥≤º≠ ∫Ò¿≤ ±∏«œ±‚
-    // √÷∞Ìº”µµ * sin(∫Ò¿≤ *Pi)
+	} else
+	{
+		_vector vecTarget = vPlayerPos;
+		vecTarget = XMVectorSetY(vecTarget,0.f);
+		m_pTransformCom->LookAt(vecTarget);
+		m_bFind_Path = false;
+		// ÏÇ¨Ï†ïÍ±∞Î¶¨ Î∞ñÏóê ÏûàÏúºÎ©¥
+		if(fDistance > 700.f)
+		{
+			m_pCurrentState->Move(this);
+			//  ÏõÄÏßÅÏûÑ 
+			if(m_pModelCom->Play_Animation(fTimeDelta,false))
+			{// Ïï†ÎãàÎ©îÏù¥ÏÖò ÎÅùÎÇòÎ©¥ Ï¥àÍ∏∞Ìôî
+				m_fMoveSpeed = 0.f;
+				m_fMoveTime = 0.f;
+			} else
+			{
+				// ÏõÄÏßÅÏûÑ Í≥ÑÏÇ∞
+				m_fMoveTime += fTimeDelta;
+				_float fRatio = m_fMoveTime / 2.f;
+				m_fMoveSpeed = 10.f * sin(fRatio * 3.141592f);
+				if(m_fMoveSpeed < 0)
+					m_fMoveSpeed = 0;
+				_vector vMovePos = m_vecPosition + (m_pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * m_fMoveSpeed);
+				m_pTransformCom->Go_Straight_Nav_Type2(fTimeDelta,vMovePos,m_pNavigationCom);
+			}
+		} else // ÌîåÎ†àÏù¥Ïñ¥Í∞Ä ÏÇ¨Ï†ïÍ±∞Î¶¨ ÏïàÏóê ÏûàÏúºÎ©¥
+		{
+
+			if(m_pModelCom->Play_Animation(fTimeDelta,false,m_bShot))
+				m_bShot = false;
+			// Ï¥ùÏïå ÏÉùÏÑ±
+			if(m_fShot_Time_Delay >= 4.f)
+			{
+				m_fShotTimer += fTimeDelta;
+				// Ïï†ÎãàÎ©îÏù¥ÏÖò Î≥ÄÍ≤Ω
+				if(m_iShot_Count < 3)
+				{
+					if(m_fShotTimer >= 0.2f)
+					{
+						m_fShotTimer = 0.f;
+						m_bShot = true;
+						m_pCurrentState->Fire(this);
+						CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
+						Desc.eID = m_eLevel;
+						_float3 fBulletPos = m_fPos;
+						fBulletPos.y = 3.f;
+						Desc.fPosition = fBulletPos;
+						Desc.m_iModelNumber = 1;
+						Desc.eType = CMonster_Bullet::RIFLEMAN_BULLET;
+						Desc.vDir = XMVector3Normalize(vPlayerPos - m_vecPosition);
+						Desc.m_pBuild = m_pBuild;
+						Desc.pPlayer = m_pPlayer;
+						static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("MonsterBullet_Layer"),TEXT("Prototype_GameObject_MonsterBullet"),&Desc));
+
+						// Î∞úÏÇ¨ Î∂àÍΩÉ
+						CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
+						pFlare.eLevel = m_eLevel;
+						pFlare.eType = CEffect_Flare_Rifle::FLARE_RIFLEMAN;
+						pFlare.fScale = {1.f,1.f,1.f};
+						pFlare.vecWeaponPos = &m_vecPosition;
+						pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
+						pFlare.vecTargetPos = &vPlayerPos;
+						static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Effect_Layer"),TEXT("Prototype_GameObject_Rifle_Flare"),&pFlare));
+
+						m_pGameInstance->StopSound(SOUND_RIFLEMAN_FLARE);
+						m_pGameInstance->PlaySoundW(L"FE_Soldier_Pistol_Fire_Far_03.wav",Engine::CHANNELID::SOUND_RIFLEMAN_FLARE,m_fSound);
+
+						m_iShot_Count++;
+					}
+				} else
+				{
+					m_fShot_Time_Delay = 0.f;
+					m_iShot_Count = 0;
+				}
+			}
+			m_fShot_Time_Delay += fTimeDelta;
+		}
+	}
+
+	// Ï†ÑÏ≤¥ ÏßÑÌñâ ÏãúÍ∞ÑÏóêÏÑú ÌòÑÏû¨ ÏãúÍ∞Ñ ÎÇòÎà†ÏÑú ÎπÑÏú® Íµ¨ÌïòÍ∏∞
+	// ÏµúÍ≥†ÏÜçÎèÑ * sin(ÎπÑÏú® *Pi)
 }
 
 void CRifleMan::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
-    if (m_bDeadState == true)
-    {
-        if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM, this)))
-            return;
-        return;
-    }
-    if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
-    {
+	__super::Late_Update(fTimeDelta);
+	if(m_bDeadState == true)
+	{
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_BLOOM,this)))
+			return;
+		return;
+	}
+	if(m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+	{
 
-        m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
-        m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
-    }
+		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,m_vecPosition);
+	}
 
 }
 
 HRESULT CRifleMan::Render()
 {
-    if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
+	if(FAILED(Bind_ShaderResources()))
+		return E_FAIL;
 
-    _uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-    for (size_t i = 0; i < iNumMeshes; i++)
-    {
-        if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
-            return E_FAIL;
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
+			return E_FAIL;
 
-        if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
-            return E_FAIL;
-        if (m_bDeadState == true)
-        {
-            if (FAILED(m_pShaderCom->Begin(6)))
-                return E_FAIL;
-        }
-        else
-        {
-            if (FAILED(m_pShaderCom->Begin(0)))
-                return E_FAIL;
-        }
+		if(FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom,i,"g_BoneMatrices")))
+			return E_FAIL;
+		if(m_bDeadState == true)
+		{
+			if(FAILED(m_pShaderCom->Begin(6)))
+				return E_FAIL;
+		} else
+		{
+			if(FAILED(m_pShaderCom->Begin(0)))
+				return E_FAIL;
+		}
 
-        m_pModelCom->Render(i);
-    }
+		m_pModelCom->Render(i);
+	}
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 
-    m_pColliderCom->Render();
-#endif
+	m_pColliderCom->Render();
+	#endif
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CRifleMan::Render_Shadow()
 {
-    _float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 
-    _float fFar = m_pGameInstance->Get_CameraFar();
-    _float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
-    XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 8.f, 50.f, fPlayerPos.y - 8.f, 1.f), XMVectorSet(fPlayerPos.x, 0.f, fPlayerPos.y, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-    XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 8.f,50.f,fPlayerPos.y - 8.f,1.f),XMVectorSet(fPlayerPos.x,0.f,fPlayerPos.y,1.f),XMVectorSet(0.f,1.f,0.f,0.f)));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f),(_float)1280.f / 720.f,0.1f,fFar));
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
-        return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix",m_pTransformCom->Get_WorldMatrixPtr())))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&ViewMatrix)))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&ProjMatrix)))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
+		return E_FAIL;
 
-    _uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-    for (size_t i = 0; i < iNumMeshes; i++)
-    {
-        if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
-            return E_FAIL;
+	for(size_t i = 0; i < iNumMeshes; i++)
+	{
+		if(FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom,i,"g_BoneMatrices")))
+			return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(5)))
-            return E_FAIL;
+		if(FAILED(m_pShaderCom->Begin(5)))
+			return E_FAIL;
 
-        m_pModelCom->Render(i);
-    }
+		m_pModelCom->Render(i);
+	}
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CRifleMan::Add_Components()
 {
-    /* For.Com_Texture */
-    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Texture_Dissolved"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-        return E_FAIL;
+	/* For.Com_Texture */
+	if(FAILED(__super::Add_Component(m_eLevel,TEXT("Prototype_Component_Texture_Dissolved"),
+		TEXT("Com_Texture"),reinterpret_cast<CComponent**>(&m_pTextureCom))))
+		return E_FAIL;
 
 
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-        return E_FAIL;
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
 
-    /* For.Com_Model */
-    const _wstring Model_Component = TEXT("Prototype_Component_Model_Anim");
-    const _wstring Model_Component_Result = Model_Component + to_wstring(ANIM_RIFLEMAN);
-    if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-        TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-        return E_FAIL;
+	/* For.Com_Model */
+	const _wstring Model_Component = TEXT("Prototype_Component_Model_Anim");
+	const _wstring Model_Component_Result = Model_Component + to_wstring(ANIM_RIFLEMAN);
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
+		return E_FAIL;
 
-    CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
-    SphereDesc.fRadius = 1.f;
-    SphereDesc.vCenter = _float3(0.f, SphereDesc.fRadius, 0.f);
+	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
+	SphereDesc.fRadius = 1.f;
+	SphereDesc.vCenter = _float3(0.f,SphereDesc.fRadius,0.f);
 
-    if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
-        TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
-        return E_FAIL;
+	if(FAILED(__super::Add_Component(m_eLevel,TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"),reinterpret_cast<CComponent**>(&m_pColliderCom),&SphereDesc)))
+		return E_FAIL;
 
-    // For.Com_Navigation
-    CNavigation::NAVIGATION_DESC		Desc{};
-    Desc.iCurrentCellIndex = m_iCell_Idx;
-    switch (m_eLevel)
-    {
+	// For.Com_Navigation
+	CNavigation::NAVIGATION_DESC		Desc{};
+	Desc.iCurrentCellIndex = m_iCell_Idx;
+	switch(m_eLevel)
+	{
 
-    case Client::LEVEL_GAMEPLAY:
-    {
-        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-            TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
-            return E_FAIL;
-        break;
-    }
-    case Client::LEVEL_YARD:
-    {
-        if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-            TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
-            return E_FAIL;
-        break;
-    }
+	case Client::LEVEL_GAMEPLAY:
+	{
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom),&Desc)))
+			return E_FAIL;
+		break;
+	}
+	case Client::LEVEL_YARD:
+	{
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom),&Desc)))
+			return E_FAIL;
+		break;
+	}
 
-    default:
-        break;
-    }
+	default:
+	break;
+	}
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CRifleMan::Bind_ShaderResources()
 {
-    if (m_bDeadState == true)
-    {
-        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", static_cast<_uint>(0))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value", &m_fDissolve, sizeof(float))))
-            return E_FAIL;
-    }
+	if(m_bDeadState == true)
+	{
+		if(FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom,"g_MaskTexture",static_cast<_uint>(0))))
+			return E_FAIL;
+		if(FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve_Value",&m_fDissolve,sizeof(float))))
+			return E_FAIL;
+	}
 
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
-        return E_FAIL;
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
 
-    _float fFar = m_pGameInstance->Get_CameraFar();
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
-        return E_FAIL;
+	_float fFar = m_pGameInstance->Get_CameraFar();
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
+		return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
 void CRifleMan::Dead_Motion(_float fTimeDelta)
 {
-    if(m_bOnce == false)
-    {
-        fPlayerPos = m_pGameInstance->Get_PlayerPos();
-        vPlayerPos = XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.z, 1.f);
-        vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-        vDir = m_vecPosition - vPlayerPos;
-        m_bOnce = true;
-    }
-    m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	if(m_bOnce == false)
+	{
+		fPlayerPos = m_pGameInstance->Get_PlayerPos();
+		vPlayerPos = XMVectorSet(fPlayerPos.x,fPlayerPos.y,fPlayerPos.z,1.f);
+		vUp = XMVectorSet(0.f,1.f,0.f,0.f);
+		vDir = m_vecPosition - vPlayerPos;
+		m_bOnce = true;
+	}
+	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-    if (XMVectorGetY(m_vecPosition ) <= 0.f)
-    {
-        m_fDeadPower.y = 35.f;
-        m_fGravity = 2.7f;
-        
-    }
-    m_bDissolveStart = true;
+	if(XMVectorGetY(m_vecPosition) <= 0.f)
+	{
+		m_fDeadPower.y = 35.f;
+		m_fGravity = 2.7f;
 
-    m_fDeadPower.y -= m_fGravity;
+	}
+	m_bDissolveStart = true;
 
-    if (m_fDeadPower.x > 0.f)
-        m_fDeadPower.x -= 0.3f;
-    else
-    {
-        m_fDeadPower.x = 3.f;
-        m_bDissolveStart = true;
-    }
+	m_fDeadPower.y -= m_fGravity;
+
+	if(m_fDeadPower.x > 0.f)
+		m_fDeadPower.x -= 0.3f;
+	else
+	{
+		m_fDeadPower.x = 3.f;
+		m_bDissolveStart = true;
+	}
 
 
 
-    m_vecPosition += vDir * fTimeDelta * m_fDeadPower.x;
-    m_vecPosition += vUp * fTimeDelta * m_fDeadPower.y;
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
-    m_pTransformCom->Turn(0.f, 0.f, 1.f, fTimeDelta * 0.5f);
+	m_vecPosition += vDir * fTimeDelta * m_fDeadPower.x;
+	m_vecPosition += vUp * fTimeDelta * m_fDeadPower.y;
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,m_vecPosition);
+	m_pTransformCom->Turn(0.f,0.f,1.f,fTimeDelta * 0.5f);
 
 }
 
-CRifleMan* CRifleMan::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CRifleMan* CRifleMan::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-    CRifleMan* pInstance = new CRifleMan(pDevice, pContext);
+	CRifleMan* pInstance = new CRifleMan(pDevice,pContext);
 
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX("Failed to Created : CRifleMan");
-        Safe_Release(pInstance);
-    }
-    return pInstance;
+	if(FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CRifleMan");
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
 CGameObject* CRifleMan::Clone(void* pArg)
 {
-    CRifleMan* pInstance = new CRifleMan(*this);
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX("Failed to Created : CRifleMan");
-        Safe_Release(pInstance);
-    }
-    return pInstance;
+	CRifleMan* pInstance = new CRifleMan(*this);
+	if(FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Created : CRifleMan");
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
 void CRifleMan::Free()
 {
-    __super::Free();
-    Safe_Release(m_pColliderCom);
-    Safe_Release(m_pModelCom);
-    Safe_Release(m_pShaderCom);
-    Safe_Release(m_pNavigationCom);
-    Safe_Release(m_pTextureCom);
+	__super::Free();
+	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pTextureCom);
 }

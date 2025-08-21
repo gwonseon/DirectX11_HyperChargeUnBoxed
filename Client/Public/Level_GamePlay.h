@@ -14,6 +14,11 @@
 #include "InGameUI.h"
 #include "Bulb.h"
 
+#include <BatteryGage.h>
+#include <BatteryUI.h>
+#include <Ending_UI.h>
+
+
 BEGIN(Client)
 class CGamePlay_Round;
 class CLevel_GamePlay : public CLevel
@@ -61,18 +66,18 @@ private:
 	CEnergy_Machine*			m_pEnergyMachine		= { nullptr };
 	CEnergy_Cap*				m_pEnergyMachine_Cap	= { nullptr };
 	CBattery*					m_pBattery				= { nullptr };
-	CInGameUI*					m_pBatteryUI			= { nullptr };
-	CInGameUI*					m_pBatteryGaugeUI		= { nullptr };
+	CBatteryUI*					m_pBatteryUI			= {nullptr};
+	CBatteryGage*				m_pBatteryGaugeUI		= { nullptr };
 	CInGameUI*					m_pConversationBox		= { nullptr };
 	CInGameUI*					m_pCharacter			= { nullptr };
 
-	CInGameUI*					m_pEnding = { nullptr };
+	CEnding_UI*					m_pEnding = { nullptr };
 
 	CWeapon_Item*				m_pWeaponItem[2];
 	_bool		m_bVictory = false;
 	_float	m_fDelay{};
 	_bool m_bOnce = false;
-	// Ãæµ¹¿ë
+	// ï¿½æµ¹ï¿½ï¿½
 private:
 	CLayer* pPlayerLayer		= { nullptr };
 	CLayer* pNearMonsterLayer	= { nullptr };
@@ -93,7 +98,7 @@ private:
 private:
 	vector<CTrap_Marks*> m_vecTrapMark;
 
-	// ¶ó¿îµå
+	// ï¿½ï¿½ï¿½ï¿½
 private:
 	_float	m_fSkipTimer{};
 	CGamePlay_Round* m_pRound[3] = {nullptr};

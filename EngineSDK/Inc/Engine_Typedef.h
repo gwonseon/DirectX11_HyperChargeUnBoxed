@@ -3,71 +3,71 @@
 
 namespace Engine
 {
-	typedef		bool						_bool;
+typedef		bool						_bool;
 
-	typedef		signed char					_byte;
-	typedef		unsigned char				_ubyte;
-	typedef		char						_char;
-	typedef		wchar_t						_tchar;
+typedef		signed char					_byte;
+typedef		unsigned char				_ubyte;
+typedef		char						_char;
+typedef		wchar_t						_tchar;
 
-	typedef		wstring						_wstring;
+typedef		wstring						_wstring;
 
-	typedef		signed short				_short;
-	typedef		unsigned short				_ushort;
+typedef		signed short				_short;
+typedef		unsigned short				_ushort;
 
-	typedef		signed int					_int;
-	typedef		unsigned int				_uint;
+typedef		signed int					_int;
+typedef		unsigned int				_uint;
 
-	typedef		signed long					_long;
-	typedef		unsigned long				_ulong;
+typedef		signed long					_long;
+typedef		unsigned long				_ulong;
 
-	typedef		float						_float;
-	typedef		double						_double;
+typedef		float						_float;
+typedef		double						_double;
 
-	// ´Ü¼ø ÀúÀå¿ë º¤ÅÍ¿Í Çà·Ä Å¸ÀÔ ( ¿¬»ê¿ëÀÌ ¾Æ´Ï´Ù)
-	typedef		XMFLOAT2					_float2;
-	typedef		XMFLOAT3					_float3;
-	typedef		XMFLOAT4					_float4;
-	typedef		XMFLOAT4X4					_float4x4;
-
-
-
-	// ÀúÀåÀÌ °¡´ÉÇÏ±ä ÇÏÁö¸¸ ¿¬»ê¿ë º¤ÅÍ¿Í Çà·Ä
-	typedef		XMVECTOR					_vector;
-	typedef		FXMVECTOR					_fvector;
-	typedef		GXMVECTOR					_gvector;
-	typedef		HXMVECTOR					_hvector;
-	typedef		CXMVECTOR					_cvector;
-	typedef		XMMATRIX					_matrix;
-	typedef		FXMMATRIX					_fmatrix;
-	typedef		CXMMATRIX					_cmatrix;
-
-
-	/*
-	¿¬»êÀÇ ÃÖÀûÈ­¸¦ À§ÇØ ÀúÀå¿ë°ú ¿¬»ê¿ëÀ» µû·Î ÇÑ´Ù.
-	¿¬»êÀ» ÇÒ ¶§´Â ÀúÀå¿ëÅ¸ÀÔÀ» ¿¬»ê¿ë Å¸ÀÔÀ¸·Î Ä¡È¯ÇØ¼­ »ç¿ëÇÒµ¡
+// ë‹¨ìˆœ ì €ì¥ìš© ë²¡í„°ì™€ í–‰ë ¬ íƒ€ì… ( ì—°ì‚°ìš©ì´ ì•„ë‹ˆë‹¤)
+typedef		XMFLOAT2					_float2;
+typedef		XMFLOAT3					_float3;
+typedef		XMFLOAT4					_float4;
+typedef		XMFLOAT4X4					_float4x4;
 
 
 
-	ÇöÀç ´ëºÎºĞÀÇ CPU´Â ¸ÖÆ¼ ÄÚ¾î¸¦ Áö¿øÇÑ´Ù.
-	±×·¯ÇÑ Æ¯¼ºÀ» ÀÌ¿ëÇÏ¿© ¿¬»êÀÇ º´·ÄÈ­¸¦ ÅëÇØ ºü¸¥ ¿¬»êÀ» ¼öÇàÇÒ ¼ö ÀÖ´Ù.
-	º´·ÄÈ­¸¦ À§ÇØ µ¥ÀÌÅÍ¸¦ Á¶±İ ´Ù¸¥ ¹æ½ÄÀ¸·Î ÀúÀåÇØ¾ß ÇÏ´Âµ¥ 
-	±×·¡¼­ XMVECTOR, XMMATRIX¿¡ µ¥ÀÌÅÍ¸¦ ÀúÀåÇÏ°í SIMD °¡¼ÓÀ» ¹Ş´Â º´·Ä ¿¬»êÀ» ¼öÇàÇÏ´Â °ÍÀÌ´Ù.
-	XMVECTOR ¸¦ ÀÌ¿ëÇÑ ¿¬»êÀ» ¼öÇàÇÒ ¶§ µ¥ÀÌÅÍµéÀÌ ¾ÈÁ¤ÀûÀÎ °ø°£¿¡ Á¸ÀçÇÏ´Â °ÍÀ» ±ÇÀåÇÏ³®,
-	µû¶ó¼­ ½ºÅÃ ¸Ş¸ğ¸®¿¡ XMVECTOR¸¦ µÎ°í »ç¿ëÇÏ´Â °ÍÀÌ ÁÁ´Ù. ( ÇÔ¼öÀÇ Áö¿ªº¯¼ö·Î¼­ »ç¿ëÇÑ´Ù´Â ÀÇ¹Ì)
-	½ºÅÃ ¸Ş¸ğ¸®´Â Àü¿ªÀûÀ¸·Î Á¢±ÙÇÏ´Â °ø°£ÀÌ ¾Æ´Ï±â¿¡ ºñ±³Àû ¾ÈÁ¤ÀûÀÌ±â ¶§¹®ÀÌ´Ù.
+// ì €ì¥ì´ ê°€ëŠ¥í•˜ê¸´ í•˜ì§€ë§Œ ì—°ì‚°ìš© ë²¡í„°ì™€ í–‰ë ¬
+typedef		XMVECTOR					_vector;
+typedef		FXMVECTOR					_fvector;
+typedef		GXMVECTOR					_gvector;
+typedef		HXMVECTOR					_hvector;
+typedef		CXMVECTOR					_cvector;
+typedef		XMMATRIX					_matrix;
+typedef		FXMMATRIX					_fmatrix;
+typedef		CXMMATRIX					_cmatrix;
 
-	¶ÇÇÑ µ¥ÀÌÅÍ ¿µ¿ªÀ» ÇÔ¼öÀÇ ÆÄ¶ó¹ÌÅÍ·Î ³Ñ±æ ¶§¿¡µµ ÆÄ¶ó¹ÌÅÍ ³Ñ¹ö¿¡ µû¶ó ³Ñ°Ü¾ß ÇÏ´Â Å¸ÀÔÀÌ Á¤ÇØÁ®ÀÖ´Ù.
-	1 ~ 3¹ø : FXMVECTOR
-	4¹ø : GXMVECTOR
-	5 ~ 6¹ø : HXMVECTOR
-	7¹ø ÀÌ»ó : CXMVECTOR
 
-	1¹ø : FXMMATRIX
-	2¹ø ÀÌ»ó : CXMMATRIX
+/*
+ì—°ì‚°ì˜ ìµœì í™”ë¥¼ ìœ„í•´ ì €ì¥ìš©ê³¼ ì—°ì‚°ìš©ì„ ë”°ë¡œ í•œë‹¤.
+ì—°ì‚°ì„ í•  ë•ŒëŠ” ì €ì¥ìš©íƒ€ì…ì„ ì—°ì‚°ìš© íƒ€ì…ìœ¼ë¡œ ì¹˜í™˜í•´ì„œ ì‚¬ìš©í• ë§
 
-	
-	*/
+
+
+í˜„ì¬ ëŒ€ë¶€ë¶„ì˜ CPUëŠ” ë©€í‹° ì½”ì–´ë¥¼ ì§€ì›í•œë‹¤.
+ê·¸ëŸ¬í•œ íŠ¹ì„±ì„ ì´ìš©í•˜ì—¬ ì—°ì‚°ì˜ ë³‘ë ¬í™”ë¥¼ í†µí•´ ë¹ ë¥¸ ì—°ì‚°ì„ ìˆ˜í–‰í•  ìˆ˜ ìˆë‹¤.
+ë³‘ë ¬í™”ë¥¼ ìœ„í•´ ë°ì´í„°ë¥¼ ì¡°ê¸ˆ ë‹¤ë¥¸ ë°©ì‹ìœ¼ë¡œ ì €ì¥í•´ì•¼ í•˜ëŠ”ë°
+ê·¸ë˜ì„œ XMVECTOR, XMMATRIXì— ë°ì´í„°ë¥¼ ì €ì¥í•˜ê³  SIMD ê°€ì†ì„ ë°›ëŠ” ë³‘ë ¬ ì—°ì‚°ì„ ìˆ˜í–‰í•˜ëŠ” ê²ƒì´ë‹¤.
+XMVECTOR ë¥¼ ì´ìš©í•œ ì—°ì‚°ì„ ìˆ˜í–‰í•  ë•Œ ë°ì´í„°ë“¤ì´ ì•ˆì •ì ì¸ ê³µê°„ì— ì¡´ì¬í•˜ëŠ” ê²ƒì„ ê¶Œì¥í•˜ë‚Ÿ,
+ë”°ë¼ì„œ ìŠ¤íƒ ë©”ëª¨ë¦¬ì— XMVECTORë¥¼ ë‘ê³  ì‚¬ìš©í•˜ëŠ” ê²ƒì´ ì¢‹ë‹¤. ( í•¨ìˆ˜ì˜ ì§€ì—­ë³€ìˆ˜ë¡œì„œ ì‚¬ìš©í•œë‹¤ëŠ” ì˜ë¯¸)
+ìŠ¤íƒ ë©”ëª¨ë¦¬ëŠ” ì „ì—­ì ìœ¼ë¡œ ì ‘ê·¼í•˜ëŠ” ê³µê°„ì´ ì•„ë‹ˆê¸°ì— ë¹„êµì  ì•ˆì •ì ì´ê¸° ë•Œë¬¸ì´ë‹¤.
+
+ë˜í•œ ë°ì´í„° ì˜ì—­ì„ í•¨ìˆ˜ì˜ íŒŒë¼ë¯¸í„°ë¡œ ë„˜ê¸¸ ë•Œì—ë„ íŒŒë¼ë¯¸í„° ë„˜ë²„ì— ë”°ë¼ ë„˜ê²¨ì•¼ í•˜ëŠ” íƒ€ì…ì´ ì •í•´ì ¸ìˆë‹¤.
+1 ~ 3ë²ˆ : FXMVECTOR
+4ë²ˆ : GXMVECTOR
+5 ~ 6ë²ˆ : HXMVECTOR
+7ë²ˆ ì´ìƒ : CXMVECTOR
+
+1ë²ˆ : FXMMATRIX
+2ë²ˆ ì´ìƒ : CXMMATRIX
+
+
+*/
 
 }
 

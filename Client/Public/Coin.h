@@ -56,7 +56,10 @@ public:
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, { PosX,PosY,PosZ,1 });
 	}
-
+	void Set_Dead() {
+		m_pAura->Set_Dead();
+		m_bDead = true;
+	}
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

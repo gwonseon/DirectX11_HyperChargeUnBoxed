@@ -14,131 +14,79 @@ END
 BEGIN(Client)
 
 
-class CInGameUI final : public CUIObject
+class CInGameUI : public CUIObject
 {
 public:
-	enum GAMEUI{UI_SHIFT, UI_RBUTTON, UI_LBUTTON, UI_SPACE,UI_DEAD,UI_BATTERY,UI_BATTERY_GAGE ,
-		UI_MACHINE_HP,UI_BULLET,UI_CHARACTER,UI_CONVERSATIONBOX, UI_CONVERSATIONBOX_BACKGROUND, UI_BUILDMODE_CONVERSATIONBOX, UI_BUILDMODE_F,
-		UI_MACHINE_ENERGY,UI_DAMAGED,UI_PLAYER_HP, UI_PLAYER_ENERGY,
-		UI_ENERGY_ICON, UI_HP_ICON, UI_CREDIT_ICON,UI_RUN_ICON, UI_JUMP_ICON, UI_MODECHANGE_ICON, UI_VIEWCHANGE_ICON,
-		UI_PUNCH_ICON, UI_V, UI_F, UI_C, UI_CENTERICON, UI_SLICE, UI_MISSILE_TIMER, UI_NUCLEAR,
-		UI_VICTORY, UI_END};
+	enum GAMEUI{
+		UI_CHARACTER,UI_CONVERSATIONBOX,UI_CONVERSATIONBOX_BACKGROUND,
+		UI_BUILDMODE_CONVERSATIONBOX,UI_BUILDMODE_F,
+		UI_MODECHANGE_ICON,	UI_CENTERICON,UI_SLICE,	UI_END
+	};
 
-	typedef struct : public CUIObject::UIOBJECT_DESC
+	typedef struct: public CUIObject::UIOBJECT_DESC
 	{
-		_uint* iRound			= { nullptr };
-
-		_float* fPlayerHP		= { nullptr };
-		_float* fPlayerEnergy	= { nullptr };
-		_float* fBrainHP		= { nullptr };
-		_float* fBrainEnergy	= { nullptr };
-		_float* fTimer			= { nullptr };
-		GAMEUI	eUITag{};
 		_uint	iIndex{};
-	
+		GAMEUI	eUITag{};
 		CPlayer* pPlayer{};
-		CUI_CircleGuage* pCircle = { nullptr };
+		CUI_CircleGuage* pCircle = {nullptr};
 	}INGAMEUI_DESC;
 
-private:
-	CInGameUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+protected:
+	CInGameUI(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CInGameUI(const CInGameUI& Prototype);
 	virtual ~CInGameUI() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-	void Change_Count(_int iDeltaCount) { m_iCount += iDeltaCount; }
+	void Change_Count(_int iDeltaCount) {
+		m_iCount += iDeltaCount;
+	}
 
 public:
-	void Battery_UI(_float fTimeDelta);
-	void Machine_HP_UI(_float fTimeDelta);
-	void Charater_UI(_float fTimeDelta);
-	void UI_Conversation(_float fTimeDelta);
-	void Machine_UI_Energy(_float fTimeDelta);
-	void Player_UI_Hp(_float fTimeDelta);
-	void Player_UI_Energy(_float fTimeDelta);
+	void Set_Draw(_bool bDraw) {
+		m_bDraw = bDraw;
+	}
 
-public:
-	void Set_BatteryGauge(float fGauge) { m_fBatteryGauge = fGauge; }
-	void Set_Draw(_bool bDraw) { m_bDraw = bDraw; }
 
 private:
-	//_float						m_fX{}, m_fY{}, m_fSizeX{}, m_fSizeY{};
-	//_float4x4					m_ViewMatrix, m_ProjMatrix;
-
-
-	// ¹èÅÍ¸®
-	_uint						m_iBattery = 0;
-	float						m_fBatteryGauge = 0.f;
-
-
-	// Ä³¸¯ÅÍ ´ëÈ­ »óÀÚ
+	// ìºë¦­í„° ëŒ€í™” ìƒì
 	_uint						m_iCharacter_Number = 0;
 
-	// ´ëÈ­»óÀÚ µŞ¹è°æ
-	_uint						m_iIndex = 0;
-	
-	// ±â°è HP
-	float*						m_fMachineHP;
-
-	// ±â°è Energy
-	float*						m_fMachineEnergy;
-
-	// ÇÃ·¹ÀÌ¾î HP
-	float*						m_fPlayerHp;
-	// ÇÃ·¹ÀÌ¾î Energy
-	float*						m_fPlayerEnergy;
-
-	// ±ÛÀÚ Ãâ·Â À§Ä¡¸¦ À§ÇØ¼­ °°ÀÌ ¶ç¿ì´Â À§Ä¡ ÀúÀå
+	// ê¸€ì ì¶œë ¥ ìœ„ì¹˜ë¥¼ ìœ„í•´ì„œ ê°™ì´ ë„ìš°ëŠ” ìœ„ì¹˜ ì €ì¥
 	_float3						m_fUIPosition{};
 
-	// ³»°¡ °¡Áø ÄÚÀÎÀÌ ¾ó¸¶³ª ÀÖ´ÂÁö ¾Ë¸²
-	_uint						m_iCoin{};
-
-	// ±×¸±Áö ¾È±×¸±Áö °áÁ¤
+	// ê·¸ë¦´ì§€ ì•ˆê·¸ë¦´ì§€ ê²°ì •
 	_bool						m_bDraw = true;
 
-	LEVELID m_eLevel{};
-
-	//  ÇÃ·¹ÀÌ¾î¿¡°Ô¼­ °¡Á®¿Í¾ß ÇÏ´Â °ªÀÌ ¸¹¾Æ¼­ ÇÃ·¹ÀÌ¾î Æ÷ÀÎÅÍ¸¦ µé°í¿È ( ¾ÆÂ÷ÇÇ »èÁ¦ ¾ÈµÊ ¤¡¤º)
-	CPlayer*					m_pPlayer = { nullptr };
-
-	// Å¸ÀÌ¸Ó
-	_float*						m_fTimer = { nullptr };
-
-	// ¶ó¿îµå
-	_uint*						m_iRound = { nullptr };
-
-	// ¶ó¿îµå Á¾·á
-	_bool						m_bRoundEnd = false;
-
-public:
-	void Set_RoundEnd(_bool bEnd) { m_bRoundEnd = bEnd; }
-
-private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
-	CUI_CircleGuage* m_pCircle = { nullptr };
+	//  í”Œë ˆì´ì–´ì—ê²Œì„œ ê°€ì ¸ì™€ì•¼ í•˜ëŠ” ê°’ì´ ë§ì•„ì„œ í”Œë ˆì´ì–´ í¬ì¸í„°ë¥¼ ë“¤ê³ ì˜´ ( ì•„ì°¨í”¼ ì‚­ì œ ì•ˆë¨ ã„±ã…Š)
+	CPlayer*					m_pPlayer = {nullptr};
 
 
 	GAMEUI		m_eUIType = UI_END;
+
+private:
+	CShader* m_pShaderCom = {nullptr};
+	CTexture* m_pTextureCom = {nullptr};
+	CVIBuffer_Rect* m_pVIBufferCom = {nullptr};
+	CUI_CircleGuage* m_pCircle = {nullptr};
+
+
 private:
 	HRESULT Add_Components(_int iNum);
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CInGameUI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CInGameUI* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

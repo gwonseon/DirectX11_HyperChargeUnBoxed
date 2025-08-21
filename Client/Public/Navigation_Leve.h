@@ -12,13 +12,17 @@
 
 BEGIN(Client)
 
-class CNavigation_Leve final : public CLevel
+class CNavigation_Leve final: public CLevel
 {
 public:
-	enum IMGUI_TYPE { IMGUI_OBJECT_NONANIM, IMGUI_OBJECT_ANIM, IMGUI_BUILD, IMGUI_MAPTOOL, NAVIGATION, IMGUI_END };
-	enum NAVIGATION_MODE { CREATE_NAVIPOINT, SELECT_NAVIPOINT, NAVIMODE_END };
+	enum IMGUI_TYPE {
+		IMGUI_OBJECT_NONANIM,IMGUI_OBJECT_ANIM,IMGUI_BUILD,IMGUI_MAPTOOL,NAVIGATION,IMGUI_END
+	};
+	enum NAVIGATION_MODE {
+		CREATE_NAVIPOINT,SELECT_NAVIPOINT,NAVIMODE_END
+	};
 private:
-	CNavigation_Leve(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CNavigation_Leve(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CNavigation_Leve() = default;
 
 public:
@@ -37,11 +41,11 @@ private:
 
 
 private:
-	void Add_Point(_float fTimeDelta, _float3 fPointPos);
+	void Add_Point(_float fTimeDelta,_float3 fPointPos);
 	HRESULT Save_Navigation(_float fTimeDelta);
 
 private:
-	CVIBuffer_Terrain* pVIBuffer_Terrain = { nullptr }; // ÅÍ·¹ÀÎ ÇÇÅ·
+	CVIBuffer_Terrain* pVIBuffer_Terrain = {nullptr}; // í„°ë ˆì¸ í”¼í‚¹
 	CTerrain* m_pTerrain;
 	_bool bAble_Select = true;
 	_float3 m_fPickingPos{};
@@ -50,7 +54,7 @@ private:
 	XMFLOAT3		vPoints[3];
 	float			fPoints[3];
 	int			m_iCellType = 0;
-	vector<CCollisionBox*> m_vecCollision{};  // Äİ¸®Àü ¹Ú½º ´ã¾ÆµÎ±â
+	vector<CCollisionBox*> m_vecCollision{};  // ì½œë¦¬ì „ ë°•ìŠ¤ ë‹´ì•„ë‘ê¸°
 
 	NAVIGATION_MODE		eNaviMode = CREATE_NAVIPOINT;
 
@@ -59,9 +63,9 @@ private:
 
 
 
-	_uint		m_iSelected_index = -1;  // ¼±ÅÃÇÑ ÀÎµ¦½º ¹øÈ£
-	_uint		m_iIndex{}; // ÀüÃ¼ ÀÎµ¦½º 
-	_int		m_iCount{};		// ÀÌ°Ç ¹è¿­¿¡ µé¾î°¡´Â ÀÎµ¦½º ¹øÈ£
+	_uint		m_iSelected_index = -1;  // ì„ íƒí•œ ì¸ë±ìŠ¤ ë²ˆí˜¸
+	_uint		m_iIndex{}; // ì „ì²´ ì¸ë±ìŠ¤ 
+	_int		m_iCount{};		// ì´ê±´ ë°°ì—´ì— ë“¤ì–´ê°€ëŠ” ì¸ë±ìŠ¤ ë²ˆí˜¸
 
 
 	_bool m_bAfter_AddPoints = false;
@@ -75,7 +79,7 @@ private:
 	ID3D11ShaderResourceView* my_Loadtexture = nullptr;
 
 public:
-	static CNavigation_Leve* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CNavigation_Leve* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 };
 

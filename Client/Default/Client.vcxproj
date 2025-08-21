@@ -164,6 +164,8 @@
     <ClInclude Include="..\Public\AttackState_Pony.h" />
     <ClInclude Include="..\Public\Aura.h" />
     <ClInclude Include="..\Public\Battery.h" />
+    <ClInclude Include="..\Public\BatteryGage.h" />
+    <ClInclude Include="..\Public\BatteryUI.h" />
     <ClInclude Include="..\Public\Blimp.h" />
     <ClInclude Include="..\Public\BrainCore.h" />
     <ClInclude Include="..\Public\BackGround.h" />
@@ -171,6 +173,7 @@
     <ClInclude Include="..\Public\Broken_Bricks.h" />
     <ClInclude Include="..\Public\Bulb.h" />
     <ClInclude Include="..\Public\Bullet.h" />
+    <ClInclude Include="..\Public\BulletUI.h" />
     <ClInclude Include="..\Public\ButtonUI.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
@@ -178,7 +181,10 @@
     <ClInclude Include="..\Public\Coin_Item.h" />
     <ClInclude Include="..\Public\Collector.h" />
     <ClInclude Include="..\Public\CollisionBox.h" />
+    <ClInclude Include="..\Public\ConstUI.h" />
     <ClInclude Include="..\Public\CrossLine.h" />
+    <ClInclude Include="..\Public\DamagedUI.h" />
+    <ClInclude Include="..\Public\DeadUI.h" />
     <ClInclude Include="..\Public\Effect.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -188,6 +194,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Electricity.h" />
+    <ClInclude Include="..\Public\Ending_UI.h" />
     <ClInclude Include="..\Public\Energy_Cap.h" />
     <ClInclude Include="..\Public\Energy_Lader.h" />
     <ClInclude Include="..\Public\Energy_Machine.h" />
@@ -214,9 +221,11 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Loading_UI.h" />
+    <ClInclude Include="..\Public\MachineHp.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MenuUI.h" />
     <ClInclude Include="..\Public\Missile_Flame.h" />
+    <ClInclude Include="..\Public\Missile_TimeUI.h" />
     <ClInclude Include="..\Public\Missile_Truck.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Monster_Bullet.h" />
@@ -229,6 +238,7 @@
     <ClInclude Include="..\Public\Particle_Snow.h" />
     <ClInclude Include="..\Public\Pivot.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\PlayerHp.h" />
     <ClInclude Include="..\Public\Player_Build.h" />
     <ClInclude Include="..\Public\Player_FPS.h" />
     <ClInclude Include="..\Public\Pony.h" />
@@ -272,19 +282,25 @@
     <ClCompile Include="..\Private\Aura.cpp" />
     <ClCompile Include="..\Private\BackGround.cpp" />
     <ClCompile Include="..\Private\Battery.cpp" />
+    <ClCompile Include="..\Private\BatteryGage.cpp" />
+    <ClCompile Include="..\Private\BatteryUI.cpp" />
     <ClCompile Include="..\Private\Blimp.cpp" />
     <ClCompile Include="..\Private\Body_Player.cpp" />
     <ClCompile Include="..\Private\BrainCore.cpp" />
     <ClCompile Include="..\Private\Broken_Bricks.cpp" />
     <ClCompile Include="..\Private\Bulb.cpp" />
     <ClCompile Include="..\Private\Bullet.cpp" />
+    <ClCompile Include="..\Private\BulletUI.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\Coin_Item.cpp" />
     <ClCompile Include="..\Private\Collector.cpp" />
     <ClCompile Include="..\Private\CollisionBox.cpp" />
+    <ClCompile Include="..\Private\ConstUI.cpp" />
     <ClCompile Include="..\Private\CrossLine.cpp" />
+    <ClCompile Include="..\Private\DamagedUI.cpp" />
+    <ClCompile Include="..\Private\DeadUI.cpp" />
     <ClCompile Include="..\Private\Effect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -294,6 +310,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Electricity.cpp" />
+    <ClCompile Include="..\Private\Ending_UI.cpp" />
     <ClCompile Include="..\Private\Energy_Cap.cpp" />
     <ClCompile Include="..\Private\Energy_Lader.cpp" />
     <ClCompile Include="..\Private\Energy_Machine.cpp" />
@@ -320,9 +337,11 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Loading_UI.cpp" />
+    <ClCompile Include="..\Private\MachineHp.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MenuUI.cpp" />
     <ClCompile Include="..\Private\Missile_Flame.cpp" />
+    <ClCompile Include="..\Private\Missile_TimeUI.cpp" />
     <ClCompile Include="..\Private\Missile_Truck.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Monster_Bullet.cpp" />
@@ -335,6 +354,7 @@
     <ClCompile Include="..\Private\Particle_Snow.cpp" />
     <ClCompile Include="..\Private\Pivot.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\PlayerHp.cpp" />
     <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />
     <ClCompile Include="..\Private\Pony.cpp" />

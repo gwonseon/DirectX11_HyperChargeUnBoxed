@@ -7,26 +7,26 @@ BEGIN(Engine)
 class ENGINE_DLL CContainerObject abstract : public CGameObject
 {
 public:
-	typedef struct : CGameObject::GAMEOBJ_DESC
+	typedef struct: CGameObject::GAMEOBJ_DESC
 	{
-	
+
 		_uint	iNumPartObjects;
 	}CONTAINEROBJECT_DESC;
 
 protected:
-	CContainerObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CContainerObject(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CContainerObject(const CContainerObject& Prototype);
 	virtual ~CContainerObject() = default;
 
 public:
-	virtual class CComponent* Find_Component(const _wstring& strComponentTag, _uint iPartObjID = 0) override;
+	virtual class CComponent* Find_Component(const _wstring& strComponentTag,_uint iPartObjID = 0) override;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype();
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
@@ -34,13 +34,13 @@ public:
 	virtual HRESULT Render();
 
 protected:
-	_uint								m_iNumPartObjects = { 0 };
+	_uint								m_iNumPartObjects = {0};
 	vector<class CPartObject*>			m_PartObjects;
 
 
 	_uint								m_iViewState{};
 protected:
-	HRESULT Add_PartObject(const _wstring& strPrototypeTag, _uint iPartObjectIndex, void* pArg = nullptr);
+	HRESULT Add_PartObject(const _wstring& strPrototypeTag,_uint iPartObjectIndex,void* pArg = nullptr);
 	CPartObject* Get_PartObject(_uint iPartObjectIndex);
 
 public:

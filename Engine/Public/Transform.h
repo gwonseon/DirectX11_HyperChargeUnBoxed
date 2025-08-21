@@ -2,16 +2,18 @@
 
 #include "Component.h"
 
-/* ¿ùµå °ø°£¿¡¼­ÀÇ °´Ã¼ÀÇ »óÅÂ¸¦ Ç¥ÇöÇÏ±âÀ§ÇÑ Çà·Ä. */
-/* Ç¥Çö : ¿ùµåÇà·ÄÀ» µé°í ÀÖÀ½À¸·Î¼­ ¿ùµå°ø°£¿¡¼­ÀÇ right, up, look, positionÀ» ÀúÀåÇÏ°í ÀÖ´Â ±â´É. */
-/* Ç¥Çö : »óÅÂ º¤ÅÍµéÀ» ÀÌ¿ëÇØ¼­ ¿ùµå°ø°£¿¡¼­ÀÇ »óÅÂ º¯È¯À» ¼öÇàÇÏ´Â ±â´É. */
+/* ì›”ë“œ ê³µê°„ì—ì„œì˜ ê°ì²´ì˜ ìƒíƒœë¥¼ í‘œí˜„í•˜ê¸°ìœ„í•œ í–‰ë ¬. */
+/* í‘œí˜„ : ì›”ë“œí–‰ë ¬ì„ ë“¤ê³  ìˆìŒìœ¼ë¡œì„œ ì›”ë“œê³µê°„ì—ì„œì˜ right, up, look, positionì„ ì €ì¥í•˜ê³  ìˆëŠ” ê¸°ëŠ¥. */
+/* í‘œí˜„ : ìƒíƒœ ë²¡í„°ë“¤ì„ ì´ìš©í•´ì„œ ì›”ë“œê³µê°„ì—ì„œì˜ ìƒíƒœ ë³€í™˜ì„ ìˆ˜í–‰í•˜ëŠ” ê¸°ëŠ¥. */
 
 BEGIN(Engine)
-// ENGINE_DLL : Å¬¶óÀÌ¾ğÆ®°¡ Á÷Á¢ µé°í ÀÖ´Â ÇüÅÂ
-class ENGINE_DLL CTransform final : public CComponent
+// ENGINE_DLL : í´ë¼ì´ì–¸íŠ¸ê°€ ì§ì ‘ ë“¤ê³  ìˆëŠ” í˜•íƒœ
+class ENGINE_DLL CTransform final: public CComponent
 {
 public:
-	enum STATE { STATE_RIGHT, STATE_UP, STATE_LOOK, STATE_POSITION, STATE_END };
+	enum STATE {
+		STATE_RIGHT,STATE_UP,STATE_LOOK,STATE_POSITION,STATE_END
+	};
 
 	typedef struct
 	{
@@ -22,25 +24,25 @@ public:
 	}TRANSFORM_DESC;
 
 private:
-	CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTransform(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CTransform() = default;
 
 public:
-	void Set_State(STATE eState, _fvector vState) {
-		// ¿ùµåÇà·Ä¿¡ XMVECTORÀÇ °ªÀ» ³Ö´Â´Ù.
-		// XMStoreFloat4ÀÇ Ã¹ ÀÎÀÚ´Â XMFLOAT4ÀÌ´Ù.
-		// m_WorldMatrix.m[eState][0] Àº ÁÖ¼Ò´Ï _float4* ·Î Çüº¯È¯ÇØ¾ßÇÑ´Ù. 
-		XMStoreFloat4((_float4*)&m_WorldMatrix.m[eState][0], vState);
+	void Set_State(STATE eState,_fvector vState) {
+		// ì›”ë“œí–‰ë ¬ì— XMVECTORì˜ ê°’ì„ ë„£ëŠ”ë‹¤.
+		// XMStoreFloat4ì˜ ì²« ì¸ìëŠ” XMFLOAT4ì´ë‹¤.
+		// m_WorldMatrix.m[eState][0] ì€ ì£¼ì†Œë‹ˆ _float4* ë¡œ í˜•ë³€í™˜í•´ì•¼í•œë‹¤. 
+		XMStoreFloat4((_float4*)&m_WorldMatrix.m[eState][0],vState);
 	}
 
 	_vector Get_State(STATE eState) {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
-		//XMLoadFloat4x4 Çà·Ä µ¥ÀÌÅÍ¸¦ XMMATRIX·Î º¯È¯ÇÑ´Ù. 
-		// ÀÌ Çà·ÄÀº ¿ùµå º¯È¯ Çà·ÄÀ» ÀúÀåÇÏ°í ÀÖ´Âµ¥ ÀÌ Çà·Ä¿¡¼­ eState¹øÂ° ÇàÀ» °¡Á®¿À´Â ¿ªÇÒÀ» ÇÑ´Ù.
-		// r[0] : XÃà ¹æÇâ º¤ÅÍ 
-		// r[1] : YÃà ¹æÇâ º¤ÅÍ
-		// r[2] : ZÃà ¹æÇâ º¤ÅÍ
-		// r[3] : À§Ä¡ Á¤º¸
+		//XMLoadFloat4x4 í–‰ë ¬ ë°ì´í„°ë¥¼ XMMATRIXë¡œ ë³€í™˜í•œë‹¤. 
+		// ì´ í–‰ë ¬ì€ ì›”ë“œ ë³€í™˜ í–‰ë ¬ì„ ì €ì¥í•˜ê³  ìˆëŠ”ë° ì´ í–‰ë ¬ì—ì„œ eStateë²ˆì§¸ í–‰ì„ ê°€ì ¸ì˜¤ëŠ” ì—­í• ì„ í•œë‹¤.
+		// r[0] : Xì¶• ë°©í–¥ ë²¡í„° 
+		// r[1] : Yì¶• ë°©í–¥ ë²¡í„°
+		// r[2] : Zì¶• ë°©í–¥ ë²¡í„°
+		// r[3] : ìœ„ì¹˜ ì •ë³´
 	}
 
 	const _float4x4* Get_WorldMatrixPtr() const {
@@ -48,7 +50,7 @@ public:
 	}
 	_matrix Get_WorldMatrix_Inverse()
 	{
-		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
+		return XMMatrixInverse(nullptr,XMLoadFloat4x4(&m_WorldMatrix));
 	}
 	_matrix Get_WorldMatrix() const {
 		return XMLoadFloat4x4(&m_WorldMatrix);
@@ -62,55 +64,55 @@ public:
 			XMVectorGetX(XMVector3Length(Get_State(STATE_RIGHT))),
 			XMVectorGetX(XMVector3Length(Get_State(STATE_UP))),
 			XMVectorGetX(XMVector3Length(Get_State(STATE_LOOK)))
-			);
+		);
 	}
 public:
 	virtual HRESULT Initialize_Prototype(void* pTransformDesc);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	void Set_Scaling(_float fScaleX, _float fScaleY, _float fScaleZ);
+	void Set_Scaling(_float fScaleX,_float fScaleY,_float fScaleZ);
 	void LookAt(_fvector vAt);
 
-	void Go_Straight(_float fTimeDelta); 
-	void Go_Straight(_float fTimeDelta, _float AddfSpeed);
+	void Go_Straight(_float fTimeDelta);
+	void Go_Straight(_float fTimeDelta,_float AddfSpeed);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
 	void Go_Backward(_float fTimeDelta);
-	void Turn(_fvector vAxis, _float fTimeDelta);
-	void Turn(_bool bX, _bool bY, _bool bZ, _float fTimeDelta);
-	void Rotation(_float fX, _float fY, _float fZ);
-	void Jump(_float fTimeDelta, _float& fHeight, _float& fPower, _uint iJumpState, _uint iJumpCount,_float fMinHeight = 0.f);
+	void Turn(_fvector vAxis,_float fTimeDelta);
+	void Turn(_bool bX,_bool bY,_bool bZ,_float fTimeDelta);
+	void Rotation(_float fX,_float fY,_float fZ);
+	void Jump(_float fTimeDelta,_float& fHeight,_float& fPower,_uint iJumpState,_uint iJumpCount,_float fMinHeight = 0.f);
 	void Set_Min_Height();
-	_bool KnockBack(_float fTimeDelta, _vector vKnockBackDir, _float& fPower, _float StartHeight);
+	_bool KnockBack(_float fTimeDelta,_vector vKnockBackDir,_float& fPower,_float StartHeight);
 
-	void Go_Left_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Right_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Straight_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Backward_Nav(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Straight_Nav_Type2(_float fTimeDelta,_vector vPos, class CNavigation* pNavigation = nullptr);
+	void Go_Left_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
+	void Go_Right_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
+	void Go_Straight_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
+	void Go_Backward_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
+	void Go_Straight_Nav_Type2(_float fTimeDelta,_vector vPos,class CNavigation* pNavigation = nullptr);
 
 	void Go_Straight_Player(_float fTimeDelta);
-	void Go_Straight_Player(_float fTimeDelta, _float AddfSpeed);
+	void Go_Straight_Player(_float fTimeDelta,_float AddfSpeed);
 	void Go_Left_Player(_float fTimeDelta);
 	void Go_Right_Player(_float fTimeDelta);
 	void Go_Backward_Player(_float fTimeDelta);
 
-	_float Cal_Distance(_float3 fObj, _float3 fTarget);
-	_float Cal_Distance_vec(_vector vObj, _vector vTarget);
-	_float Cal_Distance_No_Height(_float3 fObj, _float3 fTarget);
-	_float Cal_Distance_vec_No_Height(_vector vObj, _vector vTarget);
+	_float Cal_Distance(_float3 fObj,_float3 fTarget);
+	_float Cal_Distance_vec(_vector vObj,_vector vTarget);
+	_float Cal_Distance_No_Height(_float3 fObj,_float3 fTarget);
+	_float Cal_Distance_vec_No_Height(_vector vObj,_vector vTarget);
 
 
-	void Gravity(_vector vPos, _float fTimeDelta, _float fMinHeight);
-	_bool  IsPass_TargetPosition(_vector prevPos, _vector currentPos, _vector targetPos);
-	// A½ºÅ¸ ÀÌµ¿
+	void Gravity(_vector vPos,_float fTimeDelta,_float fMinHeight);
+	_bool  IsPass_TargetPosition(_vector prevPos,_vector currentPos,_vector targetPos);
+	// AìŠ¤íƒ€ ì´ë™
 public:
-	vector<_float3> PathFind(_float fTimeDelta, CNavigation* pNavigation,_int CurrentCell_Idx, _int TargetCell_Idx);
+	vector<_float3> PathFind(_float fTimeDelta,CNavigation* pNavigation,_int CurrentCell_Idx,_int TargetCell_Idx);
 
 
 public:
-	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
+	HRESULT Bind_ShaderResource(class CShader* pShader,const _char* pConstantName);
 
 private:
 	_float4x4					m_WorldMatrix = {};
@@ -123,7 +125,7 @@ private:
 	_float						m_fStart_Height{};
 	_float						m_fJumpSpeed{};
 public:
-	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pTransformDesc);
+	static CTransform* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,void* pTransformDesc);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 

@@ -5,15 +5,15 @@
 #include "Level_Loading.h"
 #include "Loading_UI.h"
 #include "BackGround.h"
-/* ÇöÀç ·ÎµùÈ­¸éÀ» º¸¿©ÁØ´Ù. */
-/* ´ÙÀ½ ·¹º§¿¡ ´ëÇÑ ÀÚ¿øÀ» ÁØºñÇÑ´Ù.(CLoader ÇÏÃ»À» ¸Ã±æ°Å¾ß) */
+/* í˜„ì¬ ë¡œë”©í™”ë©´ì„ ë³´ì—¬ì¤€ë‹¤. */
+/* ë‹¤ìŒ ë ˆë²¨ì— ëŒ€í•œ ìì›ì„ ì¤€ë¹„í•œë‹¤.(CLoader í•˜ì²­ì„ ë§¡ê¸¸ê±°ì•¼) */
 
 BEGIN(Client)
 
-class CLevel_Loading final : public CLevel
+class CLevel_Loading final: public CLevel
 {
 private:
-	CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLevel_Loading(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CLevel_Loading() = default;
 
 public:
@@ -22,8 +22,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	class CLoader* m_pLoader = { nullptr };
-	LEVELID						m_eNextLevelID = { LEVEL_END };
+	class CLoader* m_pLoader = {nullptr};
+	LEVELID						m_eNextLevelID = {LEVEL_END};
 	_float						m_fLoading_Per = 0.f;
 
 	//CLoading_UI* m_pLoadingUI = { nullptr };
@@ -38,7 +38,7 @@ public:
 	HRESULT Ready_Layer_UI_LOGO(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_UI_GameTitle(const _tchar* pLayerTag);
 public:
-	static CLevel_Loading* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID);
+	static CLevel_Loading* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,LEVELID eNextLevelID);
 	virtual void Free() override;
 };
 

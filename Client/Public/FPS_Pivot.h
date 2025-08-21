@@ -10,25 +10,25 @@ END
 
 BEGIN(Client)
 
-class CFPS_Pivot final : public CPartObject
+class CFPS_Pivot final: public CPartObject
 {
 public:
-	typedef struct : CPartObject::PARTOBJECT_DESC
+	typedef struct: CPartObject::PARTOBJECT_DESC
 	{
-		const _uint* pParentState = { nullptr };
-		const _float4x4* pSocketMatrix = { nullptr };
+		const _uint* pParentState = {nullptr};
+		const _float4x4* pSocketMatrix = {nullptr};
 	}FPSPIVOT_DESC;
 private:
-	CFPS_Pivot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CFPS_Pivot(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CFPS_Pivot(const CFPS_Pivot& Prototype);
 	virtual ~CFPS_Pivot() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -37,7 +37,9 @@ public:
 
 
 public:
-	_vector* Get_FPS_CameraPos() { return &m_vecFPS_CamPos; }
+	_vector* Get_FPS_CameraPos() {
+		return &m_vecFPS_CamPos;
+	}
 
 public:
 	_vector Get_PivotPos() {
@@ -45,11 +47,11 @@ public:
 	}
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	const _float4x4* m_pSocketMatrix = { nullptr };
-	const _uint* m_pParentState = { nullptr };
-	
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	const _float4x4* m_pSocketMatrix = {nullptr};
+	const _uint* m_pParentState = {nullptr};
+
 
 	_vector m_vecFPS_CamPos{};
 private:
@@ -60,9 +62,9 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
-	_float3 Position{}, Rotation{};
+	_float3 Position{},Rotation{};
 public:
-	static CFPS_Pivot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CFPS_Pivot* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

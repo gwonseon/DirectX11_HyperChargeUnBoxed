@@ -7,7 +7,7 @@
 BEGIN(Engine)
 
 
-class CCollisionMgr final : public CBase
+class CCollisionMgr final: public CBase
 {
 
 private:
@@ -19,17 +19,17 @@ public:
 
 
 public:
-	_bool Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDir, _vector vRayPos, _bool* bShot,_float fDamage ,_uint iTargetPartObjID = 0);
-	void Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	void Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	void Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
+	_bool Collision_Bullet(CLayer* Target,const _wstring& strTargetComponentTag,_vector vRayDir,_vector vRayPos,_bool* bShot,_float fDamage,_uint iTargetPartObjID = 0);
+	void Collision_Layer(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	void Collision_Layer_Coin(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	void Collision_Trap(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
 
-	void Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag,_uint iCount ,_uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
+	void Collision_Explosion(CLayer* pExplosionLayer,CLayer* pAttackedLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iCount,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
 	//void Collision_Explosion(CLayer* pExplosionLayer,const _wstring& strExplosionComponentTag,_uint iCount, _uint irExplosionPartObjID = 0, CCollider* pCollider);
 
-	// π–æÓ≥ª±‚, ∆ƒ∆ƒ∞Ì øµæÓ æÓ∑∆≥ﬂ
-	void Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID = 0, _uint iDstPartObjID = 0);
-	void Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring& strSrcComponentTag, _uint iSrcPartObjID = 0);
+	// Î∞ÄÏñ¥ÎÇ¥Í∏∞, ÌååÌååÍ≥† ÏòÅÏñ¥ Ïñ¥Î†µÎÑπ
+	void Anti_OverLapping(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID = 0,_uint iDstPartObjID = 0);
+	void Anti_OverLapping_SameLayer(CLayer* pSrcLayer,const _wstring& strSrcComponentTag,_uint iSrcPartObjID = 0);
 
 public:
 	virtual void Free() override;

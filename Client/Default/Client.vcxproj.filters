@@ -292,6 +292,39 @@
     <Filter Include="02. GameObjects\Effect\aura">
       <UniqueIdentifier>{b2f33a2b-a640-42b7-9dad-ec817efaa055}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo">
+      <UniqueIdentifier>{92614ef4-9202-454a-834d-94621b9a5e78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\PlayerHp">
+      <UniqueIdentifier>{49d10abf-da69-4e91-80e5-0069b791e707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\MachineHp">
+      <UniqueIdentifier>{9385dd0e-4363-4b42-95a9-0ffb6c73b908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\BatteryGage">
+      <UniqueIdentifier>{a44d45e8-fa82-4aaf-977e-dff5aabec100}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\Battery_UI">
+      <UniqueIdentifier>{71661ab0-32db-4b5f-8b12-6b313ab3abaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\EndingUI">
+      <UniqueIdentifier>{7f974107-806b-411c-bc3b-ea0962c70a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\Missile_TimerUI">
+      <UniqueIdentifier>{dd001c8b-263d-4291-9962-2a9332cdeb7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\DeadUI">
+      <UniqueIdentifier>{fb8de27b-44bc-459b-9f21-fcb17d99d78e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\BulletUI">
+      <UniqueIdentifier>{ff88069a-2036-4280-8d65-7129daaf90fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\DamagedUI">
+      <UniqueIdentifier>{88fdc338-2389-46e3-9f62-f901c99cff79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\ConstUI">
+      <UniqueIdentifier>{7d39388f-8cdf-4093-b3eb-826b6c3c495d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -576,6 +609,36 @@
     <ClInclude Include="..\Public\Aura.h">
       <Filter>02. GameObjects\Effect\aura</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerHp.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\PlayerHp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MachineHp.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\MachineHp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BatteryGage.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\BatteryGage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BatteryUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\Battery_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Ending_UI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\EndingUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Missile_TimeUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\Missile_TimerUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DeadUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\DeadUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BulletUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\BulletUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DamagedUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\DamagedUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ConstUI.h">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\ConstUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -725,9 +788,6 @@
     <ClCompile Include="..\Private\Energy_Cap.cpp">
       <Filter>02. GameObjects\Player_Build\Energy_Machine\Energy_Cap</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Battery.cpp">
-      <Filter>02. GameObjects\Environment\Battery</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TrotState_Pony.cpp">
       <Filter>02. GameObjects\Monster\Pony\PonyState\Trot</Filter>
     </ClCompile>
@@ -838,6 +898,39 @@
     </ClCompile>
     <ClCompile Include="..\Private\Aura.cpp">
       <Filter>02. GameObjects\Effect\aura</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Battery.cpp">
+      <Filter>02. GameObjects\Environment\Battery</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerHp.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\PlayerHp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MachineHp.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\MachineHp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BatteryGage.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\BatteryGage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BatteryUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\Battery_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Ending_UI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\EndingUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Missile_TimeUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\Missile_TimerUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DeadUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\DeadUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BulletUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\BulletUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DamagedUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\PlayerInfo\DamagedUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ConstUI.cpp">
+      <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\ConstUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

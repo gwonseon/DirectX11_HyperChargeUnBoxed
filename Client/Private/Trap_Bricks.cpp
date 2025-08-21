@@ -3,15 +3,13 @@
 
 #include "GameInstance.h"
 #include "Broken_Bricks.h"
-CTrap_Bricks::CTrap_Bricks(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPlayer_Build{ pDevice, pContext }
-{
-}
+CTrap_Bricks::CTrap_Bricks(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CPlayer_Build{pDevice,pContext}
+{}
 
 CTrap_Bricks::CTrap_Bricks(const CTrap_Bricks& Prototype)
-	: CPlayer_Build{ Prototype }
-{
-}
+	: CPlayer_Build{Prototype}
+{}
 
 HRESULT CTrap_Bricks::Initialize_Prototype()
 {
@@ -28,9 +26,9 @@ HRESULT CTrap_Bricks::Initialize(void* pArg)
 	m_bBuild = pDesc->m_bBuild;
 	m_bBuild_PreView = pDesc->m_bBuild_PreView;
 
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;	
-	if (FAILED(Add_Components()))
+	if(FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+	if(FAILED(Add_Components()))
 		return E_FAIL;
 
 
@@ -38,72 +36,70 @@ HRESULT CTrap_Bricks::Initialize(void* pArg)
 	m_bDontDestroy = true;
 	m_bDraw = false;
 	m_bOnce = false;
-	if (m_iModel_Idx == 1) // ·¹°í Æ®·¦
+	if(m_iModel_Idx == 1) // ë ˆê³  íŠ¸ëž©
 	{
 		m_fHp = 100.f;
 		m_iCoin = 100;
 	}
-	if (m_iModel_Idx == 9) // ÅÊÅ© Æ®·¦
+	if(m_iModel_Idx == 9) // íƒ±í¬ íŠ¸ëž©
 	{
 		m_fHp = 70.f;
 		m_iCoin = 70;
 	}
-	
+
 	return S_OK;
 }
 
 void CTrap_Bricks::Priority_Update(_float fTimeDelta)
 {
-	// ÆÄ±«µÇ¾úÀ» ¶§
-	if (m_bKnockdown == true)
+	// íŒŒê´´ë˜ì—ˆì„ ë•Œ
+	if(m_bKnockdown == true)
 	{
 		m_bAffected = false;
 		*m_bBuild = false;
 		*m_bBuild_PreView = false;
 
-		if (m_bOnce == false && m_iModel_Idx == 1)
+		if(m_bOnce == false && m_iModel_Idx == 1)
 		{
 			m_fSound = m_pGameInstance->Sound_Cal(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			m_pGameInstance->PlaySoundW(L"FE_Buildable_Trap_Destroy.wav", Engine::CHANNELID::TRAP_BROKEN, m_fSound);
+			m_pGameInstance->PlaySoundW(L"FE_Buildable_Trap_Destroy.wav",Engine::CHANNELID::TRAP_BROKEN,m_fSound);
 
 			_float3 fPos{};
-			XMStoreFloat3(&fPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			XMStoreFloat3(&fPos,m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			CBroken_Bricks::PLAYER_BUILD_DESC pDesc{};
 			pDesc.fPosition = fPos;
 			pDesc.fSpeedPerSec = 3.f;
 			pDesc.eID = m_eLevel;
-			pDesc.fScale = { 4.f,4.f,4.f };
-			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Broken"), TEXT("Prototype_GameObject_broken"), &pDesc);
+			pDesc.fScale = {4.f,4.f,4.f};
+			m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Layer_Broken"),TEXT("Prototype_GameObject_broken"),&pDesc);
 
 			m_bOnce = true;
 		}
 
-	
+
 	}
 }
 
 void CTrap_Bricks::Update(_float fTimeDelta)
 {
-	if (m_bDead)
+	if(m_bDead)
 		return;
-	// °Ç¼³µÇ¾úÀ» ¶§
+	// ê±´ì„¤ë˜ì—ˆì„ ë•Œ
 	if(*m_bBuild == true)
 	{
 		m_bAffected = true;
 		m_bCanAttacked = true;
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-	}
-	else
+	} else
 	{
 		m_bAffected = false;
 		m_bCanAttacked = false;
-		// °Ç¼³ ¾ÈµÇ¾úÀ» ¶§
-		// »ì ¼ö ÀÖÀ» ¶§¿Í ¾øÀ» ¶§ ±¸ºÐ
-		if (m_pPlayer->Get_Coin() > m_iCoin)
+		// ê±´ì„¤ ì•ˆë˜ì—ˆì„ ë•Œ
+		// ì‚´ ìˆ˜ ìžˆì„ ë•Œì™€ ì—†ì„ ë•Œ êµ¬ë¶„
+		if(m_pPlayer->Get_Coin() > m_iCoin)
 		{
 			m_bCanBuy = true;
-		}
-		else
+		} else
 		{
 			m_bCanBuy = false;
 		}
@@ -113,55 +109,53 @@ void CTrap_Bricks::Update(_float fTimeDelta)
 
 void CTrap_Bricks::Late_Update(_float fTimeDelta)
 {
-	if (*m_bBuild_PreView == true || *m_bBuild == true)
+	if(*m_bBuild_PreView == true || *m_bBuild == true)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 			return;
-		
+
 	}
-	if (*m_bBuild == true)
+	if(*m_bBuild == true)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT, this)))
+		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_HEIGHT,this)))
 			return;
 	}
 }
 
 HRESULT CTrap_Bricks::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
 			return E_FAIL;
-		if (*m_bBuild == false)
+		if(*m_bBuild == false)
 		{
 			if(m_bCanBuy == true)
 			{
-				if (FAILED(m_pShaderCom->Begin(0)))
+				if(FAILED(m_pShaderCom->Begin(0)))
 					return E_FAIL;
-			}
-			else
+			} else
 			{
-				if (FAILED(m_pShaderCom->Begin(2)))
+				if(FAILED(m_pShaderCom->Begin(2)))
 					return E_FAIL;
 			}
-		}
-		else
+		} else
 		{
-			if (FAILED(m_pShaderCom->Begin(1)))
+			if(FAILED(m_pShaderCom->Begin(1)))
 				return E_FAIL;
 		}
 
 		m_pModelCom->Render(i);
 	}
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	m_pColliderCom->Render();
-#endif
+	#endif
 	return S_OK;
 }
 
@@ -169,34 +163,34 @@ HRESULT CTrap_Bricks::Render()
 HRESULT CTrap_Bricks::Render_Height()
 {
 
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
-	_float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 
-	CLayer* pPlayerLayer = (m_pGameInstance->Find_Layer(m_eLevel, TEXT("Layer_Player")));
+	CLayer* pPlayerLayer = (m_pGameInstance->Find_Layer(m_eLevel,TEXT("Layer_Player")));
 	CPlayer* pPlayer = static_cast<CPlayer*>(pPlayerLayer->Get_GameObject_List().front());
 	_vector PlayerPos = pPlayer->Get_Position();
 	_matrix			matView = XMMatrixIdentity();
-	matView.r[0] = XMVectorSet(1.f, 0.f, 0.f, 0.f);
-	matView.r[1] = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-	matView.r[2] = XMVectorSet(0.f, -1.f, 0.f, 0.f);
-	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos), XMVectorGetY(PlayerPos) + 6.f, XMVectorGetZ(PlayerPos), 1.f);
+	matView.r[0] = XMVectorSet(1.f,0.f,0.f,0.f);
+	matView.r[1] = XMVectorSet(0.f,0.f,1.f,0.f);
+	matView.r[2] = XMVectorSet(0.f,-1.f,0.f,0.f);
+	matView.r[3] = XMVectorSet(XMVectorGetX(PlayerPos),XMVectorGetY(PlayerPos) + 6.f,XMVectorGetZ(PlayerPos),1.f);
 
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixInverse(nullptr, matView));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixOrthographicLH(200.f, 200.f, 0.f, 30.f));
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixInverse(nullptr,matView));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixOrthographicLH(200.f,200.f,0.f,30.f));
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&ViewMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&ProjMatrix)))
 		return E_FAIL;
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pShaderCom->Begin(3))) // ¹«Á¶°Ç ±×¸²
+		if(FAILED(m_pShaderCom->Begin(3))) // ë¬´ì¡°ê±´ ê·¸ë¦¼
 			return E_FAIL;
 		m_pModelCom->Render(i);
 	}
@@ -206,26 +200,26 @@ HRESULT CTrap_Bricks::Render_Height()
 HRESULT CTrap_Bricks::Add_Components()
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTrap"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxTrap"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Trap");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModel_Idx);
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	CBounding_AABB::BOUND_AABB_DESC		AABBDesc{};
 	if(m_iModel_Idx == 1)
-		AABBDesc.vExtents = _float3(1.2f, 0.3f, 1.2f);
-	if (m_iModel_Idx == 9)
-		AABBDesc.vExtents = _float3(0.6f, 0.6f, 0.6f);
+		AABBDesc.vExtents = _float3(1.2f,0.3f,1.2f);
+	if(m_iModel_Idx == 9)
+		AABBDesc.vExtents = _float3(0.6f,0.6f,0.6f);
 
-	AABBDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_AABB"),
-		TEXT("Com_Collider_AABB"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+	AABBDesc.vCenter = _float3(0.f,0.f,0.f);
+	if(FAILED(__super::Add_Component(m_eLevel,TEXT("Prototype_Component_Collider_AABB"),
+		TEXT("Com_Collider_AABB"),reinterpret_cast<CComponent**>(&m_pColliderCom),&AABBDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -233,16 +227,16 @@ HRESULT CTrap_Bricks::Add_Components()
 
 HRESULT CTrap_Bricks::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 		return E_FAIL;
@@ -262,10 +256,10 @@ HRESULT CTrap_Bricks::Bind_ShaderResources()
 	return S_OK;
 }
 
-CTrap_Bricks* CTrap_Bricks::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTrap_Bricks* CTrap_Bricks::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CTrap_Bricks* pInstance = new CTrap_Bricks(pDevice, pContext);
-	if (FAILED(pInstance->Initialize_Prototype()))
+	CTrap_Bricks* pInstance = new CTrap_Bricks(pDevice,pContext);
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CTrap_Bricks");
 		Safe_Release(pInstance);
@@ -276,7 +270,7 @@ CTrap_Bricks* CTrap_Bricks::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 CGameObject* CTrap_Bricks::Clone(void* pArg)
 {
 	CTrap_Bricks* pInstance = new CTrap_Bricks(*this);
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CTrap_Bricks");
 		Safe_Release(pInstance);

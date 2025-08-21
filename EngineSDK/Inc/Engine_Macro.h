@@ -1,7 +1,7 @@
 #ifndef Engine_Macro_h__
 #define Engine_Macro_h__
 
-// ¸ÅÅ©·Î µéÀÌ Á¤ÀÇµÇ¾î ÀÖ´Â ÆÄÀÏ
+// ë§¤í¬ë¡œ ë“¤ì´ ì •ì˜ë˜ì–´ ìˆëŠ” íŒŒì¼
 namespace Engine
 {
 

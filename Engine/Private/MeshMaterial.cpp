@@ -1,9 +1,9 @@
 #include "..\Public\MeshMaterial.h"
 #include "Shader.h"
 
-CMeshMaterial::CMeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice{ pDevice }
-	, m_pContext{ pContext }
+CMeshMaterial::CMeshMaterial(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: m_pDevice{pDevice}
+	,m_pContext{pContext}
 {
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
@@ -60,68 +60,67 @@ CMeshMaterial::CMeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 //	return S_OK;
 //}
 
-HRESULT CMeshMaterial::Bind_ShaderResource(CShader* pShader, aiTextureType eTextureType, _uint iIndex, const _char* pConstantName)
+HRESULT CMeshMaterial::Bind_ShaderResource(CShader* pShader,aiTextureType eTextureType,_uint iIndex,const _char* pConstantName)
 {
-	if (iIndex >= m_Materials[eTextureType].size())
+	if(iIndex >= m_Materials[eTextureType].size())
 		return E_FAIL;
 
-	return pShader->Bind_SRV(pConstantName, m_Materials[eTextureType][iIndex]);
+	return pShader->Bind_SRV(pConstantName,m_Materials[eTextureType][iIndex]);
 }
 
 HRESULT CMeshMaterial::Initialize_ReadData(HANDLE hFileRead)
 {
-	// ÀÌ°Å 18·Î ¼öÁ¤
-	for (size_t i = 0; i < aiTextureType_UNKNOWN; i++)
+	// Ã€ÃŒÂ°Ã… 18Â·ÃŽ Â¼Ã¶ÃÂ¤
+	for(size_t i = 0; i < aiTextureType_UNKNOWN; i++)
 	{
 		_uint		iNumTexture = 0;
-		ReadFile(hFileRead, &iNumTexture, sizeof(_uint), &dwByte, nullptr);
-		for (_uint j = 0; j < iNumTexture; j++)
+		ReadFile(hFileRead,&iNumTexture,sizeof(_uint),&dwByte,nullptr);
+		for(_uint j = 0; j < iNumTexture; j++)
 		{
-			ID3D11ShaderResourceView* pSRV = { nullptr };
+			ID3D11ShaderResourceView* pSRV = {nullptr};
 			_char			szFullPath[MAX_PATH] = {};
 			_char			szExt[MAX_PATH] = {};
-			_uint			iExtLen{}, iFullPathLen{};
+			_uint			iExtLen{},iFullPathLen{};
 
-			ReadFile(hFileRead, &iExtLen, sizeof(_uint), &dwByte, nullptr);
-			for (_uint k = 0; k < iExtLen; k++)
+			ReadFile(hFileRead,&iExtLen,sizeof(_uint),&dwByte,nullptr);
+			for(_uint k = 0; k < iExtLen; k++)
 			{
-				ReadFile(hFileRead, &szExt[k], sizeof(_char), &dwByte, nullptr);
+				ReadFile(hFileRead,&szExt[k],sizeof(_char),&dwByte,nullptr);
 			}
-			ReadFile(hFileRead, &iFullPathLen, sizeof(_uint), &dwByte, nullptr);
-			for (_uint k = 0; k < iFullPathLen; k++)
+			ReadFile(hFileRead,&iFullPathLen,sizeof(_uint),&dwByte,nullptr);
+			for(_uint k = 0; k < iFullPathLen; k++)
 			{
-				ReadFile(hFileRead, &szFullPath[k], sizeof(_char), &dwByte, nullptr);
+				ReadFile(hFileRead,&szFullPath[k],sizeof(_char),&dwByte,nullptr);
 			}
 
 
 			_tchar		szPerfectPath[MAX_PATH] = {};
-			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szPerfectPath, MAX_PATH);
+			MultiByteToWideChar(CP_ACP,0,szFullPath,strlen(szFullPath),szPerfectPath,MAX_PATH);
 			//cout << szFullPath << endl;
 
-			if (false == strcmp(szExt, ".dds"))
+			if(false == strcmp(szExt,".dds"))
 			{
-				if (FAILED(CreateDDSTextureFromFile(m_pDevice, szPerfectPath, nullptr, &pSRV)))
+				if(FAILED(CreateDDSTextureFromFile(m_pDevice,szPerfectPath,nullptr,&pSRV)))
 					return E_FAIL;
-			}
-			else
+			} else
 			{
-				if (FAILED(CreateWICTextureFromFile(m_pDevice, szPerfectPath, nullptr, &pSRV)))
+				if(FAILED(CreateWICTextureFromFile(m_pDevice,szPerfectPath,nullptr,&pSRV)))
 					return E_FAIL;
 			}
 
 			m_Materials[i].push_back(pSRV);
-		
+
 		}
 	}
 
 	return S_OK;
 }
 
-CMeshMaterial* CMeshMaterial::Create_ReadData(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,  HANDLE hFileRead)
+CMeshMaterial* CMeshMaterial::Create_ReadData(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,HANDLE hFileRead)
 {
-	CMeshMaterial* pInstance = new CMeshMaterial(pDevice, pContext);
+	CMeshMaterial* pInstance = new CMeshMaterial(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_ReadData( hFileRead)))
+	if(FAILED(pInstance->Initialize_ReadData(hFileRead)))
 	{
 		MSG_BOX("Failed to Created : CMeshMaterial");
 		Safe_Release(pInstance);
@@ -134,9 +133,9 @@ void CMeshMaterial::Free()
 {
 	__super::Free();
 
-	for (auto& Textures : m_Materials)
+	for(auto& Textures : m_Materials)
 	{
-		for (auto& pSRV : Textures)
+		for(auto& pSRV : Textures)
 			Safe_Release(pSRV);
 		Textures.clear();
 	}

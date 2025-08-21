@@ -12,227 +12,225 @@
 
 
 
-CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CLevel{ pDevice, pContext }
-{
-}
+CLevel_ImGui::CLevel_ImGui(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CLevel{pDevice,pContext}
+{}
 
 HRESULT CLevel_ImGui::Initialize()
 {
 	ShowCursor(true);
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;  // «√∑π¿ÃæÓ ª˝º∫
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// ƒ´∏ﬁ∂Û ª˝º∫
-	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// ¡ˆ«¸ ª˝º∫
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))			return E_FAIL;	// ∏ÛΩ∫≈Õ
-//	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;	// «√∑π¿ÃæÓ
-	if (FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))				return E_FAIL;
-	if (FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_Trap"))))				return E_FAIL;
+	if(FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;  // ÌîåÎ†àÏù¥Ïñ¥ ÏÉùÏÑ±
+	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))			return E_FAIL;	// Ïπ¥Î©îÎùº ÏÉùÏÑ±
+	if(FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))			return E_FAIL;	// ÏßÄÌòï ÏÉùÏÑ±
+	if(FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))			return E_FAIL;	// Î™¨Ïä§ÌÑ∞
+	//	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))			return E_FAIL;	// ÌîåÎ†àÏù¥Ïñ¥
+	if(FAILED(Ready_Layer_Trap(TEXT("Layer_Trap"))))				return E_FAIL;
+	if(FAILED(Ready_Layer_PlayerBuild(TEXT("Layer_Trap"))))				return E_FAIL;
 
-	
-	if (FAILED(Ready_Layer_Grass(TEXT("Layer_Grass"))))				return E_FAIL;
-	if (FAILED(Ready_Lights()))										return E_FAIL;	// ∫˚
-	if (FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// ∑Œµ˘ ¥›±‚
-	
-	// ≈Õ∑π¿Œ ««≈∑¿ª ¿ß«ÿ ≈Õ∑π¿Œ ƒƒ∆˜≥Õ∆Æ ∞°¡Æø¿±‚
-	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_IMGUI, TEXT("Layer_Terrain"), TEXT("Com_VIBuffer")));
 
-	// ¿˙¿Â ∑ŒµÂ πˆ∆∞(¿ÃπÃ¡ˆ πˆ∆∞)
+	if(FAILED(Ready_Layer_Grass(TEXT("Layer_Grass"))))				return E_FAIL;
+	if(FAILED(Ready_Lights()))										return E_FAIL;	// Îπõ
+	if(FAILED(m_pGameInstance->Close_Level(LEVEL_LOADING)))		return E_FAIL;	// Î°úÎî© Îã´Í∏∞
+
+	// ÌÑ∞Î†àÏù∏ ÌîºÌÇπÏùÑ ÏúÑÌï¥ ÌÑ∞Î†àÏù∏ Ïª¥Ìè¨ÎÑåÌä∏ Í∞ÄÏ†∏Ïò§Í∏∞
+	pVIBuffer_Terrain = dynamic_cast<CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_IMGUI,TEXT("Layer_Terrain"),TEXT("Com_VIBuffer")));
+
+	// Ï†ÄÏû• Î°úÎìú Î≤ÑÌäº(Ïù¥ÎØ∏ÏßÄ Î≤ÑÌäº)
 	Create_ImageButton();
-	
-    return S_OK;
+
+	return S_OK;
 }
 
 void CLevel_ImGui::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+	__super::Update(fTimeDelta);
 
 
-	// ESC ¥©∏£∏È √¢ ≥™∞°¡¸
-	// æ÷¥œ∏ﬁ¿Ãº« æ¯¥¬ ≈¯
-	if (GetAsyncKeyState(VK_F1) & 0x0001)  // æ÷¥œ æ¯¥¬ ∏µ®
+	// ESC ÎàÑÎ•¥Î©¥ Ï∞Ω ÎÇòÍ∞ÄÏßê
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò ÏóÜÎäî Ìà¥
+	if(GetAsyncKeyState(VK_F1) & 0x0001)  // Ïï†Îãà ÏóÜÎäî Î™®Îç∏
 	{
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
 			pBuild->Set_PickingCheck(false);
 			pBuild->Set_ImGuiMode(IMGUI_OBJECT_NONANIM);
 		}
-		for (auto& pEnviron : m_vecEnvironment)
+		for(auto& pEnviron : m_vecEnvironment)
 		{
 			pEnviron->Set_ImGuiMode(IMGUI_OBJECT_NONANIM);
 		}
-		
+
 		m_eImGui_Type = IMGUI_OBJECT_NONANIM;
 		m_iModelIndex = 0;
-		m_fPickingPos = { 0.f,0.f,0.f };
+		m_fPickingPos = {0.f,0.f,0.f};
 	}
-	// æ÷¥œ∏ﬁ¿Ãº« ∏µ® ≈¯
-	if (GetAsyncKeyState(VK_F2) & 0x0001)  // æ÷¥œ ¿÷¥¬ ∏µ®
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò Î™®Îç∏ Ìà¥
+	if(GetAsyncKeyState(VK_F2) & 0x0001)  // Ïï†Îãà ÏûàÎäî Î™®Îç∏
 	{
 		m_eImGui_Type = IMGUI_OBJECT_ANIM;
 		m_iModelIndex = 0;
-		m_fPickingPos = { 0.f,0.f,0.f };
+		m_fPickingPos = {0.f,0.f,0.f};
 	}
-	// ∞«√‡≈¯
-	if (GetAsyncKeyState(VK_F3) & 0x0001) // ∞«π∞≈¯
+	// Í±¥Ï∂ïÌà¥
+	if(GetAsyncKeyState(VK_F3) & 0x0001) // Í±¥Î¨ºÌà¥
 	{
-		for (auto& pEnviron : m_vecEnvironment)
+		for(auto& pEnviron : m_vecEnvironment)
 		{
 			pEnviron->Set_PickingCheck(false);
 			pEnviron->Set_ImGuiMode(IMGUI_BUILD);
 		}
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
 			pBuild->Set_ImGuiMode(IMGUI_BUILD);
 		}
 		m_eImGui_Type = IMGUI_BUILD;
 		m_iModelIndex = 0;
-		m_fPickingPos = { 0.f,0.f,0.f };
+		m_fPickingPos = {0.f,0.f,0.f};
 	}
-	// ƒ⁄¿Œ
-	if (GetAsyncKeyState(VK_F4) & 0x0001) // ƒ⁄¿Œ
+	// ÏΩîÏù∏
+	if(GetAsyncKeyState(VK_F4) & 0x0001) // ÏΩîÏù∏
 	{
-		for (auto& pEnviron : m_vecEnvironment)
+		for(auto& pEnviron : m_vecEnvironment)
 		{
 			pEnviron->Set_PickingCheck(false);
 			pEnviron->Set_ImGuiMode(IMGUI_ITEM);
 		}
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
 			pBuild->Set_ImGuiMode(IMGUI_ITEM);
 		}
 		m_eImGui_Type = IMGUI_ITEM;
 		m_iModelIndex = 0;
-		m_fPickingPos = { 0.f,0.f,0.f };
+		m_fPickingPos = {0.f,0.f,0.f};
 	}
-	// ¿‹µ
-	if (GetAsyncKeyState(VK_F5) & 0x0001) // ¿‹µ
+	// ÏûîÎîî
+	if(GetAsyncKeyState(VK_F5) & 0x0001) // ÏûîÎîî
 	{
-		for (auto& pEnviron : m_vecEnvironment)
+		for(auto& pEnviron : m_vecEnvironment)
 		{
 			pEnviron->Set_PickingCheck(false);
 			pEnviron->Set_ImGuiMode(IMGUI_GRASS);
 		}
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
 			pBuild->Set_ImGuiMode(IMGUI_GRASS);
 		}
 		m_bInstancing_Model_Choice = false;
 		m_eImGui_Type = IMGUI_GRASS;
 		m_iModelIndex = 0;
-		m_fPickingPos = { 0.f,0.f,0.f };
+		m_fPickingPos = {0.f,0.f,0.f};
 	}
 
-	// ∏µÂ º±≈√ ,   create   select ∏µÂ 
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_TAB))
+	// Î™®Îìú ÏÑ†ÌÉù ,   create   select Î™®Îìú 
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_TAB))
 	{
-		if (m_iModeSelect == IMGUI_SELECT)
+		if(m_iModeSelect == IMGUI_SELECT)
 		{
-			_float3 fPos{}, fScale{}, fCollisionPos{}, fCollisionScale{};
-			_vector vPos{}, vCollisionPos{};
-			
-			switch (m_eImGui_Type)
+			_float3 fPos{},fScale{},fCollisionPos{},fCollisionScale{};
+			_vector vPos{},vCollisionPos{};
+
+			switch(m_eImGui_Type)
 			{
 			case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
-				
-				if(m_iEnvironment_Count > 0)
+
+			if(m_iEnvironment_Count > 0)
+			{
+				for(auto& pEnviron : m_vecEnvironment)
 				{
-					for (auto& pEnviron : m_vecEnvironment)
-					{
-						pEnviron->Set_PickingCheck(false);
-					}
-					vPos = m_vecEnvironment.back()->Get_Pos();
-					fScale = m_vecEnvironment.back()->Get_Scale();
-					m_vecEnvironment.back()->Set_PickingCheck(true);
-					vCollisionPos = m_vecEnvironment.back()->Get_CollisionBoxPos();
-					fCollisionScale = m_vecEnvironment.back()->Get_CollisionBoxScale();
-					XMStoreFloat3(&fPos, vPos);
-					XMStoreFloat3(&fCollisionPos, vCollisionPos);
+					pEnviron->Set_PickingCheck(false);
 				}
-				break;
+				vPos = m_vecEnvironment.back()->Get_Pos();
+				fScale = m_vecEnvironment.back()->Get_Scale();
+				m_vecEnvironment.back()->Set_PickingCheck(true);
+				vCollisionPos = m_vecEnvironment.back()->Get_CollisionBoxPos();
+				fCollisionScale = m_vecEnvironment.back()->Get_CollisionBoxScale();
+				XMStoreFloat3(&fPos,vPos);
+				XMStoreFloat3(&fCollisionPos,vCollisionPos);
+			}
+			break;
 			case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
-				break;
+			break;
 			case Client::CLevel_ImGui::IMGUI_BUILD:
-				if(m_iBuild_Count > 0)
+			if(m_iBuild_Count > 0)
+			{
+				for(auto& pBuild : m_vecBuild)
 				{
-					for (auto& pBuild : m_vecBuild)
-					{
-						pBuild->Set_PickingCheck(false);
-					}
-					vPos = m_vecBuild.back()->Get_Pos();
-					fScale = m_vecBuild.back()->Get_Scale();
-					m_vecBuild.back()->Set_PickingCheck(true);
-					vCollisionPos = m_vecBuild.back()->Get_CollisionBoxPos();
-					fCollisionScale = m_vecBuild.back()->Get_CollisionBoxScale();
-					XMStoreFloat3(&fPos, vPos);
-					XMStoreFloat3(&fCollisionPos, vCollisionPos);
+					pBuild->Set_PickingCheck(false);
 				}
-				break;
+				vPos = m_vecBuild.back()->Get_Pos();
+				fScale = m_vecBuild.back()->Get_Scale();
+				m_vecBuild.back()->Set_PickingCheck(true);
+				vCollisionPos = m_vecBuild.back()->Get_CollisionBoxPos();
+				fCollisionScale = m_vecBuild.back()->Get_CollisionBoxScale();
+				XMStoreFloat3(&fPos,vPos);
+				XMStoreFloat3(&fCollisionPos,vCollisionPos);
+			}
+			break;
 			case Client::CLevel_ImGui::IMGUI_ITEM:
-				if(m_vecCoin.size() > 0)
-				{
-					vPos = m_vecCoin.back()->Get_Pos();
-					fScale = m_vecCoin.back()->Get_Scale();
-				}
-				break;
+			if(m_vecCoin.size() > 0)
+			{
+				vPos = m_vecCoin.back()->Get_Pos();
+				fScale = m_vecCoin.back()->Get_Scale();
+			}
+			break;
 			case Client::CLevel_ImGui::IMGUI_GRASS:
-				if (m_vecInstancing.size() > 0)
-				{
-					vPos = XMVectorSet(m_vecInstancing.back().fPos.x, m_vecInstancing.back().fPos.y, m_vecInstancing.back().fPos.z,1.f);
-					fScale = {8.f,8.f,8.f};
-				}
-				break;
+			if(m_vecInstancing.size() > 0)
+			{
+				vPos = XMVectorSet(m_vecInstancing.back().fPos.x,m_vecInstancing.back().fPos.y,m_vecInstancing.back().fPos.z,1.f);
+				fScale = {8.f,8.f,8.f};
+			}
+			break;
 			case Client::CLevel_ImGui::IMGUI_END:
-				break;
+			break;
 			default:
-				break;
+			break;
 			}
 			Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
 			Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
 			if(m_eImGui_Type != IMGUI_ITEM)
 			{
-				// Coin¿œ ∂ß √Êµππ⁄Ω∫ æ»æ∏
+				// CoinÏùº Îïå Ï∂©ÎèåÎ∞ïÏä§ ÏïàÏîÄ
 				CollisionBox_Pos[0] = fCollisionPos.x;					CollisionBox_Pos[1] = fCollisionPos.y;					CollisionBox_Pos[2] = fCollisionPos.z;
 				CollisionBox_Scale[0] = fCollisionScale.x;				CollisionBox_Scale[1] = fCollisionScale.y;				CollisionBox_Scale[2] = fCollisionScale.z;
 			}
 			m_iModeSelect = IMGUI_CREATE;
-		}
-		else if (m_iModeSelect == IMGUI_CREATE)
+		} else if(m_iModeSelect == IMGUI_CREATE)
 		{
 			m_iModeSelect = IMGUI_SELECT;
 		}
-	}  
-	// º±≈√ »§¿∫ ª˝º∫ ∞°¥…«œ∞‘ «ÿ¡÷¥¬ bool ∞™ ∫Ø∞Ê
-	if ((m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN) && (bAble_Select == false)))
+	}
+	// ÏÑ†ÌÉù ÌòπÏùÄ ÏÉùÏÑ± Í∞ÄÎä•ÌïòÍ≤å Ìï¥Ï£ºÎäî bool Í∞í Î≥ÄÍ≤Ω
+	if((m_pGameInstance->Get_DIKeyState_Down(DIK_RETURN) && (bAble_Select == false)))
 	{
 		bAble_Select = true;
 	}
-	
-	
-	// ≈¯ø° µ˚∏• æ˜µ•¿Ã∆Æ 
-	switch (m_eImGui_Type)
+
+
+	// Ìà¥Ïóê Îî∞Î•∏ ÏóÖÎç∞Ïù¥Ìä∏ 
+	switch(m_eImGui_Type)
 	{
 	case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
-		Object_NonAnim_Update(fTimeDelta);
-		break;
+	Object_NonAnim_Update(fTimeDelta);
+	break;
 	case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
-		break;
+	break;
 	case Client::CLevel_ImGui::IMGUI_BUILD:
-		Build_Update(fTimeDelta);
+	Build_Update(fTimeDelta);
 	case Client::CLevel_ImGui::IMGUI_ITEM:
-		Item_Update(fTimeDelta);
-		break;
+	Item_Update(fTimeDelta);
+	break;
 	case Client::CLevel_ImGui::IMGUI_GRASS:
-		Grass_Update(fTimeDelta);
-		break;
+	Grass_Update(fTimeDelta);
+	break;
 	case Client::CLevel_ImGui::IMGUI_END:
-		break;
+	break;
 	default:
-		break;
+	break;
 	}
 
-	if (m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
+	if(m_pGameInstance->Get_DIKeyState_Down(DIK_ESCAPE))
 	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_IMGUI, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
+		if(FAILED(m_pGameInstance->Open_Level(LEVEL_IMGUI,CLevel_Loading::Create(m_pDevice,m_pContext,LEVEL_LOGO))))
 			return;
 	}
 }
@@ -242,78 +240,78 @@ HRESULT CLevel_ImGui::Render()
 	__super::Render();
 	if(m_bWindowsMove == false)
 	{
-		ImGui::SetWindowPos("ParentWindow", ImVec2(0, 200)); // √ ±‚ ¿ßƒ° º≥¡§
+		ImGui::SetWindowPos("ParentWindow",ImVec2(0,200)); // Ï¥àÍ∏∞ ÏúÑÏπò ÏÑ§Ï†ï
 	}
-	ImGui::SetNextWindowSize(ImVec2(400, 600)); // ∞°∑Œ 400, ºº∑Œ 600 ≈©±‚∑Œ º≥¡§
-	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(800, 600)); // √÷º“ ≈©±‚ 200x200, √÷¥Î ≈©±‚ 800x600
-	ImGui::Begin("ParentWindow", nullptr, ImGuiWindowFlags_None); // √¢ ¿Ãµø ∞°¥…
-	// ImGui ƒ⁄µÂ ¿€º∫ƒ≠
-	switch (m_eImGui_Type)
+	ImGui::SetNextWindowSize(ImVec2(400,600)); // Í∞ÄÎ°ú 400, ÏÑ∏Î°ú 600 ÌÅ¨Í∏∞Î°ú ÏÑ§Ï†ï
+	ImGui::SetNextWindowSizeConstraints(ImVec2(200,200),ImVec2(800,600)); // ÏµúÏÜå ÌÅ¨Í∏∞ 200x200, ÏµúÎåÄ ÌÅ¨Í∏∞ 800x600
+	ImGui::Begin("ParentWindow",nullptr,ImGuiWindowFlags_None); // Ï∞Ω Ïù¥Îèô Í∞ÄÎä•
+	// ImGui ÏΩîÎìú ÏûëÏÑ±Ïπ∏
+	switch(m_eImGui_Type)
 	{
 	case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
-		Object_NonAnim();
-		break;
+	Object_NonAnim();
+	break;
 	case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
-		Object_Anim();
-		break;
+	Object_Anim();
+	break;
 	case Client::CLevel_ImGui::IMGUI_BUILD:
-		Object_Build();
-		break;
+	Object_Build();
+	break;
 	case Client::CLevel_ImGui::IMGUI_ITEM:
-		Object_Item();
-		break;
+	Object_Item();
+	break;
 	case Client::CLevel_ImGui::IMGUI_GRASS:
-		Object_Grass();
-		break;
+	Object_Grass();
+	break;
 	case Client::CLevel_ImGui::IMGUI_END:
-		break;
+	break;
 	default:
-		break;
+	break;
 	}
 	ImGui::End();
-    
-	if (m_bWindowsMove == false)
+
+	if(m_bWindowsMove == false)
 	{
 		m_bWindowsMove = true;
-		ImGui::SetWindowPos("Save_Load", ImVec2(0, 0));
+		ImGui::SetWindowPos("Save_Load",ImVec2(0,0));
 	}
-	ImGui::SetNextWindowSize(ImVec2(300, 100)); // ∞°∑Œ 400, ºº∑Œ 300 ≈©±‚∑Œ º≥¡§
-	ImGui::SetNextWindowSizeConstraints(ImVec2(30, 30), ImVec2(150, 100)); // √÷º“ ≈©±‚ 200x200, √÷¥Î ≈©±‚ 800x600
-	ImGui::Begin("Save_Load", nullptr, ImGuiWindowFlags_None);
-	if (ImGui::ImageButton("Save", my_Savetexture, ImVec2(50, 50), ImVec2(0, 0)))
+	ImGui::SetNextWindowSize(ImVec2(300,100)); // Í∞ÄÎ°ú 400, ÏÑ∏Î°ú 300 ÌÅ¨Í∏∞Î°ú ÏÑ§Ï†ï
+	ImGui::SetNextWindowSizeConstraints(ImVec2(30,30),ImVec2(150,100)); // ÏµúÏÜå ÌÅ¨Í∏∞ 200x200, ÏµúÎåÄ ÌÅ¨Í∏∞ 800x600
+	ImGui::Begin("Save_Load",nullptr,ImGuiWindowFlags_None);
+	if(ImGui::ImageButton("Save",my_Savetexture,ImVec2(50,50),ImVec2(0,0)))
 	{
 		Save = true;
 	}
 	ImGui::SameLine();
-	if (ImGui::ImageButton("Load", my_Loadtexture, ImVec2(50, 50), ImVec2(0, 0)))
+	if(ImGui::ImageButton("Load",my_Loadtexture,ImVec2(50,50),ImVec2(0,0)))
 	{
-		switch (m_eImGui_Type)
+		switch(m_eImGui_Type)
 		{
 		case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
-			Environment_Load();
-			break;
+		Environment_Load();
+		break;
 		case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
-			break;
+		break;
 		case Client::CLevel_ImGui::IMGUI_BUILD:
-			Build_Load();
-			break;
+		Build_Load();
+		break;
 		case Client::CLevel_ImGui::IMGUI_ITEM:
-			Item_Load();
-			break;
+		Item_Load();
+		break;
 		case Client::CLevel_ImGui::IMGUI_GRASS:
-			Grass_Load();
-			break;
+		Grass_Load();
+		break;
 		case Client::CLevel_ImGui::IMGUI_END:
-			break;
+		break;
 		default:
-			break;
+		break;
 		}
 	}
 	ImGui::End();
 
-#ifdef _DEBUG
-	SetWindowText(g_hWnd, TEXT("ImGui∑π∫ß¿‘¥œ¥Ÿ."));
-#endif
+	#ifdef _DEBUG
+	SetWindowText(g_hWnd,TEXT("ImGuiÎ†àÎ≤®ÏûÖÎãàÎã§."));
+	#endif
 
 	return S_OK;
 }
@@ -323,79 +321,78 @@ HRESULT CLevel_ImGui::Ready_Layer_Terrain(const _tchar* pLayerTag)
 	CTerrain::TERRAIN_DESC pDesc{};
 	pDesc.eID= LEVEL_IMGUI;
 	pDesc.eTargetID = m_eID;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_Terrain_ImGui"), &pDesc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_Terrain_ImGui"),&pDesc)))
 		return E_FAIL;
 	return S_OK;
 }
 
 HRESULT CLevel_ImGui::Picking_Create()
 {
-	if (IMGUI_GRASS == m_eImGui_Type && m_fTimer_for_Instancing_Add >= 0.15f)
+	if(IMGUI_GRASS == m_eImGui_Type && m_fTimer_for_Instancing_Add >= 0.15f)
 	{
 		if(m_pGameInstance->Get_DIMouseState_Pressing(DIM_LB))
 		{
-			_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+			_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 			XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 			XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-			XMVECTOR RayPos, RayDir;
+			XMVECTOR RayPos,RayDir;
 
-			m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+			m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
 
 			RayDir = XMVector3Normalize(RayDir);
 
-			const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 πËø≠¿« Ω√¿€ ¡÷º“ π›»Ø
+			const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 Î∞∞Ïó¥Ïùò ÏãúÏûë Ï£ºÏÜå Î∞òÌôò
 			_uint VtxCountX = pVIBuffer_Terrain->Get_VtxCountX();
 			_uint VtxCountZ = pVIBuffer_Terrain->Get_VtxCountZ();
 
 
-			m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+			m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos,RayDir,VtxPos,VtxCountX,VtxCountZ);
 
 			Grass_Add();
 			m_fTimer_for_Instancing_Add = 0.f;
 		}
-	}
-	else if ((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)) && (bAble_Select == true) && m_iModeSelect == IMGUI_CREATE)
+	} else if((m_pGameInstance->Get_DIMouseState_Down(DIM_LB)) && (bAble_Select == true) && m_iModeSelect == IMGUI_CREATE)
 	{
-		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-		XMVECTOR RayPos, RayDir;
+		XMVECTOR RayPos,RayDir;
 
-		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+		m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
 
 		RayDir = XMVector3Normalize(RayDir);
-		
-		const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 πËø≠¿« Ω√¿€ ¡÷º“ π›»Ø
+
+		const _float3* VtxPos = pVIBuffer_Terrain->Get_VtxPos();  // _float3 Î∞∞Ïó¥Ïùò ÏãúÏûë Ï£ºÏÜå Î∞òÌôò
 		_uint VtxCountX = pVIBuffer_Terrain->Get_VtxCountX();
 		_uint VtxCountZ = pVIBuffer_Terrain->Get_VtxCountZ();
 
-	
-		m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
-			
-			switch (m_eImGui_Type)
-			{
-			case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
-				Environment_Add();
-				break;
-			case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
-				break;
-			case Client::CLevel_ImGui::IMGUI_BUILD:
-				Build_Add();
-				break;
-			case Client::CLevel_ImGui::IMGUI_ITEM:
-				Item_Add();
-				break;
-			case Client::CLevel_ImGui::IMGUI_GRASS:
-				
-				break;
-			case Client::CLevel_ImGui::IMGUI_END:
-				break;
-			default:
-				break;
-			}
-	
 
-	
+		m_fPickingPos = m_pGameInstance->Picking_Terrain(RayPos,RayDir,VtxPos,VtxCountX,VtxCountZ);
+
+		switch(m_eImGui_Type)
+		{
+		case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
+		Environment_Add();
+		break;
+		case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
+		break;
+		case Client::CLevel_ImGui::IMGUI_BUILD:
+		Build_Add();
+		break;
+		case Client::CLevel_ImGui::IMGUI_ITEM:
+		Item_Add();
+		break;
+		case Client::CLevel_ImGui::IMGUI_GRASS:
+
+		break;
+		case Client::CLevel_ImGui::IMGUI_END:
+		break;
+		default:
+		break;
+		}
+
+
+
 	}
 	return S_OK;
 }
@@ -403,14 +400,14 @@ HRESULT CLevel_ImGui::Picking_Create()
 
 
 void CLevel_ImGui::Object_NonAnim_Update(_float fTimeDelta)
-{	
-	
-	if (m_iEnvironment_Count > 0)
-		Environment_DataChange(fTimeDelta);
-	Picking_Create();  // Create ∏µÂ
-	Environment_Select();  // Select ∏µÂ
+{
 
-	if (Save == true)
+	if(m_iEnvironment_Count > 0)
+		Environment_DataChange(fTimeDelta);
+	Picking_Create();  // Create Î™®Îìú
+	Environment_Select();  // Select Î™®Îìú
+
+	if(Save == true)
 	{
 		Environment_Save();
 		Save = false;
@@ -418,18 +415,17 @@ void CLevel_ImGui::Object_NonAnim_Update(_float fTimeDelta)
 }
 
 void CLevel_ImGui::Object_Anim_Update(_float fTimeDelta)
-{
-}
+{}
 
 void CLevel_ImGui::Build_Update(_float fTimeDelta)
 {
 
-	if (m_iBuild_Count > 0)
+	if(m_iBuild_Count > 0)
 		Build_DataChange(fTimeDelta);
 	Picking_Create();
 	Build_Select();
 
-	if (Save == true)
+	if(Save == true)
 	{
 		Build_Save();
 		Save = false;
@@ -438,12 +434,12 @@ void CLevel_ImGui::Build_Update(_float fTimeDelta)
 
 void CLevel_ImGui::Item_Update(_float fTimeDelta)
 {
-	if (m_iCoin_Count > 0)
+	if(m_iCoin_Count > 0)
 		Item_DataChange(fTimeDelta);
 	Picking_Create();
 	Item_Select();
 
-	if (Save == true)
+	if(Save == true)
 	{
 		Item_Save();
 		Save = false;
@@ -454,18 +450,18 @@ void CLevel_ImGui::Grass_Update(_float fTimeDelta)
 {
 	if(m_bInstancing_Model_Choice == true)
 	{
-		if (m_iGrass_Count > 0)
+		if(m_iGrass_Count > 0)
 			Grass_DataChange(fTimeDelta);
 		Picking_Create();
 		Grass_Select();
 	}
 
-	if (m_iModelIndex != 0 )
+	if(m_iModelIndex != 0)
 	{
 		m_bInstancing_Model_Choice = true;
 	}
-	
-	if (Save == true)
+
+	if(Save == true)
 	{
 		Grass_Save();
 		Save = false;
@@ -480,35 +476,35 @@ void CLevel_ImGui::Object_NonAnim()
 	ImGui::Text(pText);
 	ImGui::Text(" ");
 
-	if (m_iModeSelect == IMGUI_CREATE)
+	if(m_iModeSelect == IMGUI_CREATE)
 	{
 		const char* pModeText = "Create Mode";
 		ImGui::Text(pModeText);
 	}
-	if (m_iModeSelect == IMGUI_SELECT)
+	if(m_iModeSelect == IMGUI_SELECT)
 	{
 		const char* pModeText = "Select Mode";
 		ImGui::Text(pModeText);
 	}
 
-	// ¿ßƒ° ≈©±‚ πÊ«‚ ºˆ¡§√¢
+	// ÏúÑÏπò ÌÅ¨Í∏∞ Î∞©Ìñ• ÏàòÏ†ïÏ∞Ω
 	ImGui::Text("Object Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
-	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::DragFloat3("Position",Position,0.1f,-200.f,3000.f);
+	ImGui::DragFloat3("Scale",Scale,0.1f,0.f,10000.f);
 	ImGui::Text(" ");
 	ImGui::Text("CollisionBox");
-	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
-	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
+	ImGui::DragFloat3("Box_Position",CollisionBox_Pos,0.1f,-90.f,10000.f);
+	ImGui::DragFloat3("Box_Scale",CollisionBox_Scale,0.1f,0.f,10000.f);
 
-	// ∏µ® º±≈√√¢
+	// Î™®Îç∏ ÏÑ†ÌÉùÏ∞Ω
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 
 	ImGui::Text("Environment List ");
-	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
-	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
-	ButtonImage_List(); // ImGui º±≈√ ∏ÆΩ∫∆Æ ( Environment ∏ÆΩ∫∆Æ )
+	ImGui::BeginChild("Scrolling",ImVec2(0,0),false,ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex",&m_iModelIndex,0);
+	ButtonImage_List(); // ImGui ÏÑ†ÌÉù Î¶¨Ïä§Ìä∏ ( Environment Î¶¨Ïä§Ìä∏ )
 	ImGui::EndChild();
 }
 
@@ -517,32 +513,32 @@ void CLevel_ImGui::Object_Anim()
 	const char* pText = "Anim Object Tool";
 	ImGui::Text(pText);
 	ImGui::Text(" ");
-	if (m_iModeSelect == IMGUI_CREATE)
+	if(m_iModeSelect == IMGUI_CREATE)
 	{
 		const char* pModeText = "Create Mode";
 		ImGui::Text(pModeText);
 	}
-	if (m_iModeSelect == IMGUI_SELECT)
+	if(m_iModeSelect == IMGUI_SELECT)
 	{
 		const char* pModeText = "Select Mode";
 		ImGui::Text(pModeText);
 	}
-	// ¿ßƒ° ≈©±‚ πÊ«‚ ºˆ¡§√¢
+	// ÏúÑÏπò ÌÅ¨Í∏∞ Î∞©Ìñ• ÏàòÏ†ïÏ∞Ω
 	ImGui::Text("Object Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
-	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::DragFloat3("Position",Position,0.1f,-200.f,3000.f);
+	ImGui::DragFloat3("Scale",Scale,0.1f,0.f,10000.f);
 	ImGui::Text(" ");
 	ImGui::Text("CollisionBox");
-	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
-	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
-	// ∏µ® º±≈√√¢
+	ImGui::DragFloat3("Box_Position",CollisionBox_Pos,0.1f,-90.f,10000.f);
+	ImGui::DragFloat3("Box_Scale",CollisionBox_Scale,0.1f,0.f,10000.f);
+	// Î™®Îç∏ ÏÑ†ÌÉùÏ∞Ω
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 
 	ImGui::Text("MapObject List ");
-	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
-	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
+	ImGui::BeginChild("Scrolling",ImVec2(0,0),false,ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex",&m_iModelIndex,0);
 
 	ImGui::EndChild();
 }
@@ -552,35 +548,35 @@ void CLevel_ImGui::Object_Build()
 	const char* pText = "Build Tool";
 	ImGui::Text(pText);
 	ImGui::Text(" ");
-	if (m_iModeSelect == IMGUI_CREATE)
+	if(m_iModeSelect == IMGUI_CREATE)
 	{
 		const char* pModeText = "Create Mode";
 		ImGui::Text(pModeText);
 	}
-	if (m_iModeSelect == IMGUI_SELECT)
+	if(m_iModeSelect == IMGUI_SELECT)
 	{
 		const char* pModeText = "Select Mode";
 		ImGui::Text(pModeText);
 	}
-	// ¿ßƒ° ≈©±‚ πÊ«‚ ºˆ¡§√¢
+	// ÏúÑÏπò ÌÅ¨Í∏∞ Î∞©Ìñ• ÏàòÏ†ïÏ∞Ω
 	ImGui::Text("Build Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
-	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::DragFloat3("Position",Position,0.1f,-200.f,3000.f);
+	ImGui::DragFloat3("Scale",Scale,0.1f,0.f,10000.f);
 	ImGui::Text(" ");
 	ImGui::Text("CollisionBox");
-	ImGui::DragFloat3("Box_Position", CollisionBox_Pos, 0.1f, -90.f, 10000.f);
-	ImGui::DragFloat3("Box_Scale", CollisionBox_Scale, 0.1f, 0.f, 10000.f);
+	ImGui::DragFloat3("Box_Position",CollisionBox_Pos,0.1f,-90.f,10000.f);
+	ImGui::DragFloat3("Box_Scale",CollisionBox_Scale,0.1f,0.f,10000.f);
 
 
-	// ∏µ® º±≈√√¢
+	// Î™®Îç∏ ÏÑ†ÌÉùÏ∞Ω
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 
 	ImGui::Text("Build List ");
-	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
-	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
-	ButtonImage_List(); // ImGui º±≈√ ∏ÆΩ∫∆Æ ( Environment ∏ÆΩ∫∆Æ )
+	ImGui::BeginChild("Scrolling",ImVec2(0,0),false,ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex",&m_iModelIndex,0);
+	ButtonImage_List(); // ImGui ÏÑ†ÌÉù Î¶¨Ïä§Ìä∏ ( Environment Î¶¨Ïä§Ìä∏ )
 	ImGui::EndChild();
 }
 
@@ -589,30 +585,30 @@ void CLevel_ImGui::Object_Item()
 	const char* pText = "Coin Tool";
 	ImGui::Text(pText);
 	ImGui::Text(" ");
-	if (m_iModeSelect == IMGUI_CREATE)
+	if(m_iModeSelect == IMGUI_CREATE)
 	{
 		const char* pModeText = "Create Mode";
 		ImGui::Text(pModeText);
 	}
-	if (m_iModeSelect == IMGUI_SELECT)
+	if(m_iModeSelect == IMGUI_SELECT)
 	{
 		const char* pModeText = "Select Mode";
 		ImGui::Text(pModeText);
 	}
-	// ¿ßƒ° ≈©±‚ πÊ«‚ ºˆ¡§√¢
+	// ÏúÑÏπò ÌÅ¨Í∏∞ Î∞©Ìñ• ÏàòÏ†ïÏ∞Ω
 	ImGui::Text("Build Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
-	ImGui::DragFloat3("Scale", Scale, 0.1f, 0.f, 10000.f);
+	ImGui::DragFloat3("Position",Position,0.1f,-200.f,3000.f);
+	ImGui::DragFloat3("Scale",Scale,0.1f,0.f,10000.f);
 
-	// ∏µ® º±≈√√¢
+	// Î™®Îç∏ ÏÑ†ÌÉùÏ∞Ω
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 
 	ImGui::Text("Build List ");
-	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
-	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
-	ButtonImage_List(); // ImGui º±≈√ ∏ÆΩ∫∆Æ ( Environment ∏ÆΩ∫∆Æ )
+	ImGui::BeginChild("Scrolling",ImVec2(0,0),false,ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex",&m_iModelIndex,0);
+	ButtonImage_List(); // ImGui ÏÑ†ÌÉù Î¶¨Ïä§Ìä∏ ( Environment Î¶¨Ïä§Ìä∏ )
 	ImGui::EndChild();
 
 }
@@ -622,29 +618,29 @@ void CLevel_ImGui::Object_Grass()
 	const char* pText = "Grass Tool";
 	ImGui::Text(pText);
 	ImGui::Text(" ");
-	if (m_iModeSelect == IMGUI_CREATE)
+	if(m_iModeSelect == IMGUI_CREATE)
 	{
 		const char* pModeText = "Create Mode";
 		ImGui::Text(pModeText);
 	}
-	if (m_iModeSelect == IMGUI_SELECT)
+	if(m_iModeSelect == IMGUI_SELECT)
 	{
 		const char* pModeText = "Select Mode";
 		ImGui::Text(pModeText);
 	}
-	// ¿ßƒ° ≈©±‚ πÊ«‚ ºˆ¡§√¢
+	// ÏúÑÏπò ÌÅ¨Í∏∞ Î∞©Ìñ• ÏàòÏ†ïÏ∞Ω
 	ImGui::Text("Build Data");
-	ImGui::DragFloat3("Position", Position, 0.1f, -200.f, 3000.f);
+	ImGui::DragFloat3("Position",Position,0.1f,-200.f,3000.f);
 
-	// ∏µ® º±≈√√¢
+	// Î™®Îç∏ ÏÑ†ÌÉùÏ∞Ω
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 	ImGui::Text(" ");
 
 	ImGui::Text("Build List ");
-	ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_None);
-	ImGui::InputInt("ModelIndex", &m_iModelIndex, 0);
-	ButtonImage_List(); // ImGui º±≈√ ∏ÆΩ∫∆Æ ( Environment ∏ÆΩ∫∆Æ )
+	ImGui::BeginChild("Scrolling",ImVec2(0,0),false,ImGuiWindowFlags_None);
+	ImGui::InputInt("ModelIndex",&m_iModelIndex,0);
+	ButtonImage_List(); // ImGui ÏÑ†ÌÉù Î¶¨Ïä§Ìä∏ ( Environment Î¶¨Ïä§Ìä∏ )
 	ImGui::EndChild();
 
 }
@@ -653,19 +649,19 @@ void CLevel_ImGui::Object_Grass()
 void CLevel_ImGui::ButtonImage_List()
 {
 	ImGui::BeginChild("Choose Environment");
-	int iButton = 0;	
+	int iButton = 0;
 
-	switch (m_eImGui_Type)
+	switch(m_eImGui_Type)
 	{
 	case Client::CLevel_ImGui::IMGUI_OBJECT_NONANIM:
 	{
 		auto& SRVs = m_pEnviron->Get_SRV();
-		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		for(auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
 		{
-			if (iButton % 4 != 0)
+			if(iButton % 4 != 0)
 				ImGui::SameLine();
 			string tag = "Environment" + to_string(iButton);
-			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			if(ImGui::ImageButton(tag.c_str(),*iter,ImVec2(50,50),ImVec2(0,0)))
 			{
 				m_iModelIndex = iButton;
 			}
@@ -673,18 +669,18 @@ void CLevel_ImGui::ButtonImage_List()
 		}
 		ImGui::EndChild();
 	}
-		break;
+	break;
 	case Client::CLevel_ImGui::IMGUI_OBJECT_ANIM:
-		break;
+	break;
 	case Client::CLevel_ImGui::IMGUI_BUILD:
 	{
 		auto& SRVs = m_pBuild->Get_SRV();
-		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		for(auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
 		{
-			if (iButton % 4 != 0)
+			if(iButton % 4 != 0)
 				ImGui::SameLine();
 			string tag = "Build" + to_string(iButton);
-			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			if(ImGui::ImageButton(tag.c_str(),*iter,ImVec2(50,50),ImVec2(0,0)))
 			{
 				m_iModelIndex = iButton;
 			}
@@ -692,16 +688,16 @@ void CLevel_ImGui::ButtonImage_List()
 		}
 		ImGui::EndChild();
 	}
-		break;
+	break;
 	case Client::CLevel_ImGui::IMGUI_ITEM:
 	{
 		auto& SRVs = m_pBuild->Get_SRV();
-		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		for(auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
 		{
-			if (iButton % 4 != 0)
+			if(iButton % 4 != 0)
 				ImGui::SameLine();
 			string tag = "Build" + to_string(iButton);
-			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			if(ImGui::ImageButton(tag.c_str(),*iter,ImVec2(50,50),ImVec2(0,0)))
 			{
 				m_iModelIndex = iButton;
 			}
@@ -713,12 +709,12 @@ void CLevel_ImGui::ButtonImage_List()
 	case Client::CLevel_ImGui::IMGUI_GRASS:
 	{
 		auto& SRVs = m_pBuild->Get_SRV();
-		for (auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
+		for(auto iter = SRVs.begin(); iter != SRVs.end(); ++iter)
 		{
-			if (iButton % 4 != 0)
+			if(iButton % 4 != 0)
 				ImGui::SameLine();
 			string tag = "Build" + to_string(iButton);
-			if (ImGui::ImageButton(tag.c_str(), *iter, ImVec2(50, 50), ImVec2(0, 0)))
+			if(ImGui::ImageButton(tag.c_str(),*iter,ImVec2(50,50),ImVec2(0,0)))
 			{
 				m_iModelIndex = iButton;
 			}
@@ -728,9 +724,9 @@ void CLevel_ImGui::ButtonImage_List()
 	}
 	break;
 	case Client::CLevel_ImGui::IMGUI_END:
-		break;
+	break;
 	default:
-		break;
+	break;
 	}
 
 
@@ -738,33 +734,33 @@ void CLevel_ImGui::ButtonImage_List()
 
 HRESULT CLevel_ImGui::Environment_Add()
 {
-	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+	if(m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
 		return S_OK;
 
 	CEnvironment::ENVIRONMENT_DESC			Desc{};
 	Desc.eID = LEVEL_IMGUI;
 	Desc.fPosition = m_fPickingPos;
 	Desc.iModelComponentIndex = m_iModelIndex;
-	Desc.fScale = { 1.f,1.f ,1.f };
+	Desc.fScale = {1.f,1.f,1.f};
 	Desc.iImGuiMode = IMGUI_OBJECT_NONANIM;
 	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
 	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
-	
+
 
 
 	CollisionBox_Pos[0] = m_fPickingPos.x;		CollisionBox_Pos[1] = m_fPickingPos.y;		CollisionBox_Pos[2] = m_fPickingPos.z;
 	CollisionBox_Scale[0] = Desc.fScale.x;		CollisionBox_Scale[1] = Desc.fScale.y;		CollisionBox_Scale[2] = Desc.fScale.z;
 
-	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
-		TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-	if (pGameObj != nullptr)
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Environment"),
+		TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+	if(pGameObj != nullptr)
 	{
-		for (auto& pEnviron : m_vecEnvironment)
+		for(auto& pEnviron : m_vecEnvironment)
 		{
 			pEnviron->Set_PickingCheck(false);
 		}
 		m_vecEnvironment.push_back(dynamic_cast<CEnvironment*>(pGameObj));
-		m_vecEnvironment.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+		m_vecEnvironment.back()->Set_CollisionBox(CollisionBox_Scale[0],CollisionBox_Scale[1],CollisionBox_Scale[2],CollisionBox_Pos[0],CollisionBox_Pos[1],CollisionBox_Pos[2]);
 		m_vecEnvironment.back()->Set_PickingCheck(true);
 		m_iEnvironment_Count++;
 		bAble_Select = false;
@@ -775,29 +771,29 @@ HRESULT CLevel_ImGui::Environment_Add()
 }
 HRESULT CLevel_ImGui::Environment_DataChange(_float fTimeDelta)
 {
-	if(m_iModeSelect == IMGUI_CREATE)   // Create ∏µÂ ¿œ ∂ß ∞°¿Â √÷±Ÿ º≥ƒ° «◊∏Òø° ¥Î«— ºˆ¡§ ∞°¥… ±‚¥…
+	if(m_iModeSelect == IMGUI_CREATE)   // Create Î™®Îìú Ïùº Îïå Í∞ÄÏû• ÏµúÍ∑º ÏÑ§Ïπò Ìï≠Î™©Ïóê ÎåÄÌïú ÏàòÏ†ï Í∞ÄÎä• Í∏∞Îä•
 	{
-		// ∞°¿Â √÷±Ÿ º≥ƒ°«— Environment ªË¡¶«œ±‚
-		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iEnvironment_Count > 0)
+		// Í∞ÄÏû• ÏµúÍ∑º ÏÑ§ÏπòÌïú Environment ÏÇ≠Ï†úÌïòÍ∏∞
+		if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iEnvironment_Count > 0)
 		{
 			m_vecEnvironment.back()->Set_DeadEnviron();
 			m_vecEnvironment.erase(m_vecEnvironment.end() - 1);
 			--m_iEnvironment_Count;
-			cout << "≥≤¿∫ Environment ∞≥ºˆ : " << m_iEnvironment_Count << endl;
+			cout << "ÎÇ®ÏùÄ Environment Í∞úÏàò : " << m_iEnvironment_Count << endl;
 
-			if (m_iEnvironment_Count > 0)
+			if(m_iEnvironment_Count > 0)
 			{
-				_float3 fPos, fScale;
+				_float3 fPos,fScale;
 				_vector vPos = m_vecEnvironment.back()->Get_Pos();
 				fScale = m_vecEnvironment.back()->Get_Scale();
 				m_vecEnvironment.back()->Set_PickingCheck(true);
 				_float3 fCollisionBoxScale = m_vecEnvironment.back()->Get_CollisionBoxScale();
 				_vector vecCollisionBoxPos = m_vecEnvironment.back()->Get_CollisionBoxPos();
-				_float3 fEnvironPos{}, fCollisionBoxPos{};
+				_float3 fEnvironPos{},fCollisionBoxPos{};
 
-				XMStoreFloat3(&fCollisionBoxPos, vecCollisionBoxPos);
+				XMStoreFloat3(&fCollisionBoxPos,vecCollisionBoxPos);
 
-				XMStoreFloat3(&fPos, vPos);
+				XMStoreFloat3(&fPos,vPos);
 				Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
 				Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
 
@@ -805,8 +801,7 @@ HRESULT CLevel_ImGui::Environment_DataChange(_float fTimeDelta)
 				CollisionBox_Scale[0] = fCollisionBoxScale.x;				CollisionBox_Scale[1] = fCollisionBoxScale.y;				CollisionBox_Scale[2] = fCollisionBoxScale.z;
 
 
-			}
-			else
+			} else
 			{
 				Position[0] = 0.f;				Position[1] = 0.f;				Position[2] = 0.f;
 				Scale[0] = 0.f;					Scale[1] = 0.f;					Scale[2] = 0.f;
@@ -817,115 +812,103 @@ HRESULT CLevel_ImGui::Environment_DataChange(_float fTimeDelta)
 		}
 
 
-		m_vecEnvironment.back()->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
-		m_vecEnvironment.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
-		m_vecEnvironment.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+		m_vecEnvironment.back()->MovePos(fTimeDelta,Position[0],Position[1],Position[2]);
+		m_vecEnvironment.back()->Set_Scale(fTimeDelta,Scale[0],Scale[1],Scale[2]);
+		m_vecEnvironment.back()->Set_CollisionBox(CollisionBox_Scale[0],CollisionBox_Scale[1],CollisionBox_Scale[2],CollisionBox_Pos[0],CollisionBox_Pos[1],CollisionBox_Pos[2]);
 
-	
-		XMVECTOR vTemp = {0.f, 0.f ,0.f ,1.f }; // »∏¿¸√‡
+
+		XMVECTOR vTemp = {0.f,0.f,0.f,1.f}; // ÌöåÏ†ÑÏ∂ï
 		_bool bGetKey = false;
-		if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		if((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 		{
 			bGetKey = true;
-			vTemp = { 0.f, 0.f, -1.f, 1.f };
-		}
-		else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			vTemp = {0.f,0.f,-1.f,1.f};
+		} else if((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 		{
 			bGetKey = true;
-			vTemp = { 0.f, 0.f, 1.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+			vTemp = {0.f,0.f,1.f,1.f};
+		} else if(GetAsyncKeyState(VK_LEFT) & 0x8000)
 		{
 			bGetKey = true;
-			vTemp = { 0.f, -1.f, 0.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+			vTemp = {0.f,-1.f,0.f,1.f};
+		} else if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
 		{
 			bGetKey = true;
-			vTemp = { 0.f, 1.f, 0.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_UP) & 0x8000)
+			vTemp = {0.f,1.f,0.f,1.f};
+		} else if(GetAsyncKeyState(VK_UP) & 0x8000)
 		{
 			bGetKey = true;
-	
-			vTemp = { 1.f, 0.f, 0.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+
+			vTemp = {1.f,0.f,0.f,1.f};
+		} else if(GetAsyncKeyState(VK_DOWN) & 0x8000)
 		{
 			bGetKey = true;
-			vTemp = { -1.f, 0.f, 0.f, 1.f };
-		}
-		else
+			vTemp = {-1.f,0.f,0.f,1.f};
+		} else
 		{
 			bGetKey = false;
 		}
 
 		if(bGetKey == true)
-			m_vecEnvironment.back()->Set_Turn(fTimeDelta, vTemp);
-	
-	}
-	else if (m_iModeSelect == IMGUI_SELECT)
+			m_vecEnvironment.back()->Set_Turn(fTimeDelta,vTemp);
+
+	} else if(m_iModeSelect == IMGUI_SELECT)
 	{
 		_uint iEnvironmentIndex = 0;
-		for (auto& pEnviron : m_vecEnvironment)
+		for(auto& pEnviron : m_vecEnvironment)
 		{
 
-			if (true == pEnviron->Get_PickingCheck())
+			if(true == pEnviron->Get_PickingCheck())
 			{
 
-				if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iEnvironment_Count > 0)
+				if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iEnvironment_Count > 0)
 				{
 					pEnviron->Set_DeadEnviron();
 					m_vecEnvironment.erase(m_vecEnvironment.begin() + iEnvironmentIndex);
 					--m_iEnvironment_Count;
-					cout << "≥≤¿∫ Environment ∞≥ºˆ : " << m_iEnvironment_Count << endl;
+					cout << "ÎÇ®ÏùÄ Environment Í∞úÏàò : " << m_iEnvironment_Count << endl;
 
 					break;
 				}
 
-				pEnviron->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
-				pEnviron->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
-				pEnviron->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+				pEnviron->MovePos(fTimeDelta,Position[0],Position[1],Position[2]);
+				pEnviron->Set_Scale(fTimeDelta,Scale[0],Scale[1],Scale[2]);
+				pEnviron->Set_CollisionBox(CollisionBox_Scale[0],CollisionBox_Scale[1],CollisionBox_Scale[2],CollisionBox_Pos[0],CollisionBox_Pos[1],CollisionBox_Pos[2]);
 
-				XMVECTOR vTemp = { 0.f, 0.f ,0.f ,1.f }; // »∏¿¸√‡
+				XMVECTOR vTemp = {0.f,0.f,0.f,1.f}; // ÌöåÏ†ÑÏ∂ï
 				_bool bGetKey = false;
-				if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				if((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 				{
 					bGetKey = true;
-					vTemp = { 0.f, 0.f, -1.f, 1.f };
-				}
-				else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+					vTemp = {0.f,0.f,-1.f,1.f};
+				} else if((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 				{
 					bGetKey = true;
-					vTemp = { 0.f, 0.f, 1.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+					vTemp = {0.f,0.f,1.f,1.f};
+				} else if(GetAsyncKeyState(VK_LEFT) & 0x8000)
 				{
 					bGetKey = true;
-					vTemp = { 0.f, -1.f, 0.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+					vTemp = {0.f,-1.f,0.f,1.f};
+				} else if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
 				{
 					bGetKey = true;
-					vTemp = { 0.f, 1.f, 0.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_UP) & 0x8000)
+					vTemp = {0.f,1.f,0.f,1.f};
+				} else if(GetAsyncKeyState(VK_UP) & 0x8000)
 				{
 					bGetKey = true;
 
-					vTemp = { 1.f, 0.f, 0.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+					vTemp = {1.f,0.f,0.f,1.f};
+				} else if(GetAsyncKeyState(VK_DOWN) & 0x8000)
 				{
 					bGetKey = true;
-					vTemp = { -1.f, 0.f, 0.f, 1.f };
+					vTemp = {-1.f,0.f,0.f,1.f};
 				}
 
 				else
 					bGetKey = false;
 
-				if (bGetKey == true)
-					pEnviron->Set_Turn(fTimeDelta, vTemp);
+				if(bGetKey == true)
+					pEnviron->Set_Turn(fTimeDelta,vTemp);
 
 				break;
 			}
@@ -938,47 +921,47 @@ HRESULT CLevel_ImGui::Environment_DataChange(_float fTimeDelta)
 void CLevel_ImGui::Environment_Save()
 {
 	HANDLE hFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
-		case Client::LEVEL_GAMEPLAY:
-		{
-			 hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	case Client::LEVEL_GAMEPLAY:
+	{
+		hFile = CreateFile(L"../Bin/Data/Environment.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 
-			if (INVALID_HANDLE_VALUE == hFile)
-			{
-				MessageBox(NULL, L"Save Environment File Creation Failed", L"Error", MB_OK);
-				return;
-			}
-		}
-			break;
-		case Client::LEVEL_YARD:
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			 hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-			if (INVALID_HANDLE_VALUE == hFile)
-			{
-				MessageBox(NULL, L"Save Environment_Yard File Creation Failed", L"Error", MB_OK);
-				return;
-			}
+			MessageBox(NULL,L"Save Environment File Creation Failed",L"Error",MB_OK);
+			return;
 		}
-			break;
-		default:
-			break;
 	}
-	
+	break;
+	case Client::LEVEL_YARD:
+	{
+		hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+
+		if(INVALID_HANDLE_VALUE == hFile)
+		{
+			MessageBox(NULL,L"Save Environment_Yard File Creation Failed",L"Error",MB_OK);
+			return;
+		}
+	}
+	break;
+	default:
+	break;
+	}
+
 	DWORD dwByte = 0;
 	_float3 fPos;
-	for (auto& environment : m_vecEnvironment)
+	for(auto& environment : m_vecEnvironment)
 	{
-		if (environment)
+		if(environment)
 		{
-			
-			
+
+
 			LEVELID iLevel = environment->Get_Level();
 			_int  iModelIndex = environment->Get_ModelIndex();
 			_uint iImGuiMode = environment->Get_ImGuiMode();
 			_vector vPos = environment->Get_Pos();
-			XMStoreFloat3(&fPos, vPos);
+			XMStoreFloat3(&fPos,vPos);
 			_float3 fScale = environment->Get_Scale();
 			_float3 fCollisionScale = environment->Get_CollisionBoxScale();
 			_vector vecCollisionPos = environment->Get_CollisionBoxPos();
@@ -986,92 +969,92 @@ void CLevel_ImGui::Environment_Save()
 			_vector	vUp{};
 			_vector	vLook{};
 
-			environment->Get_Rotation(vRight, vUp, vLook);
+			environment->Get_Rotation(vRight,vUp,vLook);
 
-			WriteFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr);
-			WriteFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-			WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &fCollisionScale, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+			WriteFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr);
+			WriteFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+			WriteFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&fCollisionScale,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
 
-			WriteFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
-			WriteFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-			WriteFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-			WriteFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+			WriteFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
+			WriteFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+			WriteFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+			WriteFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 			m_vecModelIndex.push_back(iModelIndex);
 		}
 	}
 
 	CloseHandle(hFile);
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		MessageBox(NULL, L"Environment Saved Successfully", L"Success", MB_OK);
-		break;
+	MessageBox(NULL,L"Environment Saved Successfully",L"Success",MB_OK);
+	break;
 	case Client::LEVEL_YARD:
-		MessageBox(NULL, L"Environment_Yard Saved Successfully", L"Success", MB_OK);
-		break;
-	
+	MessageBox(NULL,L"Environment_Yard Saved Successfully",L"Success",MB_OK);
+	break;
+
 	default:
-		break;
+	break;
 	}
 
-	sort(m_vecModelIndex.begin(), m_vecModelIndex.end());
-	vector<_int>::iterator iter = unique(m_vecModelIndex.begin(), m_vecModelIndex.end());
-	m_vecModelIndex.erase(iter, m_vecModelIndex.end());
+	sort(m_vecModelIndex.begin(),m_vecModelIndex.end());
+	vector<_int>::iterator iter = unique(m_vecModelIndex.begin(),m_vecModelIndex.end());
+	m_vecModelIndex.erase(iter,m_vecModelIndex.end());
 
-	HANDLE hIndexFile{}; 
-	switch (m_eID)
+	HANDLE hIndexFile{};
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 
-		break;
+	break;
 	case Client::LEVEL_YARD:
-		hIndexFile = CreateFile(L"../Bin/Data/GameYardLevel_Env_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		break;
+	hIndexFile = CreateFile(L"../Bin/Data/GameYardLevel_Env_Index.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+	break;
 	default:
-		break;
+	break;
 	}
-	if (INVALID_HANDLE_VALUE == hIndexFile)
+	if(INVALID_HANDLE_VALUE == hIndexFile)
 	{
-		switch (m_eID)
+		switch(m_eID)
 		{
 		case Client::LEVEL_GAMEPLAY:
-			MessageBox(NULL, L"Save GamePlayLevel_Env_Index File Creation Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Save GamePlayLevel_Env_Index File Creation Failed",L"Error",MB_OK);
 
-			break;
+		break;
 		case Client::LEVEL_YARD:
-			MessageBox(NULL, L"Save GameYardLevel_Env_Index File Creation Failed", L"Error", MB_OK);
-			break;
+		MessageBox(NULL,L"Save GameYardLevel_Env_Index File Creation Failed",L"Error",MB_OK);
+		break;
 		default:
-			break;
+		break;
 		}
 		return;
 	}
 
 	dwByte = 0;
 
-	for (auto& pIndex : m_vecModelIndex)
+	for(auto& pIndex : m_vecModelIndex)
 	{
-		WriteFile(hIndexFile, &pIndex, sizeof(_int), &dwByte, nullptr);
+		WriteFile(hIndexFile,&pIndex,sizeof(_int),&dwByte,nullptr);
 	}
 
 	CloseHandle(hIndexFile);
 
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		MessageBox(NULL, L"GamePlayLevel_Env_Index Saved Successfully", L"Success", MB_OK);
+	MessageBox(NULL,L"GamePlayLevel_Env_Index Saved Successfully",L"Success",MB_OK);
 
-		break;
+	break;
 	case Client::LEVEL_YARD:
-		MessageBox(NULL, L"GameYardLevel_Env_Index Saved Successfully", L"Success", MB_OK);
-		break;
+	MessageBox(NULL,L"GameYardLevel_Env_Index Saved Successfully",L"Success",MB_OK);
+	break;
 	default:
-		break;
+	break;
 	}
 
 
@@ -1079,59 +1062,59 @@ void CLevel_ImGui::Environment_Save()
 }
 void CLevel_ImGui::Environment_Load()
 {
-	for (auto& pEnviron : m_vecEnvironment)
+	for(auto& pEnviron : m_vecEnvironment)
 	{
 		pEnviron->Set_DeadEnviron();
 	}
 	m_vecEnvironment.clear();
 	m_iEnvironment_Count = 0;
 	HANDLE hFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		hFile = CreateFile(L"../Bin/Data/Environment.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Environment.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Environment File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Environment File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		 hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Environment_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Environment_Yard File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Environment_Yard File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_int  iModelIndex;
-	_float3 fPos{}, fCollisionScale{}, fScale{}, fCollisionPos{};
-	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+	_float3 fPos{},fCollisionScale{},fScale{},fCollisionPos{};
+	_vector	vRight{},vUp{},vLook{},vecCollisionPos{};
 	_uint iImGuiMode{};
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
 
-		ReadFile(hFile, &fCollisionScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
+
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
@@ -1140,31 +1123,31 @@ void CLevel_ImGui::Environment_Load()
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
 
 			Position[0] = fPos.x;			Position[1] = fPos.y;			Position[2] = fPos.z;
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
-	
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
+
 			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
 
-			XMStoreFloat3(&fCollisionPos, vecCollisionPos);
-			
+			XMStoreFloat3(&fCollisionPos,vecCollisionPos);
+
 			Desc.CollisionBoxScale.x = fCollisionScale.x;		Desc.CollisionBoxScale.y = fCollisionScale.y;		Desc.CollisionBoxScale.z = fCollisionScale.z;
 			Desc.CollisionBoxPos.x = fCollisionPos.x;			Desc.CollisionBoxPos.y = fCollisionPos.y;			Desc.CollisionBoxPos.z = fCollisionPos.z;
 			/*
 						CollisionBox_Pos[0] = fPos.x;		CollisionBox_Pos[1] = fPos.y;		CollisionBox_Pos[2] = fPos.z;
 						CollisionBox_Scale[0] = fCollisionBox_Scale.x;		CollisionBox_Scale[1] = fCollisionBox_Scale.y;		CollisionBox_Scale[2] = fCollisionBox_Scale.z;
 			*/
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_CollisionBox(fCollisionScale.x, fCollisionScale.y, fCollisionScale.z, fCollisionPos.x, fCollisionPos.y, fCollisionPos.z);
-
-		
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_CollisionBox(fCollisionScale.x,fCollisionScale.y,fCollisionScale.z,fCollisionPos.x,fCollisionPos.y,fCollisionPos.z);
 
 
-			if(m_vecEnvironment.size() >0 )
+
+
+			if(m_vecEnvironment.size() >0)
 				m_vecEnvironment.back()->Set_PickingCheck(false);
 			m_vecEnvironment.push_back(dynamic_cast<CEnvironment*>(pGameObj));
 			m_vecEnvironment.back()->Set_PickingCheck(true);
@@ -1173,41 +1156,41 @@ void CLevel_ImGui::Environment_Load()
 	}
 
 	CloseHandle(hFile);
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-		MessageBox(NULL, L"Environment Loaded Successfully", L"Success", MB_OK);
-		break;
+	MessageBox(NULL,L"Environment Loaded Successfully",L"Success",MB_OK);
+	break;
 	case Client::LEVEL_YARD:
-		MessageBox(NULL, L"Environment_Yard Loaded Successfully", L"Success", MB_OK);
-		break;
+	MessageBox(NULL,L"Environment_Yard Loaded Successfully",L"Success",MB_OK);
+	break;
 	default:
-		break;
+	break;
 	}
 }
 
 HRESULT CLevel_ImGui::Environment_Select()
 {
-	if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000) && m_iModeSelect == IMGUI_SELECT && bAble_Select == true)
+	if((GetAsyncKeyState(VK_LBUTTON) & 0x8000) && m_iModeSelect == IMGUI_SELECT && bAble_Select == true)
 	{
-		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-		XMVECTOR RayPos, RayDir;
-		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+		XMVECTOR RayPos,RayDir;
+		m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
 		RayDir = XMVector3Normalize(RayDir);
 
-		for (auto& pEnvironment : m_vecEnvironment)
+		for(auto& pEnvironment : m_vecEnvironment)
 		{
-			XMFLOAT3 fBoxPos{}, fMinPoint{}, fMaxPoint{};
+			XMFLOAT3 fBoxPos{},fMinPoint{},fMaxPoint{};
 			_vector vBoxPos = pEnvironment->Get_CollisionBoxPos();
-			XMStoreFloat3(&fBoxPos, vBoxPos);
-			 XMFLOAT3 fBoxSize = pEnvironment->Get_CollisionBoxScale();
-		
-			m_pGameInstance->CreateBoundingBox(fBoxPos, fBoxSize, fMinPoint, fMaxPoint);
+			XMStoreFloat3(&fBoxPos,vBoxPos);
+			XMFLOAT3 fBoxSize = pEnvironment->Get_CollisionBoxScale();
+
+			m_pGameInstance->CreateBoundingBox(fBoxPos,fBoxSize,fMinPoint,fMaxPoint);
 			_bool bPickCheck = false;
 			float distance;
-			if (m_pGameInstance->Picking_Box(RayPos, RayDir, fMinPoint, fMaxPoint, distance, pEnvironment->Get_BoundingBox()))
+			if(m_pGameInstance->Picking_Box(RayPos,RayDir,fMinPoint,fMaxPoint,distance,pEnvironment->Get_BoundingBox()))
 			{
 				bPickCheck = true;
 				pEnvironment->Set_PickingCheck(bPickCheck);
@@ -1215,37 +1198,37 @@ HRESULT CLevel_ImGui::Environment_Select()
 				_float3 fEnvironScale = pEnvironment->Get_Scale();
 
 				_float3 fEnvironPos{};
-				XMStoreFloat3(&fEnvironPos, vecEnvironPos);
+				XMStoreFloat3(&fEnvironPos,vecEnvironPos);
 
 
 				Position[0] = fEnvironPos.x;		Position[1] = fEnvironPos.y;		Position[2] = fEnvironPos.z;
 				Scale[0] = fEnvironScale.x;			Scale[1] = fEnvironScale.y;			Scale[2] = fEnvironScale.z;
 
-			
+
 				CollisionBox_Pos[0] = fBoxPos.x;			CollisionBox_Pos[1] = fBoxPos.y;			CollisionBox_Pos[2] = fBoxPos.z;
 				CollisionBox_Scale[0] = fBoxSize.x;		CollisionBox_Scale[1] = fBoxSize.y;		CollisionBox_Scale[2] = fBoxSize.z;
 
 				bAble_Select = false;
-				
+
 			}
 			pEnvironment->Set_PickingCheck(bPickCheck);
 
 		}
 	}
-	
+
 	return S_OK;
 }
 
 HRESULT CLevel_ImGui::Build_Add()
 {
-	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+	if(m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
 		return S_OK;
 
 	CEnvironment::ENVIRONMENT_DESC			Desc{};
 	Desc.eID = LEVEL_IMGUI;
 	Desc.fPosition = m_fPickingPos;
 	Desc.iModelComponentIndex = m_iModelIndex + ENVIRONMENT_EA;
-	Desc.fScale = { 1.f,1.f ,1.f };
+	Desc.fScale = {1.f,1.f,1.f};
 	Desc.iImGuiMode = IMGUI_BUILD;
 	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
 	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
@@ -1253,17 +1236,17 @@ HRESULT CLevel_ImGui::Build_Add()
 	CollisionBox_Pos[0] = m_fPickingPos.x;		CollisionBox_Pos[1] = m_fPickingPos.y;		CollisionBox_Pos[2] = m_fPickingPos.z;
 	CollisionBox_Scale[0] = Desc.fScale.x;		CollisionBox_Scale[1] = Desc.fScale.y;		CollisionBox_Scale[2] = Desc.fScale.z;
 
-	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
-		TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-	if (pGameObj != nullptr)
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Environment"),
+		TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+	if(pGameObj != nullptr)
 	{
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
 			pBuild->Set_PickingCheck(false);
 		}
 		m_vecBuild.push_back(dynamic_cast<CEnvironment*>(pGameObj));
 		m_vecBuild.back()->Set_PickingCheck(true);
-		m_vecBuild.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+		m_vecBuild.back()->Set_CollisionBox(CollisionBox_Scale[0],CollisionBox_Scale[1],CollisionBox_Scale[2],CollisionBox_Pos[0],CollisionBox_Pos[1],CollisionBox_Pos[2]);
 
 		m_iBuild_Count++;
 		bAble_Select = false;
@@ -1275,39 +1258,38 @@ HRESULT CLevel_ImGui::Build_Add()
 HRESULT CLevel_ImGui::Build_DataChange(_float fTimeDelta)
 {
 
-	if (m_iModeSelect == IMGUI_CREATE)   // Create ∏µÂ ¿œ ∂ß ∞°¿Â √÷±Ÿ º≥ƒ° «◊∏Òø° ¥Î«— ºˆ¡§ ∞°¥… ±‚¥…
+	if(m_iModeSelect == IMGUI_CREATE)   // Create Î™®Îìú Ïùº Îïå Í∞ÄÏû• ÏµúÍ∑º ÏÑ§Ïπò Ìï≠Î™©Ïóê ÎåÄÌïú ÏàòÏ†ï Í∞ÄÎä• Í∏∞Îä•
 	{
-		// ∞°¿Â √÷±Ÿ º≥ƒ°«— Build ªË¡¶«œ±‚
-		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB) ) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iBuild_Count > 0)
+		// Í∞ÄÏû• ÏµúÍ∑º ÏÑ§ÏπòÌïú Build ÏÇ≠Ï†úÌïòÍ∏∞
+		if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iBuild_Count > 0)
 		{
 
 			m_vecBuild.back()->Set_DeadEnviron();
 			m_vecBuild.erase(m_vecBuild.end() - 1);
 			--m_iBuild_Count;
-			cout << "≥≤¿∫ Build ∞≥ºˆ : " << m_iBuild_Count << endl;
+			cout << "ÎÇ®ÏùÄ Build Í∞úÏàò : " << m_iBuild_Count << endl;
 
 			bAble_Select = true;
-			if (m_iBuild_Count > 0)
+			if(m_iBuild_Count > 0)
 			{
-				_float3 fPos, fScale;
+				_float3 fPos,fScale;
 				_vector vPos = m_vecBuild.back()->Get_Pos();
 				fScale = m_vecBuild.back()->Get_Scale();
 				m_vecBuild.back()->Set_PickingCheck(true);
 				_float3 fCollisionBoxScale = m_vecBuild.back()->Get_CollisionBoxScale();
 				_vector vecCollisionBoxPos = m_vecBuild.back()->Get_CollisionBoxPos();
-				_float3 fEnvironPos{}, fCollisionBoxPos{};
+				_float3 fEnvironPos{},fCollisionBoxPos{};
 
-				XMStoreFloat3(&fCollisionBoxPos, vecCollisionBoxPos);
+				XMStoreFloat3(&fCollisionBoxPos,vecCollisionBoxPos);
 
-				XMStoreFloat3(&fPos, vPos);
+				XMStoreFloat3(&fPos,vPos);
 				Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
 				Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
 
 				CollisionBox_Pos[0] = fCollisionBoxPos.x;				CollisionBox_Pos[1] = fCollisionBoxPos.y;				CollisionBox_Pos[2] = fCollisionBoxPos.z;
 				CollisionBox_Scale[0] = fCollisionBoxScale.x;				CollisionBox_Scale[1] = fCollisionBoxScale.y;				CollisionBox_Scale[2] = fCollisionBoxScale.z;
 
-			}
-			else
+			} else
 			{
 				Position[0] = 0.f;				Position[1] = 0.f;				Position[2] = 0.f;
 				Scale[0] = 0.f;					Scale[1] = 0.f;					Scale[2] = 0.f;
@@ -1319,114 +1301,102 @@ HRESULT CLevel_ImGui::Build_DataChange(_float fTimeDelta)
 			return S_OK;
 		}
 
-		m_vecBuild.back()->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
-		m_vecBuild.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
-		m_vecBuild.back()->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
+		m_vecBuild.back()->MovePos(fTimeDelta,Position[0],Position[1],Position[2]);
+		m_vecBuild.back()->Set_Scale(fTimeDelta,Scale[0],Scale[1],Scale[2]);
+		m_vecBuild.back()->Set_CollisionBox(CollisionBox_Scale[0],CollisionBox_Scale[1],CollisionBox_Scale[2],CollisionBox_Pos[0],CollisionBox_Pos[1],CollisionBox_Pos[2]);
 
 
 
-		XMVECTOR vTemp = { 0.f, 0.f ,0.f ,1.f }; // »∏¿¸√‡
+		XMVECTOR vTemp = {0.f,0.f,0.f,1.f}; // ÌöåÏ†ÑÏ∂ï
 		_bool bGetKey = false;
-		if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+		if((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 		{
 			bGetKey = true;
-			vTemp = { 0.f, 0.f, -1.f, 1.f };
-		}
-		else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			vTemp = {0.f,0.f,-1.f,1.f};
+		} else if((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 		{
 			bGetKey = true;
-			vTemp = { 0.f, 0.f, 1.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+			vTemp = {0.f,0.f,1.f,1.f};
+		} else if(GetAsyncKeyState(VK_LEFT) & 0x8000)
 		{
 			bGetKey = true;
-			vTemp = { 0.f, -1.f, 0.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+			vTemp = {0.f,-1.f,0.f,1.f};
+		} else if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
 		{
 			bGetKey = true;
-			vTemp = { 0.f, 1.f, 0.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_UP) & 0x8000)
+			vTemp = {0.f,1.f,0.f,1.f};
+		} else if(GetAsyncKeyState(VK_UP) & 0x8000)
 		{
 			bGetKey = true;
 
-			vTemp = { 1.f, 0.f, 0.f, 1.f };
-		}
-		else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+			vTemp = {1.f,0.f,0.f,1.f};
+		} else if(GetAsyncKeyState(VK_DOWN) & 0x8000)
 		{
 			bGetKey = true;
-			vTemp = { -1.f, 0.f, 0.f, 1.f };
-		}
-		else
+			vTemp = {-1.f,0.f,0.f,1.f};
+		} else
 		{
 			bGetKey = false;
 		}
 
-		if (bGetKey == true)
-			m_vecBuild.back()->Set_Turn(fTimeDelta, vTemp);
+		if(bGetKey == true)
+			m_vecBuild.back()->Set_Turn(fTimeDelta,vTemp);
 
 
-	}
-	else if (m_iModeSelect == IMGUI_SELECT)
+	} else if(m_iModeSelect == IMGUI_SELECT)
 	{
 		_uint iBuildIndex = 0;
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
-			if (true == pBuild->Get_PickingCheck())
+			if(true == pBuild->Get_PickingCheck())
 			{
-				if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iBuild_Count > 0)
+				if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iBuild_Count > 0)
 				{
 					pBuild->Set_DeadEnviron();
 					m_vecBuild.erase(m_vecBuild.begin() + iBuildIndex);
 					--m_iBuild_Count;
-					cout << "≥≤¿∫ Environment ∞≥ºˆ : " << m_iBuild_Count << endl;
+					cout << "ÎÇ®ÏùÄ Environment Í∞úÏàò : " << m_iBuild_Count << endl;
 
 					break;
 				}
 
-				pBuild->MovePos(fTimeDelta, Position[0], Position[1], Position[2]);
-				pBuild->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
-				pBuild->Set_CollisionBox(CollisionBox_Scale[0], CollisionBox_Scale[1], CollisionBox_Scale[2], CollisionBox_Pos[0], CollisionBox_Pos[1], CollisionBox_Pos[2]);
-				XMVECTOR vTemp = { 0.f, 0.f ,0.f ,1.f }; // »∏¿¸√‡
+				pBuild->MovePos(fTimeDelta,Position[0],Position[1],Position[2]);
+				pBuild->Set_Scale(fTimeDelta,Scale[0],Scale[1],Scale[2]);
+				pBuild->Set_CollisionBox(CollisionBox_Scale[0],CollisionBox_Scale[1],CollisionBox_Scale[2],CollisionBox_Pos[0],CollisionBox_Pos[1],CollisionBox_Pos[2]);
+				XMVECTOR vTemp = {0.f,0.f,0.f,1.f}; // ÌöåÏ†ÑÏ∂ï
 				_bool bGetKey = false;
-				if ((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				if((GetAsyncKeyState(VK_LEFT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 				{
 					bGetKey = true;
-					vTemp = { 0.f, 0.f, -1.f, 1.f };
-				}
-				else if ((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
+					vTemp = {0.f,0.f,-1.f,1.f};
+				} else if((GetAsyncKeyState(VK_RIGHT) & 0x8000) && (GetAsyncKeyState(VK_CONTROL) & 0x8000))
 				{
 					bGetKey = true;
-					vTemp = { 0.f, 0.f, 1.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+					vTemp = {0.f,0.f,1.f,1.f};
+				} else if(GetAsyncKeyState(VK_LEFT) & 0x8000)
 				{
 					bGetKey = true;
-					vTemp = { 0.f, -1.f, 0.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+					vTemp = {0.f,-1.f,0.f,1.f};
+				} else if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
 				{
 					bGetKey = true;
-					vTemp = { 0.f, 1.f, 0.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_UP) & 0x8000)
+					vTemp = {0.f,1.f,0.f,1.f};
+				} else if(GetAsyncKeyState(VK_UP) & 0x8000)
 				{
 					bGetKey = true;
 
-					vTemp = { 1.f, 0.f, 0.f, 1.f };
-				}
-				else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+					vTemp = {1.f,0.f,0.f,1.f};
+				} else if(GetAsyncKeyState(VK_DOWN) & 0x8000)
 				{
 					bGetKey = true;
-					vTemp = { -1.f, 0.f, 0.f, 1.f };
+					vTemp = {-1.f,0.f,0.f,1.f};
 				}
 
 				else
 					bGetKey = false;
 
-				if (bGetKey == true)
-					pBuild->Set_Turn(fTimeDelta, vTemp);
+				if(bGetKey == true)
+					pBuild->Set_Turn(fTimeDelta,vTemp);
 
 				break;
 			}
@@ -1440,45 +1410,45 @@ HRESULT CLevel_ImGui::Build_DataChange(_float fTimeDelta)
 void CLevel_ImGui::Build_Save()
 {
 	HANDLE hFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Build.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Save Build File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save Build File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Save Build_Yard File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save Build_Yard File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
-	
+
 	DWORD dwByte = 0;
 	_float3 fPos;
-	for (auto& pBuild : m_vecBuild)
+	for(auto& pBuild : m_vecBuild)
 	{
-		if (pBuild)
+		if(pBuild)
 		{
 			LEVELID iLevel = pBuild->Get_Level();
 			_int  iModelIndex = pBuild->Get_ModelIndex();
 			_uint iImGuiMode = pBuild->Get_ImGuiMode();
 
 			_vector vPos = pBuild->Get_Pos();
-			XMStoreFloat3(&fPos, vPos);
+			XMStoreFloat3(&fPos,vPos);
 			_float3 fScale = pBuild->Get_Scale();
 			_float3 fCollisionScale = pBuild->Get_CollisionBoxScale();
 			_vector vecCollisionPos = pBuild->Get_CollisionBoxPos();
@@ -1486,96 +1456,96 @@ void CLevel_ImGui::Build_Save()
 			_vector	vUp{};
 			_vector	vLook{};
 
-			pBuild->Get_Rotation(vRight, vUp, vLook);
+			pBuild->Get_Rotation(vRight,vUp,vLook);
 
-			WriteFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr);
-			WriteFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-			WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &fCollisionScale, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
+			WriteFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr);
+			WriteFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+			WriteFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&fCollisionScale,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
 
 
-			WriteFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
-			WriteFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-			WriteFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-			WriteFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+			WriteFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
+			WriteFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+			WriteFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+			WriteFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 			m_vecBuildIndex.push_back(iModelIndex);
 		}
 	}
 	CloseHandle(hFile);
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"Build Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Build Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"Build_Yard Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Build_Yard Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
-	sort(m_vecBuildIndex.begin(), m_vecBuildIndex.end());
-	vector<_int>::iterator iter = unique(m_vecBuildIndex.begin(), m_vecBuildIndex.end());
-	m_vecBuildIndex.erase(iter, m_vecBuildIndex.end());
+	sort(m_vecBuildIndex.begin(),m_vecBuildIndex.end());
+	vector<_int>::iterator iter = unique(m_vecBuildIndex.begin(),m_vecBuildIndex.end());
+	m_vecBuildIndex.erase(iter,m_vecBuildIndex.end());
 	HANDLE hIndexFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hIndexFile)
+		hIndexFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hIndexFile)
 		{
-			MessageBox(NULL, L"Save GamePlayLevel_Build_Index File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save GamePlayLevel_Build_Index File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		hIndexFile = CreateFile(L"../Bin/Data/GameYardLevel_Build_Index.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hIndexFile)
+		hIndexFile = CreateFile(L"../Bin/Data/GameYardLevel_Build_Index.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hIndexFile)
 		{
-			MessageBox(NULL, L"Save GameYardLevel_Build_Index File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save GameYardLevel_Build_Index File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
-	
+
 
 	dwByte = 0;
 
-	for (auto& pIndex : m_vecBuildIndex)
+	for(auto& pIndex : m_vecBuildIndex)
 	{
 		pIndex -= ENVIRONMENT_EA;
-		WriteFile(hIndexFile, &pIndex, sizeof(_int), &dwByte, nullptr);
+		WriteFile(hIndexFile,&pIndex,sizeof(_int),&dwByte,nullptr);
 		cout << pIndex << endl;
 	}
 
 	CloseHandle(hIndexFile);
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"GamePlayLevel_Build_Index Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"GamePlayLevel_Build_Index Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"GameYardLevel_Build_Index Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"GameYardLevel_Build_Index Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 
@@ -1583,7 +1553,7 @@ void CLevel_ImGui::Build_Save()
 
 void CLevel_ImGui::Build_Load()
 {
-	for (auto& pBuild : m_vecBuild)
+	for(auto& pBuild : m_vecBuild)
 	{
 		pBuild->Set_DeadEnviron();
 	}
@@ -1592,52 +1562,52 @@ void CLevel_ImGui::Build_Load()
 
 	m_iBuild_Count = 0;
 	HANDLE hFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		 hFile = CreateFile(L"../Bin/Data/Build.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Build.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Build File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Build File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		 hFile = CreateFile(L"../Bin/Data/Build_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Build_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Build_Yard File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Build_Yard File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
-	
+
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_int  iModelIndex;
-	_float3 fPos{}, fScale{}, fCollisionBoxPos{}, fCollisionBoxScale{};
-	_vector	vRight{}, vUp{}, vLook{}, vecCollisionPos{};
+	_float3 fPos{},fScale{},fCollisionBoxPos{},fCollisionBoxScale{};
+	_vector	vRight{},vUp{},vLook{},vecCollisionPos{};
 	_uint iImGuiMode{};
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr);
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
-		ReadFile(hFile, &fCollisionBoxScale, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &iImGuiMode, sizeof(_uint), &dwByte, nullptr);
-		ReadFile(hFile, &vecCollisionPos, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&fCollisionBoxScale,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&iImGuiMode,sizeof(_uint),&dwByte,nullptr);
+		ReadFile(hFile,&vecCollisionPos,sizeof(_vector),&dwByte,nullptr);
 
-		ReadFile(hFile, &vRight, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vUp, sizeof(_vector), &dwByte, nullptr);
-		ReadFile(hFile, &vLook, sizeof(_vector), &dwByte, nullptr);
+		ReadFile(hFile,&vRight,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vUp,sizeof(_vector),&dwByte,nullptr);
+		ReadFile(hFile,&vLook,sizeof(_vector),&dwByte,nullptr);
 
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_IMGUI;
@@ -1645,21 +1615,21 @@ void CLevel_ImGui::Build_Load()
 		Desc.iModelComponentIndex = iModelIndex;
 		Desc.fScale = fScale;
 		//cout << fScale.x << "     " << fScale.y << "            " << fScale.z << endl;
-		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
 			Position[0] = fPos.x;			Position[1] = fPos.y;			Position[2] = fPos.z;
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight, vUp, vLook);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_Rotaion(vRight,vUp,vLook);
 			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
 
 
-			XMStoreFloat3(&fCollisionBoxPos, vecCollisionPos);
+			XMStoreFloat3(&fCollisionBoxPos,vecCollisionPos);
 			Desc.CollisionBoxScale.x = fCollisionBoxScale.x;		Desc.CollisionBoxScale.y = fCollisionBoxScale.y;		Desc.CollisionBoxScale.z = fCollisionBoxScale.z;
 			Desc.CollisionBoxPos.x = fCollisionBoxPos.x;			Desc.CollisionBoxPos.y = fCollisionBoxPos.y;			Desc.CollisionBoxPos.z = fCollisionBoxPos.z;
 
-			dynamic_cast<CEnvironment*>(pGameObj)->Set_CollisionBox(fCollisionBoxScale.x, fCollisionBoxScale.y, fCollisionBoxScale.z, fCollisionBoxPos.x, fCollisionBoxPos.y, fCollisionBoxPos.z);
+			dynamic_cast<CEnvironment*>(pGameObj)->Set_CollisionBox(fCollisionBoxScale.x,fCollisionBoxScale.y,fCollisionBoxScale.z,fCollisionBoxPos.x,fCollisionBoxPos.y,fCollisionBoxPos.z);
 
 
 			if(m_iBuild_Count > 0)
@@ -1672,54 +1642,54 @@ void CLevel_ImGui::Build_Load()
 
 	CloseHandle(hFile);
 
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"Build Loaded Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Build Loaded Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"Build_Yard Loaded Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Build_Yard Loaded Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 }
 
 HRESULT CLevel_ImGui::Build_Select()
 {
-	if ((GetAsyncKeyState(VK_LBUTTON) & 0x8000) && m_iModeSelect == IMGUI_SELECT && bAble_Select == true)
+	if((GetAsyncKeyState(VK_LBUTTON) & 0x8000) && m_iModeSelect == IMGUI_SELECT && bAble_Select == true)
 	{
-		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd, g_iWinSizeX, g_iWinSizeY);
+		_float3 fMousePos = m_pGameInstance->Get_MousePos_NDC(g_hWnd,g_iWinSizeX,g_iWinSizeY);
 		XMMATRIX invProj = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ);
 		XMMATRIX invView = m_pGameInstance->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW);
-		XMVECTOR RayPos, RayDir;
-		m_pGameInstance->Get_MouseRayDirection(fMousePos, invProj, invView, &RayPos, &RayDir);
+		XMVECTOR RayPos,RayDir;
+		m_pGameInstance->Get_MouseRayDirection(fMousePos,invProj,invView,&RayPos,&RayDir);
 		RayDir = XMVector3Normalize(RayDir);
 
-		for (auto& pBuild : m_vecBuild)
+		for(auto& pBuild : m_vecBuild)
 		{
 			_vector vBoxPos = pBuild->Get_CollisionBoxPos();
 			XMFLOAT3 fBoxPos{};
-			XMStoreFloat3(&fBoxPos, vBoxPos);
+			XMStoreFloat3(&fBoxPos,vBoxPos);
 			XMFLOAT3 fBoxSize = pBuild->Get_CollisionBoxScale();
 
-			XMFLOAT3 fMinPoint, fMaxPoint;
-			m_pGameInstance->CreateBoundingBox(fBoxPos, fBoxSize, fMinPoint, fMaxPoint);
+			XMFLOAT3 fMinPoint,fMaxPoint;
+			m_pGameInstance->CreateBoundingBox(fBoxPos,fBoxSize,fMinPoint,fMaxPoint);
 			_bool bPickCheck = false;
 			float distance;
-			if (m_pGameInstance->Picking_Box(RayPos, RayDir, fMinPoint, fMaxPoint, distance, pBuild->Get_BoundingBox()))
+			if(m_pGameInstance->Picking_Box(RayPos,RayDir,fMinPoint,fMaxPoint,distance,pBuild->Get_BoundingBox()))
 			{
 				bPickCheck = true;
 				pBuild->Set_PickingCheck(bPickCheck);
 				_vector vecBuildPos = pBuild->Get_Pos();
 				_float3 fBuildScale = pBuild->Get_Scale();
 				_float3 fBuildPos{};
-				XMStoreFloat3(&fBuildPos, vecBuildPos);
+				XMStoreFloat3(&fBuildPos,vecBuildPos);
 
 
 				Position[0] = fBuildPos.x;				Position[1] = fBuildPos.y;				Position[2] = fBuildPos.z;
@@ -1729,7 +1699,7 @@ HRESULT CLevel_ImGui::Build_Select()
 				CollisionBox_Scale[0] = fBoxSize.x;				CollisionBox_Scale[1] = fBoxSize.y;				CollisionBox_Scale[2] = fBoxSize.z;
 
 				bAble_Select = false;
-				
+
 			}
 			pBuild->Set_PickingCheck(bPickCheck);
 
@@ -1741,23 +1711,23 @@ HRESULT CLevel_ImGui::Build_Select()
 
 HRESULT CLevel_ImGui::Item_Add()
 {
-	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+	if(m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
 		return S_OK;
 
 	CCoin::COIN_DESC			Desc{};
 	Desc.eID = LEVEL_IMGUI;
 	m_fPickingPos.y = 3.f;
 	Desc.fPosition = m_fPickingPos;
-	Desc.fScale = { 15.f,15.f ,15.f };
+	Desc.fScale = {15.f,15.f,15.f};
 	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
 	Scale[0] = Desc.fScale.x;		Scale[1] = Desc.fScale.y;		Scale[2] = Desc.fScale.z;
 
-	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Coin"),
-		TEXT("Prototype_GameObject_Coin"), &Desc));
-	if (pGameObj != nullptr)
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Coin"),
+		TEXT("Prototype_GameObject_Coin"),&Desc));
+	if(pGameObj != nullptr)
 	{
 		m_vecCoin.push_back(dynamic_cast<CCoin*>(pGameObj));
-		cout << m_fPickingPos.x << "  " << m_fPickingPos.y << "  " << m_fPickingPos.z << "   √ﬂ∞°" << endl;
+		cout << m_fPickingPos.x << "  " << m_fPickingPos.y << "  " << m_fPickingPos.z << "   Ï∂îÍ∞Ä" << endl;
 		m_iCoin_Count++;
 		bAble_Select = false;
 	}
@@ -1766,29 +1736,28 @@ HRESULT CLevel_ImGui::Item_Add()
 
 HRESULT CLevel_ImGui::Item_DataChange(_float fTimeDelta)
 {
-	if (m_iModeSelect == IMGUI_CREATE)   // Create ∏µÂ ¿œ ∂ß ∞°¿Â √÷±Ÿ º≥ƒ° «◊∏Òø° ¥Î«— ºˆ¡§ ∞°¥… ±‚¥…
+	if(m_iModeSelect == IMGUI_CREATE)   // Create Î™®Îìú Ïùº Îïå Í∞ÄÏû• ÏµúÍ∑º ÏÑ§Ïπò Ìï≠Î™©Ïóê ÎåÄÌïú ÏàòÏ†ï Í∞ÄÎä• Í∏∞Îä•
 	{
-		// ∞°¿Â √÷±Ÿ º≥ƒ°«— Coin ªË¡¶«œ±‚
-		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iCoin_Count > 0)
+		// Í∞ÄÏû• ÏµúÍ∑º ÏÑ§ÏπòÌïú Coin ÏÇ≠Ï†úÌïòÍ∏∞
+		if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iCoin_Count > 0)
 		{
 			m_vecCoin.back()->Set_Dead();
 			m_vecCoin.erase(m_vecCoin.end() - 1);
 			--m_iCoin_Count;
-			cout << "≥≤¿∫ Coin ∞≥ºˆ : " << m_iCoin_Count << endl;
+			cout << "ÎÇ®ÏùÄ Coin Í∞úÏàò : " << m_iCoin_Count << endl;
 
-			if (m_iCoin_Count > 0)
+			if(m_iCoin_Count > 0)
 			{
-				_float3 fPos, fScale;
+				_float3 fPos,fScale;
 				_vector vPos = m_vecCoin.back()->Get_Pos();
 				fScale = m_vecCoin.back()->Get_Scale();
 				_float3 fEnvironPos{};
 
-				XMStoreFloat3(&fPos, vPos);
+				XMStoreFloat3(&fPos,vPos);
 				Position[0] = fPos.x;				Position[1] = fPos.y;				Position[2] = fPos.z;
 				Scale[0] = fScale.x;				Scale[1] = fScale.y;				Scale[2] = fScale.z;
 
-			}
-			else
+			} else
 			{
 				Position[0] = 0.f;				Position[1] = 0.f;				Position[2] = 0.f;
 				Scale[0] = 0.f;					Scale[1] = 0.f;					Scale[2] = 0.f;
@@ -1797,8 +1766,8 @@ HRESULT CLevel_ImGui::Item_DataChange(_float fTimeDelta)
 		}
 
 
-		m_vecCoin.back()->MovePos( Position[0], Position[1], Position[2]);
-		m_vecCoin.back()->Set_Scale(fTimeDelta, Scale[0], Scale[1], Scale[2]);
+		m_vecCoin.back()->MovePos(Position[0],Position[1],Position[2]);
+		m_vecCoin.back()->Set_Scale(fTimeDelta,Scale[0],Scale[1],Scale[2]);
 
 	}
 	return S_OK;
@@ -1807,65 +1776,65 @@ HRESULT CLevel_ImGui::Item_DataChange(_float fTimeDelta)
 void CLevel_ImGui::Item_Save()
 {
 	HANDLE hFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Coin.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Save Coin File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save Coin File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		hFile = CreateFile(L"../Bin/Data/Coin_Yard.dat", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Coin_Yard.dat",GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Save Coin_Yard File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save Coin_Yard File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 
 	DWORD dwByte = 0;
 	_float3 fPos;
-	for (auto& pCoin : m_vecCoin)
+	for(auto& pCoin : m_vecCoin)
 	{
-		if (pCoin)
+		if(pCoin)
 		{
 			LEVELID iLevel = pCoin->Get_Level();
 			_vector vPos = pCoin->Get_Pos();
-			XMStoreFloat3(&fPos, vPos);
+			XMStoreFloat3(&fPos,vPos);
 			_float3 fScale = pCoin->Get_Scale();
 
-			WriteFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr);
-			WriteFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-			WriteFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr);
+			WriteFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+			WriteFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 		}
 	}
 	CloseHandle(hFile);
 
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"Coin Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Coin Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"Coin_Yard Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Coin_Yard Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 
@@ -1873,84 +1842,84 @@ void CLevel_ImGui::Item_Save()
 
 void CLevel_ImGui::Item_Load()
 {
-	for (auto& pCoin : m_vecCoin)
+	for(auto& pCoin : m_vecCoin)
 	{
 		pCoin->Set_Dead();
 	}
 	m_vecCoin.clear();
-	
+
 
 	m_iCoin_Count = 0;
 	HANDLE hFile{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		 hFile = CreateFile(L"../Bin/Data/Coin.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Coin.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Coin File Failed",L"Error",MB_OK);
 			return;
-		}		
+		}
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		 hFile = CreateFile(L"../Bin/Data/Coin_Yard.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(L"../Bin/Data/Coin_Yard.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Coin_Yard File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Coin_Yard File Failed",L"Error",MB_OK);
 			return;
-		}		
+		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
-	
+
 	DWORD dwByte = 0;
 	LEVELID iLevel;
-	_float3 fPos{}, fScale{};
-	
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	_float3 fPos{},fScale{};
+
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&fScale,sizeof(_float3),&dwByte,nullptr);
 
 		CCoin::COIN_DESC			Desc{};
 		Desc.eID = iLevel;
 		Desc.fPosition = fPos;
 		Desc.fScale = fScale;
-		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Coin"),
-			TEXT("Prototype_GameObject_Coin"), &Desc));
-		if (pGameObj != nullptr)
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Coin"),
+			TEXT("Prototype_GameObject_Coin"),&Desc));
+		if(pGameObj != nullptr)
 		{
 
 			Position[0] = fPos.x;			Position[1] = fPos.y;			Position[2] = fPos.z;
-			dynamic_cast<CCoin*>(pGameObj)->Set_Scale(0.f, fScale.x, fScale.y, fScale.z);
-			dynamic_cast<CCoin*>(pGameObj)->MovePos(fPos.x, fPos.y, fPos.z);
+			dynamic_cast<CCoin*>(pGameObj)->Set_Scale(0.f,fScale.x,fScale.y,fScale.z);
+			dynamic_cast<CCoin*>(pGameObj)->MovePos(fPos.x,fPos.y,fPos.z);
 			Scale[0] = fScale.x;			Scale[1] = fScale.y;			Scale[2] = fScale.z;
-	
+
 			m_vecCoin.push_back(dynamic_cast<CCoin*>(pGameObj));
 			m_iCoin_Count++;
 		}
 	}
 
 	CloseHandle(hFile);
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"Coin Loaded Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Coin Loaded Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"Coin_Yard Loaded Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Coin_Yard Loaded Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 
@@ -1963,30 +1932,30 @@ HRESULT CLevel_ImGui::Item_Select()
 
 HRESULT CLevel_ImGui::Grass_Add()
 {
-	if (m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
+	if(m_fPickingPos.x == 0 && m_fPickingPos.y == 0 && m_fPickingPos.z == 0)
 		return S_OK;
 
 	CEnvironment::ENVIRONMENT_DESC			Desc{};
 	Desc.eID = LEVEL_IMGUI;
 	Desc.fPosition = m_fPickingPos;
 	Desc.iModelComponentIndex = m_iModelIndex + ENVIRONMENT_EA;
-	Desc.fScale = { 8.f,8.f ,8.f };
+	Desc.fScale = {8.f,8.f,8.f};
 	Desc.iImGuiMode = IMGUI_GRASS;
 	Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
 
-	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
-		TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-	if (pGameObj != nullptr)
+	pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Environment"),
+		TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+	if(pGameObj != nullptr)
 	{
 		m_Instance.eID = m_eID;
 		m_Instance.fPos = m_fPickingPos;
 		m_Instance.iModelNumber = m_iModelIndex + ENVIRONMENT_EA;
-		
+
 		m_vecInstancing_Environ.push_back(dynamic_cast<CEnvironment*>(pGameObj));
 		m_vecInstancing.push_back(m_Instance);
 
 		m_iGrass_Count++;
-		
+
 	}
 
 	return S_OK;
@@ -1995,41 +1964,40 @@ HRESULT CLevel_ImGui::Grass_Add()
 
 HRESULT CLevel_ImGui::Grass_DataChange(_float fTimeDelta)
 {
-	if (m_iModeSelect == IMGUI_CREATE)  
+	if(m_iModeSelect == IMGUI_CREATE)
 	{
-		if ((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iGrass_Count > 0)
+		if((m_pGameInstance->Get_DIMouseState_Down(DIM_RB)) && (GetAsyncKeyState(VK_CONTROL) & 0x8000) && m_iGrass_Count > 0)
 		{
 			m_vecInstancing_Environ.back()->Set_Dead();
 			m_vecInstancing.erase(m_vecInstancing.end() - 1);
-			m_vecInstancing_Environ.erase(m_vecInstancing_Environ.end() - 1); // ∞°¿Â ∏∂¡ˆ∏∑ º≥ƒ°«— ¿‹µ ªË¡¶
+			m_vecInstancing_Environ.erase(m_vecInstancing_Environ.end() - 1); // Í∞ÄÏû• ÎßàÏßÄÎßâ ÏÑ§ÏπòÌïú ÏûîÎîî ÏÇ≠Ï†ú
 
 			--m_iGrass_Count;
-			cout << "≥≤¿∫ Grass ∞≥ºˆ : " << m_iGrass_Count << endl;
+			cout << "ÎÇ®ÏùÄ Grass Í∞úÏàò : " << m_iGrass_Count << endl;
 		}
 
 
-	}
-	else if (m_iModeSelect == IMGUI_SELECT)
+	} else if(m_iModeSelect == IMGUI_SELECT)
 	{
-		if (m_bGrassDelete == true)
+		if(m_bGrassDelete == true)
 		{
-			if (m_pGameInstance->Get_DIKeyState_Pressing(DIK_BACKSPACE) && m_iGrass_Count > 0 && m_fTimer_for_Instancing_Delete >= 0.15f)
+			if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_BACKSPACE) && m_iGrass_Count > 0 && m_fTimer_for_Instancing_Delete >= 0.15f)
 			{
-				m_fTimer_for_Instancing_Delete = 0.f; // ≈∏¿Ã∏” ( 0.5√ ø° «— π¯æø Ω««‡ )
+				m_fTimer_for_Instancing_Delete = 0.f; // ÌÉÄÏù¥Î®∏ ( 0.5Ï¥àÏóê Ìïú Î≤àÏî© Ïã§Ìñâ )
 				m_vecInstancing_Environ.back()->Set_Dead();
-				m_vecInstancing.erase(m_vecInstancing.end() - 1); // ∞°¿Â ∏∂¡ˆ∏∑ º≥ƒ°«— ¿‹µ ªË¡¶
-				m_vecInstancing_Environ.erase(m_vecInstancing_Environ.end() - 1); // ∞°¿Â ∏∂¡ˆ∏∑ º≥ƒ°«— ¿‹µ ªË¡¶
+				m_vecInstancing.erase(m_vecInstancing.end() - 1); // Í∞ÄÏû• ÎßàÏßÄÎßâ ÏÑ§ÏπòÌïú ÏûîÎîî ÏÇ≠Ï†ú
+				m_vecInstancing_Environ.erase(m_vecInstancing_Environ.end() - 1); // Í∞ÄÏû• ÎßàÏßÄÎßâ ÏÑ§ÏπòÌïú ÏûîÎîî ÏÇ≠Ï†ú
 				--m_iGrass_Count;
-				cout << "≥≤¿∫ Grass ∞≥ºˆ : " << m_iGrass_Count << endl;
+				cout << "ÎÇ®ÏùÄ Grass Í∞úÏàò : " << m_iGrass_Count << endl;
 
 			}
 			m_fTimer_for_Instancing_Delete += fTimeDelta;
 		}
 
 
-		if (m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE))
+		if(m_pGameInstance->Get_DIKeyState_Down(DIK_SPACE))
 		{
-			if (m_bGrassDelete == true)
+			if(m_bGrassDelete == true)
 				m_bGrassDelete = false;
 			else
 				m_bGrassDelete = true;
@@ -2044,16 +2012,16 @@ void CLevel_ImGui::Grass_Save()
 	HANDLE hFile{};
 	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
 	_wstring Last_Path = TEXT(".dat");
-	_wstring Result_Path{}; 
-	switch (m_eID)
+	_wstring Result_Path{};
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
 		Result_Path = Grass_Path + TEXT("_GamePlay") + to_wstring(m_iModelIndex) + Last_Path;
-		hFile = CreateFile(Result_Path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(Result_Path.c_str(),GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Save Coin File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save Coin File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
@@ -2061,45 +2029,45 @@ void CLevel_ImGui::Grass_Save()
 	case Client::LEVEL_YARD:
 	{
 		Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-		hFile = CreateFile(Result_Path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(Result_Path.c_str(),GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Save Coin_Yard File Creation Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Save Coin_Yard File Creation Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 
 	DWORD dwByte = 0;
 	_float3 fPos{};
-	for (auto& pInstance : m_vecInstancing)
+	for(auto& pInstance : m_vecInstancing)
 	{
-		if (pInstance.iModelNumber == (m_iModelIndex + ENVIRONMENT_EA)) // ¥ı«— ∞™∞˙ ∫Ò±≥«ÿæﬂ«‘, ±∏¡∂√ºø°¥¬ ¥ı«— ∞™¿”
+		if(pInstance.iModelNumber == (m_iModelIndex + ENVIRONMENT_EA)) // ÎçîÌïú Í∞íÍ≥º ÎπÑÍµêÌï¥ÏïºÌï®, Íµ¨Ï°∞Ï≤¥ÏóêÎäî ÎçîÌïú Í∞íÏûÑ
 		{
-		WriteFile(hFile, &pInstance.eID, sizeof(LEVELID), &dwByte, nullptr);
-		WriteFile(hFile, &pInstance.fPos, sizeof(_float3), &dwByte, nullptr);
+			WriteFile(hFile,&pInstance.eID,sizeof(LEVELID),&dwByte,nullptr);
+			WriteFile(hFile,&pInstance.fPos,sizeof(_float3),&dwByte,nullptr);
 		}
 	}
 	CloseHandle(hFile);
 
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"Instancing_Gameplay Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Instancing_Gameplay Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"Instancing_Yard Saved Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Instancing_Yard Saved Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 }
@@ -2111,54 +2079,54 @@ void CLevel_ImGui::Grass_Load()
 	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
 	_wstring Last_Path = TEXT(".dat");
 	_wstring Result_Path{};
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
-	{		
+	{
 		Result_Path = Grass_Path + TEXT("_GamePlay") + to_wstring(m_iModelIndex) + Last_Path;
 
-		hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Coin File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Coin File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	case Client::LEVEL_YARD:
-	{	
+	{
 		Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-		hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (INVALID_HANDLE_VALUE == hFile)
+		hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if(INVALID_HANDLE_VALUE == hFile)
 		{
-			MessageBox(NULL, L"Load Coin_Yard File Failed", L"Error", MB_OK);
+			MessageBox(NULL,L"Load Coin_Yard File Failed",L"Error",MB_OK);
 			return;
 		}
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 
 	DWORD dwByte = 0;
 	LEVELID iLevel;
 	_float3 fPos{};
 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
-		
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
+
 		CEnvironment::ENVIRONMENT_DESC			Desc{};
 		Desc.eID = LEVEL_IMGUI;
 		Desc.fPosition = fPos;
 		Desc.iModelComponentIndex = m_iModelIndex + ENVIRONMENT_EA;
-		Desc.fScale = { 8.f,8.f ,8.f };
+		Desc.fScale = {8.f,8.f,8.f};
 		Desc.iImGuiMode = IMGUI_GRASS;
 		Position[0] = m_fPickingPos.x;	Position[1] = m_fPickingPos.y;	Position[2] = m_fPickingPos.z;
 
-		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, TEXT("Layer_Environment"),
-			TEXT("Prototype_GameObject_Environment_ImGui"), &Desc));
-		if (pGameObj != nullptr)
+		pGameObj = (m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,TEXT("Layer_Environment"),
+			TEXT("Prototype_GameObject_Environment_ImGui"),&Desc));
+		if(pGameObj != nullptr)
 		{
 			m_Instance.eID = m_eID;
 			m_Instance.fPos = fPos;
@@ -2173,20 +2141,20 @@ void CLevel_ImGui::Grass_Load()
 
 	CloseHandle(hFile);
 
-	switch (m_eID)
+	switch(m_eID)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		MessageBox(NULL, L"Instancing_Gameplay Loaded Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Instancing_Gameplay Loaded Successfully",L"Success",MB_OK);
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		MessageBox(NULL, L"Instancing_Yard Loaded Successfully", L"Success", MB_OK);
+		MessageBox(NULL,L"Instancing_Yard Loaded Successfully",L"Success",MB_OK);
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 }
 
@@ -2195,11 +2163,11 @@ HRESULT CLevel_ImGui::Grass_Select()
 	return S_OK;
 }
 
-CLevel_ImGui* CLevel_ImGui::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLevel_ImGui* CLevel_ImGui::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CLevel_ImGui* pInstance = new CLevel_ImGui(pDevice, pContext);
+	CLevel_ImGui* pInstance = new CLevel_ImGui(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if(FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CLevel_ImGui");
 		Safe_Release(pInstance);
@@ -2220,16 +2188,16 @@ void CLevel_ImGui::Free()
 
 void CLevel_ImGui::Create_ImageButton()
 {
-	m_pSave = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Save.jpg"));
-	m_pLoad = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Load.jpg"));
+	m_pSave = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Save.jpg"));
+	m_pLoad = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Load.jpg"));
 
-	m_pEnviron = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/ImGui/Button/Environment%d.png"), ENVIRONMENT_EA);
-	m_pBuild = CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/ImGui/Button/Build%d.png"), BUILD_EA);
+	m_pEnviron = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/ImGui/Button/Environment%d.png"),ENVIRONMENT_EA);
+	m_pBuild = CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/ImGui/Button/Build%d.png"),BUILD_EA);
 
-	// ªÁ¡¯¿« ∏Æº“Ω∫∫‰ ∞°¡Æø¿±‚
+	// ÏÇ¨ÏßÑÏùò Î¶¨ÏÜåÏä§Î∑∞ Í∞ÄÏ†∏Ïò§Í∏∞
 	my_Savetexture = *m_pSave->Get_SRV().begin();
 	my_Loadtexture = *m_pLoad->Get_SRV().begin();
-	
+
 }
 
 
@@ -2238,8 +2206,8 @@ HRESULT CLevel_ImGui::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC			Desc{};
 
-	Desc.vEye = _float4(0.f, 10.f, -5.f, 1.f);
-	Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	Desc.vEye = _float4(0.f,10.f,-5.f,1.f);
+	Desc.vAt = _float4(0.f,0.f,0.f,1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
 	Desc.fNearZ = 0.1f;
 	Desc.fFar = 500.f;
@@ -2248,8 +2216,8 @@ HRESULT CLevel_ImGui::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 	Desc.fMouseSensor = 0.05f;
 	Desc.eLevel = LEVEL_IMGUI;
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free_ImGui"), &Desc)))
+	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,
+		TEXT("Prototype_GameObject_Camera_Free_ImGui"),&Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -2260,12 +2228,12 @@ HRESULT CLevel_ImGui::Ready_Lights()
 	LIGHT_DESC	LightDesc{};
 
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vDirection = _float4(1.f,-1.f,1.f,0.f);
+	LightDesc.vDiffuse = _float4(1.f,1.f,1.f,1.f);
+	LightDesc.vAmbient = _float4(1.f,1.f,1.f,1.f);
+	LightDesc.vSpecular = _float4(1.f,1.f,1.f,1.f);
 
-	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+	if(FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -2297,24 +2265,24 @@ HRESULT CLevel_ImGui::Ready_Layer_Grass(const _tchar* pLayerTag)
 		pGrass.eLevel = LEVEL_IMGUI;
 
 		pGrass.iType = 108;
-		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,
+			TEXT("Prototype_GameObject_Grass"),&pGrass)))
 			return E_FAIL;
 
 		pGrass.iType = 109;
-		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,
+			TEXT("Prototype_GameObject_Grass"),&pGrass)))
 			return E_FAIL;
 
 		pGrass.iType = 110;
-		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,
+			TEXT("Prototype_GameObject_Grass"),&pGrass)))
 			return E_FAIL;
 
 
 		pGrass.iType = 111;
-		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI, pLayerTag,
-			TEXT("Prototype_GameObject_Grass"), &pGrass)))
+		if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,
+			TEXT("Prototype_GameObject_Grass"),&pGrass)))
 			return E_FAIL;
 	}
 
@@ -2327,70 +2295,70 @@ HRESULT CLevel_ImGui::Ready_Layer_Trap(const _tchar* pLayerTag)
 {
 	CTrap_Marks::TRAP_MARKS_DESC Mark_Desc{};
 	Mark_Desc.eID = LEVEL_IMGUI;
-	Mark_Desc.fScale = { 4.f,4.f,4.f };
+	Mark_Desc.fScale = {4.f,4.f,4.f};
 
 
-#pragma region ∑π∞Ì∆Æ∑¶
+	#pragma region Î†àÍ≥†Ìä∏Îû©
 	Mark_Desc.eType = CTrap_Marks::BRICKS_TRAP;
 
-	Mark_Desc.fPosition = _float3(502.f, 0.11f, 505.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(502.f,0.11f,505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(478.f, 0.11f, 505.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(478.f,0.11f,505.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(490.f, 0.11f, 493.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(490.f,0.11f,493.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(490.f, 0.11f, 517.f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(490.f,0.11f,517.f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-#pragma endregion ∑π∞Ì∆Æ∑¶
+	#pragma endregion Î†àÍ≥†Ìä∏Îû©
 
-#pragma region ≈ ≈©∆Æ∑¶
+	#pragma region ÌÉ±ÌÅ¨Ìä∏Îû©
 	Mark_Desc.eType = CTrap_Marks::TANK_TRAP;
 
-	Mark_Desc.fPosition = _float3(620.293f, 0.f, 526.778f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(620.293f,0.f,526.778f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(575.161f, 0.f, 598.337f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(575.161f,0.f,598.337f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(586.718f, 0.f, 518.17f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(586.718f,0.f,518.17f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(496.737f, 0.f, 594.82f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(496.737f,0.f,594.82f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(399.722f, 0.f, 576.963f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(399.722f,0.f,576.963f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(399.895f, 0.f, 428.506f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(399.895f,0.f,428.506f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(453.112f, 0.f, 374.234f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(453.112f,0.f,374.234f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(550.279f, 0.f, 405.683f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(550.279f,0.f,405.683f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(600.133f, 0.f, 439.33f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(600.133f,0.f,439.33f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(482.854f, 0.f, 379.527f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(482.854f,0.f,379.527f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(434.03f, 0.f, 400.054f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(434.03f,0.f,400.054f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(370.759f, 0.f, 484.017f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(370.759f,0.f,484.017f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
-	Mark_Desc.fPosition = _float3(356.141f, 0.f, 516.032f);
-	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_TrapMarks"), &Mark_Desc)));
+	Mark_Desc.fPosition = _float3(356.141f,0.f,516.032f);
+	m_vecTrapMark.push_back(static_cast<CTrap_Marks*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_TrapMarks"),&Mark_Desc)));
 
 
-#pragma endregion ≈ ≈©∆Æ∑¶
+	#pragma endregion ÌÉ±ÌÅ¨Ìä∏Îû©
 
 
 
@@ -2404,28 +2372,28 @@ HRESULT CLevel_ImGui::Ready_Layer_Trap(const _tchar* pLayerTag)
 
 HRESULT CLevel_ImGui::Ready_Layer_PlayerBuild(const _tchar* pLayerTag)
 {
-	// ∫Í∑π¿Œ ƒ⁄æÓ
-	CBrainCore::BRAIN_CORE_DESC pDesc{};
-	pDesc.eID = LEVEL_IMGUI;
-	pDesc.fPosition = _float3(490.f, 0.1f, 505.f);
-	pDesc.fScale = { 4.f,4.f,4.f };
-	pDesc.iModelComponentIndex = 205;
-	static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_BrainCore"), &pDesc));
-	// 563
-	// ø°≥ ¡ˆ ∏”Ω≈
-	CEnergy_Machine::ENERGYMACHINE_DESC pEnergyMachine{};
-	pEnergyMachine.eID = LEVEL_IMGUI;
-	pEnergyMachine.fScale = { 5.f,5.f,5.f };
-	pEnergyMachine.fPosition = _float3{ 477.267f, 0.1f,532.115f };
-	static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_EnergyMachine"), &pEnergyMachine));
+	//// Î∏åÎ†àÏù∏ ÏΩîÏñ¥
+	//CBrainCore::BRAIN_CORE_DESC pDesc{};
+	//pDesc.eID = LEVEL_IMGUI;
+	//pDesc.fPosition = _float3(490.f,0.1f,505.f);
+	//pDesc.fScale = {4.f,4.f,4.f};
+	//pDesc.iModelComponentIndex = 205;
+	//static_cast<CBrainCore*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_BrainCore"),&pDesc));
+	//// 563
+	//// ÏóêÎÑàÏßÄ Î®∏Ïã†
+	//CEnergy_Machine::ENERGYMACHINE_DESC pEnergyMachine{};
+	//pEnergyMachine.eID = LEVEL_IMGUI;
+	//pEnergyMachine.fScale = {5.f,5.f,5.f};
+	//pEnergyMachine.fPosition = _float3{477.267f,0.1f,532.115f};
+	//static_cast<CEnergy_Machine*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_EnergyMachine"),&pEnergyMachine));
 
 
-	// ø°≥ ¡ˆ ∏”Ω≈ ƒ∏
-	CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
-	pEnergyCap.eID = LEVEL_IMGUI;
-	pEnergyCap.fScale = { 5.f,5.f,5.f };
-	pEnergyCap.fPosition = _float3{ 476.075f, 5.82203f,532.203f };
-	static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI, pLayerTag, TEXT("Prototype_GameObject_EnergyCap"), &pEnergyCap));
+	//// ÏóêÎÑàÏßÄ Î®∏Ïã† Ï∫°
+	//CEnergy_Cap::ENERGYCAP_DESC pEnergyCap{};
+	//pEnergyCap.eID = LEVEL_IMGUI;
+	//pEnergyCap.fScale = {5.f,5.f,5.f};
+	//pEnergyCap.fPosition = _float3{476.075f,5.82203f,532.203f};
+	//static_cast<CEnergy_Cap*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_IMGUI,pLayerTag,TEXT("Prototype_GameObject_EnergyCap"),&pEnergyCap));
 
 	return S_OK;
 }

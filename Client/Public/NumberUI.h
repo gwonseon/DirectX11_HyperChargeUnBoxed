@@ -11,20 +11,22 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CNumberUI final : public CUIObject
+class CNumberUI final: public CUIObject
 {
 public:
 	enum DIGIT {
-		ONE_DIGIT,        // ÀÏÀÇ ÀÚ¸®
-		TEN_DIGIT,        // ½ÊÀÇ ÀÚ¸®
-		HUNDREDS_DIGIT,   // ¹éÀÇ ÀÚ¸®
-		THOUSANDS_DIGIT,  // ÃµÀÇ ÀÚ¸®
-		TENS_OF_THOUSANDS_DIGIT, // ¸¸ÀÇ ÀÚ¸®
-		HUNDREDS_OF_THOUSANDS_DIGIT // ½Ê¸¸ÀÇ ÀÚ¸®
+		ONE_DIGIT,        // ì¼ì˜ ìë¦¬
+		TEN_DIGIT,        // ì‹­ì˜ ìë¦¬
+		HUNDREDS_DIGIT,   // ë°±ì˜ ìë¦¬
+		THOUSANDS_DIGIT,  // ì²œì˜ ìë¦¬
+		TENS_OF_THOUSANDS_DIGIT, // ë§Œì˜ ìë¦¬
+		HUNDREDS_OF_THOUSANDS_DIGIT // ì‹­ë§Œì˜ ìë¦¬
 	};
 
-	enum TYPE_OF_USAGE{TYPE_COIN, TYPE_BULLET, TYPE_FULLBULLET,TYPE_END };
-	typedef struct : public CUIObject::UIOBJECT_DESC
+	enum TYPE_OF_USAGE{
+		TYPE_COIN,TYPE_BULLET,TYPE_FULLBULLET,TYPE_END
+	};
+	typedef struct: public CUIObject::UIOBJECT_DESC
 	{
 		TYPE_OF_USAGE eTypeUsage{};
 		DIGIT	eDigit{};
@@ -33,16 +35,16 @@ public:
 	}NUMBERUI_DESC;
 
 private:
-	CNumberUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CNumberUI(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CNumberUI(const CNumberUI& Prototype);
 	virtual ~CNumberUI() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -54,12 +56,12 @@ public:
 	void Bullet(_float fTimeDelta);
 	void FullBullet(_float fTimeDelta);
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CTexture* m_pTextureCom = {nullptr};
+	CVIBuffer_Rect* m_pVIBufferCom = {nullptr};
 
 
-	CPlayer* m_pPlayer = { nullptr };
+	CPlayer* m_pPlayer = {nullptr};
 
 
 private:
@@ -74,7 +76,7 @@ private:
 	_float m_fDistance{};
 	_vector vFirstPos{};
 	LEVELID m_eLevel{};
-	
+
 	_bool m_bDraw = false;
 
 	_vector vPos{};
@@ -83,7 +85,7 @@ private:
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CNumberUI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CNumberUI* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

@@ -5,16 +5,16 @@
 #include "Player.h"
 BEGIN(Client)
 
-class CMonster : public CGameObject
+class CMonster: public CGameObject
 {
 public:
-	typedef struct : public CGameObject::GAMEOBJ_DESC
+	typedef struct: public CGameObject::GAMEOBJ_DESC
 	{
-		CPlayer* pPlayer = { nullptr };
-		CLayer* pTrapLayer = { nullptr };
+		CPlayer* pPlayer = {nullptr};
+		CLayer* pTrapLayer = {nullptr};
 
-		const _float4x4* matPlayerWorld = { nullptr };
-		const _float4x4* matBrainCoreWorld = { nullptr };
+		const _float4x4* matPlayerWorld = {nullptr};
+		const _float4x4* matBrainCoreWorld = {nullptr};
 		_vector* vecTargetPos = {nullptr};
 
 		LEVELID		eID = {};
@@ -23,7 +23,7 @@ public:
 		_uint		iCell_Idx{};
 	}MONSTER_DESC;
 
-	
+
 	enum EVILDAMAGE_ANIM
 	{
 
@@ -56,7 +56,7 @@ public:
 	};
 
 protected:
-	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMonster(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CMonster(const CMonster& Prototype);
 	virtual ~CMonster() = default;
 
@@ -70,24 +70,26 @@ public:
 	virtual HRESULT Render_Height() override;
 
 
-	void Set_TargetPos(_vector* pPos) { m_vecTargetPos = pPos; }
+	void Set_TargetPos(_vector* pPos) {
+		m_vecTargetPos = pPos;
+	}
 
 protected:
 	LEVELID	m_eLevel = {};
 	_int	m_iModelIndex = {};
 	_uint	m_iBraincore_CellNumber = {};
-	const _float4x4* m_matPlayerWorld = { nullptr };
-	const _float4x4* m_matBrainCoreWorld = { nullptr };
+	const _float4x4* m_matPlayerWorld = {nullptr};
+	const _float4x4* m_matBrainCoreWorld = {nullptr};
 
-	_float		m_fTime_For_Target{};  // ∆Æ∑¶ √£¥¬ ∞Ê∑Œ ≈Ωªˆ ¡ˆø¨ Ω√∞£
-	_float		m_fCurrentTime = 0.f;  
+	_float		m_fTime_For_Target{};  // Ìä∏Îû© Ï∞æÎäî Í≤ΩÎ°ú ÌÉêÏÉâ ÏßÄÏó∞ ÏãúÍ∞Ñ
+	_float		m_fCurrentTime = 0.f;
 	_float		m_fDamaged_DelayTime = 1.f;
-	// ≥ÀπÈøÎ
+	// ÎÑâÎ∞±Ïö©
 	_bool		m_bKnockBacking = false;
 	_float		m_fKnockBack_Power = 0.f;
 	_float		m_fKnockBack_Height = 0.f;
 	_float		m_fPrevHp{};
-	//  ±Ê √£±‚
+	//  Í∏∏ Ï∞æÍ∏∞
 	vector<_float3> Path{};
 	_uint		m_iCell_Idx{};
 	_uint		m_iPrevPlayer_Cell_Idx{};
@@ -104,8 +106,8 @@ protected:
 	_vector		m_vecNewTargetPos{};
 	_vector		m_vecStoreTargetPos{};
 
-	CPlayer*	m_pPlayer		= { nullptr };
-	CLayer*		m_pTrapLayer	= { nullptr };
+	CPlayer*	m_pPlayer		= {nullptr};
+	CLayer*		m_pTrapLayer	= {nullptr};
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free() override;

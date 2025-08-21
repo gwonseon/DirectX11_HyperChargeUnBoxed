@@ -10,14 +10,14 @@ END
 
 BEGIN(Client)
 
-class CHead_Player final : public CPartObject
+class CHead_Player final: public CPartObject
 {
 public:
-	typedef struct : CPartObject::PARTOBJECT_DESC
+	typedef struct: CPartObject::PARTOBJECT_DESC
 	{
 		LEVELID m_eLevelID{};
-		const _uint* pParentState = { nullptr };
-		const _float4x4* pSocketMatrix = { nullptr };
+		const _uint* pParentState = {nullptr};
+		const _float4x4* pSocketMatrix = {nullptr};
 		_uint* m_iWeaponState{};
 	}HEADPLAYER_DESC;
 
@@ -36,16 +36,16 @@ public:
 
 
 private:
-	CHead_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CHead_Player(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CHead_Player(const CHead_Player& Prototype);
 	virtual ~CHead_Player() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -55,21 +55,23 @@ public:
 
 
 public:
-	void	Set_PlayerViewState(_bool bTPS) { m_bTPSState = bTPS;	}
+	void	Set_PlayerViewState(_bool bTPS) {
+		m_bTPSState = bTPS;
+	}
 
 private:
 	_bool m_bTPSState = false;
 
 	_uint* m_iWeaponState{};
 	_uint* m_iViewState{};
-	_float3 Position{}, Rotation{};
+	_float3 Position{},Rotation{};
 	_float		m_fAngle_Y{};
 	LEVELID m_eLevelID{};
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	const _float4x4* m_pSocketMatrix = { nullptr };
-	const _uint* m_pParentState = { nullptr };
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	const _float4x4* m_pSocketMatrix = {nullptr};
+	const _uint* m_pParentState = {nullptr};
 
 
 
@@ -80,7 +82,7 @@ private:
 
 
 public:
-	static CHead_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CHead_Player* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

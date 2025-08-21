@@ -8,35 +8,35 @@ BEGIN(Engine)
 class CShader;
 class CCollider;
 class CModel;
-class CTexture; 
+class CTexture;
 class CNavigation;
 END
 
 BEGIN(Client)
 
-class CPony : public CMonster
+class CPony: public CMonster
 {
 private:
 	CPony_State* m_pCurrentState;
 
 public:
-	typedef struct : CMonster::MONSTER_DESC
+	typedef struct: CMonster::MONSTER_DESC
 	{
 		_vector* vecTargetPos{};
-		CPlayer_Build* m_pBuild = { nullptr };
+		CPlayer_Build* m_pBuild = {nullptr};
 	}PONY_DESC;
 
 	enum PONY_ANIM {
-		PONY_AttackRepeat,		PONY_Dash, 		PONY_GallopFast,		PONY_Gallop,		PONY_Idle01,
-		PONY_Neigh,		PONY_Trot,		PONY_Walk, 
+		PONY_AttackRepeat,PONY_Dash,PONY_GallopFast,PONY_Gallop,PONY_Idle01,
+		PONY_Neigh,PONY_Trot,PONY_Walk,
 	};
 
 	enum PONY_STATE
 	{
-		TROT_STATE, RUN_STATE, ATTACK_STATE, PONY_STATE_END
+		TROT_STATE,RUN_STATE,ATTACK_STATE,PONY_STATE_END
 	};
 private:
-	CPony(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPony(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CPony(const CPony& Prototype);
 	virtual ~CPony() = default;
 
@@ -50,10 +50,10 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 
-public: // ªÛ≈¬∆–≈œ
+public: // ¬ª√≥√Ö√Ç√Ü√ê√Ö√è
 	void ChangeState(CPony_State* pNewState)
 	{
-		if (m_pCurrentState)
+		if(m_pCurrentState)
 		{
 			m_pCurrentState->Exit(this);
 			delete m_pCurrentState;
@@ -61,7 +61,7 @@ public: // ªÛ≈¬∆–≈œ
 
 		m_pCurrentState = pNewState;
 
-		if (m_pCurrentState)
+		if(m_pCurrentState)
 		{
 			m_pCurrentState->Enter(this);
 		}
@@ -69,22 +69,26 @@ public: // ªÛ≈¬∆–≈œ
 
 
 public:
-	CModel* Get_ModelCom() { return m_pModelCom; }
-	PONY_STATE Get_State() { return m_ePonyState; }
+	CModel* Get_ModelCom() {
+		return m_pModelCom;
+	}
+	PONY_STATE Get_State() {
+		return m_ePonyState;
+	}
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
 private:
-	CCollider*		m_pColliderCom			= { nullptr };
-	CShader*		m_pShaderCom				= { nullptr };
-	CModel*			m_pModelCom					= { nullptr };
-	CNavigation*	m_pNavigationCom		= { nullptr };
-	CCollider*	m_pTargetCollider = { nullptr };
-	CPlayer_Build* m_pBuild = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	_vector* m_vecTargetPos				= { nullptr };
+	CCollider*		m_pColliderCom			= {nullptr};
+	CShader*		m_pShaderCom				= {nullptr};
+	CModel*			m_pModelCom					= {nullptr};
+	CNavigation*	m_pNavigationCom		= {nullptr};
+	CCollider*	m_pTargetCollider = {nullptr};
+	CPlayer_Build* m_pBuild = {nullptr};
+	CTexture* m_pTextureCom = {nullptr};
+	_vector* m_vecTargetPos				= {nullptr};
 
 private:
 	_vector vPlayerPos{};
@@ -96,8 +100,14 @@ private:
 	_bool	m_bFind_Path = false;
 	_bool  m_bOnce = false;
 	PONY_STATE m_ePonyState = TROT_STATE;
+
+	_float m_fDistnace = 0.5f;
+private: // For Thread 
+	future<vector<_float3>> m_vecFindingPath;
+	bool m_bRequest_Path = false;
+
 public:
-	static CPony* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPony* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

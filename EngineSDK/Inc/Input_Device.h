@@ -6,12 +6,12 @@
 
 BEGIN(Engine)
 
-class CInput_Device : public CBase
+class CInput_Device: public CBase
 {
 private:
 	CInput_Device(void);
 	virtual ~CInput_Device(void) = default;
-	
+
 public:
 	_ubyte Get_DIKeyState(_ubyte byKeyID);            // Pressing
 	_ubyte Get_DIKeyState_Pressing(_ubyte byKeyID);   // Pressing
@@ -26,21 +26,21 @@ public:
 
 
 public:
-	HRESULT Initialize(HINSTANCE hInst, HWND hWnd);
+	HRESULT Initialize(HINSTANCE hInst,HWND hWnd);
 	void	Update_InputDev(void);
 
 private:
-	LPDIRECTINPUT8			m_pInputSDK = { nullptr };
-	LPDIRECTINPUTDEVICE8	m_pKeyBoard = { nullptr };
-	LPDIRECTINPUTDEVICE8	m_pMouse = { nullptr };
+	LPDIRECTINPUT8			m_pInputSDK = {nullptr};
+	LPDIRECTINPUTDEVICE8	m_pKeyBoard = {nullptr};
+	LPDIRECTINPUTDEVICE8	m_pMouse = {nullptr};
 
 private:
-	_byte					m_byKeyState[256] = {};		// Å°º¸µå¿¡ ÀÖ´Â ¸ğµç Å°°ªÀ» ÀúÀåÇÏ±â À§ÇÑ º¯¼ö
+	_byte					m_byKeyState[256] = {};		// í‚¤ë³´ë“œì— ìˆëŠ” ëª¨ë“  í‚¤ê°’ì„ ì €ì¥í•˜ê¸° ìœ„í•œ ë³€ìˆ˜
 	_byte                    m_byPrevKeyState[256];
 	DIMOUSESTATE			m_tMouseState = {};
 	DIMOUSESTATE             m_tPrevMouseState;
 public:
-	static CInput_Device* Create(HINSTANCE hInst, HWND hWnd);
+	static CInput_Device* Create(HINSTANCE hInst,HWND hWnd);
 	virtual void	Free(void);
 
 };

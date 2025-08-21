@@ -7,48 +7,48 @@
 
 
 
-CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CComponent{ pDevice, pContext }
+CModel::CModel(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CComponent{pDevice,pContext}
 {
 
 }
 
 CModel::CModel(const CModel& Prototype)
-	: CComponent{ Prototype }
-	, m_eModelType{ Prototype.m_eModelType }
-	, m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
-	, m_iNumMeshes{ Prototype.m_iNumMeshes }
-	, m_Meshes{ Prototype.m_Meshes }
-	, m_iNumMaterials{ Prototype.m_iNumMaterials }
-	, m_Materials{ Prototype.m_Materials }
-	, m_iNumAnimations{ Prototype.m_iNumAnimations }
+	: CComponent{Prototype}
+	,m_eModelType{Prototype.m_eModelType}
+	,m_PreTransformMatrix{Prototype.m_PreTransformMatrix}
+	,m_iNumMeshes{Prototype.m_iNumMeshes}
+	,m_Meshes{Prototype.m_Meshes}
+	,m_iNumMaterials{Prototype.m_iNumMaterials}
+	,m_Materials{Prototype.m_Materials}
+	,m_iNumAnimations{Prototype.m_iNumAnimations}
 {
-	for (auto& pPrototypeAnimation : Prototype.m_Animations)
+	for(auto& pPrototypeAnimation : Prototype.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
 
-	for (auto& pPrototypeBone : Prototype.m_Bones)
+	for(auto& pPrototypeBone : Prototype.m_Bones)
 		m_Bones.push_back(pPrototypeBone->Clone());
 
-	for (auto& pMaterials : m_Materials)
+	for(auto& pMaterials : m_Materials)
 		Safe_AddRef(pMaterials);
 
-	for (auto& pMesh : m_Meshes)
+	for(auto& pMesh : m_Meshes)
 		Safe_AddRef(pMesh);
 }
 
 _uint CModel::Get_BoneIndex(const _char* pBoneName) const
 {
-	_uint	iBoneIndex = { 0 };
-	auto	iter = find_if(m_Bones.begin(), m_Bones.end(), [&](class CBone* pBone)->_bool
-		{
-			//cout << pBoneName << endl;
-			if (!strcmp(pBone->Get_Name(), pBoneName))
-				return true;
+	_uint	iBoneIndex = {0};
+	auto	iter = find_if(m_Bones.begin(),m_Bones.end(),[&](class CBone* pBone)->_bool
+	{
+		//cout << pBoneName << endl;
+		if(!strcmp(pBone->Get_Name(),pBoneName))
+			return true;
 
-			++iBoneIndex;
+		++iBoneIndex;
 
-			return false;
-		});
+		return false;
+	});
 
 	return iBoneIndex;
 }
@@ -57,25 +57,25 @@ const _float4x4* CModel::Get_BoneMatrix(const _char* pBoneName) const
 {
 	return m_Bones[Get_BoneIndex(pBoneName)]->Get_CombinedTransformationFloat4x4Ptr();
 }
-HRESULT CModel::Initialize_Prototype_ReadDataFile(TYPE eModelType, const wstring pDataFile, _uint iIndex, _fmatrix PreTransformMatrix)
+HRESULT CModel::Initialize_Prototype_ReadDataFile(TYPE eModelType,const wstring pDataFile,_uint iIndex,_fmatrix PreTransformMatrix)
 {
 	m_eModelType = eModelType;
 
-	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
-	
-	HANDLE hFileRead = CreateFile(pDataFile.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	XMStoreFloat4x4(&m_PreTransformMatrix,PreTransformMatrix);
 
-	if (INVALID_HANDLE_VALUE == hFileRead)
+	HANDLE hFileRead = CreateFile(pDataFile.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+
+	if(INVALID_HANDLE_VALUE == hFileRead)
 	{
-		MessageBox(NULL, L" ModelData Exporter Failed", L"Error", MB_OK);
+		MessageBox(NULL,L" ModelData Exporter Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 
 
-	if (FAILED(Ready_Meshes_ReadData_NonAnim(hFileRead)))
+	if(FAILED(Ready_Meshes_ReadData_NonAnim(hFileRead)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials_ReadData_NonAnim(hFileRead)))
+	if(FAILED(Ready_Materials_ReadData_NonAnim(hFileRead)))
 		return E_FAIL;
 
 
@@ -84,11 +84,11 @@ HRESULT CModel::Initialize_Prototype_ReadDataFile(TYPE eModelType, const wstring
 }
 
 
-CModel* CModel::Create_ReadDataFile_For_Anim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex)
+CModel* CModel::Create_ReadDataFile_For_Anim(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,TYPE eModelType,const wstring pDataFilePath,_fmatrix PreTransformMatrix,_uint iIndex)
 {
-	CModel* pInstance = new CModel(pDevice, pContext);
+	CModel* pInstance = new CModel(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype_ReadDataFile_For_Anim(eModelType, pDataFilePath, iIndex, PreTransformMatrix)))
+	if(FAILED(pInstance->Initialize_Prototype_ReadDataFile_For_Anim(eModelType,pDataFilePath,iIndex,PreTransformMatrix)))
 	{
 		MSG_BOX("Failed to Created : CModel");
 		Safe_Release(pInstance);
@@ -97,48 +97,48 @@ CModel* CModel::Create_ReadDataFile_For_Anim(ID3D11Device* pDevice, ID3D11Device
 	return pInstance;
 }
 
-HRESULT CModel::Initialize_Prototype_ReadDataFile_For_Anim(TYPE eModelType, const wstring pDataFile, _uint iIndex, _fmatrix PreTransformMatrix)
+HRESULT CModel::Initialize_Prototype_ReadDataFile_For_Anim(TYPE eModelType,const wstring pDataFile,_uint iIndex,_fmatrix PreTransformMatrix)
 {
 	m_eModelType = eModelType;
-	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
-	HANDLE hFileRead = CreateFile(pDataFile.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	XMStoreFloat4x4(&m_PreTransformMatrix,PreTransformMatrix);
+	HANDLE hFileRead = CreateFile(pDataFile.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 
-	if (INVALID_HANDLE_VALUE == hFileRead)
+	if(INVALID_HANDLE_VALUE == hFileRead)
 	{
-		MessageBox(NULL, L" ModelData Exporter Failed", L"Error", MB_OK);
+		MessageBox(NULL,L" ModelData Exporter Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	if (FAILED(Ready_Bones(-1, hFileRead)))
+	if(FAILED(Ready_Bones(-1,hFileRead)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Meshes_ReadData(hFileRead)))
+	if(FAILED(Ready_Meshes_ReadData(hFileRead)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials_ReadData_NonAnim(hFileRead)))
+	if(FAILED(Ready_Materials_ReadData_NonAnim(hFileRead)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Animations(hFileRead)))
+	if(FAILED(Ready_Animations(hFileRead)))
 		return E_FAIL;
 
 	CloseHandle(hFileRead);
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Bones(_int iParentIndex, HANDLE hFileRead)
+HRESULT CModel::Ready_Bones(_int iParentIndex,HANDLE hFileRead)
 {
-	CBone* pBone = CBone::Create(iParentIndex, hFileRead);
-	if (nullptr == pBone)
+	CBone* pBone = CBone::Create(iParentIndex,hFileRead);
+	if(nullptr == pBone)
 		return E_FAIL;
 
 	m_Bones.push_back(pBone);
 
 	_int iParentBoneIndex = m_Bones.size() - 1;
 	_uint iNumChildren = 0;
-	ReadFile(hFileRead, &iNumChildren, sizeof(_uint), &dwByte, nullptr);
+	ReadFile(hFileRead,&iNumChildren,sizeof(_uint),&dwByte,nullptr);
 
-	for (_int i = 0; i < iNumChildren; ++i)
+	for(_int i = 0; i < iNumChildren; ++i)
 	{
-		Ready_Bones(iParentIndex, hFileRead);
+		Ready_Bones(iParentIndex,hFileRead);
 	}
 
 	return S_OK;
@@ -147,12 +147,12 @@ HRESULT CModel::Ready_Bones(_int iParentIndex, HANDLE hFileRead)
 HRESULT CModel::Ready_Animations(HANDLE hFileRead)
 {
 
-	ReadFile(hFileRead, &m_iNumAnimations, sizeof(_uint), &dwByte, nullptr);		// for Export 
+	ReadFile(hFileRead,&m_iNumAnimations,sizeof(_uint),&dwByte,nullptr);		// for Export 
 
-	for (size_t i = 0; i < m_iNumAnimations; i++)
+	for(size_t i = 0; i < m_iNumAnimations; i++)
 	{
-		CAnimation* pAnimation = CAnimation::Create(this, hFileRead);
-		if (nullptr == pAnimation)
+		CAnimation* pAnimation = CAnimation::Create(this,hFileRead);
+		if(nullptr == pAnimation)
 			return E_FAIL;
 
 		m_Animations.push_back(pAnimation);
@@ -162,12 +162,12 @@ HRESULT CModel::Ready_Animations(HANDLE hFileRead)
 
 HRESULT CModel::Ready_Meshes_ReadData_NonAnim(HANDLE hFileRead)
 {
-	ReadFile(hFileRead, &m_iNumMeshes, sizeof(_uint), &dwByte, nullptr);
+	ReadFile(hFileRead,&m_iNumMeshes,sizeof(_uint),&dwByte,nullptr);
 
-	for (size_t i = 0; i < m_iNumMeshes; i++)
+	for(size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create_NonAnim(m_pDevice, m_pContext, TYPE_NONANIM, this, XMLoadFloat4x4(&m_PreTransformMatrix), hFileRead);
-		if (nullptr == pMesh) 
+		CMesh* pMesh = CMesh::Create_NonAnim(m_pDevice,m_pContext,TYPE_NONANIM,this,XMLoadFloat4x4(&m_PreTransformMatrix),hFileRead);
+		if(nullptr == pMesh)
 			return E_FAIL;
 
 		m_Meshes.push_back(pMesh);
@@ -178,27 +178,27 @@ HRESULT CModel::Ready_Meshes_ReadData_NonAnim(HANDLE hFileRead)
 
 HRESULT CModel::Ready_Meshes_ReadData(HANDLE hFileRead)
 {
-	ReadFile(hFileRead, &m_iNumMeshes, sizeof(_uint), &dwByte, nullptr);
+	ReadFile(hFileRead,&m_iNumMeshes,sizeof(_uint),&dwByte,nullptr);
 
-	for (size_t i = 0; i < m_iNumMeshes; i++)
-	{	
-		CMesh* pMesh = CMesh::Create_NonAnim(m_pDevice, m_pContext, TYPE_ANIM, this, XMLoadFloat4x4(&m_PreTransformMatrix), hFileRead);
-		if (nullptr == pMesh)
+	for(size_t i = 0; i < m_iNumMeshes; i++)
+	{
+		CMesh* pMesh = CMesh::Create_NonAnim(m_pDevice,m_pContext,TYPE_ANIM,this,XMLoadFloat4x4(&m_PreTransformMatrix),hFileRead);
+		if(nullptr == pMesh)
 			return E_FAIL;
 
 		m_Meshes.push_back(pMesh);
 	}
-	
+
 	return S_OK;
 }
 
 HRESULT CModel::Ready_Materials_ReadData_NonAnim(HANDLE hFileRead)
 {
-	ReadFile(hFileRead, &m_iNumMaterials, sizeof(_uint), &dwByte, nullptr);
+	ReadFile(hFileRead,&m_iNumMaterials,sizeof(_uint),&dwByte,nullptr);
 
-	for (size_t i = 0; i < m_iNumMaterials; i++)
+	for(size_t i = 0; i < m_iNumMaterials; i++)
 	{
-		CMeshMaterial* pMeshMaterial = CMeshMaterial::Create_ReadData(m_pDevice, m_pContext,  hFileRead);
+		CMeshMaterial* pMeshMaterial = CMeshMaterial::Create_ReadData(m_pDevice,m_pContext,hFileRead);
 
 		m_Materials.push_back(pMeshMaterial);
 	}
@@ -207,75 +207,73 @@ HRESULT CModel::Ready_Materials_ReadData_NonAnim(HANDLE hFileRead)
 
 HRESULT CModel::Initialize(void* pArg)
 {
-	XMStoreFloat4x4(&m_PreTransformMatrix_Second, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_PreTransformMatrix_Second,XMMatrixIdentity());
 
 	return S_OK;
 }
 
-HRESULT CModel::Bind_Material_ShaderResource(CShader* pShader, _uint iMeshIndex, aiTextureType eMaterialType, _uint iIndex, const _char* pConstantName)
+HRESULT CModel::Bind_Material_ShaderResource(CShader* pShader,_uint iMeshIndex,aiTextureType eMaterialType,_uint iIndex,const _char* pConstantName)
 {
 	_uint		iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
-	return m_Materials[iMaterialIndex]->Bind_ShaderResource(pShader, eMaterialType, iIndex, pConstantName);
+	return m_Materials[iMaterialIndex]->Bind_ShaderResource(pShader,eMaterialType,iIndex,pConstantName);
 }
 
-HRESULT CModel::Bind_Mesh_BoneMatrices(CShader* pShader, _uint iMeshIndex, const _char* pConstantName)
+HRESULT CModel::Bind_Mesh_BoneMatrices(CShader* pShader,_uint iMeshIndex,const _char* pConstantName)
 {
-	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, m_Bones, pConstantName);
+	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader,m_Bones,pConstantName);
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta, _bool Once, _bool bPlay)
+_bool CModel::Play_Animation(_float fTimeDelta,_bool Once,_bool bPlay)
 {
 
-	if (m_bAnim_NoneLoop == true) // ¸¶Áö¸· µ¿ÀÛÀ» ÇÑ ¹ø ´õ ÇÏ´Â ¹®Á¦¸¦ ÇØ°áÇÏ±â À§ÇØ ·çÇÁ°¡ ³¡³µÀ» ¶§¸¦ ±â¾ïÇØ ÃÊ±âÈ­¸¸ ÇØÁØ´Ù
+	if(m_bAnim_NoneLoop == true) // ë§ˆì§€ë§‰ ë™ìž‘ì„ í•œ ë²ˆ ë” í•˜ëŠ” ë¬¸ì œë¥¼ í•´ê²°í•˜ê¸° ìœ„í•´ ë£¨í”„ê°€ ëë‚¬ì„ ë•Œë¥¼ ê¸°ì–µí•´ ì´ˆê¸°í™”ë§Œ í•´ì¤€ë‹¤
 	{
 		m_Animations[m_iCurrentAnimIndex]->CurrentPosition_Init(m_Bones);
 		m_bAnim_NoneLoop = false;
-	}
-	else
+	} else
 	{
-		if (m_iCurrentAnimIndex != m_iPrevAnimIndex)
+		if(m_iCurrentAnimIndex != m_iPrevAnimIndex)
 		{
-			// ÀÌÀü ¾Ö´Ï¸ÞÀÌ¼Ç ÀÎµ¦½º°¡ À¯È¿ÇÑÁö È®ÀÎ
-			
-			
-			if(m_Animations[m_iCurrentAnimIndex]->Get_PrevKeyFrame() != nullptr )
+			// ì´ì „ ì• ë‹ˆë©”ì´ì…˜ ì¸ë±ìŠ¤ê°€ ìœ íš¨í•œì§€ í™•ì¸
+
+
+			if(m_Animations[m_iCurrentAnimIndex]->Get_PrevKeyFrame() != nullptr)
 			{
 				m_Animations[m_iCurrentAnimIndex]->CurrentPosition_Init(m_Bones);
 
 				PrevKeyFrame = *m_Animations[m_iPrevAnimIndex]->Get_PrevKeyFrame();
 				const vector<string> strName = m_Animations[m_iPrevAnimIndex]->Get_ChannelNames();
-				m_bLinearInterpolation = m_Animations[m_iCurrentAnimIndex]->Update_LinearInterPolation(&PrevKeyFrame, m_Bones, strName, fTimeDelta);
-				for (auto& pBone : m_Bones)
+				m_bLinearInterpolation = m_Animations[m_iCurrentAnimIndex]->Update_LinearInterPolation(&PrevKeyFrame,m_Bones,strName,fTimeDelta);
+				for(auto& pBone : m_Bones)
 				{
-					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fTimeDelta);
+					pBone->Update_CombinedTransformationMatrix(m_Bones,XMLoadFloat4x4(&m_PreTransformMatrix),fTimeDelta);
 				}
 			}
 
-			if (m_Animations[m_iCurrentAnimIndex]->Get_PrevKeyFrame() == nullptr)
+			if(m_Animations[m_iCurrentAnimIndex]->Get_PrevKeyFrame() == nullptr)
+			{
+				m_iPrevAnimIndex = m_iCurrentAnimIndex;
+			} else if(m_Animations[m_iPrevAnimIndex]->Get_PrevKeyFrame() == nullptr)
 			{
 				m_iPrevAnimIndex = m_iCurrentAnimIndex;
 			}
-			else if (m_Animations[m_iPrevAnimIndex]->Get_PrevKeyFrame() == nullptr)
-			{
-				m_iPrevAnimIndex = m_iCurrentAnimIndex;
-			}
-			if (m_bLinearInterpolation == true)
+			if(m_bLinearInterpolation == true)
 			{
 				m_iPrevAnimIndex = m_iCurrentAnimIndex;
 			}
 		}
 		if(m_iPrevAnimIndex == m_iCurrentAnimIndex)
 		{
-			// ¸ðµ¨ÀÇ »ÀÀÇ Çà·Ä(TransformationMatrix)À» ÇöÀç ¾Ö´Ï¸ÞÀÌ¼Ç¿¡ ¸Â´Â »óÅÂ·Î °»½ÅÇØÁØ´Ù.
-			isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(m_Bones, m_isLoop, fTimeDelta, bPlay);
+			// ëª¨ë¸ì˜ ë¼ˆì˜ í–‰ë ¬(TransformationMatrix)ì„ í˜„ìž¬ ì• ë‹ˆë©”ì´ì…˜ì— ë§žëŠ” ìƒíƒœë¡œ ê°±ì‹ í•´ì¤€ë‹¤.
+			isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(m_Bones,m_isLoop,fTimeDelta,bPlay);
 
-			// ¸ðµç »ÀµéÀÇ CombinedTransformationMatrix¸¦ °»½ÅÇÑ´Ù.
-			for (auto& pBone : m_Bones)
+			// ëª¨ë“  ë¼ˆë“¤ì˜ CombinedTransformationMatrixë¥¼ ê°±ì‹ í•œë‹¤.
+			for(auto& pBone : m_Bones)
 			{
-				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fTimeDelta);
+				pBone->Update_CombinedTransformationMatrix(m_Bones,XMLoadFloat4x4(&m_PreTransformMatrix),fTimeDelta);
 			}
 
-			m_bAnim_NoneLoop = isFinished; // ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ Á¾·á ¿©ºÎ¸¦ ¼³Á¤
+			m_bAnim_NoneLoop = isFinished; // ì• ë‹ˆë©”ì´ì…˜ì˜ ì¢…ë£Œ ì—¬ë¶€ë¥¼ ì„¤ì •
 			m_iPrevAnimIndex = m_iCurrentAnimIndex;
 		}
 	}
@@ -284,65 +282,63 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool Once, _bool bPlay)
 
 }
 
-_bool CModel::Play_Animation_UpperBody(_float fTimeDelta, _float fRotation_Angle, _uint iUpperMotion, _bool& bShot)
+_bool CModel::Play_Animation_UpperBody(_float fTimeDelta,_float fRotation_Angle,_uint iUpperMotion,_bool& bShot)
 {
-	if (m_bAnim_NoneLoop_UpperBody == true) // ¸¶Áö¸· µ¿ÀÛÀ» ÇÑ ¹ø ´õ ÇÏ´Â ¹®Á¦¸¦ ÇØ°áÇÏ±â À§ÇØ ·çÇÁ°¡ ³¡³µÀ» ¶§¸¦ ±â¾ïÇØ ÃÊ±âÈ­¸¸ ÇØÁØ´Ù
+	if(m_bAnim_NoneLoop_UpperBody == true) // ë§ˆì§€ë§‰ ë™ìž‘ì„ í•œ ë²ˆ ë” í•˜ëŠ” ë¬¸ì œë¥¼ í•´ê²°í•˜ê¸° ìœ„í•´ ë£¨í”„ê°€ ëë‚¬ì„ ë•Œë¥¼ ê¸°ì–µí•´ ì´ˆê¸°í™”ë§Œ í•´ì¤€ë‹¤
 	{
 		m_Animations[m_iCurrentAnimIndex_UpperBody]->CurrentPosition_UpperBody_Init(m_Bones);
 		m_bAnim_NoneLoop_UpperBody = false;
-	}
-	else
+	} else
 	{
-		if (m_iCurrentAnimIndex_UpperBody != m_iPrevAnimIndex_UpperBody) // ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ ´Þ¶óÁ³À» ¶§ µé¾î¿È
+		if(m_iCurrentAnimIndex_UpperBody != m_iPrevAnimIndex_UpperBody) // ì• ë‹ˆë©”ì´ì…˜ì´ ë‹¬ë¼ì¡Œì„ ë•Œ ë“¤ì–´ì˜´
 		{
-			// ÀÌÀü ¾Ö´Ï¸ÞÀÌ¼Ç ÀÎµ¦½º°¡ À¯È¿ÇÑÁö È®ÀÎ
-			if (m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() != nullptr )
+			// ì´ì „ ì• ë‹ˆë©”ì´ì…˜ ì¸ë±ìŠ¤ê°€ ìœ íš¨í•œì§€ í™•ì¸
+			if(m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() != nullptr)
 			{
-			
+
 				PrevKeyFrame_UpperBody = *m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody();
 				const vector<string> strName = m_Animations[m_iPrevAnimIndex_UpperBody]->Get_ChannelNames();
-				m_bLinearInterpolation_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_LinearInterPolation_Player(&PrevKeyFrame_UpperBody, m_Bones, strName, fTimeDelta, true);
-			
-				for (auto& pBone : m_Bones)
+				m_bLinearInterpolation_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_LinearInterPolation_Player(&PrevKeyFrame_UpperBody,m_Bones,strName,fTimeDelta,true);
+
+				for(auto& pBone : m_Bones)
 				{
-					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fRotation_Angle, iUpperMotion);
+					pBone->Update_CombinedTransformationMatrix(m_Bones,XMLoadFloat4x4(&m_PreTransformMatrix),fRotation_Angle,iUpperMotion);
 				}
-				
+
 			}
-			if (m_Animations[m_iCurrentAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() == nullptr)
+			if(m_Animations[m_iCurrentAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() == nullptr)
+			{
+				m_iPrevAnimIndex_UpperBody = m_iCurrentAnimIndex_UpperBody;
+			} else if(m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() == nullptr)
 			{
 				m_iPrevAnimIndex_UpperBody = m_iCurrentAnimIndex_UpperBody;
 			}
-			else if (m_Animations[m_iPrevAnimIndex_UpperBody]->Get_PrevKeyFrame_UpperBody() == nullptr)
-			{
-				m_iPrevAnimIndex_UpperBody = m_iCurrentAnimIndex_UpperBody;
-			}
-			if (m_bLinearInterpolation_UpperBody == true)
+			if(m_bLinearInterpolation_UpperBody == true)
 			{
 				m_iPrevAnimIndex_UpperBody = m_iCurrentAnimIndex_UpperBody;
 			}
 		}
-		if (m_iPrevAnimIndex_UpperBody == m_iCurrentAnimIndex_UpperBody)
+		if(m_iPrevAnimIndex_UpperBody == m_iCurrentAnimIndex_UpperBody)
 		{
-			// ¸ðµ¨ÀÇ »ÀÀÇ Çà·Ä(TransformationMatrix)À» ÇöÀç ¾Ö´Ï¸ÞÀÌ¼Ç¿¡ ¸Â´Â »óÅÂ·Î °»½ÅÇØÁØ´Ù.
-			isFinished_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_UpperBody, fTimeDelta, true, iUpperMotion, bShot);
-			// ¸ðµç »ÀµéÀÇ CombinedTransformationMatrix¸¦ °»½ÅÇÑ´Ù.
-		
-			for (auto& pBone : m_Bones)
+			// ëª¨ë¸ì˜ ë¼ˆì˜ í–‰ë ¬(TransformationMatrix)ì„ í˜„ìž¬ ì• ë‹ˆë©”ì´ì…˜ì— ë§žëŠ” ìƒíƒœë¡œ ê°±ì‹ í•´ì¤€ë‹¤.
+			isFinished_UpperBody = m_Animations[m_iCurrentAnimIndex_UpperBody]->Update_TransformationMatrix_Player(m_Bones,m_isLoop_UpperBody,fTimeDelta,true,iUpperMotion,bShot);
+			// ëª¨ë“  ë¼ˆë“¤ì˜ CombinedTransformationMatrixë¥¼ ê°±ì‹ í•œë‹¤.
+
+			for(auto& pBone : m_Bones)
 			{
-				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), fRotation_Angle, iUpperMotion);
+				pBone->Update_CombinedTransformationMatrix(m_Bones,XMLoadFloat4x4(&m_PreTransformMatrix),fRotation_Angle,iUpperMotion);
 			}
-			m_bAnim_NoneLoop_UpperBody = isFinished_UpperBody; // ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ Á¾·á ¿©ºÎ¸¦ ¼³Á¤
+			m_bAnim_NoneLoop_UpperBody = isFinished_UpperBody; // ì• ë‹ˆë©”ì´ì…˜ì˜ ì¢…ë£Œ ì—¬ë¶€ë¥¼ ì„¤ì •
 			m_iPrevAnimIndex_UpperBody = m_iCurrentAnimIndex_UpperBody;
 		}
-	 }
+	}
 
 	return isFinished_UpperBody;
 }
 
 _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 {
-	if (m_bAnim_NoneLoop_LowerBody == true) // ¸¶Áö¸· µ¿ÀÛÀ» ÇÑ ¹ø ´õ ÇÏ´Â ¹®Á¦¸¦ ÇØ°áÇÏ±â À§ÇØ ·çÇÁ°¡ ³¡³µÀ» ¶§¸¦ ±â¾ïÇØ ÃÊ±âÈ­¸¸ ÇØÁØ´Ù
+	if(m_bAnim_NoneLoop_LowerBody == true) // ë§ˆì§€ë§‰ ë™ìž‘ì„ í•œ ë²ˆ ë” í•˜ëŠ” ë¬¸ì œë¥¼ í•´ê²°í•˜ê¸° ìœ„í•´ ë£¨í”„ê°€ ëë‚¬ì„ ë•Œë¥¼ ê¸°ì–µí•´ ì´ˆê¸°í™”ë§Œ í•´ì¤€ë‹¤
 	{
 		m_Animations[m_iCurrentAnimIndex_LowerBody]->CurrentPosition_LowerBody_Init(m_Bones);
 		m_bAnim_NoneLoop_LowerBody = false;
@@ -350,65 +346,64 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 
 	else
 	{
-		if (m_iCurrentAnimIndex_LowerBody != m_iPrevAnimIndex_LowerBody)
+		if(m_iCurrentAnimIndex_LowerBody != m_iPrevAnimIndex_LowerBody)
 		{
-			// ÀÌÀü ¾Ö´Ï¸ÞÀÌ¼Ç ÀÎµ¦½º°¡ À¯È¿ÇÑÁö È®ÀÎ
+			// ì´ì „ ì• ë‹ˆë©”ì´ì…˜ ì¸ë±ìŠ¤ê°€ ìœ íš¨í•œì§€ í™•ì¸
 
-			
-			if (m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame() != nullptr)
+
+			if(m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame() != nullptr)
 			{
 				PrevKeyFrame = *m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame();
 				const vector<string> strName = m_Animations[m_iPrevAnimIndex_LowerBody]->Get_ChannelNames();
-				m_bLinearInterpolation_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_LinearInterPolation_Player(&PrevKeyFrame, m_Bones, strName, fTimeDelta,false);
-				for (auto& pBone : m_Bones)
+				m_bLinearInterpolation_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_LinearInterPolation_Player(&PrevKeyFrame,m_Bones,strName,fTimeDelta,false);
+				for(auto& pBone : m_Bones)
 				{
-					pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+					pBone->Update_CombinedTransformationMatrix(m_Bones,XMLoadFloat4x4(&m_PreTransformMatrix));
 				}
 			}
 
-			if (m_Animations[m_iCurrentAnimIndex_LowerBody]->Get_PrevKeyFrame() == nullptr)
+			if(m_Animations[m_iCurrentAnimIndex_LowerBody]->Get_PrevKeyFrame() == nullptr)
+			{
+				m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
+			} else if(m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame() == nullptr)
 			{
 				m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
 			}
-			else if (m_Animations[m_iPrevAnimIndex_LowerBody]->Get_PrevKeyFrame() == nullptr)
-			{
-				m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
-			}
-			if (m_bLinearInterpolation_LowerBody == true)
+			if(m_bLinearInterpolation_LowerBody == true)
 			{
 				m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
 			}
 		}
-		if (m_iPrevAnimIndex_LowerBody == m_iCurrentAnimIndex_LowerBody)
+		if(m_iPrevAnimIndex_LowerBody == m_iCurrentAnimIndex_LowerBody)
 		{
-			_bool Temp{}; // »óÃ¼¿¡ ÇÊ¿äÇÑ ¸Å°³º¯¼ö ¶§¹®¿¡ ¸¸µç ºó ºÒ°ª
-			// ¸ðµ¨ÀÇ »ÀÀÇ Çà·Ä(TransformationMatrix)À» ÇöÀç ¾Ö´Ï¸ÞÀÌ¼Ç¿¡ ¸Â´Â »óÅÂ·Î °»½ÅÇØÁØ´Ù.
-			isFinished_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_TransformationMatrix_Player(m_Bones, m_isLoop_LowerBody, fTimeDelta,false,true, Temp);
+			_bool Temp{}; // ìƒì²´ì— í•„ìš”í•œ ë§¤ê°œë³€ìˆ˜ ë•Œë¬¸ì— ë§Œë“  ë¹ˆ ë¶ˆê°’
+			// ëª¨ë¸ì˜ ë¼ˆì˜ í–‰ë ¬(TransformationMatrix)ì„ í˜„ìž¬ ì• ë‹ˆë©”ì´ì…˜ì— ë§žëŠ” ìƒíƒœë¡œ ê°±ì‹ í•´ì¤€ë‹¤.
+			isFinished_LowerBody = m_Animations[m_iCurrentAnimIndex_LowerBody]->Update_TransformationMatrix_Player(m_Bones,m_isLoop_LowerBody,fTimeDelta,false,true,Temp);
 
-			// ¸ðµç »ÀµéÀÇ CombinedTransformationMatrix¸¦ °»½ÅÇÑ´Ù.
-			for (auto& pBone : m_Bones)
+			// ëª¨ë“  ë¼ˆë“¤ì˜ CombinedTransformationMatrixë¥¼ ê°±ì‹ í•œë‹¤.
+			for(auto& pBone : m_Bones)
 			{
-				pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+				pBone->Update_CombinedTransformationMatrix(m_Bones,XMLoadFloat4x4(&m_PreTransformMatrix));
 			}
 
-			m_bAnim_NoneLoop_LowerBody = isFinished_LowerBody; // ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ Á¾·á ¿©ºÎ¸¦ ¼³Á¤
+			m_bAnim_NoneLoop_LowerBody = isFinished_LowerBody; // ì• ë‹ˆë©”ì´ì…˜ì˜ ì¢…ë£Œ ì—¬ë¶€ë¥¼ ì„¤ì •
 			m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
 		}
-		
-
-			m_bAnim_NoneLoop_LowerBody = isFinished_LowerBody; // ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ Á¾·á ¿©ºÎ¸¦ ¼³Á¤
-			m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
 
 
+		m_bAnim_NoneLoop_LowerBody = isFinished_LowerBody; // ì• ë‹ˆë©”ì´ì…˜ì˜ ì¢…ë£Œ ì—¬ë¶€ë¥¼ ì„¤ì •
+		m_iPrevAnimIndex_LowerBody = m_iCurrentAnimIndex_LowerBody;
 
-		}
-	
+
+
+	}
+
 	return isFinished_LowerBody;
 }
 
 //_bool CModel::Play_Animation(_float fTimeDelta, _bool Once = false)
 //{
-//	if (m_bAnim_NoneLoop == true) // ¸¶Áö¸· µ¿ÀÛÀ» ÇÑ ¹ø ´õ ÇÏ´Â ¹®Á¦¸¦ÇØ°áÇÏ±â À§ÇØ ·çÇÁ°¡ ³¡³µÀ» ¶§¸¦ ±â¾ïÇØ ÃÊ±âÈ­¸¸ ÇØÁØ´Ù
+//	if (m_bAnim_NoneLoop == true) // ë§ˆì§€ë§‰ ë™ìž‘ì„ í•œ ë²ˆ ë” í•˜ëŠ” ë¬¸ì œë¥¼í•´ê²°í•˜ê¸° ìœ„í•´ ë£¨í”„ê°€ ëë‚¬ì„ ë•Œë¥¼ ê¸°ì–µí•´ ì´ˆê¸°í™”ë§Œ í•´ì¤€ë‹¤
 //	{
 //		m_Animations[m_iCurrentAnimIndex]->CurrentPosition_Init(m_Bones);
 //		m_bAnim_NoneLoop = false;
@@ -420,10 +415,10 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 //		{
 //			bAnimChange = true;
 //		}
-//		/* ¸ðµ¨ÀÇ »ÀÀÇ Çà·Ä(TransformationMatrix)À» ÇöÀç ¾Ö´Ï¸ÞÀÌ¼Ç¿¡ ¸Â´Â »óÅÂ·Î °»½ÅÇØÁØ´Ù. */
+//		/* ëª¨ë¸ì˜ ë¼ˆì˜ í–‰ë ¬(TransformationMatrix)ì„ í˜„ìž¬ ì• ë‹ˆë©”ì´ì…˜ì— ë§žëŠ” ìƒíƒœë¡œ ê°±ì‹ í•´ì¤€ë‹¤. */
 //		isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(m_Bones, m_isLoop, bAnimChange,fTimeDelta);
 //		
-//		/* ¸ðµç »ÀµéÀÇ CombinedTransformationMatrix¸¦ °»½ÅÇÑ´Ù. */
+//		/* ëª¨ë“  ë¼ˆë“¤ì˜ CombinedTransformationMatrixë¥¼ ê°±ì‹ í•œë‹¤. */
 //		for (auto& pBone : m_Bones)
 //		{
 //			pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
@@ -443,10 +438,10 @@ _bool CModel::Play_Animation_LowerBody(_float fTimeDelta)
 //_bool CModel::Play_Animation(_float fTimeDelta)
 //{
 //	
-//	/* ¸ðµ¨ÀÇ »ÀÀÇ Çà·Ä(TransformationMatrix)À» ÇöÀç ¾Ö´Ï¸ÞÀÌ¼Ç¿¡ ¸Â´Â »óÅÂ·Î °»½ÅÇØÁØ´Ù. */
+//	/* ëª¨ë¸ì˜ ë¼ˆì˜ í–‰ë ¬(TransformationMatrix)ì„ í˜„ìž¬ ì• ë‹ˆë©”ì´ì…˜ì— ë§žëŠ” ìƒíƒœë¡œ ê°±ì‹ í•´ì¤€ë‹¤. */
 //	_bool		isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(m_Bones, m_isLoop, fTimeDelta);
 //
-//	/* ¸ðµç »ÀµéÀÇ CombinedTransformationMatrix¸¦ °»½ÅÇÑ´Ù. */
+//	/* ëª¨ë“  ë¼ˆë“¤ì˜ CombinedTransformationMatrixë¥¼ ê°±ì‹ í•œë‹¤. */
 //	for (auto& pBone : m_Bones)
 //	{
 //		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
@@ -465,11 +460,11 @@ HRESULT CModel::Render(_uint iMeshIndex)
 
 
 
-CModel* CModel::Create_ReadDataFile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType,const wstring pDataFilePath, _fmatrix PreTransformMatrix, _uint iIndex)
+CModel* CModel::Create_ReadDataFile(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,TYPE eModelType,const wstring pDataFilePath,_fmatrix PreTransformMatrix,_uint iIndex)
 {
-	CModel* pInstance = new CModel(pDevice, pContext);
+	CModel* pInstance = new CModel(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype_ReadDataFile(eModelType, pDataFilePath, iIndex, PreTransformMatrix)))
+	if(FAILED(pInstance->Initialize_Prototype_ReadDataFile(eModelType,pDataFilePath,iIndex,PreTransformMatrix)))
 	{
 		MSG_BOX("Failed to Created : CModel");
 		Safe_Release(pInstance);
@@ -483,7 +478,7 @@ CComponent* CModel::Clone(void* pArg)
 {
 	CModel* pInstance = new CModel(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Cloned : CModel");
 		Safe_Release(pInstance);
@@ -496,16 +491,16 @@ void CModel::Free()
 {
 	__super::Free();
 
-	for (auto& pAnimation : m_Animations)
+	for(auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);
 
-	for (auto& pBone : m_Bones)
+	for(auto& pBone : m_Bones)
 		Safe_Release(pBone);
 
-	for (auto& pMaterial : m_Materials)
+	for(auto& pMaterial : m_Materials)
 		Safe_Release(pMaterial);
 
-	for (auto& pMesh : m_Meshes)
+	for(auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 
 

@@ -1,84 +1,82 @@
 
 #include "..\Public\VIBuffer_Box.h"
 
-CVIBuffer_Box::CVIBuffer_Box(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CVIBuffer{ pDevice, pContext }
-{
-}
+CVIBuffer_Box::CVIBuffer_Box(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CVIBuffer{pDevice,pContext}
+{}
 
 CVIBuffer_Box::CVIBuffer_Box(const CVIBuffer_Box& Prototype)
-	: CVIBuffer{ Prototype }
-{
-}
+	: CVIBuffer{Prototype}
+{}
 
 HRESULT CVIBuffer_Box::Initialize_Prototype()
 {
 	m_iVertexStride = sizeof(VTXPOSTEX);
-	m_iNumVertices = 8;  // Á¤Á¡ ¼ö 8°³
+	m_iNumVertices = 8;  // ì •ì  ìˆ˜ 8ê°œ
 	m_iIndexStride = sizeof(_ushort);
-	m_iNumIndices = 36;  // ÀÎµ¦½º ¼ö 36°³
+	m_iNumIndices = 36;  // ì¸ë±ìŠ¤ ìˆ˜ 36ê°œ
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
 	m_fVertexPos = new _float3[m_iNumVertices];
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);
 
-	/* ÇÒ´çÇÏ°íÀÚÇÏ´Â ¸Þ¸ð¸®°ø°£ÀÇ Å©±â(Byte)*/
+	/* í• ë‹¹í•˜ê³ ìží•˜ëŠ” ë©”ëª¨ë¦¬ê³µê°„ì˜ í¬ê¸°(Byte)*/
 	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
 
-	/* ¹öÆÛÀÇ ¼Ó¼º (Á¤Àû, µ¿Àû) */
+	/* ë²„í¼ì˜ ì†ì„± (ì •ì , ë™ì ) */
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);
 	VTXPOSTEX* pVertices = new VTXPOSTEX[m_iNumVertices];
 
-	pVertices[0].vPosition = { -1.f,  1.f, -1.f };
-	pVertices[0].vTexcoord = _float2(0.0f, 0.0f);
+	pVertices[0].vPosition = {-1.f,1.f,-1.f};
+	pVertices[0].vTexcoord = _float2(0.0f,0.0f);
 	m_fVertexPos[0] = pVertices[0].vPosition;
 
-	pVertices[1].vPosition = { 1.f,  1.f, -1.f };  
-	pVertices[1].vTexcoord = _float2(1.0f, 0.0f);
+	pVertices[1].vPosition = {1.f,1.f,-1.f};
+	pVertices[1].vTexcoord = _float2(1.0f,0.0f);
 	m_fVertexPos[1] = pVertices[0].vPosition;
 
 
-	pVertices[2].vPosition = { 1.f, -1.f, -1.f };  
-	pVertices[2].vTexcoord = _float2(1.0f, 1.0f);
+	pVertices[2].vPosition = {1.f,-1.f,-1.f};
+	pVertices[2].vTexcoord = _float2(1.0f,1.0f);
 	m_fVertexPos[2] = pVertices[0].vPosition;
 
-	pVertices[3].vPosition = { -1.f, -1.f, -1.f }; 
-	pVertices[3].vTexcoord = _float2(0.0f, 1.0f);
+	pVertices[3].vPosition = {-1.f,-1.f,-1.f};
+	pVertices[3].vTexcoord = _float2(0.0f,1.0f);
 	m_fVertexPos[3] = pVertices[0].vPosition;
 
-	pVertices[4].vPosition = { -1.f,  1.f,  1.f }; 
-	pVertices[4].vTexcoord = _float2(0.0f, 0.0f);
+	pVertices[4].vPosition = {-1.f,1.f,1.f};
+	pVertices[4].vTexcoord = _float2(0.0f,0.0f);
 	m_fVertexPos[4] = pVertices[0].vPosition;
 
-	pVertices[5].vPosition = { 1.f,  1.f,  1.f };  
-	pVertices[5].vTexcoord = _float2(1.0f, 0.0f);
+	pVertices[5].vPosition = {1.f,1.f,1.f};
+	pVertices[5].vTexcoord = _float2(1.0f,0.0f);
 	m_fVertexPos[5] = pVertices[0].vPosition;
 
-	pVertices[6].vPosition = { 1.f, -1.f,  1.f };  
-	pVertices[6].vTexcoord = _float2(1.0f, 1.0f);
+	pVertices[6].vPosition = {1.f,-1.f,1.f};
+	pVertices[6].vTexcoord = _float2(1.0f,1.0f);
 	m_fVertexPos[6] = pVertices[0].vPosition;
 
-	pVertices[7].vPosition = { -1.f, -1.f,  1.f }; 
-	pVertices[7].vTexcoord = _float2(0.0f, 1.0f);
+	pVertices[7].vPosition = {-1.f,-1.f,1.f};
+	pVertices[7].vTexcoord = _float2(0.0f,1.0f);
 	m_fVertexPos[7] = pVertices[0].vPosition;
 
 	m_InitialDesc.pSysMem = pVertices;
 
-	if (FAILED(__super::Create_Buffer(&m_pVB)))
+	if(FAILED(__super::Create_Buffer(&m_pVB)))
 		return E_FAIL;
 
 
 
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	ZeroMemory(&m_BufferDesc,sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -87,7 +85,7 @@ HRESULT CVIBuffer_Box::Initialize_Prototype()
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
-	ZeroMemory(&m_InitialDesc, sizeof m_InitialDesc);
+	ZeroMemory(&m_InitialDesc,sizeof m_InitialDesc);
 	_ushort* pIndices = new _ushort[m_iNumIndices];
 	pIndices[0]= 1;
 	pIndices[1]= 5;
@@ -149,7 +147,7 @@ HRESULT CVIBuffer_Box::Initialize_Prototype()
 	pIndices[35] = 3;
 	m_InitialDesc.pSysMem = pIndices;
 
-	if (FAILED(__super::Create_Buffer(&m_pIB)))
+	if(FAILED(__super::Create_Buffer(&m_pIB)))
 		return E_FAIL;
 
 
@@ -164,11 +162,11 @@ HRESULT CVIBuffer_Box::Initialize(void* pArg)
 	return S_OK;
 }
 
-CVIBuffer_Box* CVIBuffer_Box::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CVIBuffer_Box* CVIBuffer_Box::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CVIBuffer_Box* pInstance = new CVIBuffer_Box(pDevice, pContext);
+	CVIBuffer_Box* pInstance = new CVIBuffer_Box(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Box");
 		Safe_Release(pInstance);
@@ -181,7 +179,7 @@ CComponent* CVIBuffer_Box::Clone(void* pArg)
 {
 	CVIBuffer_Box* pInstance = new CVIBuffer_Box(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Box");
 		Safe_Release(pInstance);

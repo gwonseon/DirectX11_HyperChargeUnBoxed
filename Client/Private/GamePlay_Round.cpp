@@ -8,35 +8,34 @@
 #include "Blimp.h"
 #include "RifleMan.h"
 
-CGamePlay_Round::CGamePlay_Round(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLevel_GamePlay{ pDevice, pContext }
-{
-}
+CGamePlay_Round::CGamePlay_Round(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CLevel_GamePlay{pDevice,pContext}
+{}
 
-HRESULT CGamePlay_Round::Initialize( _uint iRound)
+HRESULT CGamePlay_Round::Initialize(_uint iRound)
 {
-	// ¿©±â¼­ º¤ÅÍ¿¡ ¶ó¿îµå¿¡ µû¶ó¼­ ¸ó½ºÅÍ ´ã¾Æ¼­ »ı¼ºÇÏ¸é µÉ°Íµµ °°Àºµ¥
+	// ì—¬ê¸°ì„œ ë²¡í„°ì— ë¼ìš´ë“œì— ë”°ë¼ì„œ ëª¬ìŠ¤í„° ë‹´ì•„ì„œ ìƒì„±í•˜ë©´ ë ê²ƒë„ ê°™ì€ë°
 	m_iMyRound = iRound;
 	MONSTER_CREATE_DESC pDesc{};
-	_ulong		dwByte = { 0 };
+	_ulong		dwByte = {0};
 	_wstring strLast = TEXT(".dat");
 	_wstring strPath = TEXT("../Bin/Data/Gameplay_Monster");
 	_wstring Path_Result = strPath + to_wstring(iRound) + strLast;
-	HANDLE		hFile = CreateFile(Path_Result.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE		hFile = CreateFile(Path_Result.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Monster File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Monster File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 
-	while(ReadFile(hFile, &pDesc.eModelIndex, sizeof(_uint), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&pDesc.eModelIndex,sizeof(_uint),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &pDesc.fPos, sizeof(_float3), &dwByte, nullptr);
-		ReadFile(hFile, &pDesc.iCell_Idx, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile,&pDesc.fPos,sizeof(_float3),&dwByte,nullptr);
+		ReadFile(hFile,&pDesc.iCell_Idx,sizeof(_uint),&dwByte,nullptr);
 		m_vecMonsterCreate.push_back(pDesc);
 		m_iMonsterCount++;
 	}
-	
+
 	fRound_Time = 0.f;
 	fCreate_Time = 0.f;
 	return S_OK;
@@ -44,39 +43,38 @@ HRESULT CGamePlay_Round::Initialize( _uint iRound)
 
 void CGamePlay_Round::Update(_float fTimeDelta)
 {
-	// Áö±İ ¶ó¿îµå¿Í ÀÌ °´Ã¼ÀÇ ¶ó¿îµå°¡ ÀÏÄ¡ÇÒ ¶§ »ı¼ºÀÌ µÈ´Ù.
-	if (m_iMyRound == m_iCurrentRound)
+	// ì§€ê¸ˆ ë¼ìš´ë“œì™€ ì´ ê°ì²´ì˜ ë¼ìš´ë“œê°€ ì¼ì¹˜í•  ë•Œ ìƒì„±ì´ ëœë‹¤.
+	if(m_iMyRound == m_iCurrentRound)
 	{
-		// ÇÊµå¿¡ ³²Àº ¸ó½ºÅÍ°¡ 5¸¶¸® ¹ØÀÌ°í ¸¸µé ¼ö ÀÖ´Â ¸ó½ºÅÍ°¡ ´õ ÀÖÀ» ¶§
-		if (m_iCurrent_RemainMonster < 5 && m_iMonsterCount > 0 && fRound_Time > 0.f)
+		// í•„ë“œì— ë‚¨ì€ ëª¬ìŠ¤í„°ê°€ 5ë§ˆë¦¬ ë°‘ì´ê³  ë§Œë“¤ ìˆ˜ ìˆëŠ” ëª¬ìŠ¤í„°ê°€ ë” ìˆì„ ë•Œ
+		if(m_iCurrent_RemainMonster < 1 && m_iMonsterCount > 0 && fRound_Time > 0.f)
 		{
-			if (fCreate_Time >= 2.f) // 2ÃÊ¸¶´Ù 1¸¶¸®¾¿ »ı¼º
+			if(fCreate_Time >= 2.f) // 2ì´ˆë§ˆë‹¤ 1ë§ˆë¦¬ì”© ìƒì„±
 			{
 				MonsterCreate(fTimeDelta);
 				m_iMonsterCount--;
 				fCreate_Time = 0.f;
 			}
 			fCreate_Time += fTimeDelta;
-		}
-		else
+		} else
 			fCreate_Time = 0.f;
 
 
-		// Ã³À½ ½ÃÀÛÇÒ ¶§ 3¸¶¸® »ı¼º
- 		if(fRound_Time <= 0.f)
+		// ì²˜ìŒ ì‹œì‘í•  ë•Œ 3ë§ˆë¦¬ ìƒì„±
+		if(fRound_Time <= 0.f)
 		{
-			for(int i = 0; i < 3; i++)
+			for(int i = 0; i < 1; i++)
 			{
-			
+
 				MonsterCreate(fTimeDelta);
 				m_iMonsterCount--;
 			}
 		}
-		
+
 	}
 
 
-	// ÇöÀç ¶ó¿îµåÀÇ ½Ã°£¸¸ Áõ°¡µÊ
+	// í˜„ì¬ ë¼ìš´ë“œì˜ ì‹œê°„ë§Œ ì¦ê°€ë¨
 	fRound_Time += fTimeDelta;
 
 }
@@ -91,7 +89,7 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 	CBlimp::BLIMP_DESC pBlimp{};
 
 	ANIMMODEL_INDEX eModel = m_vecMonsterCreate.front().eModelIndex;
-	switch (eModel)
+	switch(eModel)
 	{
 	case Client::ANIM_HELICOPTER:
 	{
@@ -99,8 +97,8 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Helicopter_Desc.eID = LEVEL_GAMEPLAY;
 		Helicopter_Desc.fPosition = m_vecMonsterCreate.front().fPos;
 		Helicopter_Desc.pBuild = m_pBrain;
-
-		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Helicopter"), &Helicopter_Desc);
+		m_iCurrent_RemainMonster++;
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Far"),TEXT("Prototype_GameObject_Helicopter"),&Helicopter_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
 		break;
 	}
@@ -115,8 +113,9 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Tank_Desc.pTrapLayer = m_pTrapLeyer;
 		Tank_Desc.pPlayer = m_pPlayer;
 		Tank_Desc.pCamera = m_pCamera;
-		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Tank"), &Tank_Desc);
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Far"),TEXT("Prototype_GameObject_Tank"),&Tank_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
+		m_iCurrent_RemainMonster++;
 		break;
 	}
 	case Client::ANIM_ALIEN:
@@ -127,8 +126,9 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Alien_Desc.matBrainCoreWorld = matBrainCoreWorld;
 		Alien_Desc.matPlayerWorld = matPlayerWorld;
 		Alien_Desc.iCell_Idx = m_vecMonsterCreate.front().iCell_Idx;
-		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"), TEXT("Prototype_GameObject_Alien"), &Alien_Desc);
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Near"),TEXT("Prototype_GameObject_Alien"),&Alien_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
+		m_iCurrent_RemainMonster++;
 		break;
 	}
 	case Client::ANIM_PONY:
@@ -144,8 +144,9 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		Pony_Desc.pTrapLayer = m_pTrapLeyer;
 		Pony_Desc.m_pBuild = m_pBrain;
 
-		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Near"), TEXT("Prototype_GameObject_Pony"), &Pony_Desc);
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Near"),TEXT("Prototype_GameObject_Pony"),&Pony_Desc);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
+		m_iCurrent_RemainMonster++;
 		break;
 	}
 	case Client::ANIM_RIFLEMAN:
@@ -162,9 +163,9 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		pRifleMan.m_pBuild = m_pBrain;
 		pRifleMan.pCamera = m_pCamera;
 
-		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_RifleMan"), &pRifleMan);
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Far"),TEXT("Prototype_GameObject_RifleMan"),&pRifleMan);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
-
+		m_iCurrent_RemainMonster++;
 		break;
 	}
 
@@ -179,20 +180,20 @@ void CGamePlay_Round::MonsterCreate(_float fTimeDelta)
 		pBlimp.matPlayerWorld = matPlayerWorld;
 		pBlimp.matBrainCoreWorld = matBrainCoreWorld;
 		pBlimp.pBuild = m_pBrain;
-		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY, TEXT("Layer_Monster_Attack_Far"), TEXT("Prototype_GameObject_Blimp"), &pBlimp);
+		m_pGameInstance->Add_GameObject_ToLayer(LEVEL_GAMEPLAY,TEXT("Layer_Monster_Attack_Far"),TEXT("Prototype_GameObject_Blimp"),&pBlimp);
 		m_vecMonsterCreate.erase(m_vecMonsterCreate.begin());
-
+		m_iCurrent_RemainMonster++;
 		break;
 	}
 	default:
-		break;
+	break;
 	}
 }
 
-CGamePlay_Round* CGamePlay_Round::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iRound)
+CGamePlay_Round* CGamePlay_Round::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,_uint iRound)
 {
-	CGamePlay_Round* pInstance = new CGamePlay_Round(pDevice, pContext);
-	if (FAILED(pInstance->Initialize(iRound)))
+	CGamePlay_Round* pInstance = new CGamePlay_Round(pDevice,pContext);
+	if(FAILED(pInstance->Initialize(iRound)))
 	{
 		MSG_BOX("Failed to Created : CGamePlay_Round");
 		Safe_Release(pInstance);

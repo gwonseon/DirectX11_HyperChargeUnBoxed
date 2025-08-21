@@ -16,21 +16,21 @@ END
 
 BEGIN(Client)
 
-class CRifleMan : public CMonster
+class CRifleMan: public CMonster
 {
 private:
 	CRifleMan_State* m_pCurrentState;
 
 public:
-	typedef struct : CMonster::MONSTER_DESC
+	typedef struct: CMonster::MONSTER_DESC
 	{
-		CCamera_Free* pCamera = { nullptr };
-		CPlayer_Build* m_pBuild = { nullptr };
+		CCamera_Free* pCamera = {nullptr};
+		CPlayer_Build* m_pBuild = {nullptr};
 	}RIFLEMAN_DESC;
 
 	enum RIFLEMAN_ANIM
 	{
-		 AA_ArmyMen_EndFire
+		AA_ArmyMen_EndFire
 		,AA_ArmyMen_LoopFir
 		,AA_ArmyMen_Mov
 		,AA_ArmyMen_Mov001
@@ -42,7 +42,7 @@ public:
 	};
 
 private:
-	CRifleMan(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CRifleMan(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CRifleMan(const CRifleMan& Prototype);
 	virtual ~CRifleMan() = default;
 
@@ -55,10 +55,10 @@ public:
 	virtual HRESULT Render();
 	virtual HRESULT Render_Shadow() override;
 
-public: // »óÅÂÆĞÅÏ
+public: // ìƒíƒœíŒ¨í„´
 	void ChangeState(CRifleMan_State* pNewState)
 	{
-		if (m_pCurrentState)
+		if(m_pCurrentState)
 		{
 			m_pCurrentState->Exit(this);
 			delete m_pCurrentState;
@@ -66,14 +66,18 @@ public: // »óÅÂÆĞÅÏ
 
 		m_pCurrentState = pNewState;
 
-		if (m_pCurrentState)
+		if(m_pCurrentState)
 		{
 			m_pCurrentState->Enter(this);
 		}
 	}
 public:
-	CModel* Get_ModelCom() { return m_pModelCom; }
-	_bool	Get_MoveAnimState() { return m_bMove_Anim; }
+	CModel* Get_ModelCom() {
+		return m_pModelCom;
+	}
+	_bool	Get_MoveAnimState() {
+		return m_bMove_Anim;
+	}
 
 private:
 	_vector vPlayerPos{};
@@ -81,11 +85,11 @@ private:
 
 	_float	m_fMoveTime = 0.f;
 	_float	m_fMoveSpeed = 0.f;
-	_float	m_fTime_For_Target = 0.f;  // Æ®·¦ Ã£´Â °æ·Î Å½»ö Áö¿¬ ½Ã°£
+	_float	m_fTime_For_Target = 0.f;  // íŠ¸ë© ì°¾ëŠ” ê²½ë¡œ íƒìƒ‰ ì§€ì—° ì‹œê°„
 	_float	m_fShotTimer = 0.f;
 
-	_float		m_iShot_Count = 0; // 3¹ß ½î±â À§ÇØ ¸î ¹ß ½ú´ÂÁö ÀúÀå
-	_float		m_fShot_Time_Delay = 3.f; // ÃÑ¾Ë ½î±â¿ë µô·¹ÀÌ ½Ã°£
+	_float		m_iShot_Count = 0; // 3ë°œ ì˜ê¸° ìœ„í•´ ëª‡ ë°œ ìˆëŠ”ì§€ ì €ì¥
+	_float		m_fShot_Time_Delay = 3.f; // ì´ì•Œ ì˜ê¸°ìš© ë”œë ˆì´ ì‹œê°„
 
 	_bool m_bShot = false;
 	_bool m_bMove_Anim = false;
@@ -106,17 +110,23 @@ private:
 
 
 private:
-	CCollider* m_pColliderCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CNavigation* m_pNavigationCom = { nullptr };
-	CCollider* m_pTargetCollider = { nullptr };
-	CPlayer_Build* m_pBuild = { nullptr };
-	CCamera_Free* m_pCamera = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CCollider* m_pColliderCom = {nullptr};
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	CNavigation* m_pNavigationCom = {nullptr};
+	CCollider* m_pTargetCollider = {nullptr};
+	CPlayer_Build* m_pBuild = {nullptr};
+	CCamera_Free* m_pCamera = {nullptr};
+	CTexture* m_pTextureCom = {nullptr};
 
+private: // For Thread 
+	future<vector<_float3>> m_vecFindingPath;
+	bool m_bRequest_Path = false;
+	
+
+	_float m_fDistnace = 0.5f;
 public:
-	static CRifleMan* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CRifleMan* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

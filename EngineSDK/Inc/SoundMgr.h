@@ -6,42 +6,48 @@ BEGIN(Engine)
 
 
 
-class CSoundMgr final : public CBase
+class CSoundMgr final: public CBase
 {
 private:
-	CSoundMgr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSoundMgr(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual ~CSoundMgr() = default;
 
 public:
 	HRESULT Ready_Sound();
 public:
-	void PlaySoundW(const wstring pSoundKey, CHANNELID eID, float fVolume = 0);
-	void PlayBGM(const wstring pSoundKey, float fVolume = 0);
+	void PlaySoundW(const wstring pSoundKey,CHANNELID eID,float fVolume = 0);
+	void PlayBGM(const wstring pSoundKey,float fVolume = 0);
 	void StopSound(CHANNELID eID);
 	void StopAll();
 
-	void SetChannelVolume(CHANNELID eID, float fVolume);
-	void VolumeFade(bool _bOnOff, float _fMinusVolume = 0.03f, float _fPlusVolume = 0.05f);
+	void SetChannelVolume(CHANNELID eID,float fVolume);
+	void VolumeFade(bool _bOnOff,float _fMinusVolume = 0.03f,float _fPlusVolume = 0.05f);
 	void VolumeFade_boss();
-	void  Set_BGMVolume(float fVolume) { m_fVolume = fVolume; }
-	float Get_BGMVolume() { return m_fVolume; };
+	void  Set_BGMVolume(float fVolume) {
+		m_fVolume = fVolume;
+	}
+	float Get_BGMVolume() {
+		return m_fVolume;
+	};
 
-	wstring Get_NowBGM() { return nowBGM; };
+	wstring Get_NowBGM() {
+		return nowBGM;
+	};
 
 private:
 	void LoadSoundFile(const wstring soundFile);
 
 
 private:
-	// »ç¿îµå ¸®¼Ò½º¸¦ ÀúÀåÇÒ ¸Ê
- // »ç¿îµå ¸®¼Ò½º Á¤º¸¸¦ °®´Â °´Ã¼ 
-	map<wstring, FMOD::Sound*> m_mapSound;
+	// ì‚¬ìš´ë“œ ë¦¬ì†ŒìŠ¤ë¥¼ ì €ì¥í•  ë§µ
+ // ì‚¬ìš´ë“œ ë¦¬ì†ŒìŠ¤ ì •ë³´ë¥¼ ê°–ëŠ” ê°ì²´ 
+	map<wstring,FMOD::Sound*> m_mapSound;
 
-	// FMOD_CHANNEL : Àç»ıÇÏ°í ÀÖ´Â »ç¿îµå¸¦ °ü¸®ÇÒ °´Ã¼ 
+	// FMOD_CHANNEL : ì¬ìƒí•˜ê³  ìˆëŠ” ì‚¬ìš´ë“œë¥¼ ê´€ë¦¬í•  ê°ì²´ 
 	FMOD::Channel* m_pChannelArr[MAXCHANNEL]{};
 
 	FMOD::ChannelGroup* channelGroup;
-	// »ç¿îµå ,Ã¤³Î °´Ã¼ ¹× ÀåÄ¡¸¦ °ü¸®ÇÏ´Â °´Ã¼ 
+	// ì‚¬ìš´ë“œ ,ì±„ë„ ê°ì²´ ë° ì¥ì¹˜ë¥¼ ê´€ë¦¬í•˜ëŠ” ê°ì²´ 
 	FMOD::System* m_pSystem = nullptr;
 
 	FMOD_RESULT result{};
@@ -52,11 +58,11 @@ private:
 
 
 private:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11Device* m_pDevice = {nullptr};
+	ID3D11DeviceContext* m_pContext = {nullptr};
 
 public:
-	static CSoundMgr* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSoundMgr* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 
 };

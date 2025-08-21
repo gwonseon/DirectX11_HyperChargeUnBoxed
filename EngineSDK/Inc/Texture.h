@@ -2,51 +2,52 @@
 
 #include "Component.h"
 
-/*  È­¸é¿¡ Ãâ·ÂÇØÁÖ±âÀ§ÇÑ : */
-/* -> ÅØ½ºÃÄ¸¦ ¿Ã·Á³õ±âÀ§ÇÑ Á¤Á¡, ÀÎµ¦½º ¹öÆÛ ÁØºñ */
-/* -> ·»´õ¸µÆÄÀÌÇÁ¶óÀÎÀ» °ÅÄ£¸é */
-/* -> È­¸é¿¡ Á¤Á¡¹öÆÛ·ÎºÎÅÍ ÆÄ»ıµÈ ÇÈ¼¿ÀÌ Ãâ·Â(DrawIndexed)µÇ´Â°Å´Ù. */
-/* -> ÇÈ¼¿ÀÇ »öÀ» °áÁ¤ÇÑ´Ù.ÇÈ¼¿ÀÇ ÀúÀåÇÏ°íÀÖ´Â ÅØ½ºÃÄ¶ó´Â °³³äÀÌ ÇÊ¿äÇÏ´Ù. */
-/* -> ÀÌ ÅØ½ºÃÄ¸¦ ½¦ÀÌ´õ·Î ´øÁö°í ½¦ÀÌ´õ³»¿¡¼­ ÇÈ¼¿´ç »öÀ» ÅØ½ºÃÄ·ÎºÎÅÍ ¾ò¾î¿Í¼­(»ùÇÃ¸µ) ÇÈ¼¿ÀÇ »öÀ» °áÁ¤ÇØÁÖ´Â °ÍÀÌ´Ù. */
-/* °á·ĞÀûÀ¸·Î ½¦ÀÌ´õ¿¡ ´øÁ®ÁÖ±âÀ§ÇÑ ÅØ½ºÃÄ°¡ ÇÊ¿äÇØ. */
-/* ID3D11Texture2D -> ID3D11ShaderResourceView ¶ó´Â Å¸ÀÔÀÇ ÅØ½ºÃÄ¸¦ »ı¼ºÇÑ´Ù. */
+/*  í™”ë©´ì— ì¶œë ¥í•´ì£¼ê¸°ìœ„í•œ : */
+/* -> í…ìŠ¤ì³ë¥¼ ì˜¬ë ¤ë†“ê¸°ìœ„í•œ ì •ì , ì¸ë±ìŠ¤ ë²„í¼ ì¤€ë¹„ */
+/* -> ë Œë”ë§íŒŒì´í”„ë¼ì¸ì„ ê±°ì¹œë©´ */
+/* -> í™”ë©´ì— ì •ì ë²„í¼ë¡œë¶€í„° íŒŒìƒëœ í”½ì…€ì´ ì¶œë ¥(DrawIndexed)ë˜ëŠ”ê±°ë‹¤. */
+/* -> í”½ì…€ì˜ ìƒ‰ì„ ê²°ì •í•œë‹¤.í”½ì…€ì˜ ì €ì¥í•˜ê³ ìˆëŠ” í…ìŠ¤ì³ë¼ëŠ” ê°œë…ì´ í•„ìš”í•˜ë‹¤. */
+/* -> ì´ í…ìŠ¤ì³ë¥¼ ì‰ì´ë”ë¡œ ë˜ì§€ê³  ì‰ì´ë”ë‚´ì—ì„œ í”½ì…€ë‹¹ ìƒ‰ì„ í…ìŠ¤ì³ë¡œë¶€í„° ì–»ì–´ì™€ì„œ(ìƒ˜í”Œë§) í”½ì…€ì˜ ìƒ‰ì„ ê²°ì •í•´ì£¼ëŠ” ê²ƒì´ë‹¤. */
+/* ê²°ë¡ ì ìœ¼ë¡œ ì‰ì´ë”ì— ë˜ì ¸ì£¼ê¸°ìœ„í•œ í…ìŠ¤ì³ê°€ í•„ìš”í•´. */
+/* ID3D11Texture2D -> ID3D11ShaderResourceView ë¼ëŠ” íƒ€ì…ì˜ í…ìŠ¤ì³ë¥¼ ìƒì„±í•œë‹¤. */
 
-/* ³»°¡ È­¸é¿¡ Ãâ·ÂÇØÁÖ±âÀ§ÇÑ ÅØ½ºÃÄ()µéÀ» ¿©·¯°³ µé°í ÀÖ´Â Å¬·¡½º´Ù. */
+/* ë‚´ê°€ í™”ë©´ì— ì¶œë ¥í•´ì£¼ê¸°ìœ„í•œ í…ìŠ¤ì³()ë“¤ì„ ì—¬ëŸ¬ê°œ ë“¤ê³  ìˆëŠ” í´ë˜ìŠ¤ë‹¤. */
 
 BEGIN(Engine)
 
-class ENGINE_DLL CTexture final : public CComponent
+class ENGINE_DLL CTexture final: public CComponent
 {
 private:
-	CTexture(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTexture(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CTexture(const CTexture& Prototype);
 	virtual ~CTexture() = default;
 
 	/* Get */
 
 public:
-	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNumTextures);
+	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath,_uint iNumTextures);
 	virtual HRESULT Initialize(void* pArg) override;
 
 
 public:
-	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iTextureIndex);
-	HRESULT Bind_ShaderResources(class CShader* pShader, const _char* pConstantName);
+	HRESULT Bind_ShaderResource(class CShader* pShader,const _char* pConstantName,_uint iTextureIndex);
+	HRESULT Bind_ShaderResources(class CShader* pShader,const _char* pConstantName);
 
 
-	vector<ID3D11ShaderResourceView*>& Get_SRV() { return m_SRVs; }
+	vector<ID3D11ShaderResourceView*>& Get_SRV() {
+		return m_SRVs;
+	}
 public:
-	/* ½¦ÀÌ´õ¿¡ ÁöÁ¤ÇÑ ÅØ½ºÃÄ¸£ ¤©Àü´ŞÇÑ´Ù. */
+	/* ì‰ì´ë”ì— ì§€ì •í•œ í…ìŠ¤ì³ë¥´ ã„¹ì „ë‹¬í•œë‹¤. */
 
 private:
-	_uint										m_iNumTextures = { 0 };
+	_uint										m_iNumTextures = {0};
 	vector<ID3D11ShaderResourceView*>			m_SRVs;
 
 public:
-	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pTextureFilePath, _uint iNumTextures = 1);
+	static CTexture* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _tchar* pTextureFilePath,_uint iNumTextures = 1);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };
 
 END
-

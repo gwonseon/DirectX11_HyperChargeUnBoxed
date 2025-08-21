@@ -1,56 +1,56 @@
 #include "..\Public\Shader.h"
 
-CShader::CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CComponent{ pDevice, pContext }
+CShader::CShader(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CComponent{pDevice,pContext}
 {
 
 }
 
 CShader::CShader(const CShader& Prototype)
-	: CComponent{ Prototype }
-	, m_pEffect{ Prototype.m_pEffect }
-	, m_InputLayouts{ Prototype.m_InputLayouts }
-	, m_iNumPasses {Prototype.m_iNumPasses}
+	: CComponent{Prototype}
+	,m_pEffect{Prototype.m_pEffect}
+	,m_InputLayouts{Prototype.m_InputLayouts}
+	,m_iNumPasses{Prototype.m_iNumPasses}
 {
 
 	Safe_AddRef(m_pEffect);
 
-	for (auto& pInputLayout : m_InputLayouts)
+	for(auto& pInputLayout : m_InputLayouts)
 		Safe_AddRef(pInputLayout);
 }
 
-HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements)
+HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath,const D3D11_INPUT_ELEMENT_DESC* pElements,_uint iNumElements)
 {
-	_uint		iHlslFlag = { 0 };
+	_uint		iHlslFlag = {0};
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	iHlslFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
+	#else
 	iHlslFlag = D3DCOMPILE_OPTIMIZATION_LEVEL1;
-#endif 	
+	#endif 	
 
-	// 1. ÄÄÆÄÀÏÇÒ ÀÌÆåÆ® ÆÄÀÏÀÇ °æ·Î¸¦ °¡¸®Å²´Ù,
-	// 2. ½¦ÀÌ´õ ÆÄÀÏÀÇ ¸ÅÅ©·Î »ç¿ë ¿©ºÎ. 
-	// 3. D3D_COMPILE_STANDARD_FILE_INCLUDE ÀÌ ¼Ó¼ºÀ» »ç¿ëÇØ¾ß ³ªÁß¿¡ Çì´õ Æ÷ÇÔ °¡´É
-	// 4. ½¦ÀÌ´õ ÄÄÆÄÀÏ ½Ã¿¡ »ç¿ëÇÒ ÇÃ·¡±×·Î µð¹ö±ëÁ¤º¸, ÃÖÀûÈ­ ¼öÁØ ¼³Á¤ µîµîÀÌ °¡´ÉÇÏ´Ù
-	// 5. µð¹ö±× ¸ðµåÀÏ °æ¿ì µð¹ö±× ÇÃ·¡±× ¼³Á¤ 
-	// 6. ÃÖÀûÈ­ »èÁ¦¸¦ À§¿¡¼­ ÁöÁ¤ÇØµÎ¾ú´Ù.
-	// 7. ÄÄÆÄÀÏµÈ ÀÌÆåÆ® °´Ã¼ÀÇ ÁÖ¼Ò¸¦ ÀúÀåÇÒ º¯¼öÀÇ ÁÖ¼Ò
-	// 8. ÄÄÆÄÀÏ ¿À·ù ¸Þ½ÃÁö¸¦ ¹ÞÀ» ¼ö ÀÖ´Â Blob °´Ã¼ Æ÷ÀÎÅÍÀÇ ÁÖ¼Ò·Î ÇÔ¼öÀÇ ½ÇÇà °á°ú Á¤º¸¸¦ Àü´ÞÇÏ´Â ¸Þ¸ð¸® °ø°£
-	if (FAILED(D3DX11CompileEffectFromFile(
-			pShaderFilePath, 
-			nullptr,
-			D3D_COMPILE_STANDARD_FILE_INCLUDE, 
-			iHlslFlag, 
-			0, 
-			m_pDevice, 
-			&m_pEffect,
-			nullptr)))
+	// 1. ì»´íŒŒì¼í•  ì´íŽ™íŠ¸ íŒŒì¼ì˜ ê²½ë¡œë¥¼ ê°€ë¦¬í‚¨ë‹¤,
+	// 2. ì‰ì´ë” íŒŒì¼ì˜ ë§¤í¬ë¡œ ì‚¬ìš© ì—¬ë¶€. 
+	// 3. D3D_COMPILE_STANDARD_FILE_INCLUDE ì´ ì†ì„±ì„ ì‚¬ìš©í•´ì•¼ ë‚˜ì¤‘ì— í—¤ë” í¬í•¨ ê°€ëŠ¥
+	// 4. ì‰ì´ë” ì»´íŒŒì¼ ì‹œì— ì‚¬ìš©í•  í”Œëž˜ê·¸ë¡œ ë””ë²„ê¹…ì •ë³´, ìµœì í™” ìˆ˜ì¤€ ì„¤ì • ë“±ë“±ì´ ê°€ëŠ¥í•˜ë‹¤
+	// 5. ë””ë²„ê·¸ ëª¨ë“œì¼ ê²½ìš° ë””ë²„ê·¸ í”Œëž˜ê·¸ ì„¤ì • 
+	// 6. ìµœì í™” ì‚­ì œë¥¼ ìœ„ì—ì„œ ì§€ì •í•´ë‘ì—ˆë‹¤.
+	// 7. ì»´íŒŒì¼ëœ ì´íŽ™íŠ¸ ê°ì²´ì˜ ì£¼ì†Œë¥¼ ì €ìž¥í•  ë³€ìˆ˜ì˜ ì£¼ì†Œ
+	// 8. ì»´íŒŒì¼ ì˜¤ë¥˜ ë©”ì‹œì§€ë¥¼ ë°›ì„ ìˆ˜ ìžˆëŠ” Blob ê°ì²´ í¬ì¸í„°ì˜ ì£¼ì†Œë¡œ í•¨ìˆ˜ì˜ ì‹¤í–‰ ê²°ê³¼ ì •ë³´ë¥¼ ì „ë‹¬í•˜ëŠ” ë©”ëª¨ë¦¬ ê³µê°„
+	if(FAILED(D3DX11CompileEffectFromFile(
+		pShaderFilePath,
+		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		iHlslFlag,
+		0,
+		m_pDevice,
+		&m_pEffect,
+		nullptr)))
 		return E_FAIL;
 
 
 	ID3DX11EffectTechnique* pTechnique = m_pEffect->GetTechniqueByIndex(0);
-	if (nullptr == pTechnique)
+	if(nullptr == pTechnique)
 		return E_FAIL;
 
 	D3DX11_TECHNIQUE_DESC		TechniqueDesc{};
@@ -59,19 +59,19 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 
 	m_iNumPasses = TechniqueDesc.Passes;
 
-	for (size_t i = 0; i < m_iNumPasses; i++)
+	for(size_t i = 0; i < m_iNumPasses; i++)
 	{
-		ID3D11InputLayout* pInputLayout = { nullptr };
+		ID3D11InputLayout* pInputLayout = {nullptr};
 
 		ID3DX11EffectPass* pPass = pTechnique->GetPassByIndex(i);
-		if (nullptr == pPass)
+		if(nullptr == pPass)
 			return E_FAIL;
 
 		D3DX11_PASS_DESC		PassDesc{};
 
 		pPass->GetDesc(&PassDesc);
 
-		if (FAILED(m_pDevice->CreateInputLayout(pElements, iNumElements, PassDesc.pIAInputSignature, PassDesc.IAInputSignatureSize, &pInputLayout)))
+		if(FAILED(m_pDevice->CreateInputLayout(pElements,iNumElements,PassDesc.pIAInputSignature,PassDesc.IAInputSignatureSize,&pInputLayout)))
 			return E_FAIL;
 
 		m_InputLayouts.push_back(pInputLayout);
@@ -87,122 +87,122 @@ HRESULT CShader::Initialize(void* pArg)
 
 HRESULT CShader::Begin(_uint iPassIndex)
 {
-	if (iPassIndex >= m_iNumPasses)
+	if(iPassIndex >= m_iNumPasses)
 		return E_FAIL;
 
 	m_pContext->IASetInputLayout(m_InputLayouts[iPassIndex]);
-	// IASetInputLayout ´Â ³»°¡ ±×¸®·Á°í ÇÏ´Â Á¤Á¡µéÀ» ³»°¡ ¸¸µç ½¦ÀÌ´õ¿¡¼­ Àß ÀÔ·Â ¹Þ¾Æ¿Ã ¼ö ÀÖ´Â °¡¿¡ ´ëÇÑ °ËÁõÀ» ÇØÁÖ´Â ÇÔ¼öÀÌ´Ù.
-// CreateInputLayOut() À» ÅëÇØ ·¹ÀÌ¾Æ¿ôÀ» »ý¼ºÇÏ°í È£ÃâÇÏ¸é µÈ´Ù. initial_prototype¿¡¼­ CreateÇÔ
+	// IASetInputLayout ëŠ” ë‚´ê°€ ê·¸ë¦¬ë ¤ê³  í•˜ëŠ” ì •ì ë“¤ì„ ë‚´ê°€ ë§Œë“  ì‰ì´ë”ì—ì„œ ìž˜ ìž…ë ¥ ë°›ì•„ì˜¬ ìˆ˜ ìžˆëŠ” ê°€ì— ëŒ€í•œ ê²€ì¦ì„ í•´ì£¼ëŠ” í•¨ìˆ˜ì´ë‹¤.
+// CreateInputLayOut() ì„ í†µí•´ ë ˆì´ì•„ì›ƒì„ ìƒì„±í•˜ê³  í˜¸ì¶œí•˜ë©´ ëœë‹¤. initial_prototypeì—ì„œ Createí•¨
 
 	ID3DX11EffectPass* pPass = m_pEffect->GetTechniqueByIndex(0)->GetPassByIndex(iPassIndex);
-	if (nullptr == pPass)
+	if(nullptr == pPass)
 		return E_FAIL;
 
-	/* ½¦ÀÌ´õ´Â Àü¿ªº¯¼ö¸¦ Å¬¶óÀÌ¾ðÆ®·ÎºÎÅÍ ¹Þ¾Æ¿Ã ¼ö ÀÖ´Ù. */
-	/* ApplyÇÔ¼ö¸¦ È£ÃâÇÏ±â Àü¿¡ ¹Þ¾Æ¿Í¾ßÇÒ ¸ðµç °ªµéÀ» ¹Þ¾Æ¿Í¾ßÇÏ³®. */
-	/* ApplyÇÔ¼ö´Â ½¦ÀÌ´õ¿¡ Àü´ÞÇÒ ¸ðµç º¯¼ö¸¦ ´Ù ´øÁö°í È£ÃâÇØ¾ßÇÑ´Ù. */
-	pPass->Apply(0, m_pContext);
+	/* ì‰ì´ë”ëŠ” ì „ì—­ë³€ìˆ˜ë¥¼ í´ë¼ì´ì–¸íŠ¸ë¡œë¶€í„° ë°›ì•„ì˜¬ ìˆ˜ ìžˆë‹¤. */
+	/* Applyí•¨ìˆ˜ë¥¼ í˜¸ì¶œí•˜ê¸° ì „ì— ë°›ì•„ì™€ì•¼í•  ëª¨ë“  ê°’ë“¤ì„ ë°›ì•„ì™€ì•¼í•˜ë‚Ÿ. */
+	/* Applyí•¨ìˆ˜ëŠ” ì‰ì´ë”ì— ì „ë‹¬í•  ëª¨ë“  ë³€ìˆ˜ë¥¼ ë‹¤ ë˜ì§€ê³  í˜¸ì¶œí•´ì•¼í•œë‹¤. */
+	pPass->Apply(0,m_pContext);
 
 	return S_OK;
 }
 
-// ¼ÎÀÌ´õ¸¦ È£ÃâÇÏ±â Àü¿¡ Àü¿ª º¯¼ö¸¦ ¼¼ÆÃÇØÁÖ´Â ¿ªÇÒ, Çà·ÄÀ» ¹ÙÀÎµùÇÏ´Â ÇÔ¼ö
-HRESULT CShader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix)
+// ì…°ì´ë”ë¥¼ í˜¸ì¶œí•˜ê¸° ì „ì— ì „ì—­ ë³€ìˆ˜ë¥¼ ì„¸íŒ…í•´ì£¼ëŠ” ì—­í• , í–‰ë ¬ì„ ë°”ì¸ë”©í•˜ëŠ” í•¨ìˆ˜
+HRESULT CShader::Bind_Matrix(const _char* pConstantName,const _float4x4* pMatrix)
 {
-	if (nullptr == m_pEffect)
+	if(nullptr == m_pEffect)
 		return E_FAIL;
-	// ¼ÎÀÌ´õÆÄÀÏ¾È¿¡ Á¤ÀÇµÇ¾î ÀÖ´Â ÁöÁ¤ÇÑ ÀÌ¸§ÀÇ Àü¿ªº¯¼ö¿¡ ´ëÇÑ ÇÚµéÀ» ¾ò¾î¿Â´Ù.
+	// ì…°ì´ë”íŒŒì¼ì•ˆì— ì •ì˜ë˜ì–´ ìžˆëŠ” ì§€ì •í•œ ì´ë¦„ì˜ ì „ì—­ë³€ìˆ˜ì— ëŒ€í•œ í•¸ë“¤ì„ ì–»ì–´ì˜¨ë‹¤.
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
-	if (nullptr == pVariable)
+	if(nullptr == pVariable)
 		return E_FAIL;
 
 
-	//AsMatrix :  Effect ÆÄÀÏÀÇ º¯¼ö¸¦ Çà·Ä·Î Ä¡È¯ÇØÁØ´Ù.
+	//AsMatrix :  Effect íŒŒì¼ì˜ ë³€ìˆ˜ë¥¼ í–‰ë ¬ë¡œ ì¹˜í™˜í•´ì¤€ë‹¤.
 	ID3DX11EffectMatrixVariable* pMatrixVariable = pVariable->AsMatrix();
-	if (nullptr == pMatrixVariable)
+	if(nullptr == pMatrixVariable)
 		return E_FAIL;
 
-	// Çà·Äµ¥ÀÌÅÍ¸¦ È¿°ú º¯¼ö¿¡ ¼³Á¤ÇØÁØ´Ù.
+	// í–‰ë ¬ë°ì´í„°ë¥¼ íš¨ê³¼ ë³€ìˆ˜ì— ì„¤ì •í•´ì¤€ë‹¤.
 	return  pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));
 }
 
 
-HRESULT CShader::Bind_Matrices(const _char* pConstantName, const _float4x4* pMatrices, _uint iNumMatrices)
+HRESULT CShader::Bind_Matrices(const _char* pConstantName,const _float4x4* pMatrices,_uint iNumMatrices)
 {
-	if (nullptr == m_pEffect)
+	if(nullptr == m_pEffect)
 		return E_FAIL;
 
 
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
-	if (nullptr == pVariable)
+	if(nullptr == pVariable)
 		return E_FAIL;
 
 	ID3DX11EffectMatrixVariable* pMatrixVariable = pVariable->AsMatrix();
-	if (nullptr == pMatrixVariable)
+	if(nullptr == pMatrixVariable)
 		return E_FAIL;
 
-	return pMatrixVariable->SetMatrixArray(reinterpret_cast<const _float*>(pMatrices), 0, iNumMatrices);
+	return pMatrixVariable->SetMatrixArray(reinterpret_cast<const _float*>(pMatrices),0,iNumMatrices);
 }
 
 
 
-// ¼ÎÀÌ´õ¸¦ È£ÃâÇÏ±â Àü¿¡ Àü¿ª º¯¼ö¸¦ ¼¼ÆÃÇØÁÖ´Â ¿ªÇÒ, SRC ( ÅØ½ºÃ³ ) ¸¦ ¹ÙÀÎµùÇÏ´Â ÇÔ¼ö
-HRESULT CShader::Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV)
+// ì…°ì´ë”ë¥¼ í˜¸ì¶œí•˜ê¸° ì „ì— ì „ì—­ ë³€ìˆ˜ë¥¼ ì„¸íŒ…í•´ì£¼ëŠ” ì—­í• , SRC ( í…ìŠ¤ì²˜ ) ë¥¼ ë°”ì¸ë”©í•˜ëŠ” í•¨ìˆ˜
+HRESULT CShader::Bind_SRV(const _char* pConstantName,ID3D11ShaderResourceView* pSRV)
 {
 
-	if (nullptr == m_pEffect)
+	if(nullptr == m_pEffect)
 		return E_FAIL;
-	// ¼ÎÀÌ´õ ÆÄÀÏ ¾È¿¡ Á¤ÀÇµÇ¾î ÀÖ´Â ÁöÁ¤ÇÑ ÀÌ¸§ÀÇ Àü¿ªº¯¼ö¿¡ ´ëÇÑ ÇÚµéÀ» ¾ò¾î¿Â´Ù
+	// ì…°ì´ë” íŒŒì¼ ì•ˆì— ì •ì˜ë˜ì–´ ìžˆëŠ” ì§€ì •í•œ ì´ë¦„ì˜ ì „ì—­ë³€ìˆ˜ì— ëŒ€í•œ í•¸ë“¤ì„ ì–»ì–´ì˜¨ë‹¤
 	ID3DX11EffectVariable* pVariable= m_pEffect->GetVariableByName(pConstantName);
 
-	if (nullptr == pVariable)
+	if(nullptr == pVariable)
 		return E_FAIL;
 
-	// AsShaderResource : È¿°ú ÆÄÀÏÀ¸ ¤Óº¯¼ö¸¦ ¼ÎÀÌ´õ ¸®¼Ò½º·Î Ä³½ºÆÃÇÏ±â À§ÇØ »ç¿ëµÇ´Â ¸Þ¼­µå
+	// AsShaderResource : íš¨ê³¼ íŒŒì¼ìœ¼ ã…£ë³€ìˆ˜ë¥¼ ì…°ì´ë” ë¦¬ì†ŒìŠ¤ë¡œ ìºìŠ¤íŒ…í•˜ê¸° ìœ„í•´ ì‚¬ìš©ë˜ëŠ” ë©”ì„œë“œ
 	ID3DX11EffectShaderResourceVariable* pSRVariable = pVariable->AsShaderResource();
-	if (nullptr == pSRVariable)
+	if(nullptr == pSRVariable)
 		return E_FAIL;
 
-	// ¼ÎÀÌ´õ ¸®¼Ò½º º¯¼ö¸¦ ¼³Á¤,  ¼ÎÀÌ´õ ¸®¼Ò½º ºä¸¦ ¼ÎÀÌ´õ¿¡ ¹ÙÀÎµùÇÑ´Ù.
+	// ì…°ì´ë” ë¦¬ì†ŒìŠ¤ ë³€ìˆ˜ë¥¼ ì„¤ì •,  ì…°ì´ë” ë¦¬ì†ŒìŠ¤ ë·°ë¥¼ ì…°ì´ë”ì— ë°”ì¸ë”©í•œë‹¤.
 	return pSRVariable->SetResource(pSRV);
 
 }
 
-HRESULT CShader::Bind_SRVs(const _char* pConstantName, ID3D11ShaderResourceView** ppSRVs, _uint iNumSRVs)
+HRESULT CShader::Bind_SRVs(const _char* pConstantName,ID3D11ShaderResourceView** ppSRVs,_uint iNumSRVs)
 {
-	if (nullptr == m_pEffect)
+	if(nullptr == m_pEffect)
 		return E_FAIL;
 
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
-	if (nullptr == pVariable)
+	if(nullptr == pVariable)
 		return E_FAIL;
 
 	ID3DX11EffectShaderResourceVariable* pSRVariable = pVariable->AsShaderResource();
-	if (nullptr == pSRVariable)
+	if(nullptr == pSRVariable)
 		return E_FAIL;
 
-	return pSRVariable->SetResourceArray(ppSRVs, 0, iNumSRVs);
+	return pSRVariable->SetResourceArray(ppSRVs,0,iNumSRVs);
 }
 
-HRESULT CShader::Bind_RawValue(const _char* pConstantName, const void* pData, _uint iLength)
+HRESULT CShader::Bind_RawValue(const _char* pConstantName,const void* pData,_uint iLength)
 {
-	if (nullptr == m_pEffect)
+	if(nullptr == m_pEffect)
 		return E_FAIL;
 
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
-	if (nullptr == pVariable)
+	if(nullptr == pVariable)
 		return E_FAIL;
 
-	return pVariable->SetRawValue(pData, 0, iLength);
+	return pVariable->SetRawValue(pData,0,iLength);
 }
 
 
 
-CShader* CShader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements)
+CShader* CShader::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,const _tchar* pShaderFilePath,const D3D11_INPUT_ELEMENT_DESC* pElements,_uint iNumElements)
 {
-	CShader* pInstance = new CShader(pDevice, pContext);
+	CShader* pInstance = new CShader(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pShaderFilePath, pElements, iNumElements)))
+	if(FAILED(pInstance->Initialize_Prototype(pShaderFilePath,pElements,iNumElements)))
 	{
 		MSG_BOX("Failed to Created : CShader");
 		Safe_Release(pInstance);
@@ -215,7 +215,7 @@ CComponent* CShader::Clone(void* pArg)
 {
 	CShader* pInstance = new CShader(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CShader");
 		Safe_Release(pInstance);
@@ -230,6 +230,6 @@ void CShader::Free()
 
 	Safe_Release(m_pEffect);
 
-	for (auto& pInputLayout : m_InputLayouts)
+	for(auto& pInputLayout : m_InputLayouts)
 		Safe_Release(pInputLayout);
 }

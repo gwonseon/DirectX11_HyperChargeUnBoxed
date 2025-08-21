@@ -28,7 +28,7 @@ struct VS_IN
 	float3 vNormal : NORMAL;
 	float2 vTexcoord : TEXCOORD0;	
 	float3 vTangent : TANGENT;
-	/* ÀÌ ¸Þ½Ã¿¡ ¿µÇâÀ» ÁÖ´Â »ÀµéÀÇ ÀÎµ¦½º */
+	/* ï¿½ï¿½ ï¿½Þ½Ã¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ */
 	uint4  vBlendIndex : BLENDINDEX;
 	float4 vBlendWeight : BLENDWEIGHT;
 };
@@ -43,7 +43,7 @@ struct VS_OUT
 
 };
 
-VS_OUT VS_MAIN( /* ³»°¡ ±×¸±·Á°í Çß´ø Á¤Á¡À» ¹Þ¾Æ¿À´Â°Å´Ù*/ VS_IN In)
+VS_OUT VS_MAIN( /* ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¿ï¿½ï¿½Â°Å´ï¿½*/ VS_IN In)
 {	
     VS_OUT Out = (VS_OUT) 0;
 
@@ -84,7 +84,7 @@ struct PS_IN
 
 struct PS_OUT
 {
-	/* º¯¼ö¿¡ ´ëÇÑ ½Ã¸àÆ½À» Á¤ÀÇÇÑ´Ù. */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¸ï¿½Æ½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½. */
     vector vDiffuse : SV_TARGET0;
     vector vNormal : SV_TARGET1;
     vector vDepth : SV_TARGET2;

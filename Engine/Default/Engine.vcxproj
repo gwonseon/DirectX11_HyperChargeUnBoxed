@@ -201,6 +201,8 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\SoundMgr.h" />
     <ClInclude Include="..\Public\SphereCollider.h" />
     <ClInclude Include="..\Public\Target_Manager.h" />
+    <ClInclude Include="..\Public\ThreadMgr.h" />
+    <ClInclude Include="..\Public\ThreadPool.h" />
     <ClInclude Include="..\Public\UIManager.h" />
     <ClInclude Include="..\Public\VIBuffer_Box.h" />
     <ClInclude Include="..\Public\Input_Device.h" />
@@ -235,6 +237,9 @@ call UpdateLib.bat</Command>
     <ClInclude Include="..\Public\VIBuffer_Particle_Rect.h" />
     <ClInclude Include="..\Public\VIBuffer_Rect.h" />
     <ClInclude Include="..\Public\VIBuffer_Terrain.h" />
+    <ClInclude Include="..\Public\VIBuffer_Trail.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Animation.cpp" />
@@ -269,6 +274,8 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Private\SoundMgr.cpp" />
     <ClCompile Include="..\Private\SphereCollider.cpp" />
     <ClCompile Include="..\Private\Target_Manager.cpp" />
+    <ClCompile Include="..\Private\ThreadMgr.cpp" />
+    <ClCompile Include="..\Private\ThreadPool.cpp" />
     <ClCompile Include="..\Private\UIManager.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Box.cpp" />
     <ClCompile Include="..\Private\Input_Device.cpp" />
@@ -303,6 +310,9 @@ call UpdateLib.bat</Command>
     <ClCompile Include="..\Private\VIBuffer_Particle_Rect.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Rect.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Terrain.cpp" />
+    <ClCompile Include="..\Private\VIBuffer_Trail.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli" />

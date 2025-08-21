@@ -14,13 +14,13 @@ END
 
 BEGIN(Client)
 
-class CTank final : public CMonster
+class CTank final: public CMonster
 {
 public:
-	typedef struct : CMonster::MONSTER_DESC
+	typedef struct: CMonster::MONSTER_DESC
 	{
-		CCamera_Free* pCamera = { nullptr };
-		CPlayer_Build* m_pBuild = { nullptr };
+		CCamera_Free* pCamera = {nullptr};
+		CPlayer_Build* m_pBuild = {nullptr};
 	}TANK_DESC;
 
 	enum TANK_ANIM
@@ -35,16 +35,16 @@ public:
 	};
 
 private:
-	CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTank(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CTank(const CTank& Prototype);
 	virtual ~CTank() = default;
 
 public:
-	/* ¿øÇü»ı¼º½Ã È£Ãâ : »ı¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆĞÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹íˆ ë¬´ê±°ìš´ ì‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ì…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆĞÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Ş¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºĞ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ì…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…íˆ ì¡´ì¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ì¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
@@ -56,24 +56,29 @@ public:
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-	
-private:
-	CCollider* m_pColliderCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CPlayer_Build* m_pBuild = { nullptr };
-	CNavigation* m_pNavigationCom = nullptr;
-	CCamera_Free* m_pCamera = { nullptr };
 
 private:
-	
+	CCollider* m_pColliderCom = {nullptr};
+	CShader* m_pShaderCom = {nullptr};
+	CModel* m_pModelCom = {nullptr};
+	CPlayer_Build* m_pBuild = {nullptr};
+	CNavigation* m_pNavigationCom = nullptr;
+	CCamera_Free* m_pCamera = {nullptr};
+
+private:
+
 
 
 	_bool		m_bAnimState{};
-	_bool		m_bFirstShot = false; // Ã¹ ¹ßÀº ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î ¾ÈµÅ¼­ µû·Î ½÷ÁÜ
-	_bool		m_bShotOnce = false;	// ¾Ö´Ï¸ŞÀÌ¼Ç ³¡³µÀ» ¶§ÀÇ Á¶°Ç¹®ÀÌ µÎ ¹ø µ¹¾Æ¼­ ÇÑ ¹ø¸¸ ½î°Ô ¸¸µé¾îÁÜ
+	_bool		m_bFirstShot = false; // ì²« ë°œì€ ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ì•ˆë¼ì„œ ë”°ë¡œ ì´ì¤Œ
+	_bool		m_bShotOnce = false;	// ì• ë‹ˆë©”ì´ì…˜ ëë‚¬ì„ ë•Œì˜ ì¡°ê±´ë¬¸ì´ ë‘ ë²ˆ ëŒì•„ì„œ í•œ ë²ˆë§Œ ì˜ê²Œ ë§Œë“¤ì–´ì¤Œ
+
+private: // For Thread 
+	future<vector<_float3>> m_vecFindingPath;
+	bool m_bRequest_Path = false;
+
 public:
-	static CTank* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTank* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

@@ -6,6 +6,10 @@
 #include "InGameUI.h"
 #include "Energy_Machine.h"
 #include "BrainCore.h"
+
+#include "BatteryGage.h"
+#include "BatteryUI.h"
+
 BEGIN(Engine)
 class CShader;
 class CModel;
@@ -18,8 +22,8 @@ class CBattery final : public CGameObject
 public:
 	typedef struct : public CGameObject::GAMEOBJ_DESC
 	{
-		CInGameUI* pInGameUI_Gauge = { nullptr };
-		CInGameUI* pInGameUI = { nullptr };
+		CBatteryGage* pInGameUI_Gauge = { nullptr };
+		CBatteryUI* pInGameUI = { nullptr };
 		CBrainCore* pBrain = { nullptr };
 		CEnergy_Machine* pEnergy_Machine = { nullptr };
 		CUI_CircleGuage* pGauge = { nullptr };
@@ -56,8 +60,8 @@ private:
 	CBrainCore*				m_pBrain = { nullptr };
 	CUI_CircleGuage*		m_pGauge = { nullptr };
 	CEnergy_Machine*		m_pEnergy_Machine = { nullptr };
-	CInGameUI*				m_pInGameUI = { nullptr };
-	CInGameUI*				m_pInGameUI_Gauge = { nullptr };
+	CBatteryUI*				m_pInGameUI = { nullptr };
+	CBatteryGage*				m_pInGameUI_Gauge = { nullptr };
 
 private:
 	LEVELID	m_eLevel = {};

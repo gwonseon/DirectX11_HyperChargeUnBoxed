@@ -5,6 +5,7 @@
 #include "BackGround.h"
 #include "CrossLine.h"
 #include "InGameUI.h"
+
 #include "MenuUI.h"
 #include "ButtonUI.h"
 #include "NumberUI.h"
@@ -76,25 +77,33 @@
 #include "Missile_Flame.h"
 #include "Aura.h"
 
+#include "PlayerHp.h"
+#include "MachineHp.h"
+#include "Missile_TimeUI.h"
+#include "Ending_UI.h"
+#include "DeadUI.h"
+#include "BulletUI.h"
+#include "DamagedUI.h"
+#include "ConstUI.h"
 
-CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: m_pDevice{ pDevice }
-	, m_pContext{ pContext }
-	, m_pGameInstance{ CGameInstance::GetInstance() }
+CLoader::CLoader(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: m_pDevice{pDevice}
+	,m_pContext{pContext}
+	,m_pGameInstance{CGameInstance::GetInstance()}
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
 }
 
-/* ¿⁄ø¯¿ª ∑ŒµÂ«—¥Ÿ. (º≠∫Í Ω∫∑πµÂ)*/
+/* ÏûêÏõêÏùÑ Î°úÎìúÌïúÎã§. (ÏÑúÎ∏å Ïä§Î†àÎìú)*/
 _uint APIENTRY LoadingMain(void* pArg)
 {
-	CoInitializeEx(nullptr, 0);
+	CoInitializeEx(nullptr,0);
 
 	CLoader* pLoader = static_cast<CLoader*>(pArg);
 
-	if (FAILED(pLoader->Loading()))
+	if(FAILED(pLoader->Loading()))
 		return 1;
 
 	return 0;
@@ -106,46 +115,43 @@ HRESULT CLoader::Initialize(LEVELID eNextLevelID)
 
 	InitializeCriticalSection(&m_CriticalSection);
 
-	/* º≠∫ÍΩ∫∑πµÂ∏¶ ª˝º∫«—¥Ÿ( ∏ﬁ¿ŒΩ∫é•)*/
+	m_hThread = (HANDLE)_beginthreadex(nullptr,0,LoadingMain,this,0,nullptr);
+	if(0 == m_hThread)
+		return E_FAIL; 
 
-	/* unsigned (__stdcall* _beginthreadex_proc_type)(void*); */
-	m_hThread = (HANDLE)_beginthreadex(nullptr, 0, LoadingMain, this, 0, nullptr);
-	if (0 == m_hThread)
-		return E_FAIL;
-	
 	return S_OK;
 }
 
-// (º≠∫Í Ω∫∑πµÂ)
+// (ÏÑúÎ∏å Ïä§Î†àÎìú)
 HRESULT CLoader::Loading()
 {
 	EnterCriticalSection(&m_CriticalSection);
 
-	HRESULT		hr = { 0 };
-	
-	switch (m_eNextLevelID)
+	HRESULT		hr = {0};
+
+	switch(m_eNextLevelID)
 	{
 	case LEVEL_LOGO:
-		hr = Loading_For_LogoLevel();
-		break;
+	hr = Loading_For_LogoLevel();
+	break;
 	case LEVEL_GAMEPLAY:
-		hr = Loading_For_GamePlayLevel();
-		break;
+	hr = Loading_For_GamePlayLevel();
+	break;
 	case LEVEL_YARD:
-		hr = Loading_For_GameYardLevel();
-		break;
+	hr = Loading_For_GameYardLevel();
+	break;
 	case LEVEL_IMGUI:
-		hr = Loading_For_ImGuiLevel();
-		break;
+	hr = Loading_For_ImGuiLevel();
+	break;
 	case LEVEL_NAVIGATION:
-		hr = Loading_For_NavigationLevel();
-		break;
+	hr = Loading_For_NavigationLevel();
+	break;
 	case LEVEL_MONSTERSPAWN:
-		hr = Loading_For_MonsterSpawnLevel();
-		break;
+	hr = Loading_For_MonsterSpawnLevel();
+	break;
 	}
 
-	if (FAILED(hr))
+	if(FAILED(hr))
 		return E_FAIL;
 
 	LeaveCriticalSection(&m_CriticalSection);
@@ -157,7 +163,7 @@ HRESULT CLoader::Loading()
 
 void CLoader::Output_LoadingState()
 {
-	SetWindowText(g_hWnd, m_strLoadingText.c_str());
+	SetWindowText(g_hWnd,m_strLoadingText.c_str());
 }
 
 #endif
@@ -165,549 +171,548 @@ void CLoader::Output_LoadingState()
 
 HRESULT CLoader::Loading_For_LogoLevel()
 {
-	m_strLoadingText = TEXT("≈ÿΩ∫√ƒ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÌÖçÏä§Ï≥ê Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 	/* For.Prototype_Component_Texture_Logo */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_GameTitle"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_HyperchargeLogoBase.png")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO,TEXT("Prototype_Component_Texture_GameTitle"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/LogoLevel/T_U_HyperchargeLogoBase.png")))))
 		return E_FAIL;
-	// µﬁπË∞Ê
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Menu_Back"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/LogoLevel/T_U_BackgroundStats_Background.png")))))
+	// Îí∑Î∞∞Í≤Ω
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO,TEXT("Prototype_Component_Texture_Menu_Back"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/LogoLevel/T_U_BackgroundStats_Background.png")))))
 		return E_FAIL;
 
 	// UI
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Button0"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/MenuUI/UI%d.png"),2))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO,TEXT("Prototype_Component_Texture_Button0"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/MenuUI/UI%d.png"),2))))
 		return E_FAIL;
 
 
 	m_fPersent += 20.f;
-	m_strLoadingText = TEXT("∏µ® ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î™®Îç∏ Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;
-	m_strLoadingText = TEXT("ºŒ¿Ã¥ı ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÏÖ∞Ïù¥Îçî Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;
-	m_strLoadingText = TEXT("∞¥√ºø¯«¸ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
-	// µﬁπË∞Ê
+	m_strLoadingText = TEXT("Í∞ùÏ≤¥ÏõêÌòï Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
+	// Îí∑Î∞∞Í≤Ω
 	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BackGround_Menu")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_Menu"),
-			CBackGround::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_Menu"),
+			CBackGround::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// UI
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_ButtonUI_Menu")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_ButtonUI_Menu")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ButtonUI_Menu"),
-			CButtonUI::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ButtonUI_Menu"),
+			CButtonUI::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
+
 	// Title
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_GameTitle")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_GameTitle")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_GameTitle"),
-			CMenuUI::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_GameTitle"),
+			CMenuUI::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
 	m_fPersent += 20.f;
-	m_strLoadingText = TEXT("∑Œµ˘ øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î°úÎî© ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.");
 	m_fPersent += 20.f;
 	m_isFinished = true;
-
 	return S_OK;
 }
 
 HRESULT CLoader::Loading_For_GamePlayLevel()
 {
-	m_strLoadingText = TEXT("≈ÿΩ∫√ƒ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÌÖçÏä§Ï≥ê Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	/* For.Prototype_Component_Texture_Sky */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Sky"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"),4))))
 		return E_FAIL;
-	Loading_Effect(LEVEL_GAMEPLAY);
 
-#pragma region UI≈ÿΩ∫√≥ ª˝º∫
-	// ≈©∑ŒΩ∫ ∂Û¿Œ
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Logo2"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CrossLine/CrossLine%d.png"), 24))))
+	Loading_Effect(LEVEL_GAMEPLAY);
+	#pragma region UIÌÖçÏä§Ï≤ò ÏÉùÏÑ±
+	// ÌÅ¨Î°úÏä§ ÎùºÏù∏
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Logo2"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/CrossLine/CrossLine%d.png"),24))))
 		return E_FAIL;
 
 	// LButton
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_LButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/LButton.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_LButton"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/LButton.dds")))))
 		return E_FAIL;
 
 	// RButton
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/RButton.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_RButton"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/RButton.dds")))))
 		return E_FAIL;
 
 	// V_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_VIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/VKey_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_VIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/VKey_ICon.dds")))))
 		return E_FAIL;
 	// F_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/FKey_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_FIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/FKey_ICon.dds")))))
 		return E_FAIL;
 	// C_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CKey_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_CIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/CKey_ICon.dds")))))
 		return E_FAIL;
 
 	// Shift
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Shift"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ShiftUI.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Shift"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/ShiftUI.dds")))))
 		return E_FAIL;
 
 	// Space
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Space"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Space.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Space"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Space.dds")))))
 		return E_FAIL;
 
 	// EnergyIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_EnergyIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/EnergyIcon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_EnergyIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/EnergyIcon.dds")))))
 		return E_FAIL;
 
 	// HPIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_HpIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/HP_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_HpIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/HP_ICon.dds")))))
 		return E_FAIL;
 
 	// CreditIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CreditIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Credit_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_CreditIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Credit_Icon.dds")))))
 		return E_FAIL;
 
 	// RunIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_RunIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Run_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_RunIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Run_Icon.dds")))))
 		return E_FAIL;
 
 	// JumpIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_JumpIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Jump_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_JumpIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Jump_Icon.dds")))))
 		return E_FAIL;
 
 	// ModeChangeIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_ModeChangeIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ModeChange_Icon%d.dds"),2))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_ModeChangeIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/ModeChange_Icon%d.dds"),2))))
 		return E_FAIL;
 
 	// Punch_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_PuchIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Punch_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_PuchIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Punch_Icon.dds")))))
 		return E_FAIL;
 
 	// ViewChange_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_ViewChangeIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/View_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_ViewChangeIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/View_Icon.dds")))))
 		return E_FAIL;
 
 	// Death
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Death"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Death.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Death"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Death.dds")))))
 		return E_FAIL;
 
 	// Battery
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Battery"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Battery%d.dds"),5))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Battery"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Battery%d.dds"),5))))
 		return E_FAIL;
 
 	// Character_UI
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Character"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Character/UI_Character%d.png"), 12))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Character"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Character/UI_Character%d.png"),12))))
 		return E_FAIL;
 
-	// UI_BackGround ±€ææ ∂ÁøÏ¥¬∞≈ µﬁ πË∞Ê
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBackGround"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/UI_BackGround%d.png"), 2))))
-		return E_FAIL;
-	
-	// UI_Bar  √º∑¬ ø°≥ ¡ˆ πË≈Õ∏Æ µÓµÓ
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIBar"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/UI_Bar%d.dds"), 5))))
+	// UI_BackGround Í∏ÄÏî® ÎùÑÏö∞ÎäîÍ±∞ Îí∑ Î∞∞Í≤Ω
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_UIBackGround"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/UI_BackGround%d.png"),2))))
 		return E_FAIL;
 
-	// µ•πÃ¡ˆ ¿‘æ˙¿ª ∂ß πË∞Ê
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UIDamaged"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/DamageIndicator.png")))))
+	// UI_Bar  Ï≤¥Î†• ÏóêÎÑàÏßÄ Î∞∞ÌÑ∞Î¶¨ Îì±Îì±
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_UIBar"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/UI_Bar%d.dds"),5))))
 		return E_FAIL;
-	
+
+	// Îç∞ÎØ∏ÏßÄ ÏûÖÏóàÏùÑ Îïå Î∞∞Í≤Ω
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_UIDamaged"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/DamageIndicator.png")))))
+		return E_FAIL;
+
 	//CircleGuage
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CircleGuage"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CircleGuage.png")))))
-		return E_FAIL;	
-	
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_CircleGuage"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/CircleGuage.png")))))
+		return E_FAIL;
+
 	//CenterUI 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CenterUI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CenterUI%d.png"),3))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_CenterUI"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/CenterUI%d.png"),3))))
 		return E_FAIL;
 
 	//Slice
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Slice"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Slice.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Slice"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Slice.dds")))))
 		return E_FAIL;
 
 	// Number 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Number"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/%d.dds"), 10))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_Number"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/%d.dds"),10))))
 		return E_FAIL;
 
 
-#pragma endregion UI≈ÿΩ∫√≥ ª˝º∫
+	#pragma endregion UIÌÖçÏä§Ï≤ò ÏÉùÏÑ±
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∏µ® ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î™®Îç∏ Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 
 	/* For.Prototype_Component_VIBuffer_Cube */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
-		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice,m_pContext))))
 		return E_FAIL;
 
 	Loading_DataFile_For_GameLevel();
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("ºŒ¿Ã¥ı ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÏÖ∞Ïù¥Îçî Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	/* For.Prototype_Component_Shader_VtxCube */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxCube"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Shader_VtxCube"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"),VTXCUBE::Elements,VTXCUBE::iNumElements))))
 		return E_FAIL;
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∞¥√ºø¯«¸ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Í∞ùÏ≤¥ÏõêÌòï Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 
-		// ΩΩ∑°Ω¨
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Slash")) == nullptr)
+	// Ïä¨ÎûòÏâ¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Slash")) == nullptr)
 	{
-		/* ∫Œº≠¡¸ */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Slash"),
-			CSlash_Mesh::Create(m_pDevice, m_pContext))))
+		/* Î∂ÄÏÑúÏßê */
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Slash"),
+			CSlash_Mesh::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// ¿¸±∏
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bulb")) == nullptr)
+	// Ï†ÑÍµ¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bulb")) == nullptr)
 	{
-		/* ∫Œº≠¡¸ */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bulb"),
-			CBulb::Create(m_pDevice, m_pContext))))
+		/* Î∂ÄÏÑúÏßê */
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bulb"),
+			CBulb::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	
+
 	/* Prototype_GameObject_Sky */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
-			CSky::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
+			CSky::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	
-	// ≈©∑ŒΩ∫ ∂Û¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CrossLine")) == nullptr)
+
+	// ÌÅ¨Î°úÏä§ ÎùºÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CrossLine")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CrossLine"),
-			CCrossLine::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CrossLine"),
+			CCrossLine::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//UI
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI"),
-			CInGameUI::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI"),
+			CInGameUI::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//UI_circle
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Circle_UI")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Circle_UI")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Circle_UI"),
-			CUI_CircleGuage::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Circle_UI"),
+			CUI_CircleGuage::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//UINumber
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UINumber")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UINumber")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UINumber"),
-			CNumberUI::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UINumber"),
+			CNumberUI::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ≈Õ∑π¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
+	// ÌÑ∞Î†àÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
-			CTerrain::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
+			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Prototype_GameObject_Camera_Free */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-			CCamera_Free::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
+			CCamera_Free::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-			CPlayer::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ ∏ˆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î™∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
-			CBody_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ∏”∏Æ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î®∏Î¶¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
-			CHead_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
+			CHead_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ TPS ««∫ø
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ TPS ÌîºÎ¥á
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
-			CPivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
+			CPivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ FPS vlqht
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ FPS vlqht
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
-			CFPS_Pivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
+			CFPS_Pivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ π´±‚
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î¨¥Í∏∞
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-			CWeapon::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ƒÆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Ïπº
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
-			CWeapon_Katana::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
+			CWeapon_Katana::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// π´±‚ æ∆¿Ã≈€
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
+	// Î¨¥Í∏∞ ÏïÑÏù¥ÌÖú
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
-			CWeapon_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
+			CWeapon_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ƒ⁄¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	// ÏΩîÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
-			CCoin::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// Battery 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
-			CBattery::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
+			CBattery::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// CoinItem 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CoinItem")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CoinItem")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CoinItem"),
-			CCoin_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CoinItem"),
+			CCoin_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// HpItem 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_HpItem")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_HpItem")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HpItem"),
-			CHp_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HpItem"),
+			CHp_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Tank */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tank"),
-			CTank::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tank"),
+			CTank::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
+
 	/* Heli */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Helicopter")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Helicopter")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Helicopter"),
-			CHelicopter::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Helicopter"),
+			CHelicopter::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Alien */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Alien")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Alien")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Alien"),
-			CAlien::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Alien"),
+			CAlien::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
 	/* PONY */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pony")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pony")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pony"),
-			CPony::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pony"),
+			CPony::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* RIFLEMAN */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_RifleMan")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_RifleMan")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_RifleMan"),
-			CRifleMan::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_RifleMan"),
+			CRifleMan::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
+
 	/* Blimp */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Blimp")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Blimp")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Blimp"),
-			CBlimp::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Blimp"),
+			CBlimp::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
+
 	// Environment
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
-			CEnvironment::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// BrainCore
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
-			CBrainCore::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
-			CEnergy_Machine::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
+			CEnergy_Machine::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine Lader
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
-			CEnergy_Lader::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
+			CEnergy_Lader::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine Lader
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
-			CEnergy_Cap::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
+			CEnergy_Cap::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∆Æ∑¶ ∏∂≈©
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
+	// Ìä∏Îû© ÎßàÌÅ¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
-			CTrap_Marks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
+			CTrap_Marks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∆Æ∑¶ ∑π∞Ì ∫Æµπ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
+	// Ìä∏Îû© Î†àÍ≥† Î≤ΩÎèå
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
-			CTrap_Bricks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
+			CTrap_Bricks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∑π∞Ì ∫Œº≠¡¸
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
+	// Î†àÍ≥† Î∂ÄÏÑúÏßê
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
-			CBroken_Bricks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
+			CBroken_Bricks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//Bullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
-			CBullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//MonsterBullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
-			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_AABB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Collider_AABB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_AABB))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_OBB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Collider_OBB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_OBB))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_Sphere */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Collider_Sphere"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_SPHERE))))
 			return E_FAIL;
 	}
 
 
-
+	Loading_UI();
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∑Œµ˘ øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î°úÎî© ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.");
 	m_fPersent += 20.f;
 	m_isFinished = true;
 
@@ -716,681 +721,681 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 
 HRESULT CLoader::Loading_For_GameYardLevel()
 {
-	m_strLoadingText = TEXT("≈ÿΩ∫√ƒ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÌÖçÏä§Ï≥ê Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 
 	/* For.Prototype_Component_Texture_Sky */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Sky"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"),4))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Texture_Snow */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Snow"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Snow"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Snow/Snow.png")))))
 		return E_FAIL;
 
 
 	Loading_Effect(LEVEL_YARD);
-#pragma region UI≈ÿΩ∫√≥ ª˝º∫
+	#pragma region UIÌÖçÏä§Ï≤ò ÏÉùÏÑ±
 	// Nuclear
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Nuclear"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Nuclear.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Nuclear"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Nuclear.dds")))))
 		return E_FAIL;
 
-	// ≈©∑ŒΩ∫ ∂Û¿Œ
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Logo2"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CrossLine/CrossLine%d.png"), 24))))
+	// ÌÅ¨Î°úÏä§ ÎùºÏù∏
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Logo2"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/CrossLine/CrossLine%d.png"),24))))
 		return E_FAIL;
 
 	// UI_MISSILE_TIMER
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Missile_Timer"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/MISSILE_TIMER.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Missile_Timer"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/MISSILE_TIMER.dds")))))
 		return E_FAIL;
-	
+
 	// LButton
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_LButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/LButton.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_LButton"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/LButton.dds")))))
 		return E_FAIL;
 
 	// RButton
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_RButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/RButton.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_RButton"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/RButton.dds")))))
 		return E_FAIL;
 
 	// V_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_VIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/VKey_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_VIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/VKey_ICon.dds")))))
 		return E_FAIL;
 	// F_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_FIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/FKey_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_FIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/FKey_ICon.dds")))))
 		return E_FAIL;
 	// C_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_CIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CKey_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_CIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/CKey_ICon.dds")))))
 		return E_FAIL;
 
 	// Shift
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Shift"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ShiftUI.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Shift"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/ShiftUI.dds")))))
 		return E_FAIL;
 
 	// Space
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Space"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Space.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Space"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Space.dds")))))
 		return E_FAIL;
 
 	// EnergyIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_EnergyIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/EnergyIcon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_EnergyIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/EnergyIcon.dds")))))
 		return E_FAIL;
 
 	// HPIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_HpIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/HP_ICon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_HpIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/HP_ICon.dds")))))
 		return E_FAIL;
 
 	// CreditIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_CreditIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Credit_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_CreditIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Credit_Icon.dds")))))
 		return E_FAIL;
 
 	// RunIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_RunIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Run_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_RunIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Run_Icon.dds")))))
 		return E_FAIL;
 
 	// JumpIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_JumpIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Jump_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_JumpIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Jump_Icon.dds")))))
 		return E_FAIL;
 
 	// ModeChangeIcon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_ModeChangeIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/ModeChange_Icon%d.dds"), 2))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_ModeChangeIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/ModeChange_Icon%d.dds"),2))))
 		return E_FAIL;
 
 	// Punch_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_PuchIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Punch_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_PuchIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Punch_Icon.dds")))))
 		return E_FAIL;
 
 	// ViewChange_Icon
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_ViewChangeIcon"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/View_Icon.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_ViewChangeIcon"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/View_Icon.dds")))))
 		return E_FAIL;
 
 	// Death
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Death"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Death.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Death"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Death.dds")))))
 		return E_FAIL;
 
 	// Battery
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Battery"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Battery%d.dds"), 5))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Battery"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Battery%d.dds"),5))))
 		return E_FAIL;
 
 	// Character_UI
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Character"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Character/UI_Character%d.png"), 12))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Character"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Character/UI_Character%d.png"),12))))
 		return E_FAIL;
 
-	// UI_BackGround ±€ææ ∂ÁøÏ¥¬∞≈ µﬁ πË∞Ê
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_UIBackGround"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/UI_BackGround%d.png"), 2))))
+	// UI_BackGround Í∏ÄÏî® ÎùÑÏö∞ÎäîÍ±∞ Îí∑ Î∞∞Í≤Ω
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_UIBackGround"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/UI_BackGround%d.png"),2))))
 		return E_FAIL;
 
-	// UI_Bar  √º∑¬ ø°≥ ¡ˆ πË≈Õ∏Æ µÓµÓ
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_UIBar"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/UI_Bar%d.dds"), 5))))
+	// UI_Bar  Ï≤¥Î†• ÏóêÎÑàÏßÄ Î∞∞ÌÑ∞Î¶¨ Îì±Îì±
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_UIBar"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/UI_Bar%d.dds"),5))))
 		return E_FAIL;
 
-	// µ•πÃ¡ˆ ¿‘æ˙¿ª ∂ß πË∞Ê
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_UIDamaged"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/DamageIndicator.png")))))
+	// Îç∞ÎØ∏ÏßÄ ÏûÖÏóàÏùÑ Îïå Î∞∞Í≤Ω
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_UIDamaged"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/DamageIndicator.png")))))
 		return E_FAIL;
 
 	//CircleGuage
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_CircleGuage"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CircleGuage.png")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_CircleGuage"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/CircleGuage.png")))))
 		return E_FAIL;
 
 	//CenterUI 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_CenterUI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/CenterUI%d.png"), 3))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_CenterUI"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/CenterUI%d.png"),3))))
 		return E_FAIL;
 
 	//Slice
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Slice"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Slice.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Slice"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Slice.dds")))))
 		return E_FAIL;
 
 	// Number 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Texture_Number"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/%d.dds"), 10))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Texture_Number"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/%d.dds"),10))))
 		return E_FAIL;
 
 
-#pragma endregion UI≈ÿΩ∫√≥ ª˝º∫
+	#pragma endregion UIÌÖçÏä§Ï≤ò ÏÉùÏÑ±
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∏µ® ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î™®Îç∏ Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	Loading_DataFile_For_YardLevel();
 	Loading_DataFile_For_Instancing_YardLevel();
 
-#pragma region ¿ŒΩ∫≈œΩÃ
+	#pragma region Ïù∏Ïä§ÌÑ¥Ïã±
 
 	/* For.Prototype_Component_VIBuffer_Particle_Snow*/
 	CVIBuffer_Instancing::INSTANCING_DESC		ParticleSnowDesc{};
 	ParticleSnowDesc.iNumInstance = 3000;
-	ParticleSnowDesc.vCenter = _float3(645.424f, 0.f, 559.107f);
-	ParticleSnowDesc.vRange = _float3(128.f, 0.f, 128.f);
-	ParticleSnowDesc.vSize = _float2(100.f, 100.f);
-	ParticleSnowDesc.vSpeed = _float2(1.f, 7.f);
-	ParticleSnowDesc.vLifeTime = _float2(3.f, 10.f);
+	ParticleSnowDesc.vCenter = _float3(645.424f,0.f,559.107f);
+	ParticleSnowDesc.vRange = _float3(128.f,0.f,128.f);
+	ParticleSnowDesc.vSize = _float2(100.f,100.f);
+	ParticleSnowDesc.vSpeed = _float2(1.f,7.f);
+	ParticleSnowDesc.vLifeTime = _float2(3.f,10.f);
 	ParticleSnowDesc.isLoop = true;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Snow"),
-		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext, &ParticleSnowDesc))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Particle_Snow"),
+		CVIBuffer_Particle_Point::Create(m_pDevice,m_pContext,&ParticleSnowDesc))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Particle_Explosion */
 	CVIBuffer_Instancing::INSTANCING_DESC		ParticleExploDesc{};
 	ParticleExploDesc.iNumInstance = 700;
-	ParticleExploDesc.vCenter = _float3(645.424f, 0.f, 559.107f);
-	ParticleExploDesc.vRange = _float3(4.f, 4.f, 4.f);
-	ParticleExploDesc.vSize = _float2(1.01f, 1.1f);
-	ParticleExploDesc.vSpeed = _float2(0.3f, 1.f);
-	ParticleExploDesc.vLifeTime = _float2(0.1f, 0.5f);
-	ParticleExploDesc.vPivot = _float3(0.f, -0.5f, 0.f);
+	ParticleExploDesc.vCenter = _float3(645.424f,0.f,559.107f);
+	ParticleExploDesc.vRange = _float3(4.f,4.f,4.f);
+	ParticleExploDesc.vSize = _float2(1.01f,1.1f);
+	ParticleExploDesc.vSpeed = _float2(0.3f,1.f);
+	ParticleExploDesc.vLifeTime = _float2(0.1f,0.5f);
+	ParticleExploDesc.vPivot = _float3(0.f,-0.5f,0.f);
 	ParticleExploDesc.isLoop = true;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Particle_Explosion"),
-		CVIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, &ParticleExploDesc))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Particle_Explosion"),
+		CVIBuffer_Particle_Rect::Create(m_pDevice,m_pContext,&ParticleExploDesc))))
 		return E_FAIL;
 
-	// ¿‹µ
+	// ÏûîÎîî
 	CVIBuffer_Instancing::INSTANCING_DESC	GrassInstancing{};
 	GrassInstancing.iNumInstance = m_iGrass_Count[0];
-	GrassInstancing.vCenter = _float3(645.424f, 0.f, 559.107f);
-	GrassInstancing.vRange = _float3(128.f, 0.f, 128.f);
-	GrassInstancing.vSize = _float2(8.f, 8.f);
+	GrassInstancing.vCenter = _float3(645.424f,0.f,559.107f);
+	GrassInstancing.vRange = _float3(128.f,0.f,128.f);
+	GrassInstancing.vSize = _float2(8.f,8.f);
 
-	 _wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build108.dat");
+	_wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build108.dat");
 	_matrix			PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass108"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0,m_vecGrassPos[0], &GrassInstancing))))
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Grass108"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[0],&GrassInstancing))))
 		return E_FAIL;
 
 	GrassInstancing.iNumInstance = m_iGrass_Count[1];
 	Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build109.dat");
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass109"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[1], &GrassInstancing))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Grass109"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[1],&GrassInstancing))))
 		return E_FAIL;
 
 	GrassInstancing.iNumInstance = m_iGrass_Count[2];
 	Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build110.dat");
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass110"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[2], &GrassInstancing))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Grass110"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[2],&GrassInstancing))))
 		return E_FAIL;
 
 	GrassInstancing.iNumInstance = m_iGrass_Count[3];
 	Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build111.dat");
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Grass111"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[3], &GrassInstancing))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Grass111"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[3],&GrassInstancing))))
 		return E_FAIL;
 
-#pragma endregion ¿ŒΩ∫≈œΩÃ
+	#pragma endregion Ïù∏Ïä§ÌÑ¥Ïã±
 
 
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("ºŒ¿Ã¥ı ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÏÖ∞Ïù¥Îçî Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	/* For.Prototype_Component_Shader_VtxCube */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxCube"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Shader_VtxCube"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"),VTXCUBE::Elements,VTXCUBE::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxParticleRect */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticleRect"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticleRect.hlsl"), VTXPARTICLE_RECT::Elements, VTXPARTICLE_RECT::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Shader_VtxParticleRect"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxParticleRect.hlsl"),VTXPARTICLE_RECT::Elements,VTXPARTICLE_RECT::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxParticlePoint */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticlePoint"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticlePoint.hlsl"), VTXPARTICLE_POINT::Elements, VTXPARTICLE_POINT::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Shader_VtxParticlePoint"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxParticlePoint.hlsl"),VTXPARTICLE_POINT::Elements,VTXPARTICLE_POINT::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Cube */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_VIBuffer_Cube"),
-		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice,m_pContext))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Particle_Mesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Shader_VtxParticleMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticleMesh.hlsl"), VTXPARTICLE_MESH::Elements, VTXPARTICLE_MESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Shader_VtxParticleMesh"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxParticleMesh.hlsl"),VTXPARTICLE_MESH::Elements,VTXPARTICLE_MESH::iNumElements))))
 		return E_FAIL;
 
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∞¥√ºø¯«¸ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
-	
+	m_strLoadingText = TEXT("Í∞ùÏ≤¥ÏõêÌòï Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
-	// ∂• ∫Œº≠¡¸
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Terrain_Crushed")) == nullptr)
+
+	// ÎïÖ Î∂ÄÏÑúÏßê
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Terrain_Crushed")) == nullptr)
 	{
-		/* ∫Œº≠¡¸ */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Terrain_Crushed"),
-			CTerrain_Crushed::Create(m_pDevice, m_pContext))))
+		/* Î∂ÄÏÑúÏßê */
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Terrain_Crushed"),
+			CTerrain_Crushed::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// ΩΩ∑°Ω¨
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Slash")) == nullptr)
+	// Ïä¨ÎûòÏâ¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Slash")) == nullptr)
 	{
-		/* ∫Œº≠¡¸ */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Slash"),
-			CSlash_Mesh::Create(m_pDevice, m_pContext))))
+		/* Î∂ÄÏÑúÏßê */
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Slash"),
+			CSlash_Mesh::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// Collector Item
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collect_Item")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collect_Item")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collect_Item"),
-			CCollector::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collect_Item"),
+			CCollector::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// 3D UI
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_3DUI")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_3DUI")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_3DUI"),
-			CUI_3D::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_3DUI"),
+			CUI_3D::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Particle_Snow")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Particle_Snow")) == nullptr)
 	{
 		/* Prototype_GameObject_Particle_Snow */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Snow"),
-			CParticle_Snow::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Snow"),
+			CParticle_Snow::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Particle_Explosion")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Particle_Explosion")) == nullptr)
 	{
 		/* Prototype_GameObject_Particle_Explosion */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Explosion"),
-			CParticle_Explosion::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Explosion"),
+			CParticle_Explosion::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Grass")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Grass")) == nullptr)
 	{
 		/* Prototype_GameObject_Particle_Explosion */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
-			CGrass_Instancing::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
+			CGrass_Instancing::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	/* Explosion ∆˜≈∫ ∆¯πﬂ ƒ›∂Û¿Ã¥ı  */ 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Explosion")) == nullptr)
+	/* Explosion Ìè¨ÌÉÑ Ìè≠Î∞ú ÏΩúÎùºÏù¥Îçî  */
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Explosion")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Explosion"),
-			CExplosion::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Explosion"),
+			CExplosion::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Prototype_GameObject_Sky */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Sky")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
-			CSky::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
+			CSky::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	// ≈©∑ŒΩ∫ ∂Û¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CrossLine")) == nullptr)
+	// ÌÅ¨Î°úÏä§ ÎùºÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CrossLine")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CrossLine"),
-			CCrossLine::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CrossLine"),
+			CCrossLine::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//UI
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI"),
-			CInGameUI::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI"),
+			CInGameUI::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//UI_circle
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Circle_UI")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Circle_UI")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Circle_UI"),
-			CUI_CircleGuage::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Circle_UI"),
+			CUI_CircleGuage::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//UINumber
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UINumber")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UINumber")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UINumber"),
-			CNumberUI::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UINumber"),
+			CNumberUI::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ≈Õ∑π¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
+	// ÌÑ∞Î†àÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
-			CTerrain::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
+			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Prototype_GameObject_Camera_Free */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-			CCamera_Free::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
+			CCamera_Free::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-			CPlayer::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ ∏ˆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î™∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
-			CBody_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ∏”∏Æ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î®∏Î¶¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
-			CHead_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
+			CHead_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ TPS ««∫ø
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ TPS ÌîºÎ¥á
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
-			CPivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
+			CPivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ FPS vlqht
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ FPS vlqht
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
-			CFPS_Pivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
+			CFPS_Pivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ π´±‚
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î¨¥Í∏∞
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-			CWeapon::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ƒÆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Ïπº
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
-			CWeapon_Katana::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
+			CWeapon_Katana::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// π´±‚ æ∆¿Ã≈€
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
+	// Î¨¥Í∏∞ ÏïÑÏù¥ÌÖú
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
-			CWeapon_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
+			CWeapon_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	
-	// ƒ⁄¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+
+	// ÏΩîÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
-			CCoin::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// Battery 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
-			CBattery::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
+			CBattery::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// CoinItem 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CoinItem")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CoinItem")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CoinItem"),
-			CCoin_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CoinItem"),
+			CCoin_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// HpItem 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_HpItem")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_HpItem")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HpItem"),
-			CHp_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HpItem"),
+			CHp_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
+
 	/* Tank */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tank")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tank"),
-			CTank::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tank"),
+			CTank::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Heli */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Helicopter")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Helicopter")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Helicopter"),
-			CHelicopter::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Helicopter"),
+			CHelicopter::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Alien */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Alien")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Alien")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Alien"),
-			CAlien::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Alien"),
+			CAlien::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
 	/* PONY */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pony")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pony")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pony"),
-			CPony::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pony"),
+			CPony::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* RIFLEMAN */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_RifleMan")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_RifleMan")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_RifleMan"),
-			CRifleMan::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_RifleMan"),
+			CRifleMan::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Blimp */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Blimp")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Blimp")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Blimp"),
-			CBlimp::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Blimp"),
+			CBlimp::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// πÃªÁ¿œ ∆Æ∑∞
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck")) == nullptr)
+	// ÎØ∏ÏÇ¨Ïùº Ìä∏Îü≠
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck"),
-			CMissile_Truck::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck"),
+			CMissile_Truck::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// πÃªÁ¿œ ∆Æ∑∞ ∏ˆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck_Body")) == nullptr)
+	// ÎØ∏ÏÇ¨Ïùº Ìä∏Îü≠ Î™∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck_Body")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck_Body"),
-			CTruckBody::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck_Body"),
+			CTruckBody::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// πÃªÁ¿œ ∆Æ∑∞ πﬂªÁ¥Î
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck_Shooter")) == nullptr)
+	// ÎØ∏ÏÇ¨Ïùº Ìä∏Îü≠ Î∞úÏÇ¨ÎåÄ
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MissileTruck_Shooter")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck_Shooter"),
-			CTruckShooter::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MissileTruck_Shooter"),
+			CTruckShooter::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// πÃªÁ¿œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile")) == nullptr)
+	// ÎØ∏ÏÇ¨Ïùº
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile"),
-			CTruck_Missile::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile"),
+			CTruck_Missile::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
-	// √ﬂ¿˚¿Âƒ°
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tracker")) == nullptr)
+
+	// Ï∂îÏ†ÅÏû•Ïπò
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Tracker")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tracker"),
-			CTracker::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tracker"),
+			CTracker::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// Environment
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
-			CEnvironment::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// BrainCore
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
-			CBrainCore::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
-			CEnergy_Machine::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
+			CEnergy_Machine::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine Lader
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
-			CEnergy_Lader::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
+			CEnergy_Lader::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine Lader
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
-			CEnergy_Cap::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
+			CEnergy_Cap::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∆Æ∑¶ ∏∂≈©
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
+	// Ìä∏Îû© ÎßàÌÅ¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
-			CTrap_Marks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
+			CTrap_Marks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∆Æ∑¶ ∑π∞Ì ∫Æµπ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
+	// Ìä∏Îû© Î†àÍ≥† Î≤ΩÎèå
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
-			CTrap_Bricks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
+			CTrap_Bricks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∑π∞Ì ∫Œº≠¡¸
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
+	// Î†àÍ≥† Î∂ÄÏÑúÏßê
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
-			CBroken_Bricks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
+			CBroken_Bricks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//Bullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
-			CBullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//MonsterBullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
-			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_AABB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Collider_AABB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Collider_AABB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_AABB))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_OBB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Collider_OBB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Collider_OBB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_OBB))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_Sphere */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, TEXT("Prototype_Component_Collider_Sphere"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,TEXT("Prototype_Component_Collider_Sphere"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_SPHERE))))
 			return E_FAIL;
 	}
 
 
-
+	Loading_UI();
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∑Œµ˘ øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î°úÎî© ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.");
 	m_fPersent += 20.f;
 	m_isFinished = true;
 
@@ -1399,139 +1404,139 @@ HRESULT CLoader::Loading_For_GameYardLevel()
 
 HRESULT CLoader::Loading_For_ImGuiLevel()
 {
-	m_strLoadingText = TEXT("≈ÿΩ∫√ƒ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÌÖçÏä§Ï≥ê Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∏µ® ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î™®Îç∏ Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	Loading_DataFile(LEVEL_IMGUI);
 	Loading_DataFile_For_Instancing_ImGuiLevel();
 
-	// ¿‹µ
+	// ÏûîÎîî
 	CVIBuffer_Instancing::INSTANCING_DESC	GrassInstancing{};
 	GrassInstancing.iNumInstance = m_iGrass_Count[0];
-	GrassInstancing.vCenter = _float3(645.424f, 0.f, 559.107f);
-	GrassInstancing.vRange = _float3(128.f, 0.f, 128.f);
-	GrassInstancing.vSize = _float2(8.f, 8.f);
+	GrassInstancing.vCenter = _float3(645.424f,0.f,559.107f);
+	GrassInstancing.vRange = _float3(128.f,0.f,128.f);
+	GrassInstancing.vSize = _float2(8.f,8.f);
 
 	_wstring Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build108.dat");
 	_matrix			PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_VIBuffer_Grass108"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[0], &GrassInstancing))))
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_VIBuffer_Grass108"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[0],&GrassInstancing))))
 		return E_FAIL;
 
 	GrassInstancing.iNumInstance = m_iGrass_Count[1];
 	Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build109.dat");
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_VIBuffer_Grass109"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[1], &GrassInstancing))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_VIBuffer_Grass109"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[1],&GrassInstancing))))
 		return E_FAIL;
 
 	GrassInstancing.iNumInstance = m_iGrass_Count[2];
 	Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build110.dat");
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_VIBuffer_Grass110"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[2], &GrassInstancing))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_VIBuffer_Grass110"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[2],&GrassInstancing))))
 		return E_FAIL;
 
 	GrassInstancing.iNumInstance = m_iGrass_Count[3];
 	Grass_Path = TEXT("../Bin/Resources/Model/ModelData_Build111.dat");
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_VIBuffer_Grass111"),
-		CVIBuffer_Grass::Create(m_pDevice, m_pContext, Grass_Path, PreTransformMatrix, 0, m_vecGrassPos[3], &GrassInstancing))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_VIBuffer_Grass111"),
+		CVIBuffer_Grass::Create(m_pDevice,m_pContext,Grass_Path,PreTransformMatrix,0,m_vecGrassPos[3],&GrassInstancing))))
 		return E_FAIL;
 
 	//----------------------------------------------------------------------------------------------------
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("ºŒ¿Ã¥ı ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÏÖ∞Ïù¥Îçî Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	/* For.Prototype_Component_VIBuffer_Particle_Mesh */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Shader_VtxParticleMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxParticleMesh.hlsl"), VTXPARTICLE_MESH::Elements, VTXPARTICLE_MESH::iNumElements))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Shader_VtxParticleMesh"),
+		CShader::Create(m_pDevice,m_pContext,TEXT("../Bin/ShaderFiles/Shader_VtxParticleMesh.hlsl"),VTXPARTICLE_MESH::Elements,VTXPARTICLE_MESH::iNumElements))))
 		return E_FAIL;
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∞¥√ºø¯«¸ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Í∞ùÏ≤¥ÏõêÌòï Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 
 	// BrainCore
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
-			CBrainCore::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyMachine")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
-			CEnergy_Machine::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyMachine"),
+			CEnergy_Machine::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine Lader
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyLader")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
-			CEnergy_Lader::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyLader"),
+			CEnergy_Lader::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// EnergyMachine Lader
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_EnergyCap")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
-			CEnergy_Cap::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EnergyCap"),
+			CEnergy_Cap::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∆Æ∑¶ ∏∂≈©
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
+	// Ìä∏Îû© ÎßàÌÅ¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapMarks")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
-			CTrap_Marks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapMarks"),
+			CTrap_Marks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∆Æ∑¶ ∑π∞Ì ∫Æµπ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
+	// Ìä∏Îû© Î†àÍ≥† Î≤ΩÎèå
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_TrapBricks")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
-			CTrap_Bricks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrapBricks"),
+			CTrap_Bricks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ∑π∞Ì ∫Œº≠¡¸
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
+	// Î†àÍ≥† Î∂ÄÏÑúÏßê
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_broken")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
-			CBroken_Bricks::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_broken"),
+			CBroken_Bricks::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Grass")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Grass")) == nullptr)
 	{
 		/* Prototype_GameObject_Particle_Explosion */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
-			CGrass_Instancing::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grass"),
+			CGrass_Instancing::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// ≈Õ∑π¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain_ImGui")) == nullptr)
+	// ÌÑ∞Î†àÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain_ImGui"),
-			CTerrain::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain_ImGui"),
+			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Prototype_GameObject_Camera_Free */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free_ImGui"),
-			CCamera_Free::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free_ImGui"),
+			CCamera_Free::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
-			CCoin::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	///* ∏ÛΩ∫≈Õ */
+	///* Î™¨Ïä§ÌÑ∞ */
 	//if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Monster_ImGui")) == nullptr)
 	//{
 	//	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_ImGui"),
@@ -1540,159 +1545,159 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 	//}
 
 	/* Prototype GameObject Player*/
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-			CPlayer::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
-			CBody_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-			CWeapon::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// Environment
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
-			CEnvironment::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Save")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Save")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Save"),
-			CBackGround::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Save"),
+			CBackGround::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
-			CCollisionBox::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
+			CCollisionBox::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
+
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_AABB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_AABB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_AABB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_AABB))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_OBB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_OBB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_OBB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_OBB))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_Sphere */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_Sphere"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_Sphere"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_SPHERE))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-			CPlayer::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ ∏ˆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î™∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
-			CBody_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ∏”∏Æ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î®∏Î¶¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
-			CHead_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
+			CHead_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ TPS ««∫ø
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ TPS ÌîºÎ¥á
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
-			CPivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
+			CPivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ FPS vlqht
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ FPS vlqht
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
-			CFPS_Pivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
+			CFPS_Pivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ π´±‚
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î¨¥Í∏∞
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-			CWeapon::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ƒÆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Ïπº
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
-			CWeapon_Katana::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
+			CWeapon_Katana::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// π´±‚ æ∆¿Ã≈€
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
+	// Î¨¥Í∏∞ ÏïÑÏù¥ÌÖú
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
-			CWeapon_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
+			CWeapon_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ƒ⁄¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	// ÏΩîÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
-			CCoin::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// Battery 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
-			CBattery::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
+			CBattery::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∑Œµ˘ øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î°úÎî© ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.");
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
 	m_isFinished = true;
 
@@ -1701,212 +1706,212 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 
 HRESULT CLoader::Loading_For_NavigationLevel()
 {
-	m_strLoadingText = TEXT("≈ÿΩ∫√ƒ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÌÖçÏä§Ï≥ê Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∏µ® ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î™®Îç∏ Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	Loading_DataFile_For_NavigationLevel();
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("ºŒ¿Ã¥ı ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÏÖ∞Ïù¥Îçî Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∞¥√ºø¯«¸ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Í∞ùÏ≤¥ÏõêÌòï Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
-	// ≈Õ∑π¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
+	// ÌÑ∞Î†àÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
-			CTerrain::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
+			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Prototype_GameObject_Camera_Free */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-			CCamera_Free::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
+			CCamera_Free::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// Environment
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
-			CEnvironment::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//Bullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
-			CBullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//MonsterBullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
-			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// BrainCore
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
-			CBrainCore::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
-			CCollisionBox::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
+			CCollisionBox::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-			CPlayer::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
-			CBody_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-			CWeapon::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_AABB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_AABB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_AABB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_AABB))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_OBB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_OBB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_OBB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_OBB))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_Sphere */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_Sphere"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_Sphere"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_SPHERE))))
 			return E_FAIL;
 	}
 	// Environment
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
-			CEnvironment::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Player")) == nullptr)
 	{
 		/* Prototype GameObject Player*/
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-			CPlayer::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+			CPlayer::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ ∏ˆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î™∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Body_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
-			CBody_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Player"),
+			CBody_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ∏”∏Æ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î®∏Î¶¨
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Head_Player")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
-			CHead_Player::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Head_Player"),
+			CHead_Player::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ TPS ««∫ø
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ TPS ÌîºÎ¥á
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Pivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
-			CPivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Pivot"),
+			CPivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	// «√∑π¿ÃæÓ FPS vlqht
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ FPS vlqht
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_FPSPivot")) == nullptr)
 	{
 
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
-			CFPS_Pivot::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FPSPivot"),
+			CFPS_Pivot::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ π´±‚
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Î¨¥Í∏∞
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Weapon")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-			CWeapon::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// «√∑π¿ÃæÓ ƒÆ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
+	// ÌîåÎ†àÏù¥Ïñ¥ Ïπº
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
-			CWeapon_Katana::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana"),
+			CWeapon_Katana::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// π´±‚ æ∆¿Ã≈€
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
+	// Î¨¥Í∏∞ ÏïÑÏù¥ÌÖú
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_WeaponItem")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
-			CWeapon_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WeaponItem"),
+			CWeapon_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	// ƒ⁄¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
+	// ÏΩîÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
-			CCoin::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Coin"),
+			CCoin::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// Battery 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery")) == nullptr)
 	{
 		/* Prototype_GameObject_Weapon */
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
-			CBattery::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery"),
+			CBattery::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// CoinItem 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CoinItem")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_CoinItem")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CoinItem"),
-			CCoin_Item::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CoinItem"),
+			CCoin_Item::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∑Œµ˘ øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î°úÎî© ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.");
 	m_fPersent += 20.f;
 	m_isFinished = true;
 
@@ -1915,111 +1920,111 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 
 HRESULT CLoader::Loading_For_MonsterSpawnLevel()
 {
-	m_strLoadingText = TEXT("≈ÿΩ∫√ƒ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÌÖçÏä§Ï≥ê Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∏µ® ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î™®Îç∏ Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	Loading_DataFile_For_MonsterSpawnLevel(m_eTargetLevel);
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("ºŒ¿Ã¥ı ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("ÏÖ∞Ïù¥Îçî Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∞¥√ºø¯«¸ ∑Œµ˘¡ﬂ¿‘¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Í∞ùÏ≤¥ÏõêÌòï Î°úÎî©Ï§ëÏûÖÎãàÎã§.");
 
-	// ≈Õ∑π¿Œ
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
+	// ÌÑ∞Î†àÏù∏
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Terrain")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
-			CTerrain::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
+			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Prototype_GameObject_Camera_Free */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-			CCamera_Free::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
+			CCamera_Free::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	// Environment
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Environment_ImGui")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
-			CEnvironment::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Environment_ImGui"),
+			CEnvironment::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Save")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Save")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Save"),
-			CBackGround::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Save"),
+			CBackGround::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
-			CCollisionBox::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
+			CCollisionBox::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_AABB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_AABB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_AABB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_AABB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_AABB))))
 			return E_FAIL;
 	}
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_OBB")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_OBB */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_OBB"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_OBB"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_OBB))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_Component_Collider_Sphere")) == nullptr)
 	{
 		/* For.Prototype_Component_Collider_Sphere */
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI, TEXT("Prototype_Component_Collider_Sphere"),
-			CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_IMGUI,TEXT("Prototype_Component_Collider_Sphere"),
+			CCollider::Create(m_pDevice,m_pContext,CCollider::TYPE_SPHERE))))
 			return E_FAIL;
 	}
 	//Bullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Bullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
-			CBullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Bullet"),
+			CBullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	//MonsterBullet
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_MonsterBullet")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
-			CMonster_Bullet::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+			CMonster_Bullet::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// BrainCore
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BrainCore")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
-			CBrainCore::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BrainCore"),
+			CBrainCore::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Collision_Box")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
-			CCollisionBox::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Collision_Box"),
+			CCollisionBox::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 
 	}
 
 
 	m_fPersent += 20.f;//----------------------------------------------------------------------------------------------------
-	m_strLoadingText = TEXT("∑Œµ˘ øœ∑·µ«æ˙Ω¿¥œ¥Ÿ.");
+	m_strLoadingText = TEXT("Î°úÎî© ÏôÑÎ£åÎêòÏóàÏäµÎãàÎã§.");
 	m_fPersent += 20.f;
 	m_isFinished = true;
 
@@ -2035,15 +2040,15 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
 	const _wstring Ext = TEXT(".dat");
 	// PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	cout << "Environment ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 	while(iPathIndex < ENVIRONMENT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
 		iPathIndex++;
@@ -2052,18 +2057,18 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	iPathIndex = 0;
 	cout << "BUILD ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < BUILD_EA)
+	while(iPathIndex < BUILD_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
 		iPathIndex++;
 	}
 
-	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(1.f,1.f,1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
 	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
@@ -2071,12 +2076,12 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	_uint iCharacterIndex = 0;
 	cout << "Character ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < 2)
+	while(iPathIndex < 2)
 	{
 		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
 		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iCharacterIndex))))
 			return E_FAIL;
 		iCharacterIndex++;
 		iPathIndex++;
@@ -2090,61 +2095,56 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iPathIndex < WEAPON_EA)
+	while(iPathIndex < WEAPON_EA)
 	{
 
 		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
 		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iWeaponIndex))))
 			return E_FAIL;
 		iWeaponIndex++;
 		iPathIndex++;
 	}
 
 
-	// æ÷¥œ∏ﬁ¿Ãº«
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò
+	PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 	_int iAnimModelIndex = 0;
 	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
-	cout << "æ÷¥œ∏ﬁ¿Ãº« ---------------------------------------------------------------------------" << endl;
+	cout << "Ïï†ÎãàÎ©îÏù¥ÏÖò ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iAnimModelIndex < 12)
+	while(iAnimModelIndex < 12)
 	{
-		if ( iAnimModelIndex == 11)
+		if(iAnimModelIndex == 11)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 2) // Tank
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 2) // Tank
 		{
-			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (  iAnimModelIndex == 7)
+			PreTransformMatrix = XMMatrixScaling(0.005f,0.005f,0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 7)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
-		}
-		else if (iAnimModelIndex == 6)
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
+		} else if(iAnimModelIndex == 6)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
-		}
-		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
+			PreTransformMatrix = XMMatrixScaling(0.03f,0.03f,0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f,5.f,0.f);
+		} else if(iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f)) ;
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f)) ;
 		}
-//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
+		//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
 		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
 		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
-		cout << iAnimModelIndex << "π¯ æ÷¥‘∏µ®" << endl;
+		cout << iAnimModelIndex << "Î≤à Ïï†ÎãòÎ™®Îç∏" << endl;
 		cout << "--------------------------------------------------" << endl;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, ModelAnim_Component_Result,
-			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice,m_pContext,CModel::TYPE_ANIM,ModelAnim_Path_Result,PreTransformMatrix,iAnimModelIndex))))
 			return E_FAIL;
 		++iAnimModelIndex;
 	}
@@ -2155,12 +2155,12 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 	_uint iTrapIndex = 0;
 	cout << "Trap ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < TRAP_EA)
+	while(iPathIndex < TRAP_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component_Trap + to_wstring(iTrapIndex);
 		const _wstring Model_Path_Result = Model_Trap_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iTrapIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iTrapIndex))))
 			return E_FAIL;
 		iTrapIndex++;
 		iPathIndex++;
@@ -2170,7 +2170,7 @@ HRESULT CLoader::Loading_DataFile(LEVELID eLevelID)
 
 HRESULT CLoader::Loading_DataFile_For_GameLevel()
 {
-	_int iPathIndex{}, iModelIndex{}, iEnvironmentIndex = 0;
+	_int iPathIndex{},iModelIndex{},iEnvironmentIndex = 0;
 	DWORD dwByte = 0;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -2179,135 +2179,129 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
 	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
 	const _wstring Ext = TEXT(".dat");
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-	cout << "Environment ---------------------------------------------------------------------------" << endl;
-	cout << "----------------------------------------------------------------------------------------" << endl;
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
-	HANDLE hFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile = CreateFile(L"../Bin/Data/GamePlayLevel_Env_Index.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load GamePlayLevel_Env_Index File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load GamePlayLevel_Env_Index File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 
-	while (ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr) && dwByte > 0)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iModelIndex);
 		const _wstring Model_Path_Result = Model_Path + to_wstring(iModelIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iModelIndex))))
 			return E_FAIL;
-		
+
 	}
 	CloseHandle(hFile);
-	cout << "Environment Read øœ∑·" << endl;
 
-	//-----------------------------------------------------------------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------------------------------------------------------------
+
 	const _wstring Model_Build_Path = TEXT("../Bin/Resources/Model/ModelData_Build");
 
-	cout << "BUILD ---------------------------------------------------------------------------" << endl;
-	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	HANDLE hBuildFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hBuildFile)
+	HANDLE hBuildFile = CreateFile(L"../Bin/Data/GamePlayLevel_Build_Index.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hBuildFile)
 	{
-		MessageBox(NULL, L"Load GamePlayLevel_Build_Index File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load GamePlayLevel_Build_Index File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 
-	while (ReadFile(hBuildFile, &iModelIndex, sizeof(_int), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hBuildFile,&iModelIndex,sizeof(_int),&dwByte,nullptr) && dwByte > 0)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iModelIndex + ENVIRONMENT_EA);
 		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iModelIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iModelIndex ))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iModelIndex))))
 			return E_FAIL;
-		
+
 	}
 	CloseHandle(hBuildFile);
-	cout << "Build Read øœ∑·" << endl;
-	// ∫Í∑π¿Œ ƒ⁄æÓ
+
+	// Î∏åÎ†àÏù∏ ÏΩîÏñ¥
 	_wstring Model_Component_Result = Model_Component + to_wstring(40 + ENVIRONMENT_EA);
 	_wstring Model_Path_Result = Model_Build_Path + to_wstring(40) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,40))))
 		return E_FAIL;
-	// ø°≥ ¡ˆ ∏”Ω≈
-	 Model_Component_Result = Model_Component + to_wstring(44 + ENVIRONMENT_EA);
-	 Model_Path_Result = Model_Build_Path + to_wstring(44) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 44))))
+	// ÏóêÎÑàÏßÄ Î®∏Ïã†
+	Model_Component_Result = Model_Component + to_wstring(44 + ENVIRONMENT_EA);
+	Model_Path_Result = Model_Build_Path + to_wstring(44) + Ext;
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,44))))
 		return E_FAIL;
-	// ø°≥ ¡ˆ ∏”Ω≈ ∑π¿Ã¥ı
+	// ÏóêÎÑàÏßÄ Î®∏Ïã† Î†àÏù¥Îçî
 	Model_Component_Result = Model_Component + to_wstring(45 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(45) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 45))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,45))))
 		return E_FAIL;
-	// ø°≥ ¡ˆ Cap
+	// ÏóêÎÑàÏßÄ Cap
 	Model_Component_Result = Model_Component + to_wstring(43 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(43) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 45))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,45))))
 		return E_FAIL;
 
-	// ƒ⁄¿Œ
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// ÏΩîÏù∏
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(41 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(41) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,40))))
 		return E_FAIL;
 
-	// πÓ¡ˆæ∆¿Ã≈€
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// Î±ÉÏßÄÏïÑÏù¥ÌÖú
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(46 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(46) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,46))))
 		return E_FAIL;
-	// Coin_Læ∆¿Ã≈€
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// Coin_LÏïÑÏù¥ÌÖú
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(47 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(47) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 47))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,47))))
 		return E_FAIL;
-	// Coin_Mæ∆¿Ã≈€
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// Coin_MÏïÑÏù¥ÌÖú
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(48 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(48) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 48))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,48))))
 		return E_FAIL;
-	// Coin_Sæ∆¿Ã≈€
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// Coin_SÏïÑÏù¥ÌÖú
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(49 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(49) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 49))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,49))))
 		return E_FAIL;
-	// HPæ∆¿Ã≈€
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// HPÏïÑÏù¥ÌÖú
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(50 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(50) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 50))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,50))))
 		return E_FAIL;
 
-	// ¿¸±∏
+	// Ï†ÑÍµ¨
 	Model_Component_Result = Model_Component + to_wstring(157 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(157) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 157))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,157))))
 		return E_FAIL;
 
-	// Ω∫∆˜∆Æ∂Û¿Ã∆Æ
+	// Ïä§Ìè¨Ìä∏ÎùºÏù¥Ìä∏
 	Model_Component_Result = Model_Component + to_wstring(158 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(158) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 158))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,158))))
 		return E_FAIL;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -2315,32 +2309,32 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	cout << "Bullet ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 	const _wstring Model_Bullet_Component = TEXT("Prototype_Component_Model_Bullet");
-	PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
+	PreTransformMatrix = XMMatrixScaling(0.001f,0.001f,0.001f);
 	for(int i = 0; i < BULLET_EA;i++)
 	{
 		const _wstring Model_Component_Bullet_Result = Model_Bullet_Component + to_wstring(i);
 		const _wstring Model_Path_Bullet_Result = Model_Bullet_Path + to_wstring(i) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Bullet_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Bullet_Result, PreTransformMatrix, i))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Bullet_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Bullet_Result,PreTransformMatrix,i))))
 			return E_FAIL;
 	}
-	cout << "Bullet Read øœ∑·" << endl;
+	cout << "Bullet Read ÏôÑÎ£å" << endl;
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------		
-	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(1.f,1.f,1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
 	iPathIndex = 0;
 	_uint iCharacterIndex = 0;
 	cout << "Character ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < 2)
+	while(iPathIndex < 2)
 	{
 		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
 		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iCharacterIndex))))
 			return E_FAIL;
 		iCharacterIndex++;
 		iPathIndex++;
@@ -2352,13 +2346,13 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	_uint iWeaponIndex = 0;
 	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < WEAPON_EA)
+	while(iPathIndex < WEAPON_EA)
 	{
 
 		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
 		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iWeaponIndex))))
 			return E_FAIL;
 		iWeaponIndex++;
 		iPathIndex++;
@@ -2370,12 +2364,12 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	_uint iTrapIndex = 0;
 	cout << "Trap ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < TRAP_EA)
+	while(iPathIndex < TRAP_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component_Trap + to_wstring(iTrapIndex);
 		const _wstring Model_Path_Result = Model_Trap_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iTrapIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iTrapIndex))))
 			return E_FAIL;
 		iTrapIndex++;
 		iPathIndex++;
@@ -2388,59 +2382,54 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 	_uint iEffectIndex = 0;
 	cout << "Effect ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < EFFECT_EA)
+	while(iPathIndex < EFFECT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component_Effect + to_wstring(iEffectIndex);
 		const _wstring Model_Path_Result = Model_Effect_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEffectIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEffectIndex))))
 			return E_FAIL;
 		iEffectIndex++;
 		iPathIndex++;
 	}
 
-	// æ÷¥œ∏ﬁ¿Ãº«
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò
+	PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 	_int iAnimModelIndex = 0;
 	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
-	cout << "æ÷¥œ∏ﬁ¿Ãº« ---------------------------------------------------------------------------" << endl;
+	cout << "Ïï†ÎãàÎ©îÏù¥ÏÖò ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iAnimModelIndex < 12)
+	while(iAnimModelIndex < 12)
 	{
-		if (iAnimModelIndex == 11)
+		if(iAnimModelIndex == 11)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else if (iAnimModelIndex == 2) // Tank
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else if(iAnimModelIndex == 2) // Tank
 		{
-			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 7)
+			PreTransformMatrix = XMMatrixScaling(0.005f,0.005f,0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 7)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
-		}
-		else if (iAnimModelIndex == 6)
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
+		} else if(iAnimModelIndex == 6)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
-		}
-		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
+			PreTransformMatrix = XMMatrixScaling(0.03f,0.03f,0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f,5.f,0.f);
+		} else if(iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 		}
 		//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
 		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
 		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
-		cout << iAnimModelIndex << "π¯ æ÷¥‘∏µ®" << endl;
+		cout << iAnimModelIndex << "Î≤à Ïï†ÎãòÎ™®Îç∏" << endl;
 		cout << "--------------------------------------------------" << endl;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, ModelAnim_Component_Result,
-			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY,ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice,m_pContext,CModel::TYPE_ANIM,ModelAnim_Path_Result,PreTransformMatrix,iAnimModelIndex))))
 			return E_FAIL;
 		iAnimModelIndex++;
 	}
@@ -2450,7 +2439,7 @@ HRESULT CLoader::Loading_DataFile_For_GameLevel()
 
 HRESULT CLoader::Loading_DataFile_For_YardLevel()
 {
-	_int iPathIndex{}, iModelIndex{}, iEnvironmentIndex = 0;
+	_int iPathIndex{},iModelIndex{},iEnvironmentIndex = 0;
 	DWORD dwByte = 0;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -2459,28 +2448,28 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Environment");
 	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
 	const _wstring Ext = TEXT(".dat");
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	cout << "Environment ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	HANDLE hFile = CreateFile(L"../Bin/Data/GameYardLevel_Env_Index.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	HANDLE hFile = CreateFile(L"../Bin/Data/GameYardLevel_Env_Index.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load GameYardLevel_Env_Index File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load GameYardLevel_Env_Index File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 
-	while (ReadFile(hFile, &iModelIndex, sizeof(_int), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iModelIndex,sizeof(_int),&dwByte,nullptr) && dwByte > 0)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iModelIndex);
 		const _wstring Model_Path_Result = Model_Path + to_wstring(iModelIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iModelIndex))))
 			return E_FAIL;
 
 	}
 	CloseHandle(hFile);
-	cout << "Environment Read øœ∑·" << endl;
+	cout << "Environment Read ÏôÑÎ£å" << endl;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	const _wstring Model_Build_Path = TEXT("../Bin/Resources/Model/ModelData_Build");
@@ -2488,101 +2477,101 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	cout << "BUILD ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	HANDLE hBuildFile = CreateFile(L"../Bin/Data/GameYardLevel_Build_Index.dat", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hBuildFile)
+	HANDLE hBuildFile = CreateFile(L"../Bin/Data/GameYardLevel_Build_Index.dat",GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hBuildFile)
 	{
-		MessageBox(NULL, L"Load GameYardLevel_Build_Index File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load GameYardLevel_Build_Index File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
 
-	while (ReadFile(hBuildFile, &iModelIndex, sizeof(_int), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hBuildFile,&iModelIndex,sizeof(_int),&dwByte,nullptr) && dwByte > 0)
 	{
-	
+
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iModelIndex + ENVIRONMENT_EA);
 		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iModelIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iModelIndex))))
 			return E_FAIL;
 	}
 	CloseHandle(hBuildFile);
-	cout << "Build Read øœ∑·" << endl;
-	// ∫Í∑π¿Œ ƒ⁄æÓ
+	cout << "Build Read ÏôÑÎ£å" << endl;
+	// Î∏åÎ†àÏù∏ ÏΩîÏñ¥
 	_wstring Model_Component_Result = Model_Component + to_wstring(40 + ENVIRONMENT_EA);
 	_wstring Model_Path_Result = Model_Build_Path + to_wstring(40) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,40))))
 		return E_FAIL;
-	// ø°≥ ¡ˆ ∏”Ω≈
+	// ÏóêÎÑàÏßÄ Î®∏Ïã†
 	Model_Component_Result = Model_Component + to_wstring(44 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(44) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 44))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,44))))
 		return E_FAIL;
-	// ø°≥ ¡ˆ ∏”Ω≈ ∑π¿Ã¥ı
+	// ÏóêÎÑàÏßÄ Î®∏Ïã† Î†àÏù¥Îçî
 	Model_Component_Result = Model_Component + to_wstring(45 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(45) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 45))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,45))))
 		return E_FAIL;
-	// ø°≥ ¡ˆ Cap
+	// ÏóêÎÑàÏßÄ Cap
 	Model_Component_Result = Model_Component + to_wstring(43 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(43) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 45))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,45))))
 		return E_FAIL;
 
-	// ƒ⁄¿Œ
-	PreTransformMatrix = XMMatrixScaling(10.f, 10.f, 10.f);
+	// ÏΩîÏù∏
+	PreTransformMatrix = XMMatrixScaling(10.f,10.f,10.f);
 	Model_Component_Result = Model_Component + to_wstring(41 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(41) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 40))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,40))))
 		return E_FAIL;
 
-	//ø‹∞Ë¿Œ æ∆¿Ã≈€
+	//Ïô∏Í≥ÑÏù∏ ÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(154 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(154) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,46))))
 		return E_FAIL;
 
-	//ø‹∞Ë¿Œ æ∆¿Ã≈€
+	//Ïô∏Í≥ÑÏù∏ ÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(155 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(155) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,46))))
 		return E_FAIL;
 
-	// πÓ¡ˆæ∆¿Ã≈€
+	// Î±ÉÏßÄÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(46 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(46) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 46))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,46))))
 		return E_FAIL;
 
-	// Coin_Læ∆¿Ã≈€
+	// Coin_LÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(47 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(47) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 47))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,47))))
 		return E_FAIL;
-	// Coin_Mæ∆¿Ã≈€
+	// Coin_MÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(48 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(48) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 48))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,48))))
 		return E_FAIL;
-	// Coin_Sæ∆¿Ã≈€
+	// Coin_SÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(49 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(49) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 49))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,49))))
 		return E_FAIL;
-	// HPæ∆¿Ã≈€
+	// HPÏïÑÏù¥ÌÖú
 	Model_Component_Result = Model_Component + to_wstring(50 + ENVIRONMENT_EA);
 	Model_Path_Result = Model_Build_Path + to_wstring(50) + Ext;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-		CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, 50))))
+	if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+		CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,50))))
 		return E_FAIL;
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------
@@ -2590,42 +2579,42 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	cout << "Bullet ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 	const _wstring Model_Bullet_Component = TEXT("Prototype_Component_Model_Bullet");
-	for (int i = 0; i < BULLET_EA; i++)
+	for(int i = 0; i < BULLET_EA; i++)
 	{
-		if (i == 4)
+		if(i == 4)
 		{
-			PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f)/* * XMMatrixRotationZ(XMConvertToRadians(-90.f))*/; // πÃªÁ¿œ
+			PreTransformMatrix = XMMatrixScaling(1.f,1.f,1.f)/* * XMMatrixRotationZ(XMConvertToRadians(-90.f))*/; // ÎØ∏ÏÇ¨Ïùº
 		}
-		
+
 		else
 		{
-			PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f);
+			PreTransformMatrix = XMMatrixScaling(0.001f,0.001f,0.001f);
 
 		}
 
 		const _wstring Model_Component_Bullet_Result = Model_Bullet_Component + to_wstring(i);
 		const _wstring Model_Path_Bullet_Result = Model_Bullet_Path + to_wstring(i) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Bullet_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Bullet_Result, PreTransformMatrix, i))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Bullet_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Bullet_Result,PreTransformMatrix,i))))
 			return E_FAIL;
 	}
-	cout << "Bullet Read øœ∑·" << endl;
+	cout << "Bullet Read ÏôÑÎ£å" << endl;
 
 	//-----------------------------------------------------------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------------------------------------------------------		
-	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(1.f,1.f,1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
 	iPathIndex = 0;
 	_uint iCharacterIndex = 0;
 	cout << "Character ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < 2)
+	while(iPathIndex < 2)
 	{
 		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
 		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iCharacterIndex))))
 			return E_FAIL;
 		iCharacterIndex++;
 		iPathIndex++;
@@ -2637,13 +2626,13 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	_uint iWeaponIndex = 0;
 	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < WEAPON_EA)
+	while(iPathIndex < WEAPON_EA)
 	{
 
 		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
 		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iWeaponIndex))))
 			return E_FAIL;
 		iWeaponIndex++;
 		iPathIndex++;
@@ -2655,12 +2644,12 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	_uint iTrapIndex = 0;
 	cout << "Trap ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < TRAP_EA)
+	while(iPathIndex < TRAP_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component_Trap + to_wstring(iTrapIndex);
 		const _wstring Model_Path_Result = Model_Trap_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iTrapIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iTrapIndex))))
 			return E_FAIL;
 		iTrapIndex++;
 		iPathIndex++;
@@ -2672,59 +2661,54 @@ HRESULT CLoader::Loading_DataFile_For_YardLevel()
 	_uint iEffectIndex = 0;
 	cout << "Effect ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < EFFECT_EA)
+	while(iPathIndex < EFFECT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component_Effect + to_wstring(iEffectIndex);
 		const _wstring Model_Path_Result = Model_Effect_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEffectIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEffectIndex))))
 			return E_FAIL;
 		iEffectIndex++;
 		iPathIndex++;
 	}
 
-	// æ÷¥œ∏ﬁ¿Ãº«
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò
+	PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 	_int iAnimModelIndex = 0;
 	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
-	cout << "æ÷¥œ∏ﬁ¿Ãº« ---------------------------------------------------------------------------" << endl;
+	cout << "Ïï†ÎãàÎ©îÏù¥ÏÖò ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iAnimModelIndex < 13)
+	while(iAnimModelIndex < 13)
 	{
-		if (iAnimModelIndex == 11)
+		if(iAnimModelIndex == 11)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else if (iAnimModelIndex == 2) // Tank
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else if(iAnimModelIndex == 2) // Tank
 		{
-			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 7)
+			PreTransformMatrix = XMMatrixScaling(0.005f,0.005f,0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 7)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
-		}
-		else if (iAnimModelIndex == 6)
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
+		} else if(iAnimModelIndex == 6)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
-		}
-		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
+			PreTransformMatrix = XMMatrixScaling(0.03f,0.03f,0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f,5.f,0.f);
+		} else if(iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 		}
 		//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
 		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
 		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
-		cout << iAnimModelIndex << "π¯ æ÷¥‘∏µ®" << endl;
+		cout << iAnimModelIndex << "Î≤à Ïï†ÎãòÎ™®Îç∏" << endl;
 		cout << "--------------------------------------------------" << endl;
-		if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD, ModelAnim_Component_Result,
-			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(LEVEL_YARD,ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice,m_pContext,CModel::TYPE_ANIM,ModelAnim_Path_Result,PreTransformMatrix,iAnimModelIndex))))
 			return E_FAIL;
 		iAnimModelIndex++;
 	}
@@ -2742,15 +2726,15 @@ HRESULT CLoader::Loading_DataFile_For_NavigationLevel()
 	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
 	const _wstring Ext = TEXT(".dat");
 	// PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	cout << "Environment ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < ENVIRONMENT_EA)
+	while(iPathIndex < ENVIRONMENT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
 		iPathIndex++;
@@ -2759,18 +2743,18 @@ HRESULT CLoader::Loading_DataFile_For_NavigationLevel()
 	iPathIndex = 0;
 	cout << "BUILD ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < BUILD_EA)
+	while(iPathIndex < BUILD_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
 		iPathIndex++;
 	}
 
-	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(1.f,1.f,1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
 	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
@@ -2778,12 +2762,12 @@ HRESULT CLoader::Loading_DataFile_For_NavigationLevel()
 	_uint iCharacterIndex = 0;
 	cout << "Character ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < 2)
+	while(iPathIndex < 2)
 	{
 		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
 		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iCharacterIndex))))
 			return E_FAIL;
 		iCharacterIndex++;
 		iPathIndex++;
@@ -2797,61 +2781,56 @@ HRESULT CLoader::Loading_DataFile_For_NavigationLevel()
 	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iPathIndex < WEAPON_EA)
+	while(iPathIndex < WEAPON_EA)
 	{
 
 		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
 		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iWeaponIndex))))
 			return E_FAIL;
 		iWeaponIndex++;
 		iPathIndex++;
 	}
 
 
-	// æ÷¥œ∏ﬁ¿Ãº«
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò
+	PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 	_int iAnimModelIndex = 0;
 	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
-	cout << "æ÷¥œ∏ﬁ¿Ãº« ---------------------------------------------------------------------------" << endl;
+	cout << "Ïï†ÎãàÎ©îÏù¥ÏÖò ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iAnimModelIndex < 12)
+	while(iAnimModelIndex < 12)
 	{
-		if (iAnimModelIndex == 11)
+		if(iAnimModelIndex == 11)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 2) // Tank
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 2) // Tank
 		{
-			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 7)
+			PreTransformMatrix = XMMatrixScaling(0.005f,0.005f,0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 7)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
-		}
-		else if (iAnimModelIndex == 6)
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
+		} else if(iAnimModelIndex == 6)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
-		}
-		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
+			PreTransformMatrix = XMMatrixScaling(0.03f,0.03f,0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f,5.f,0.f);
+		} else if(iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 		}
 		//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
 		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
 		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
-		cout << iAnimModelIndex << "π¯ æ÷¥‘∏µ®" << endl;
+		cout << iAnimModelIndex << "Î≤à Ïï†ÎãòÎ™®Îç∏" << endl;
 		cout << "--------------------------------------------------" << endl;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, ModelAnim_Component_Result,
-			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice,m_pContext,CModel::TYPE_ANIM,ModelAnim_Path_Result,PreTransformMatrix,iAnimModelIndex))))
 			return E_FAIL;
 		++iAnimModelIndex;
 	}
@@ -2867,15 +2846,15 @@ HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID)
 	const _wstring Model_Path = TEXT("../Bin/Resources/Model/ModelData_NonAnim");
 	const _wstring Ext = TEXT(".dat");
 	// PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-	PreTransformMatrix = XMMatrixScaling(100.f, 100.f, 100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(100.f,100.f,100.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 	cout << "Environment ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < ENVIRONMENT_EA)
+	while(iPathIndex < ENVIRONMENT_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
 		iPathIndex++;
@@ -2884,18 +2863,18 @@ HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID)
 	iPathIndex = 0;
 	cout << "BUILD ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < BUILD_EA)
+	while(iPathIndex < BUILD_EA)
 	{
 		const _wstring Model_Component_Result = Model_Component + to_wstring(iEnvironmentIndex);
 		const _wstring Model_Path_Result = Model_Build_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iEnvironmentIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iEnvironmentIndex))))
 			return E_FAIL;
 		iEnvironmentIndex++;
 		iPathIndex++;
 	}
 
-	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+	PreTransformMatrix = XMMatrixScaling(1.f,1.f,1.f) * XMMatrixRotationY(XMConvertToRadians(180.f));
 
 	const _wstring Model_Component_Character = TEXT("Prototype_Component_Model_Character");
 	const _wstring Model_Character_Path = TEXT("../Bin/Resources/Model/ModelData_Character");
@@ -2903,12 +2882,12 @@ HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID)
 	_uint iCharacterIndex = 0;
 	cout << "Character ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
-	while (iPathIndex < 2)
+	while(iPathIndex < 2)
 	{
 		const _wstring Model_Component_Result = Model_Component_Character + to_wstring(iCharacterIndex);
 		const _wstring Model_Path_Result = Model_Character_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iCharacterIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iCharacterIndex))))
 			return E_FAIL;
 		iCharacterIndex++;
 		iPathIndex++;
@@ -2922,176 +2901,169 @@ HRESULT CLoader::Loading_DataFile_For_MonsterSpawnLevel(LEVELID eLevelID)
 	cout << "WEAPON ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iPathIndex < WEAPON_EA)
+	while(iPathIndex < WEAPON_EA)
 	{
 
 		const _wstring Model_Component_Result = Model_Component_Weapon + to_wstring(iWeaponIndex);
 		const _wstring Model_Path_Result = Model_Weapon_Path + to_wstring(iPathIndex) + Ext;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, Model_Component_Result,
-			CModel::Create_ReadDataFile(m_pDevice, m_pContext, CModel::TYPE_NONANIM, Model_Path_Result, PreTransformMatrix, iWeaponIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,Model_Component_Result,
+			CModel::Create_ReadDataFile(m_pDevice,m_pContext,CModel::TYPE_NONANIM,Model_Path_Result,PreTransformMatrix,iWeaponIndex))))
 			return E_FAIL;
 		iWeaponIndex++;
 		iPathIndex++;
 	}
 
 
-	// æ÷¥œ∏ﬁ¿Ãº«
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+	// Ïï†ÎãàÎ©îÏù¥ÏÖò
+	PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 	_int iAnimModelIndex = 0;
 	const _wstring ModelAnim_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring ModelAnim_Path = TEXT("../Bin/Resources/AnimModel/ModelData_Anim");
 
-	cout << "æ÷¥œ∏ﬁ¿Ãº« ---------------------------------------------------------------------------" << endl;
+	cout << "Ïï†ÎãàÎ©îÏù¥ÏÖò ---------------------------------------------------------------------------" << endl;
 	cout << "----------------------------------------------------------------------------------------" << endl;
 
-	while (iAnimModelIndex < 12)
+	while(iAnimModelIndex < 12)
 	{
-		if (iAnimModelIndex == 11)
+		if(iAnimModelIndex == 11)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 2) // Tank
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 2) // Tank
 		{
-			PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
-		}
-		else if (iAnimModelIndex == 7)
+			PreTransformMatrix = XMMatrixScaling(0.005f,0.005f,0.005f) * XMMatrixRotationY(XMConvertToRadians(180.f));
+		} else if(iAnimModelIndex == 7)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
-		}
-		else if (iAnimModelIndex == 6)
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(185.f));
+		} else if(iAnimModelIndex == 6)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.03f, 0.03f, 0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f, 5.f, 0.f);
-		}
-		else if (iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
+			PreTransformMatrix = XMMatrixScaling(0.03f,0.03f,0.03f) * XMMatrixRotationY(XMConvertToRadians(180.f)) * XMMatrixTranslation(0.f,5.f,0.f);
+		} else if(iAnimModelIndex == 8 || iAnimModelIndex == 10 || iAnimModelIndex == 0)
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
-		}
-		else
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(-90.f));
+		} else
 		{
-			PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
+			PreTransformMatrix = XMMatrixScaling(0.01f,0.01f,0.01f) * XMMatrixRotationY(XMConvertToRadians(90.f));
 		}
 		//		cout <<  endl << "------------------------------------------------------" << endl   << iAnimModelIndex;
 		const _wstring ModelAnim_Component_Result = ModelAnim_Component + to_wstring(iAnimModelIndex);
 		const _wstring ModelAnim_Path_Result = ModelAnim_Path + to_wstring(iAnimModelIndex) + Ext;
-		cout << iAnimModelIndex << "π¯ æ÷¥‘∏µ®" << endl;
+		cout << iAnimModelIndex << "Î≤à Ïï†ÎãòÎ™®Îç∏" << endl;
 		cout << "--------------------------------------------------" << endl;
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, ModelAnim_Component_Result,
-			CModel::Create_ReadDataFile_For_Anim(m_pDevice, m_pContext, CModel::TYPE_ANIM, ModelAnim_Path_Result, PreTransformMatrix, iAnimModelIndex))))
+		if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,ModelAnim_Component_Result,
+			CModel::Create_ReadDataFile_For_Anim(m_pDevice,m_pContext,CModel::TYPE_ANIM,ModelAnim_Path_Result,PreTransformMatrix,iAnimModelIndex))))
 			return E_FAIL;
 		++iAnimModelIndex;
 	}
 	return S_OK;
 }
 
-
-
 HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 {
 	/* For.Prototype_Component_Texture_Explosion */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Explosion"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"), 90))))
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Explosion"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"),90))))
 		return E_FAIL;
 
-	/*«√∑πæÓ √— */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Flare"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.png"), 9))))
-		return E_FAIL;
-		
-	/*«√∑πæÓ √— */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Flare_DDS"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.dds"), 4))))
+	/*ÌîåÎ†àÏñ¥ Ï¥ù */
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Flare"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.png"),9))))
 		return E_FAIL;
 
-	/*≈ ≈© ∆¯πﬂ */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Tank_Explosion"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"),8))))
+	/*ÌîåÎ†àÏñ¥ Ï¥ù */
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Flare_DDS"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Effect/Shot/Flare%d.dds"),4))))
 		return E_FAIL;
 
-	/* ¿¸±‚ */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Lightning"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Lightning/Electricity%d.dds"), 6))))
+	/*ÌÉ±ÌÅ¨ Ìè≠Î∞ú */
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Tank_Explosion"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Effect/Explosion/ExplosionEffect%d.dds"),8))))
 		return E_FAIL;
 
-	// µ¡π∫Í
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Dissolved"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effect/Dissolve/Dissolve%d.dds"), 11))))
+	/* Ï†ÑÍ∏∞ */
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Lightning"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Effect/Lightning/Electricity%d.dds"),6))))
+		return E_FAIL;
+
+	// ÎîîÏ°∏Î∏å
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Dissolved"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/Effect/Dissolve/Dissolve%d.dds"),11))))
 		return E_FAIL;
 
 	/* EndingUI */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevelID, TEXT("Prototype_Component_Texture_Victory"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/PlayUI/Victory.dds")))))
+	if(FAILED(m_pGameInstance->Add_Prototype(eLevelID,TEXT("Prototype_Component_Texture_Victory"),
+		CTexture::Create(m_pDevice,m_pContext,TEXT("../Bin/Resources/Textures/PlayUI/Victory.dds")))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_Aura */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Aura")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Aura")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Aura"),
-			CAura::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Aura"),
+			CAura::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
 	/* Prototype_GameObject_DeadModel */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_DeadModel")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_DeadModel")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DeadModel"),
-			CDead_Model::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DeadModel"),
+			CDead_Model::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Prototype_GameObject_Missile_Flare */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile_Flare")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile_Flare")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile_Flare"),
-			CMissile_Flame::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile_Flare"),
+			CMissile_Flame::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 
 	/* Prototype_GameObject_Effect_Katana */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana_Effect")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Katana_Effect")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana_Effect"),
-			CKatana_Effect::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Katana_Effect"),
+			CKatana_Effect::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Prototype_GameObject_Effect_Explosion */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Explosion")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Explosion")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Explosion"),
-			CEffect_Explosion::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Explosion"),
+			CEffect_Explosion::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Prototype_GameObject_Effect_Lightning */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Lightning")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Lightning")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Lightning"),
-			CEffect_Electricity::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Lightning"),
+			CEffect_Electricity::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Rader */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Rader_Effect")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Rader_Effect")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Rader_Effect"),
-			CRader_Effect::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Rader_Effect"),
+			CRader_Effect::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
 	/* Prototype_GameObject_Effect_Explosion */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Tank_Explosion")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Effect_Tank_Explosion")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Tank_Explosion"),
-			CEffect_Explosion_Tank::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Tank_Explosion"),
+			CEffect_Explosion_Tank::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	/* Rifle Flare */
-	if (m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Rifle_Flare")) == nullptr)
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Rifle_Flare")) == nullptr)
 	{
-		if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Rifle_Flare"),
-			CEffect_Flare_Rifle::Create(m_pDevice, m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Rifle_Flare"),
+			CEffect_Flare_Rifle::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 
@@ -3101,7 +3073,7 @@ HRESULT CLoader::Loading_Effect(LEVELID eLevelID)
 
 HRESULT CLoader::Loading_DataFile_For_Instancing_YardLevel()
 {
-	// 108π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 108Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	_uint m_iModelIndex = 108;
 	m_iGrass_Count[0] = 0;
 	HANDLE hFile{};
@@ -3111,75 +3083,75 @@ HRESULT CLoader::Loading_DataFile_For_Instancing_YardLevel()
 	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
 	_wstring Last_Path = TEXT(".dat");
 	_wstring Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
-		return E_FAIL; 
-	} 
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
+		return E_FAIL;
+	}
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[0].push_back(fPos);
 		m_iGrass_Count[0]++;
 	}
 	CloseHandle(hFile);
 
-	// 109π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 109Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	m_iModelIndex = 109;
 	m_iGrass_Count[1] = 0;
 	dwByte = 0;
-	
+
 	Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[1].push_back(fPos);
 		m_iGrass_Count[1]++;
 	}
 	CloseHandle(hFile);
 
-	// 110π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 110Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	m_iModelIndex = 110;
 	m_iGrass_Count[2] = 0;
 	dwByte = 0;
 
 	Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[2].push_back(fPos);
 		m_iGrass_Count[2]++;
 	}
 	CloseHandle(hFile);
 
-	// 111π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 111Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	m_iModelIndex = 111;
 	m_iGrass_Count[3] = 0;
 	dwByte = 0;
 
 	Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[3].push_back(fPos);
 		m_iGrass_Count[3]++;
 	}
@@ -3189,7 +3161,7 @@ HRESULT CLoader::Loading_DataFile_For_Instancing_YardLevel()
 
 HRESULT CLoader::Loading_DataFile_For_Instancing_ImGuiLevel()
 {
-	// 108π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 108Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	_uint m_iModelIndex = 108;
 	m_iGrass_Count[0] = 0;
 	HANDLE hFile{};
@@ -3199,75 +3171,75 @@ HRESULT CLoader::Loading_DataFile_For_Instancing_ImGuiLevel()
 	_wstring Grass_Path = TEXT("../Bin/Data/Grass");
 	_wstring Last_Path = TEXT(".dat");
 	_wstring Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[0].push_back(fPos);
 		m_iGrass_Count[0]++;
 	}
 	CloseHandle(hFile);
 
-	// 109π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 109Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	m_iModelIndex = 109;
 	m_iGrass_Count[1] = 0;
 	dwByte = 0;
 
 	Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[1].push_back(fPos);
 		m_iGrass_Count[1]++;
 	}
 	CloseHandle(hFile);
-	
-	// 110π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+
+	// 110Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	m_iModelIndex = 110;
 	m_iGrass_Count[2] = 0;
 	dwByte = 0;
 
 	Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[2].push_back(fPos);
 		m_iGrass_Count[2]++;
 	}
 	CloseHandle(hFile);
 
-	// 111π¯ ¿‹µ ¿ŒΩ∫≈œΩ∫ ª˝º∫
+	// 111Î≤à ÏûîÎîî Ïù∏Ïä§ÌÑ¥Ïä§ ÏÉùÏÑ±
 	m_iModelIndex = 111;
 	m_iGrass_Count[3] = 0;
 	dwByte = 0;
 
 	Result_Path = Grass_Path + TEXT("_Yard") + to_wstring(m_iModelIndex) + Last_Path;
-	hFile = CreateFile(Result_Path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
+	hFile = CreateFile(Result_Path.c_str(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	if(INVALID_HANDLE_VALUE == hFile)
 	{
-		MessageBox(NULL, L"Load Grass_Yard File Failed", L"Error", MB_OK);
+		MessageBox(NULL,L"Load Grass_Yard File Failed",L"Error",MB_OK);
 		return E_FAIL;
 	}
-	while (ReadFile(hFile, &iLevel, sizeof(LEVELID), &dwByte, nullptr) && dwByte > 0)
+	while(ReadFile(hFile,&iLevel,sizeof(LEVELID),&dwByte,nullptr) && dwByte > 0)
 	{
-		ReadFile(hFile, &fPos, sizeof(_float3), &dwByte, nullptr);
+		ReadFile(hFile,&fPos,sizeof(_float3),&dwByte,nullptr);
 		m_vecGrassPos[3].push_back(fPos);
 		m_iGrass_Count[3]++;
 	}
@@ -3276,11 +3248,77 @@ HRESULT CLoader::Loading_DataFile_For_Instancing_ImGuiLevel()
 	return S_OK;
 }
 
-CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVELID eNextLevelID)
+HRESULT CLoader::Loading_UI()
 {
-	CLoader* pInstance = new CLoader(pDevice, pContext);
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI_PlayerHp")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_PlayerHp"),
+			CPlayerHp::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI_MachineHp")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_MachineHp"),
+			CMachineHp::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_UI_Battery_Gage")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Battery_Gage"),
+			CBatteryGage::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Battery_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Battery_UI"),
+			CBatteryUI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Ending_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Ending_UI"),
+			CEnding_UI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Missile_Timer_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Missile_Timer_UI"),
+			CMissile_TimeUI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Dead_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Dead_UI"),
+			CDeadUI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_BulletIcon_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BulletIcon_UI"),
+			CBulletUI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Damaged_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Damaged_UI"),
+			CDamagedUI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Const_UI")) == nullptr)
+	{
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Const_UI"),
+			CConstUI::Create(m_pDevice,m_pContext))))
+			return E_FAIL;
+	}
+	
+	return S_OK;
+}
 
-	if (FAILED(pInstance->Initialize(eNextLevelID)))
+CLoader* CLoader::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext,LEVELID eNextLevelID)
+{
+	CLoader* pInstance = new CLoader(pDevice,pContext);
+
+	if(FAILED(pInstance->Initialize(eNextLevelID)))
 	{
 		MSG_BOX("Failed to Created : CLoader");
 		Safe_Release(pInstance);
@@ -3293,7 +3331,7 @@ void CLoader::Free()
 {
 	__super::Free();
 
-	WaitForSingleObject(m_hThread, INFINITE);
+	WaitForSingleObject(m_hThread,INFINITE);
 
 	DeleteObject(m_hThread);
 

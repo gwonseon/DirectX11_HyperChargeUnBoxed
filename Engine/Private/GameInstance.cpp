@@ -14,99 +14,107 @@
 #include "Frustum.h"
 #include "SoundMgr.h"
 
+#include "ThreadMgr.h"
+
 IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()
+{}
+
+HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc,ID3D11Device** ppDevice,ID3D11DeviceContext** ppContext)
 {
-}
-
-HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext)
-{
-	/* ³» °ÔÀÓ¿¡ ÇÊ¿äÇÑ ÇÊ¼ö ±â´Éµé¿¡ ´ëÇÑ ÃÊ±âÈ­°úÁ¤À» ¼öÇàÇÑ´Ù. */
-	/* ±×·¡ÇÈ Ä«µå¸¦ ÃÊ±âÈ­ÇÏ³®. */
-	m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd, EngineDesc.isWindowed, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY, ppDevice, ppContext);
-	if (nullptr == m_pGraphic_Device)
+	/* ë‚´ ê²Œìž„ì— í•„ìš”í•œ í•„ìˆ˜ ê¸°ëŠ¥ë“¤ì— ëŒ€í•œ ì´ˆê¸°í™”ê³¼ì •ì„ ìˆ˜í–‰í•œë‹¤. */
+	/* ê·¸ëž˜í”½ ì¹´ë“œë¥¼ ì´ˆê¸°í™”í•˜ë‚Ÿ. */
+	m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd,EngineDesc.isWindowed,EngineDesc.iWinSizeX,EngineDesc.iWinSizeY,ppDevice,ppContext);
+	if(nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
-	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
-	if (nullptr == m_pPicking)
+	m_pPicking = CPicking::Create(*ppDevice,*ppContext,EngineDesc.hWnd,EngineDesc.iWinSizeX,EngineDesc.iWinSizeY);
+	if(nullptr == m_pPicking)
 		return E_FAIL;
 
 
-	m_pInput_Device = CInput_Device::Create(EngineDesc.hInstance, EngineDesc.hWnd);
-	if (nullptr == m_pGraphic_Device)
+	m_pInput_Device = CInput_Device::Create(EngineDesc.hInstance,EngineDesc.hWnd);
+	if(nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
-	/* Å¸ÀÌ¸Ó¸Å´ÏÁ®¸¦ ÁØºñÇÑ´Ù. */
+	/* íƒ€ì´ë¨¸ë§¤ë‹ˆì ¸ë¥¼ ì¤€ë¹„í•œë‹¤. */
 	m_pTimer_Manager = CTimer_Manager::Create();
-	if (nullptr == m_pTimer_Manager)
+	if(nullptr == m_pTimer_Manager)
 		return E_FAIL;
 
-	/* ÀÔ·Â ÀåÄ¡¸¦ ÃÊ±âÈ­ÇÑ´Ù. */
-	/* ¿ÀºêÁ§Æ®, ÄÄÆ÷³ÍÆ® ¸Å´ÏÁ®¸¦ »ç¿ëÇÒ ÁØºñ¸¦ ÇÑ´Ù. */
+	/* ìž…ë ¥ ìž¥ì¹˜ë¥¼ ì´ˆê¸°í™”í•œë‹¤. */
+	/* ì˜¤ë¸Œì íŠ¸, ì»´í¬ë„ŒíŠ¸ ë§¤ë‹ˆì ¸ë¥¼ ì‚¬ìš©í•  ì¤€ë¹„ë¥¼ í•œë‹¤. */
 	m_pObject_Manager = CObject_Manager::Create(EngineDesc.iNumLevels);
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return E_FAIL;
-	
+
 	m_pComponent_Manager = CComponent_Manager::Create(EngineDesc.iNumLevels);
-	if (nullptr == m_pComponent_Manager)
+	if(nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
 	m_pLight_Manager = CLight_Manager::Create();
-	if (nullptr == m_pLight_Manager)
+	if(nullptr == m_pLight_Manager)
 		return E_FAIL;
 
-	/* µîµîµîµî */
+	/* ë“±ë“±ë“±ë“± */
 	m_pLevel_Manager = CLevel_Manager::Create();
-	if (nullptr == m_pLevel_Manager)
+	if(nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
 
-	m_pTarget_Manager = CTarget_Manager::Create(*ppDevice, *ppContext);
-	if (nullptr == m_pTarget_Manager)
+	m_pTarget_Manager = CTarget_Manager::Create(*ppDevice,*ppContext);
+	if(nullptr == m_pTarget_Manager)
 		return E_FAIL;
 
-	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
-	if (nullptr == m_pRenderer)
+	m_pRenderer = CRenderer::Create(*ppDevice,*ppContext);
+	if(nullptr == m_pRenderer)
 		return E_FAIL;
 
 	m_pPipeLine = CPipeLine::Create();
-	if (nullptr == m_pPipeLine)
+	if(nullptr == m_pPipeLine)
 		return E_FAIL;
 
 	m_pPicking_Manager = CPicking_Manager::Create();
-	if (nullptr == m_pPicking_Manager)
+	if(nullptr == m_pPicking_Manager)
 		return E_FAIL;
 
-	m_pFont_Manager = CFont_Manager::Create(*ppDevice, *ppContext);
-	if (nullptr == m_pFont_Manager)
+	m_pFont_Manager = CFont_Manager::Create(*ppDevice,*ppContext);
+	if(nullptr == m_pFont_Manager)
 		return E_FAIL;
 
 	m_pRound_Manager = CRound_Manager::Create();
-	if (nullptr == m_pRound_Manager)
+	if(nullptr == m_pRound_Manager)
 		return E_FAIL;
-	
+
 	m_pUI_Manager = CUIManager::Create();
-	if (nullptr == m_pUI_Manager)
+	if(nullptr == m_pUI_Manager)
 		return E_FAIL;
 
 	m_pFrustum = CFrustum::Create();
-	if (nullptr == m_pFrustum)
+	if(nullptr == m_pFrustum)
 		return E_FAIL;
 
-	m_pSound_Manager = CSoundMgr::Create(*ppDevice, *ppContext);
-	if (nullptr == m_pSound_Manager)
+	m_pSound_Manager = CSoundMgr::Create(*ppDevice,*ppContext);
+	if(nullptr == m_pSound_Manager)
 		return E_FAIL;
 
 
+
+	// ì“°ë ˆë“œí’€ ìƒì„±
+	//unsigned int coreCount = std::thread::hardware_concurrency();
+	CThreadPool* m_pThreadpool =  new CThreadPool(20);
+	m_pThread_Manager = CThreadMgr::Create(m_pThreadpool);
+	if(nullptr == m_pThread_Manager)
+		return E_FAIL;
 	return S_OK;
 }
 
 void CGameInstance::Update(_float fTimeDelta)
 {
-	/* ¿£Áø¿¡ÀÖ´Â °´Ã¼µé Áß ¹Ýº¹ÀûÀÎ °»½ÅÀÌ ÇÊ¿äÇÑ ³à¼®ÀÌ¶ó¸é ¿©±â¼­ ´Ù È£Ãâ. */
+	/* ì—”ì§„ì—ìžˆëŠ” ê°ì²´ë“¤ ì¤‘ ë°˜ë³µì ì¸ ê°±ì‹ ì´ í•„ìš”í•œ ë…€ì„ì´ë¼ë©´ ì—¬ê¸°ì„œ ë‹¤ í˜¸ì¶œ. */
 	m_pInput_Device->Update_InputDev();
-
+	
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
 	m_pObject_Manager->Update(fTimeDelta);
@@ -123,9 +131,9 @@ void CGameInstance::Update(_float fTimeDelta)
 void CGameInstance::Draw()
 {
 
-	/* °ÔÀÓ³»¿¡ ÇÊ¿äÇÑ ´ë´Ù¼öÀÇ °´Ã¼µéÀ» ¸ðµÎ ±×·Á³½´Ù. */
+	/* ê²Œìž„ë‚´ì— í•„ìš”í•œ ëŒ€ë‹¤ìˆ˜ì˜ ê°ì²´ë“¤ì„ ëª¨ë‘ ê·¸ë ¤ë‚¸ë‹¤. */
 	m_pRenderer->Draw();
-	/* ÇÒÀÏÀÌ ¾ø¾î. µð¹ö±×¸ðµå¿¡¼­¸¸ µð¹ö±×³»¿ë¸¸ Ãâ·ÂÇÏ´Â ¿ëµµ .*/
+	/* í• ì¼ì´ ì—†ì–´. ë””ë²„ê·¸ëª¨ë“œì—ì„œë§Œ ë””ë²„ê·¸ë‚´ìš©ë§Œ ì¶œë ¥í•˜ëŠ” ìš©ë„ .*/
 	m_pLevel_Manager->Render();
 }
 
@@ -133,8 +141,8 @@ void CGameInstance::Clear(_uint iClearLevelID)
 {
 	m_pObject_Manager->Clear(iClearLevelID);
 	m_pComponent_Manager->Clear(iClearLevelID);
-//	m_pRenderer->RenderList_Clear();
-	/*iClearLevelID¿¡ ÇØ´çÇÏ´Â ÀÚ¿øµéÀ» Á¤¸®ÇÑ´Ù.*/
+	//	m_pRenderer->RenderList_Clear();
+		/*iClearLevelIDì— í•´ë‹¹í•˜ëŠ” ìžì›ë“¤ì„ ì •ë¦¬í•œë‹¤.*/
 }
 
 _float CGameInstance::Compute_Random_Normal()
@@ -142,7 +150,7 @@ _float CGameInstance::Compute_Random_Normal()
 	return rand() / (_float)RAND_MAX;
 }
 
-_float CGameInstance::Compute_Random(_float fMin, _float fMax)
+_float CGameInstance::Compute_Random(_float fMin,_float fMax)
 {
 	return (fMax - fMin) * Compute_Random_Normal() + fMin;
 }
@@ -159,13 +167,13 @@ void CGameInstance::RenderGroup_Clear(_uint iClearLevelID)
 
 HRESULT CGameInstance::Render_Begin(_float4 vClearColor)
 {
-	if (nullptr == m_pGraphic_Device)
+	if(nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
-	/* ¹é¹öÆÛ¸¦ ³»°¡ ÁöÁ¤ÇÑ »öÀ¸·Î Å¬¸®¾î(ÃÊ±âÈ­)ÇÑ´Ù. */
+	/* ë°±ë²„í¼ë¥¼ ë‚´ê°€ ì§€ì •í•œ ìƒ‰ìœ¼ë¡œ í´ë¦¬ì–´(ì´ˆê¸°í™”)í•œë‹¤. */
 	m_pGraphic_Device->Clear_BackBuffer_View(vClearColor);
 
-	/* ±íÀÌ¹öÆÛ¿Í ½ºÅÙ½Ç¹öÆÛ¸¦ ³»°¡ ÁöÁ¤ÇÑ °ªÀ¸·Î Å¬¸®¾î(ÃÊ±âÈ­)ÇÑ´Ù.*/
+	/* ê¹Šì´ë²„í¼ì™€ ìŠ¤í…ì‹¤ë²„í¼ë¥¼ ë‚´ê°€ ì§€ì •í•œ ê°’ìœ¼ë¡œ í´ë¦¬ì–´(ì´ˆê¸°í™”)í•œë‹¤.*/
 	m_pGraphic_Device->Clear_DepthStencil_View();
 
 	return S_OK;
@@ -173,7 +181,7 @@ HRESULT CGameInstance::Render_Begin(_float4 vClearColor)
 
 HRESULT CGameInstance::Render_End()
 {
-	if (nullptr == m_pGraphic_Device)
+	if(nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
 	m_pGraphic_Device->Present();
@@ -183,7 +191,7 @@ HRESULT CGameInstance::Render_End()
 
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
-	if (nullptr == m_pTimer_Manager)
+	if(nullptr == m_pTimer_Manager)
 		return 0.0f;
 
 	return m_pTimer_Manager->Get_TimeDelta(strTimerTag);
@@ -191,7 +199,7 @@ _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 
 HRESULT CGameInstance::Add_Timer(const _wstring& strTimerTag)
 {
-	if (nullptr == m_pTimer_Manager)
+	if(nullptr == m_pTimer_Manager)
 		return E_FAIL;
 
 	return m_pTimer_Manager->Add_Timer(strTimerTag);
@@ -199,7 +207,7 @@ HRESULT CGameInstance::Add_Timer(const _wstring& strTimerTag)
 
 void CGameInstance::Update_TimeDelta(const _wstring& strTimerTag)
 {
-	if (nullptr == m_pTimer_Manager)
+	if(nullptr == m_pTimer_Manager)
 		return;
 
 	return m_pTimer_Manager->Update_TimeDelta(strTimerTag);
@@ -250,55 +258,63 @@ _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
 	return m_pInput_Device->Get_DIMouseMove(eMouseState);
 }
 
-HRESULT CGameInstance::Open_Level(_uint iCurrentLevelID, CLevel* pNewLevel)
+HRESULT CGameInstance::Open_Level(_uint iCurrentLevelID,CLevel* pNewLevel)
 {
-	if (nullptr == m_pLevel_Manager)
+	if(nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
-	return m_pLevel_Manager->Open_Level(iCurrentLevelID, pNewLevel);
+	return m_pLevel_Manager->Open_Level(iCurrentLevelID,pNewLevel);
+}
+
+HRESULT CGameInstance::Open_Level_InGame(_uint iCurrentLevelID,CLevel * pNewLevel)
+{
+	if(nullptr == m_pLevel_Manager)
+		return E_FAIL;
+	Clear(iCurrentLevelID);
+	return m_pLevel_Manager->Open_Level(iCurrentLevelID,pNewLevel);
 }
 
 HRESULT CGameInstance::Close_Level(_uint iLevelID)
 {
-	if (nullptr == m_pLevel_Manager)
+	if(nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
 	return m_pLevel_Manager->Close_Level(iLevelID);
 }
 
-CComponent* CGameInstance::Get_Component(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex, _uint iPartObjID)
+CComponent* CGameInstance::Get_Component(_uint iLevelIndex,const _wstring& strLayerTag,const _wstring& strComponentTag,_uint iIndex,_uint iPartObjID)
 {
-	return m_pObject_Manager->Get_Component(iLevelIndex, strLayerTag, strComponentTag, iIndex, iPartObjID);
+	return m_pObject_Manager->Get_Component(iLevelIndex,strLayerTag,strComponentTag,iIndex,iPartObjID);
 }
 
 
-HRESULT CGameInstance::Add_Prototype(const _wstring& strPrototypeTag, CGameObject* pPrototype)
+HRESULT CGameInstance::Add_Prototype(const _wstring& strPrototypeTag,CGameObject* pPrototype)
 {
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return E_FAIL;
 
-	return m_pObject_Manager->Add_Prototype(strPrototypeTag, pPrototype);
+	return m_pObject_Manager->Add_Prototype(strPrototypeTag,pPrototype);
 
 }
 
-HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg)
+HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLevelIndex,const _wstring& strLayerTag,const _wstring& strPrototypeTag,void* pArg)
 {
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return E_FAIL;
-	
-	return m_pObject_Manager->Add_GameObject_ToLayer(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
+
+	return m_pObject_Manager->Add_GameObject_ToLayer(iLevelIndex,strLayerTag,strPrototypeTag,pArg);
 }
 
-CGameObject* CGameInstance::Add_GameObject_ToLayer_ReturnObject(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strPrototypeTag, void* pArg)
+CGameObject* CGameInstance::Add_GameObject_ToLayer_ReturnObject(_uint iLevelIndex,const _wstring& strLayerTag,const _wstring& strPrototypeTag,void* pArg)
 {
-	return m_pObject_Manager->Add_GameObject_ToLayer_ReturnObject(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
+	return m_pObject_Manager->Add_GameObject_ToLayer_ReturnObject(iLevelIndex,strLayerTag,strPrototypeTag,pArg);
 }
 
-CGameObject* CGameInstance::Get_Prototype(_uint iLevelIndex, const _tchar* pLayerTag, const _wstring& strPrototypeTag)
+CGameObject* CGameInstance::Get_Prototype(_uint iLevelIndex,const _tchar* pLayerTag,const _wstring& strPrototypeTag)
 {
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return nullptr;
-	return m_pObject_Manager->Get_Prototype(iLevelIndex, pLayerTag, strPrototypeTag);
+	return m_pObject_Manager->Get_Prototype(iLevelIndex,pLayerTag,strPrototypeTag);
 }
 
 //CComponent* CGameInstance::Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex)
@@ -310,24 +326,24 @@ CGameObject* CGameInstance::Get_Prototype(_uint iLevelIndex, const _tchar* pLaye
 
 CGameObject* CGameInstance::Find_Prototype(const _wstring& strPrototypeTag)
 {
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return nullptr;
 	return m_pObject_Manager->Find_Prototype(strPrototypeTag);
 }
 
-CLayer* CGameInstance::Find_Layer(_uint iLevelIndex, const _wstring& strLayerTag)
+CLayer* CGameInstance::Find_Layer(_uint iLevelIndex,const _wstring& strLayerTag)
 {
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return nullptr;
-	return m_pObject_Manager->Find_Layer(iLevelIndex, strLayerTag);
+	return m_pObject_Manager->Find_Layer(iLevelIndex,strLayerTag);
 }
 
-CGameObject* CGameInstance::Clone_Prototype(const _wstring& strPrototypeTag, void* pArg)
+CGameObject* CGameInstance::Clone_Prototype(const _wstring& strPrototypeTag,void* pArg)
 {
-	if (nullptr == m_pObject_Manager)
+	if(nullptr == m_pObject_Manager)
 		return nullptr;
 
-	return m_pObject_Manager->Clone_Prototype(strPrototypeTag, pArg);
+	return m_pObject_Manager->Clone_Prototype(strPrototypeTag,pArg);
 }
 
 void CGameInstance::Set_KatanaState(_bool bFPS)
@@ -351,34 +367,34 @@ _float4 CGameInstance::Get_PlayerPos()
 	return 	m_pObject_Manager->Get_PlayerPos();
 }
 
-HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _wstring& strPrototypeTag, CComponent* pPrototype)
+HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex,const _wstring& strPrototypeTag,CComponent* pPrototype)
 {
-	if (nullptr == m_pComponent_Manager)
+	if(nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
-	return m_pComponent_Manager->Add_Prototype(iLevelIndex, strPrototypeTag, pPrototype);
+	return m_pComponent_Manager->Add_Prototype(iLevelIndex,strPrototypeTag,pPrototype);
 }
 
-CComponent* CGameInstance::Clone_Component(_uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg)
+CComponent* CGameInstance::Clone_Component(_uint iLevelIndex,const _wstring& strPrototypeTag,void* pArg)
 {
-	if (nullptr == m_pComponent_Manager)
+	if(nullptr == m_pComponent_Manager)
 		return nullptr;
 
-	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
+	return m_pComponent_Manager->Clone_Component(iLevelIndex,strPrototypeTag,pArg);
 }
 
-CComponent* CGameInstance::Find_Prototype_Component(_uint iLevelIndex, const _wstring& strPrototypeTag)
+CComponent* CGameInstance::Find_Prototype_Component(_uint iLevelIndex,const _wstring& strPrototypeTag)
 {
 
-	return m_pComponent_Manager->Find_Prototype(iLevelIndex, strPrototypeTag);
+	return m_pComponent_Manager->Find_Prototype(iLevelIndex,strPrototypeTag);
 }
 
-HRESULT CGameInstance::Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup, CGameObject* pRenderGameObject)
+HRESULT CGameInstance::Add_RenderGameObject(CRenderer::RENDERGROUP eRenderGroup,CGameObject* pRenderGameObject)
 {
-	if (nullptr == m_pRenderer)
+	if(nullptr == m_pRenderer)
 		return E_FAIL;
 
-	return m_pRenderer->Add_RenderGameObject(eRenderGroup, pRenderGameObject);
+	return m_pRenderer->Add_RenderGameObject(eRenderGroup,pRenderGameObject);
 }
 
 void CGameInstance::RenderList_Clear()
@@ -388,15 +404,15 @@ void CGameInstance::RenderList_Clear()
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent* pComponent)
 {
-	if (nullptr == m_pRenderer)
+	if(nullptr == m_pRenderer)
 		return E_FAIL;
 
 	return m_pRenderer->Add_DebugComponents(pComponent);
 }
 
-void CGameInstance::Set_Fog(_bool bFog, float fEnd)
-{ 
-	m_pRenderer->Set_Fog(bFog, fEnd);
+void CGameInstance::Set_Fog(_bool bFog,float fEnd)
+{
+	m_pRenderer->Set_Fog(bFog,fEnd);
 }
 
 const _float4x4* CGameInstance::Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState)
@@ -440,9 +456,9 @@ void CGameInstance::Set_CameraDir(_vector vDir)
 
 }
 
-void CGameInstance::Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix)
+void CGameInstance::Set_TransformMatrix(CPipeLine::TRANSFORMSTATE eState,_fmatrix TransformMatrix)
 {
-	return m_pPipeLine->Set_TransformMatrix(eState, TransformMatrix);
+	return m_pPipeLine->Set_TransformMatrix(eState,TransformMatrix);
 
 }
 
@@ -466,9 +482,9 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
 
-HRESULT CGameInstance::Render_Lights(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+HRESULT CGameInstance::Render_Lights(CShader* pShader,CVIBuffer_Rect* pVIBuffer)
 {
-	return m_pLight_Manager->Render(pShader, pVIBuffer);
+	return m_pLight_Manager->Render(pShader,pVIBuffer);
 }
 
 void CGameInstance::Free_Light()
@@ -476,94 +492,94 @@ void CGameInstance::Free_Light()
 	m_pLight_Manager->Free();
 }
 
-_float3 CGameInstance::Get_MousePos_NDC(HWND hWnd, const unsigned int g_iWinSizeX, const unsigned int g_iWinSizeY)
+_float3 CGameInstance::Get_MousePos_NDC(HWND hWnd,const unsigned int g_iWinSizeX,const unsigned int g_iWinSizeY)
 {
-	return m_pPicking_Manager->Get_MousePos_NDC(hWnd, g_iWinSizeX, g_iWinSizeY);
+	return m_pPicking_Manager->Get_MousePos_NDC(hWnd,g_iWinSizeX,g_iWinSizeY);
 }
 
-_float4 CGameInstance::Object_NDC_Cal(_float2 fPos, _float fSizeX, _float fSizeY, const unsigned int g_iWinSizeX, const unsigned int g_iWinSizeY)
+_float4 CGameInstance::Object_NDC_Cal(_float2 fPos,_float fSizeX,_float fSizeY,const unsigned int g_iWinSizeX,const unsigned int g_iWinSizeY)
 {
-	return m_pPicking_Manager->Object_NDC_Cal(fPos, fSizeX, fSizeY, g_iWinSizeX, g_iWinSizeY);
+	return m_pPicking_Manager->Object_NDC_Cal(fPos,fSizeX,fSizeY,g_iWinSizeX,g_iWinSizeY);
 }
 
-void CGameInstance::Get_MouseRayDirection(_float3 fPosition, XMMATRIX invProj, XMMATRIX invView, XMVECTOR* RayPos_Output, XMVECTOR* RayDir_Output)
+void CGameInstance::Get_MouseRayDirection(_float3 fPosition,XMMATRIX invProj,XMMATRIX invView,XMVECTOR* RayPos_Output,XMVECTOR* RayDir_Output)
 {
-	return m_pPicking_Manager->Get_MouseRayDirection(fPosition, invProj, invView, RayPos_Output, RayDir_Output);
+	return m_pPicking_Manager->Get_MouseRayDirection(fPosition,invProj,invView,RayPos_Output,RayDir_Output);
 }
 
-_float3 CGameInstance::Picking_Terrain(XMVECTOR RayPos, XMVECTOR RayDir, const _float3* VtxPos, _uint VtxCountX, _uint VtxCountZ)
+_float3 CGameInstance::Picking_Terrain(XMVECTOR RayPos,XMVECTOR RayDir,const _float3* VtxPos,_uint VtxCountX,_uint VtxCountZ)
 {
-	return m_pPicking_Manager->Picking_Terrain(RayPos, RayDir, VtxPos, VtxCountX, VtxCountZ);
+	return m_pPicking_Manager->Picking_Terrain(RayPos,RayDir,VtxPos,VtxCountX,VtxCountZ);
 }
 
-_float3 CGameInstance::Picking_Box_FAILED(_vector RayPos, _vector RayDir, const _float3* VtxPos)
+_float3 CGameInstance::Picking_Box_FAILED(_vector RayPos,_vector RayDir,const _float3* VtxPos)
 {
-	return m_pPicking_Manager->Picking_Box_FAILED(RayPos, RayDir, VtxPos);
+	return m_pPicking_Manager->Picking_Box_FAILED(RayPos,RayDir,VtxPos);
 }
 
-void CGameInstance::CreateBoundingBox(const _float3& center, const _float3& size, _float3& fMinPoint, _float3& fMaxPoint)
+void CGameInstance::CreateBoundingBox(const _float3& center,const _float3& size,_float3& fMinPoint,_float3& fMaxPoint)
 {
-	return m_pPicking_Manager->CreateBoundingBox(center, size, fMinPoint, fMaxPoint);
+	return m_pPicking_Manager->CreateBoundingBox(center,size,fMinPoint,fMaxPoint);
 
 }
 
-bool CGameInstance::Picking_Box(const _vector& rayOrigin, const _vector& rayDirection, const _float3& fMinPoint, const _float3& fMaxPoint, float& distance, DirectX::BoundingBox box)
+bool CGameInstance::Picking_Box(const _vector& rayOrigin,const _vector& rayDirection,const _float3& fMinPoint,const _float3& fMaxPoint,float& distance,DirectX::BoundingBox box)
 {
-	return m_pPicking_Manager->Picking_Box(rayOrigin, rayDirection, fMinPoint, fMaxPoint, distance, box);
+	return m_pPicking_Manager->Picking_Box(rayOrigin,rayDirection,fMinPoint,fMaxPoint,distance,box);
 }
 
-void CGameInstance::Collision_Layer(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iPartObjID, _uint iDstPartObjID)
+void CGameInstance::Collision_Layer(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iPartObjID,_uint iDstPartObjID)
 {
-	
-	m_pCollision_Manager->Collision_Layer(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iPartObjID, iDstPartObjID);
+
+	m_pCollision_Manager->Collision_Layer(pSrcLayer,pDstLayer,strSrcComponentTag,strDstComponentTag,iPartObjID,iDstPartObjID);
 }
 
-void CGameInstance::Collision_Layer_Coin(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CGameInstance::Collision_Layer_Coin(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	
-	m_pCollision_Manager->Collision_Layer_Coin(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
+
+	m_pCollision_Manager->Collision_Layer_Coin(pSrcLayer,pDstLayer,strSrcComponentTag,strDstComponentTag,iSrcPartObjID,iDstPartObjID);
 }
 
-_bool CGameInstance::Collision_Bullet(CLayer* Target, const _wstring& strTargetComponentTag, _vector vRayDior, _vector vRayPos, _bool* bShot, _float fDamage, _uint iTargetPartObjID)
+_bool CGameInstance::Collision_Bullet(CLayer* Target,const _wstring& strTargetComponentTag,_vector vRayDior,_vector vRayPos,_bool* bShot,_float fDamage,_uint iTargetPartObjID)
 {
-	
-	return m_pCollision_Manager->Collision_Bullet(Target, strTargetComponentTag, vRayDior, vRayPos, bShot, fDamage, iTargetPartObjID);
+
+	return m_pCollision_Manager->Collision_Bullet(Target,strTargetComponentTag,vRayDior,vRayPos,bShot,fDamage,iTargetPartObjID);
 }
 
-void CGameInstance::Collision_Trap(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CGameInstance::Collision_Trap(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	m_pCollision_Manager->Collision_Trap(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag, iSrcPartObjID, iDstPartObjID);
+	m_pCollision_Manager->Collision_Trap(pSrcLayer,pDstLayer,strSrcComponentTag,strDstComponentTag,iSrcPartObjID,iDstPartObjID);
 }
 
-void CGameInstance::Collision_Explosion(CLayer* pExplosionLayer, CLayer* pAttackedLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iCount, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CGameInstance::Collision_Explosion(CLayer* pExplosionLayer,CLayer* pAttackedLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iCount,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	m_pCollision_Manager->Collision_Explosion(pExplosionLayer, pAttackedLayer, strSrcComponentTag, strDstComponentTag, iCount,iSrcPartObjID, iDstPartObjID);
+	m_pCollision_Manager->Collision_Explosion(pExplosionLayer,pAttackedLayer,strSrcComponentTag,strDstComponentTag,iCount,iSrcPartObjID,iDstPartObjID);
 }
 
-void CGameInstance::Anti_OverLapping(CLayer* pSrcLayer, CLayer* pDstLayer, const _wstring& strSrcComponentTag, const _wstring& strDstComponentTag, _uint iSrcPartObjID, _uint iDstPartObjID)
+void CGameInstance::Anti_OverLapping(CLayer* pSrcLayer,CLayer* pDstLayer,const _wstring& strSrcComponentTag,const _wstring& strDstComponentTag,_uint iSrcPartObjID,_uint iDstPartObjID)
 {
-	m_pCollision_Manager->Anti_OverLapping(pSrcLayer, pDstLayer, strSrcComponentTag, strDstComponentTag,  iSrcPartObjID, iDstPartObjID);
+	m_pCollision_Manager->Anti_OverLapping(pSrcLayer,pDstLayer,strSrcComponentTag,strDstComponentTag,iSrcPartObjID,iDstPartObjID);
 }
 
-void CGameInstance::Anti_OverLapping_SameLayer(CLayer* pSrcLayer, const _wstring& strSrcComponentTag, _uint iSrcPartObjID)
+void CGameInstance::Anti_OverLapping_SameLayer(CLayer* pSrcLayer,const _wstring& strSrcComponentTag,_uint iSrcPartObjID)
 {
-	m_pCollision_Manager->Anti_OverLapping_SameLayer(pSrcLayer, strSrcComponentTag, iSrcPartObjID);
+	m_pCollision_Manager->Anti_OverLapping_SameLayer(pSrcLayer,strSrcComponentTag,iSrcPartObjID);
 }
 
-HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
+HRESULT CGameInstance::Add_Font(const _wstring& strFontTag,const _tchar* pFontFilePath)
 {
-	return m_pFont_Manager->Add_Font(strFontTag, pFontFilePath);
+	return m_pFont_Manager->Add_Font(strFontTag,pFontFilePath);
 }
 
-HRESULT CGameInstance::Render_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, FXMVECTOR vColor, _float fScale, _float fRotation, const _float2& vPivot)
+HRESULT CGameInstance::Render_Text(const _wstring& strFontTag,const _tchar* pText,const _float2& vPosition,FXMVECTOR vColor,_float fScale,_float fRotation,const _float2& vPivot)
 {
-	return m_pFont_Manager->Render_Text(strFontTag, pText, vPosition, vColor, fScale, fRotation, vPivot);
+	return m_pFont_Manager->Render_Text(strFontTag,pText,vPosition,vColor,fScale,fRotation,vPivot);
 }
 
-void CGameInstance::Update_Round(_float fTimeDelta, _uint& iCurrentRound, _bool& bBuildMode, CLayer* Monster_Near, CLayer* Monster_Far, _bool& bRoundStart,_float& SkipTimer)
+void CGameInstance::Update_Round(_float fTimeDelta,_uint& iCurrentRound,_bool& bBuildMode,CLayer* Monster_Near,CLayer* Monster_Far,_bool& bRoundStart,_float& SkipTimer)
 {
-	
-	return m_pRound_Manager->Update(fTimeDelta, iCurrentRound, bBuildMode, Monster_Near, Monster_Far, bRoundStart, SkipTimer);
+
+	return m_pRound_Manager->Update(fTimeDelta,iCurrentRound,bBuildMode,Monster_Near,Monster_Far,bRoundStart,SkipTimer);
 }
 
 void CGameInstance::Set_CurrentLevel(_uint iLevel)
@@ -581,24 +597,24 @@ void CGameInstance::Set_Reset()
 	m_pRound_Manager->Set_Reset();
 }
 
-void CGameInstance::CircleGauge_Interaction(CLayer* Item, CLayer* UI)
+void CGameInstance::CircleGauge_Interaction(CLayer* Item,CLayer* UI)
 {
-	m_pUI_Manager->CircleGauge_Interaction(Item, UI);
+	m_pUI_Manager->CircleGauge_Interaction(Item,UI);
 }
 
-HRESULT CGameInstance::Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
+HRESULT CGameInstance::Add_RenderTarget(const _wstring& strTargetTag,_uint iWidth,_uint iHeight,DXGI_FORMAT ePixelFormat,const _float4& vClearColor)
 {
-	return m_pTarget_Manager->Add_RenderTarget(strTargetTag, iWidth, iHeight, ePixelFormat, vClearColor);
+	return m_pTarget_Manager->Add_RenderTarget(strTargetTag,iWidth,iHeight,ePixelFormat,vClearColor);
 }
 
-HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag)
+HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag,const _wstring& strTargetTag)
 {
-	return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
+	return m_pTarget_Manager->Add_MRT(strMRTTag,strTargetTag);
 }
 
-HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool isClear)
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag,ID3D11DepthStencilView* pDSV,_bool isClear)
 {
-	return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV, isClear);
+	return m_pTarget_Manager->Begin_MRT(strMRTTag,pDSV,isClear);
 }
 
 HRESULT CGameInstance::End_MRT(const _wstring& strMRTTag)
@@ -606,25 +622,25 @@ HRESULT CGameInstance::End_MRT(const _wstring& strMRTTag)
 	return m_pTarget_Manager->End_MRT(strMRTTag);
 }
 
-HRESULT CGameInstance::Bind_RT_SRV(CShader* pShader, const _char* pConstantName, const _wstring& strTargetTag)
+HRESULT CGameInstance::Bind_RT_SRV(CShader* pShader,const _char* pConstantName,const _wstring& strTargetTag)
 {
 
-	return m_pTarget_Manager->Bind_SRV(pShader, pConstantName, strTargetTag);
+	return m_pTarget_Manager->Bind_SRV(pShader,pConstantName,strTargetTag);
 }
 
-HRESULT CGameInstance::Copy_RT_Resource(const _wstring& strTargetTag, ID3D11Texture2D* pOut)
+HRESULT CGameInstance::Copy_RT_Resource(const _wstring& strTargetTag,ID3D11Texture2D* pOut)
 {
-	return m_pTarget_Manager->Copy_Resource(strTargetTag, pOut);
+	return m_pTarget_Manager->Copy_Resource(strTargetTag,pOut);
 }
 
 #ifdef _DEBUG
-HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag,_float fX,_float fY,_float fSizeX,_float fSizeY)
 {
-	return m_pTarget_Manager->Ready_Debug(strTargetTag, fX, fY, fSizeX, fSizeY);
+	return m_pTarget_Manager->Ready_Debug(strTargetTag,fX,fY,fSizeX,fSizeY);
 }
-HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer)
+HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag,class CShader* pShader,class CVIBuffer_Rect* pVIBuffer)
 {
-	return m_pTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
+	return m_pTarget_Manager->Render_Debug(strMRTTag,pShader,pVIBuffer);
 }
 #endif
 
@@ -632,21 +648,21 @@ _bool CGameInstance::isPicked(_float3* pOut)
 {
 	return m_pPicking->isPicked(pOut);
 }
-_bool CGameInstance::isComputeHeight(_fvector vTargetPos, _float3* pOut)
+_bool CGameInstance::isComputeHeight(_fvector vTargetPos,_float3* pOut)
 {
-	return m_pPicking->isComputeHeight(vTargetPos, pOut);
+	return m_pPicking->isComputeHeight(vTargetPos,pOut);
 }
 
 #pragma region FRUSTUM
 
-_bool CGameInstance::isIn_Frustum_WorldSpace(_fvector vTargetPos, _float fRange)
+_bool CGameInstance::isIn_Frustum_WorldSpace(_fvector vTargetPos,_float fRange)
 {
-	return m_pFrustum->isIn_WorldSpace(vTargetPos, fRange);
+	return m_pFrustum->isIn_WorldSpace(vTargetPos,fRange);
 }
 
-_bool CGameInstance::isIn_Frustum_LocalSpace(_fvector vTargetPos, _float fRange)
+_bool CGameInstance::isIn_Frustum_LocalSpace(_fvector vTargetPos,_float fRange)
 {
-	return m_pFrustum->isIn_LocalSpace(vTargetPos, fRange);
+	return m_pFrustum->isIn_LocalSpace(vTargetPos,fRange);
 }
 
 void CGameInstance::Frustum_Transform_To_LocalSpace(_fmatrix WorldMatrixInv)
@@ -654,14 +670,19 @@ void CGameInstance::Frustum_Transform_To_LocalSpace(_fmatrix WorldMatrixInv)
 	return m_pFrustum->Transform_To_LocalSpace(WorldMatrixInv);
 }
 
-void CGameInstance::PlaySoundW(const wstring pSoundKey, CHANNELID eID, float fVolume)
+CThreadPool * CGameInstance::Get_ptrThreadpool()
 {
-	m_pSound_Manager->PlaySoundW(pSoundKey, eID, fVolume);
+	return m_pThread_Manager->Get_ptrThreadpool();
 }
 
-void CGameInstance::PlayBGM(const wstring pSoundKey, float fVolume)
+void CGameInstance::PlaySoundW(const wstring pSoundKey,CHANNELID eID,float fVolume)
 {
-	m_pSound_Manager->PlayBGM(pSoundKey, fVolume);
+	m_pSound_Manager->PlaySoundW(pSoundKey,eID,fVolume);
+}
+
+void CGameInstance::PlayBGM(const wstring pSoundKey,float fVolume)
+{
+	m_pSound_Manager->PlayBGM(pSoundKey,fVolume);
 }
 
 void CGameInstance::StopSound(CHANNELID eID)
@@ -675,15 +696,15 @@ void CGameInstance::StopAll()
 
 }
 
-void CGameInstance::SetChannelVolume(CHANNELID eID, float fVolume)
+void CGameInstance::SetChannelVolume(CHANNELID eID,float fVolume)
 {
-	m_pSound_Manager->SetChannelVolume(eID, fVolume);
+	m_pSound_Manager->SetChannelVolume(eID,fVolume);
 
 }
 
-void CGameInstance::VolumeFade(bool _bOnOff, float _fMinusVolume, float _fPlusVolume)
+void CGameInstance::VolumeFade(bool _bOnOff,float _fMinusVolume,float _fPlusVolume)
 {
-	m_pSound_Manager->VolumeFade(_bOnOff, _fMinusVolume, _fPlusVolume);
+	m_pSound_Manager->VolumeFade(_bOnOff,_fMinusVolume,_fPlusVolume);
 
 }
 
@@ -710,18 +731,18 @@ wstring CGameInstance::Get_NowBGM()
 _float CGameInstance::Sound_Cal(_vector vPos)
 {
 	_float4 fPlayerPos = Get_PlayerPos();
-	_float3 fObjPos = _float3(XMVectorGetX(vPos), XMVectorGetY(vPos), XMVectorGetZ(vPos));
-	
+	_float3 fObjPos = _float3(XMVectorGetX(vPos),XMVectorGetY(vPos),XMVectorGetZ(vPos));
+
 	_float fDistance = sqrt(
 		(fPlayerPos.x - fObjPos.x) * (fPlayerPos.x - fObjPos.x) +
 		(fPlayerPos.y - fObjPos.y) * (fPlayerPos.y - fObjPos.y) +
 		(fPlayerPos.z - fObjPos.z) * (fPlayerPos.z - fObjPos.z)
 	);
 
-	if (fDistance >= 400.f)
-		return 0.f; 
+	if(fDistance >= 400.f)
+		return 0.f;
 	_float fSound = 1.f - (fDistance / 400.f);
-	if (fSound >= 0.9f)
+	if(fSound >= 0.9f)
 		fSound = 0.8f;
 	return fSound;
 }
@@ -742,23 +763,24 @@ void CGameInstance::Free()
 {
 	__super::Free();
 
-	Safe_Release(	m_pFrustum				);
-	Safe_Release(	m_pInput_Device			);
-	Safe_Release(	m_pTimer_Manager		);
-	Safe_Release(	m_pLevel_Manager		);
-	Safe_Release(	m_pObject_Manager		);
-	Safe_Release(	m_pComponent_Manager	);
-	Safe_Release(	m_pRenderer				);
-	Safe_Release(	m_pPipeLine				);
-	Safe_Release(	m_pLight_Manager		);
-	Safe_Release(	m_pPicking_Manager		);
-	Safe_Release(	m_pCollision_Manager	);
-	Safe_Release(	m_pFont_Manager			);
-	Safe_Release(	m_pRound_Manager		);
-	Safe_Release(	m_pUI_Manager			);
-	Safe_Release(	m_pTarget_Manager		);
-	Safe_Release(	m_pPicking				);
-
+	Safe_Release(m_pFrustum);
+	Safe_Release(m_pInput_Device);
+	Safe_Release(m_pTimer_Manager);
+	Safe_Release(m_pLevel_Manager);
+	Safe_Release(m_pObject_Manager);
+	Safe_Release(m_pComponent_Manager);
+	Safe_Release(m_pRenderer);
+	Safe_Release(m_pPipeLine);
+	Safe_Release(m_pLight_Manager);
+	Safe_Release(m_pPicking_Manager);
+	Safe_Release(m_pCollision_Manager);
+	Safe_Release(m_pFont_Manager);
+	Safe_Release(m_pRound_Manager);
+	Safe_Release(m_pUI_Manager);
+	Safe_Release(m_pTarget_Manager);
+	Safe_Release(m_pPicking);
+	Safe_Release(m_pThread_Manager);
+	Safe_Release(m_pSound_Manager);
 
 
 	Safe_Release(m_pGraphic_Device);

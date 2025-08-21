@@ -9,16 +9,14 @@
 #include <Effect_Explosion_Tank.h>
 
 
-CTank::CTank(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CMonster{ pDevice, pContext }
-{
-}
+CTank::CTank(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
+	: CMonster{pDevice,pContext}
+{}
 
 CTank::CTank(const CTank& Prototype)
-	: CMonster{ Prototype }
+	: CMonster{Prototype}
 
-{
-}
+{}
 
 HRESULT CTank::Initialize_Prototype()
 {
@@ -30,7 +28,7 @@ HRESULT CTank::Initialize(void* pArg)
 	TANK_DESC* pDesc = static_cast<TANK_DESC*>(pArg);
 
 	pDesc->fSpeedPerSec = 10.f;
-	pDesc->fScale = _float3(3.f, 3.f, 3.f);
+	pDesc->fScale = _float3(3.f,3.f,3.f);
 	m_vecTargetPos = pDesc->vecTargetPos;
 	m_vecStoreTargetPos = *m_vecTargetPos;
 	m_pTrapLayer = pDesc->pTrapLayer;
@@ -41,19 +39,25 @@ HRESULT CTank::Initialize(void* pArg)
 	m_iBraincore_CellNumber = pDesc->iBraincore_CellNumber;
 	m_pPlayer = pDesc->pPlayer;
 	m_pCamera = pDesc->pCamera;
-	if (FAILED(__super::Initialize(pDesc)))
+	if(FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if(FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(1, true);
-	
+	m_pModelCom->Set_Animation(1,true);
+
 	m_fHp = 100.f;
 	m_fEnergy = 0.f;
-	m_fAttack = 0.f; //  ≈ ≈© ¿⁄√º¿« ∞¯∞›∑¬¿∫ 0, πÃªÁ¿œ¿Ã ∞¯∞›∑¬ ∞Æ∞‘ «œ¿⁄
+	m_fAttack = 0.f; //  ÌÉ±ÌÅ¨ ÏûêÏ≤¥Ïùò Í≥µÍ≤©Î†•ÏùÄ 0, ÎØ∏ÏÇ¨ÏùºÏù¥ Í≥µÍ≤©Î†• Í∞ñÍ≤å ÌïòÏûê
 
-	Path = m_pTransformCom->PathFind(0.f, m_pNavigationCom, m_iCell_Idx, m_iBraincore_CellNumber);
+	//Path = m_pTransformCom->PathFind(0.f,m_pNavigationCom,m_iCell_Idx,m_iBraincore_CellNumber);
+	m_vecFindingPath = m_pGameInstance->Get_ptrThreadpool()->enqueue([=]() {
+		cout << "Í∏∏ Ï∞æÍ∏∞ ÏãúÏûëÌï®" <<  endl;
+		return m_pTransformCom->PathFind(0.f,m_pNavigationCom,m_pNavigationCom->Get_CurrentCell_Index(),m_iBraincore_CellNumber);
+	});
+	m_bRequest_Path = true;
+
 	return S_OK;
 }
 
@@ -62,46 +66,54 @@ void CTank::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
-	if (m_bCanAttacked == false)
+	if(m_bRequest_Path == true && m_vecFindingPath.valid() && m_vecFindingPath.wait_for(chrono::seconds(0)) == future_status::ready)
+	{
+		// Í∏∏ Ï∞æÏïòÏùå
+		Path = m_vecFindingPath.get();
+		m_bRequest_Path = false;
+	}
+
+
+	if(m_bCanAttacked == false)
 		m_fCurrentTime += fTimeDelta;
 	m_fTime_For_Target += fTimeDelta;
 	m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	m_fSound = m_pGameInstance->Sound_Cal(m_vecPosition);
-	
+
 }
 
 void CTank::Update(_float fTimeDelta)
-{	
-	if (m_bDead == true)
+{
+	if(m_bDead == true)
 		return;
-	if (m_bDeadState == true)
+	if(m_bDeadState == true)
 	{
 
 		CDead_Model::DEADMODEL_DESC pDead{};
 		pDead.eLevel = m_eLevel;
 		pDead.eModelType = CDead_Model::DEAD_TANK_BODY;
 		pDead.vecPos = m_vecPosition;
-		pDead.fScale = { 3.f,3.f,3.f };
+		pDead.fScale = {3.f,3.f,3.f};
 		pDead.matWorld = *m_pTransformCom->Get_WorldMatrixPtr();
-		(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Dead"), TEXT("Prototype_GameObject_DeadModel"), &pDead));
+		(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Layer_Dead"),TEXT("Prototype_GameObject_DeadModel"),&pDead));
 
 		pDead.eModelType = CDead_Model::DEAD_TANK_TURRET;
-		(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Dead"), TEXT("Prototype_GameObject_DeadModel"), &pDead));
+		(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Layer_Dead"),TEXT("Prototype_GameObject_DeadModel"),&pDead));
 
 		CEffect_Explosion_Tank::EFFECT_Tank_Explosion_DESC Effect{};
 		Effect.eLevel = m_eLevel;
 		Effect.eType = CEffect_Explosion_Tank::EXPLOSION_TANK_DEAD;
-		Effect.fScale = _float3{ 20.f, 20.f, 20.f };
-		Effect.fPosition = _float3{ XMVectorGetX(m_vecPosition), XMVectorGetY(m_vecPosition) ,XMVectorGetZ(m_vecPosition) };
-		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Effect_Tank_Explosion"), &Effect);
-	
+		Effect.fScale = _float3{20.f,20.f,20.f};
+		Effect.fPosition = _float3{XMVectorGetX(m_vecPosition),XMVectorGetY(m_vecPosition),XMVectorGetZ(m_vecPosition)};
+		m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Layer_Effect"),TEXT("Prototype_GameObject_Effect_Tank_Explosion"),&Effect);
+
 		m_pGameInstance->StopSound(SOUND_TANK_EXPLOSION);
-		m_pGameInstance->PlaySoundW(L"FE_BigTank_Explosion.wav", Engine::CHANNELID::SOUND_TANK_EXPLOSION, m_fSound);
+		m_pGameInstance->PlaySoundW(L"FE_BigTank_Explosion.wav",Engine::CHANNELID::SOUND_TANK_EXPLOSION,m_fSound);
 		m_bDead = true;
 		return;
 	}
-	// µ•πÃ¡ˆ ¿‘¥¬ ≈∏¿Ãπ÷ µÙ∑π¿Ã∑Œ ∏¬√„
+	// Îç∞ÎØ∏ÏßÄ ÏûÖÎäî ÌÉÄÏù¥Î∞ç ÎîúÎ†àÏù¥Î°ú ÎßûÏ∂§
 	if(m_fCurrentTime >= m_fDamaged_DelayTime)
 	{
 		m_bCanAttacked = true;
@@ -110,18 +122,18 @@ void CTank::Update(_float fTimeDelta)
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
-	// ∆Æ∑¶¿Ã ¿÷¿ª ∞ÊøÏø° «ÿ¥Á ∆Æ∑¶¿ª ∞¯∞›«œµµ∑œ ≈∏∞Ÿ¿ª ∫Ø∞Ê«ÿ¡‹
-	if (m_fTime_For_Target >= 3.f) // «◊ªÛ ∞ÀªÁ«œ±‚ø£ ∞ÀªÁ∑Æ¿Ã ∏πæ∆º≠ ∞ÀªÁ ∫Ûµµºˆ∏¶ ¡Ÿø©¡‹
+	// Ìä∏Îû©Ïù¥ ÏûàÏùÑ Í≤ΩÏö∞Ïóê Ìï¥Îãπ Ìä∏Îû©ÏùÑ Í≥µÍ≤©ÌïòÎèÑÎ°ù ÌÉÄÍ≤üÏùÑ Î≥ÄÍ≤ΩÌï¥Ï§å
+	if(m_fTime_For_Target >= 3.f) // Ìï≠ÏÉÅ Í≤ÄÏÇ¨ÌïòÍ∏∞Ïóî Í≤ÄÏÇ¨ÎüâÏù¥ ÎßéÏïÑÏÑú Í≤ÄÏÇ¨ ÎπàÎèÑÏàòÎ•º Ï§ÑÏó¨Ï§å
 	{
 		m_fTime_For_Target = 0.f;
 		_int iCheck_Count = 0;
-		for (auto pTrap : m_pTrapLayer->Get_GameObject_List())
+		for(auto pTrap : m_pTrapLayer->Get_GameObject_List())
 		{
-			if (static_cast<CTrap_Marks*>(pTrap)->Get_Build_Done() == true)
+			if(static_cast<CTrap_Marks*>(pTrap)->Get_Build_Done() == true)
 			{
 				m_vecNewTargetPos = static_cast<CTrap_Marks*>(pTrap)->Get_TrapPos();
-				// ∞¯∞› ªÁ∞≈∏Æ∫∏¥Ÿ ∏’∞≈∏Æ±Ó¡ˆ ∞ÀªÁ«ÿæﬂ«‘
-				if (m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos, m_vecPosition) <= 2500.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
+				// Í≥µÍ≤© ÏÇ¨Í±∞Î¶¨Î≥¥Îã§ Î®ºÍ±∞Î¶¨ÍπåÏßÄ Í≤ÄÏÇ¨Ìï¥ÏïºÌï®
+				if(m_pTransformCom->Cal_Distance_vec(m_vecNewTargetPos,m_vecPosition) <= 2500.f && static_cast<CTrap_Marks*>(pTrap)->Get_knockdown() == false)
 				{
 					m_vecTargetPos = &m_vecNewTargetPos;
 					break;
@@ -129,40 +141,42 @@ void CTank::Update(_float fTimeDelta)
 			}
 			++iCheck_Count;
 		}
-		if (iCheck_Count == m_pTrapLayer->Get_GameObjectList_Size())
+		if(iCheck_Count == m_pTrapLayer->Get_GameObjectList_Size())
 		{
 			m_vecTargetPos = &m_vecStoreTargetPos;
 		}
 	}
 	_float fAnimSpeed = 1.f;
-	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos, m_vecPosition);
-	if (fDistance > 2000.f)
+	_float fDistance = m_pTransformCom->Cal_Distance_vec(*m_vecTargetPos,m_vecPosition);
+	if(fDistance > 2000.f)
 	{
 		m_vecPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_float3 fPos{};		XMStoreFloat3(&fPos, m_vecPosition);
-		// ∏Ò«• PathøÕ «ˆ¿Á ≥ª ¿ßƒ° ªÁ¿Ã¿« ∞≈∏Æ∏¶ ∆ƒæ««ÿº≠ Path πŸ≤Ÿ±‚ 
-		if (m_pTransformCom->Cal_Distance(Path.front(), fPos) <= 200.f)
+		_float3 fPos{};		XMStoreFloat3(&fPos,m_vecPosition);
+		// Î™©Ìëú PathÏôÄ ÌòÑÏû¨ ÎÇ¥ ÏúÑÏπò ÏÇ¨Ïù¥Ïùò Í±∞Î¶¨Î•º ÌååÏïÖÌï¥ÏÑú Path Î∞îÍæ∏Í∏∞ 
+		if(m_bRequest_Path == false && Path.size() > 0)
 		{
-			if(Path.size() > 1)
-				Path.erase(Path.begin());
+			if(m_pTransformCom->Cal_Distance(Path.front(),fPos) <= 200.f)
+			{
+				if(Path.size() > 1)
+					Path.erase(Path.begin());
+			}
+			// Path Îî∞Îùº Í∞à ÎïåÎäî Path Î™©Ìëú Î∞îÎùºÎ≥¥Í∏∞
+			m_pTransformCom->LookAt(XMVectorSet(Path.front().x,Path.front().y,Path.front().z,1.f));
 		}
-		// Path µ˚∂Û ∞• ∂ß¥¬ Path ∏Ò«• πŸ∂Û∫∏±‚
-		m_pTransformCom->LookAt(XMVectorSet(Path.front().x, Path.front().y, Path.front().z, 1.f));
-		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f  );
-		
-		m_pGameInstance->PlaySoundW(L"FE_BigTank_Drive.wav", Engine::CHANNELID::SOUND_TANK_MOVE, m_fSound);
+		m_pTransformCom->Go_Straight(fTimeDelta * 1.5f);
+
+		m_pGameInstance->PlaySoundW(L"FE_BigTank_Drive.wav",Engine::CHANNELID::SOUND_TANK_MOVE,m_fSound);
 
 		fAnimSpeed = 1.f;
-		
-		m_pModelCom->Set_Animation(MONSTER_Tank_Drive, true);
+
+		m_pModelCom->Set_Animation(MONSTER_Tank_Drive,true);
 		m_bFirstShot = false;
-	}
-	else
+	} else
 	{
-		if (m_bAnimState == true && m_bShotOnce == false || m_bFirstShot == false)
+		if(m_bAnimState == true && m_bShotOnce == false || m_bFirstShot == false)
 		{
 			m_bShotOnce = true;	m_bFirstShot = true;
-			// ∆˜≈∫ πﬂªÁ
+			// Ìè¨ÌÉÑ Î∞úÏÇ¨
 			_float3 fPos{};
 			XMStoreFloat3(&fPos,m_vecPosition);
 			CMonster_Bullet::MONSTER_BULLET_DESC Desc{};
@@ -172,31 +186,31 @@ void CTank::Update(_float fTimeDelta)
 			Desc.eType = CMonster_Bullet::TANK_BULLET;
 			Desc.vTargetPos = *m_vecTargetPos;
 			Desc.m_pBuild =  m_pBuild;
-			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("MonsterBullet_Layer"), TEXT("Prototype_GameObject_MonsterBullet"), &Desc));
-			
-			// πﬂªÁ ∫“≤…
+			static_cast<CMonster_Bullet*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("MonsterBullet_Layer"),TEXT("Prototype_GameObject_MonsterBullet"),&Desc));
+
+			// Î∞úÏÇ¨ Î∂àÍΩÉ
 			CEffect_Flare_Rifle::EFFECT_RIFLE_FLARE_DESC pFlare{};
 			pFlare.eLevel = m_eLevel;
 			pFlare.eType = CEffect_Flare_Rifle::FLARE_TANK;
-			pFlare.fScale = { 3.f,3.f,3.f };
+			pFlare.fScale = {3.f,3.f,3.f};
 			pFlare.vecWeaponPos = &m_vecPosition;
 			pFlare.vecCamPos = m_pCamera->Get_Camera_Pos();
 			pFlare.vecTargetPos = m_vecTargetPos;
-			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel, TEXT("Effect_Layer"), TEXT("Prototype_GameObject_Rifle_Flare"), &pFlare));
-			
+			static_cast<CEffect_Flare_Rifle*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(m_eLevel,TEXT("Effect_Layer"),TEXT("Prototype_GameObject_Rifle_Flare"),&pFlare));
+
 			m_pGameInstance->StopSound(SOUND_TANK_FLARE);
-			m_pGameInstance->PlaySoundW(L"04_12_2016_ArmyMen_Tank_1333_Fire_Expl_03.wav", Engine::CHANNELID::SOUND_TANK_FLARE, m_fSound);
+			m_pGameInstance->PlaySoundW(L"04_12_2016_ArmyMen_Tank_1333_Fire_Expl_03.wav",Engine::CHANNELID::SOUND_TANK_FLARE,m_fSound);
 
 		}
 		m_pTransformCom->LookAt(*m_vecTargetPos);
 		fAnimSpeed = 0.7f;
-		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire, false);
-		// «— π¯∏∏ ΩÓ∞‘ ∏∏µÈ±‚ ¿ß«‘
-		if (m_bAnimState == false) 
+		m_pModelCom->Set_Animation(MONSTER_Tank_RecoilForwardFire,false);
+		// Ìïú Î≤àÎßå ÏèòÍ≤å ÎßåÎì§Í∏∞ ÏúÑÌï®
+		if(m_bAnimState == false)
 			m_bShotOnce = false;
 	}
-	
-	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * fAnimSpeed, false);
+
+	m_bAnimState = m_pModelCom->Play_Animation(fTimeDelta * fAnimSpeed,false);
 	__super::Update(fTimeDelta);
 }
 
@@ -205,63 +219,63 @@ void CTank::Late_Update(_float fTimeDelta)
 	__super::Late_Update(fTimeDelta);
 
 
-	if (m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
+	if(m_bOverlab_SameLayer == true || m_bOverlab_DifferentLayer == true)
 	{
 		m_vecPosition += m_vecDirection * fTimeDelta * 0.5f;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecPosition);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,m_vecPosition);
 	}
 
 }
 
 HRESULT CTank::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
+	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, aiTextureType_DIFFUSE, 0, "g_DiffuseTexture")))
+		if(FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom,i,aiTextureType_DIFFUSE,0,"g_DiffuseTexture")))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+		if(FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom,i,"g_BoneMatrices")))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if(FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 		m_pModelCom->Render(i);
 	}
-#ifdef _DEBUG
+	#ifdef _DEBUG
 
 	m_pColliderCom->Render();
-#endif
+	#endif
 	return S_OK;
 }
 
 HRESULT CTank::Render_Shadow()
 {
-	_float4x4			ViewMatrix, ProjMatrix;
+	_float4x4			ViewMatrix,ProjMatrix;
 
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 5.f, fPlayerPos.y + 10.f, fPlayerPos.y - 5.f, 1.f), XMVectorSet(fPlayerPos.x, fPlayerPos.y, fPlayerPos.y, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), (_float)1280.f / 720.f, 0.1f, fFar));
+	XMStoreFloat4x4(&ViewMatrix,XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 5.f,fPlayerPos.y + 10.f,fPlayerPos.y - 5.f,1.f),XMVectorSet(fPlayerPos.x,fPlayerPos.y,fPlayerPos.y,1.f),XMVectorSet(0.f,1.f,0.f,0.f)));
+	XMStoreFloat4x4(&ProjMatrix,XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f),(_float)1280.f / 720.f,0.1f,fFar));
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix",m_pTransformCom->Get_WorldMatrixPtr())))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",&ViewMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",&ProjMatrix)))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	for(size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom, i, "g_BoneMatrices")))
+		if(FAILED(m_pModelCom->Bind_Mesh_BoneMatrices(m_pShaderCom,i,"g_BoneMatrices")))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(5)))
+		if(FAILED(m_pShaderCom->Begin(5)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -272,45 +286,45 @@ HRESULT CTank::Render_Shadow()
 
 HRESULT CTank::Add_Components()
 {
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+	if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		TEXT("Com_Shader"),reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 	/* For.Com_Model */
 	const _wstring Model_Component = TEXT("Prototype_Component_Model_Anim");
 	const _wstring Model_Component_Result = Model_Component + to_wstring(m_iModelIndex);
-	if (FAILED(__super::Add_Component(m_eLevel, Model_Component_Result,
-		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if(FAILED(__super::Add_Component(m_eLevel,Model_Component_Result,
+		TEXT("Com_Model"),reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 	/* For.Com_Collider_Sphere*/
 	CBounding_Sphere::BOUND_SPHERE_DESC			SphereDesc{};
 	SphereDesc.fRadius = 1.4f;
-	SphereDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Component(m_eLevel, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider_Sphere"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
+	SphereDesc.vCenter = _float3(0.f,0.f,0.f);
+	if(FAILED(__super::Add_Component(m_eLevel,TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Sphere"),reinterpret_cast<CComponent**>(&m_pColliderCom),&SphereDesc)))
 		return E_FAIL;
 
 	// For.Com_Navigation
 	CNavigation::NAVIGATION_DESC		Desc{};
 	Desc.iCurrentCellIndex = m_iCell_Idx;
-	switch (m_eLevel)
+	switch(m_eLevel)
 	{
 	case Client::LEVEL_GAMEPLAY:
 	{
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation"),
-			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
+			TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom),&Desc)))
 			return E_FAIL;
 		break;
 	}
 	case Client::LEVEL_YARD:
 	{
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Yard"),
-			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &Desc)))
+		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation_Yard"),
+			TEXT("Com_Navigation"),reinterpret_cast<CComponent**>(&m_pNavigationCom),&Desc)))
 			return E_FAIL;
 		break;
 	}
 
 	default:
-		break;
+	break;
 	}
 
 
@@ -319,25 +333,25 @@ HRESULT CTank::Add_Components()
 
 HRESULT CTank::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+	if(FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+	if(FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix",m_pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 	_float fFar = m_pGameInstance->Get_CameraFar();
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fFar", &fFar, sizeof(float))))
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fFar",&fFar,sizeof(float))))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-CTank* CTank::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTank* CTank::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
-	CTank* pInstance = new CTank(pDevice, pContext);
+	CTank* pInstance = new CTank(pDevice,pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype()))
+	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CTank");
 		Safe_Release(pInstance);
@@ -348,7 +362,7 @@ CTank* CTank::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CGameObject* CTank::Clone(void* pArg)
 {
 	CTank* pInstance = new CTank(*this);
-	if (FAILED(pInstance->Initialize(pArg)))
+	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CTank");
 		Safe_Release(pInstance);

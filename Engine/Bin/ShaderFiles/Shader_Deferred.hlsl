@@ -31,11 +31,11 @@ vector g_vMtrlAmbient = { 1.f, 1.f, 1.f, 1.f };
 vector g_vMtrlSpecular = { 0.6f, 0.6f, 0.6f, 1.f };
 vector g_vCamPosition;
 float g_fCamFar;
-// ÅØ½ºÃÄ¿¡¼­ ÇÑ ÇÈ¼¿ÀÇ °£°Ý
+// í…ìŠ¤ì³ì—ì„œ í•œ í”½ì…€ì˜ ê°„ê²©
 float dX;
 float dY;
 
-// ¾È°³
+// ì•ˆê°œ
 float g_FogStart;
 float g_FogEnd;
 
@@ -122,7 +122,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_DIRECTIONAL(PS_IN In)
 {
     PS_OUT_LIGHT Out;
 
-	/* ºû Á¤º¸¿Í ³ë¸» Á¤º¸¸¦ ÀÌ¿ëÇØ¼­ ¸í¾ÏÀ» °è»êÇÏ¿© ¸®ÅÏÇÏ³®. */
+	/* ë¹› ì •ë³´ì™€ ë…¸ë§ ì •ë³´ë¥¼ ì´ìš©í•´ì„œ ëª…ì•”ì„ ê³„ì‚°í•˜ì—¬ ë¦¬í„´í•˜ë‚Ÿ. */
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     float fViewZ = vDepthDesc.y * g_fCamFar;
@@ -131,20 +131,20 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_DIRECTIONAL(PS_IN In)
     float fShade = max(dot(normalize(g_vLightDir) * -1.f, vNormal), 0.f);
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
     float4 vWorldPos;
-	/* Åõ¿µ½ºÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
-	/* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Æ©¤Ì¿µÇà·Ä / w */
+	/* íˆ¬ì˜ìŠ¤íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
+	/* ë¡œì»¬ìœ„ì¹˜ * ì›”ë“œí–‰ë ¬ * ë·°í–‰ë ¬ * íŠœã…œì˜í–‰ë ¬ / w */
     vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
     vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
     vWorldPos.z = vDepthDesc.x;
     vWorldPos.w = 1.f;
 
-	/* ºä½ºÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
-	/* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Æ©¤Ì¿µÇà·Ä / w */
+	/* ë·°ìŠ¤íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
+	/* ë¡œì»¬ìœ„ì¹˜ * ì›”ë“œí–‰ë ¬ * ë·°í–‰ë ¬ * íŠœã…œì˜í–‰ë ¬ / w */
     vWorldPos = vWorldPos * fViewZ;
     vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
 
-	/* ¿ùµå½ºÆäÀÌ½º·Î ÀÌµ¿ÇÏÀÚ. */
-	/* ¿ùµå ÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
+	/* ì›”ë“œìŠ¤íŽ˜ì´ìŠ¤ë¡œ ì´ë™í•˜ìž. */
+	/* ì›”ë“œ íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
     vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
 
     float4 vLook = vWorldPos - g_vCamPosition;
@@ -163,27 +163,27 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_POINT(PS_IN In)
 {
     PS_OUT_LIGHT Out;
 
-	/* ºû Á¤º¸¿Í ³ë¸» Á¤º¸¸¦ ÀÌ¿ëÇØ¼­ ¸í¾ÏÀ» °è»êÇÏ¿© ¸®ÅÏÇÏ³®. */
+	/* ë¹› ì •ë³´ì™€ ë…¸ë§ ì •ë³´ë¥¼ ì´ìš©í•´ì„œ ëª…ì•”ì„ ê³„ì‚°í•˜ì—¬ ë¦¬í„´í•˜ë‚Ÿ. */
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     float fViewZ = vDepthDesc.y * g_fCamFar;
     vector vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     float4 vWorldPos;
 
-	/* Åõ¿µ½ºÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
-	/* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Æ©¤Ì¿µÇà·Ä / w */
+	/* íˆ¬ì˜ìŠ¤íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
+	/* ë¡œì»¬ìœ„ì¹˜ * ì›”ë“œí–‰ë ¬ * ë·°í–‰ë ¬ * íŠœã…œì˜í–‰ë ¬ / w */
     vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
     vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
     vWorldPos.z = vDepthDesc.x;
     vWorldPos.w = 1.f;
 
-	/* ºä½ºÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
-	/* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Æ©¤Ì¿µÇà·Ä / w */
+	/* ë·°ìŠ¤íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
+	/* ë¡œì»¬ìœ„ì¹˜ * ì›”ë“œí–‰ë ¬ * ë·°í–‰ë ¬ * íŠœã…œì˜í–‰ë ¬ / w */
     vWorldPos = vWorldPos * fViewZ;
     vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
 
-	/* ¿ùµå½ºÆäÀÌ½º·Î ÀÌµ¿ÇÏÀÚ. */
-	/* ¿ùµå ÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
+	/* ì›”ë“œìŠ¤íŽ˜ì´ìŠ¤ë¡œ ì´ë™í•˜ìž. */
+	/* ì›”ë“œ íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
     vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
 
     vector vLightDir = vWorldPos - g_vLightPos;
@@ -207,7 +207,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_SPOT(PS_IN In)
 {
     PS_OUT_LIGHT Out;
 
-   	/* ºû Á¤º¸¿Í ³ë¸» Á¤º¸¸¦ ÀÌ¿ëÇØ¼­ ¸í¾ÏÀ» °è»êÇÏ¿© ¸®ÅÏÇÏ³®. */
+   	/* ë¹› ì •ë³´ì™€ ë…¸ë§ ì •ë³´ë¥¼ ì´ìš©í•´ì„œ ëª…ì•”ì„ ê³„ì‚°í•˜ì—¬ ë¦¬í„´í•˜ë‚Ÿ. */
     vector vNormalDesc = g_NormalTexture.Sample(PointSampler, In.vTexcoord);
     vector vDepthDesc = g_DepthTexture.Sample(PointSampler, In.vTexcoord);
     float fViewZ = vDepthDesc.y * g_fCamFar;
@@ -219,28 +219,28 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_SPOT(PS_IN In)
     vWorldPos.z = vDepthDesc.x;
     vWorldPos.w = 1.f;
 
-	/* ºä½ºÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
-	/* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Æ©¤Ì¿µÇà·Ä / w */
+	/* ë·°ìŠ¤íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
+	/* ë¡œì»¬ìœ„ì¹˜ * ì›”ë“œí–‰ë ¬ * ë·°í–‰ë ¬ * íŠœã…œì˜í–‰ë ¬ / w */
     vWorldPos = vWorldPos * fViewZ;
     vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
 
-	/* ¿ùµå½ºÆäÀÌ½º·Î ÀÌµ¿ÇÏÀÚ. */
-	/* ¿ùµå ÆäÀÌ½º »óÀÇ ¿Ïº®ÇÑ ÇÈ¼¿ÀÇ À§Ä¡¸¦ ±¸Çß´Ù. */
+	/* ì›”ë“œìŠ¤íŽ˜ì´ìŠ¤ë¡œ ì´ë™í•˜ìž. */
+	/* ì›”ë“œ íŽ˜ì´ìŠ¤ ìƒì˜ ì™„ë²½í•œ í”½ì…€ì˜ ìœ„ì¹˜ë¥¼ êµ¬í–ˆë‹¤. */
     vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
     
-    // °Å¸®
+    // ê±°ë¦¬
     float fDistance = length(vWorldPos - g_vLightPos);
-    // ½ºÆ÷Æ®¶óÀÌÆ® °è»ê
+    // ìŠ¤í¬íŠ¸ë¼ì´íŠ¸ ê³„ì‚°
     float fShade = Calc_Spot_LightPower(g_vLightDir.xyz, g_vLightPos.xyz, vNormal.xyz, vWorldPos.xyz, g_fAngle);
-    // °¨¼è
+    // ê°ì‡ 
     float fAtt = saturate((g_fLightRange - fDistance) / g_fLightRange);
-    // ºû
+    // ë¹›
     Out.vShade = (g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient))) * fAtt;
 
-    // ½ºÆäÅ§·¯ °è»ê
+    // ìŠ¤íŽ˜í˜ëŸ¬ ê³„ì‚°
     float4 vLook = vWorldPos - g_vCamPosition;
     float4 vReflect = reflect(normalize(g_vLightDir), vNormal);
-    float fSpecular = (pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 30.f)) * fAtt ;
+    float fSpecular = (pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 30.f)) * fAtt;
     Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     return Out;
@@ -289,9 +289,9 @@ PS_OUT PS_BRIGHT_COLOR(PS_IN In)
     vector vColor = g_FinalTexture.Sample(PointSampler, In.vTexcoord);
     Out.vColor = float4(vColor.rgb, 1.f);
     
-    // ºí·ë Á¶°Ç
+    // ë¸”ë£¸ ì¡°ê±´
     //float BrightColor = 1.f;
-    //float redThreshold = 0.3; // »¡°£»öÀÇ ºñÀ²À» ³ªÅ¸³»´Â ±âÁØ°ª
+    //float redThreshold = 0.3; // ë¹¨ê°„ìƒ‰ì˜ ë¹„ìœ¨ì„ ë‚˜íƒ€ë‚´ëŠ” ê¸°ì¤€ê°’
     //float greenThreshold = 0.3;
     //float blueThreshold = 0.0f;
     //if (vColor.r >= redThreshold && vColor.g >= greenThreshold && vColor.b <= blueThreshold)
@@ -304,7 +304,7 @@ PS_OUT PS_BRIGHT_COLOR(PS_IN In)
     //}
     //else
     //{
-    //    // ³ª¸ÓÁö »ö»óÀº Á¦°Å
+    //    // ë‚˜ë¨¸ì§€ ìƒ‰ìƒì€ ì œê±°
     //    Out.vColor = float4(0, 0, 0, 0);
     //}
     return Out;
@@ -322,14 +322,17 @@ float g_fWeights[13] =
 };
 float g_fWeights2[5] =
 {
-     0.7261, 0.9231, 1.f, 0.9231, 0.7261
+    0.7261, 0.9231, 1.f, 0.9231, 0.7261
 };
 float Bloom_Weights[5] =
-{ 
-    0.0545, 0.2442, 1.f, 0.2442, 0.0545 
+{
+    0.0545, 0.2442, 1.f, 0.2442, 0.0545
 };
 const float Bloom_Weights2[5] = { 0.0545, 0.2442, 0.6026, 0.2442, 0.0545 };
-
+const float Bloom_Weights3[7] =
+{
+    0.028, 0.100, 0.233, 0.278, 0.233, 0.100, 0.028
+};
 PS_OUT_BLUR PS_MAIN_BLUR_X_BLOOM(PS_IN In)
 {
     PS_OUT_BLUR Out = (PS_OUT_BLUR) 0;
@@ -339,7 +342,7 @@ PS_OUT_BLUR PS_MAIN_BLUR_X_BLOOM(PS_IN In)
     for (int i = -2; i < 3; i++)
     {
         vBlurUV = In.vTexcoord + float2(1.f / 1280.f * i, 0.f);
-        Out.vBlur += g_fWeights2[i +2] * g_FinalTexture.Sample(PointSampler, vBlurUV);
+        Out.vBlur += g_fWeights2[i + 2] * g_FinalTexture.Sample(PointSampler, vBlurUV);
     }
  
     Out.vBlur /= 2.f;
@@ -420,7 +423,7 @@ PS_OUT PS_MAIN_BLUR_FINAL(PS_IN In)
 
 
 
-// ±×´ë·Î Ãâ·Â (´Ù¿î »ùÇÃ¸µ ¿ëµµ·Î »ç¿ë)
+// ê·¸ëŒ€ë¡œ ì¶œë ¥ (ë‹¤ìš´ ìƒ˜í”Œë§ ìš©ë„ë¡œ ì‚¬ìš©)
 PS_OUT PS_MAIN_DownSample(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -431,44 +434,30 @@ PS_OUT PS_MAIN_DownSample(PS_IN In)
     
     return Out;
 }
-// ºí·¯ X
+
 PS_OUT PS_MAIN_BLUR_X_DownSample(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    
     float4 vDiffuse = float4(0.f, 0.f, 0.f, 0.f);
-    
-    int i;
-    for (i = 0; i < 5; i++)
-    {
+    for (int i = 0; i < 5; i++)
         vDiffuse += Bloom_Weights2[i] * g_DiffuseTexture.Sample(LinearSampler_Clamp, In.vTexcoord + float2(dX, 0.0) * float(i - 2));
-    }
-    
     Out.vColor = vDiffuse;
-
     return Out;
 }
-// ºí·¯ Y%
+
 PS_OUT PS_MAIN_BLUR_Y_DownSample(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    
     float4 vDiffuse = float4(0.f, 0.f, 0.f, 0.f);
-    
-    int i;
-    for (i = 0; i < 5; i++)
-    {
+    for (int i = 0; i < 5; i++)
         vDiffuse += Bloom_Weights2[i] * g_DiffuseTexture.Sample(LinearSampler_Clamp, In.vTexcoord + float2(0.0, dY) * float(i - 2));
-    }
-    
     Out.vColor = vDiffuse;
-
     return Out;
 }
 
 PS_OUT PS_MAIN_FOG(PS_IN In)
 {
-    // Áö¼ö ¾È°³
+    // ì§€ìˆ˜ ì•ˆê°œ
     //PS_OUT Out = (PS_OUT) 0;
     //float4 pixelColor = g_FinalTexture.Sample(LinearSampler_Clamp, In.vTexcoord);
     //float pixelDepth = g_DepthTexture.Sample(PointSampler, In.vTexcoord).y;
@@ -478,7 +467,7 @@ PS_OUT PS_MAIN_FOG(PS_IN In)
     //Out.vColor = finalColor;
     //return Out;
     
-    // Áö¼ö ¾È°³2
+    // ì§€ìˆ˜ ì•ˆê°œ2
     //float g_FogDensity = 1.f; 
     //float fogFactor = exp2(pow((g_FogDensity * pixelDepth), 2));
     //fogFactor = 1.f / 2.7182 * saturate(fogFactor);
@@ -521,7 +510,7 @@ PS_OUT PS_MAIN_FOG(PS_IN In)
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass  // 0
+    pass DefaultPass // 0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -532,7 +521,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEBUG();
     }
 
-    pass Light_Directional  // 1
+    pass Light_Directional // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -543,7 +532,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_LIGHT_DIRECTIONAL();
     }
 
-    pass Light_Point  // 2
+    pass Light_Point // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -554,7 +543,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_LIGHT_POINT();
     }
 
-    pass Final    // 3
+    pass Final // 3
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -565,7 +554,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_FINAL();
     }
 
-    pass BlurX    // 4
+    pass BlurX // 4
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -576,7 +565,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_X();
     }
 
-    pass BlurY    // 5
+    pass BlurY // 5
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -587,7 +576,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_Y();
     }
 
-    pass Blur_Final     // 6
+    pass Blur_Final // 6
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -598,7 +587,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_FINAL();
     }
 
-    pass Bright_Extraction    // 7
+    pass Bright_Extraction // 7
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -609,7 +598,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_BRIGHT_COLOR();
     }
 
-    pass BloomX   // 8
+    pass BloomX // 8
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -620,7 +609,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_X_BLOOM();
     }
 
-    pass BloomY   // 9
+    pass BloomY // 9
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -631,7 +620,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_Y_BLOOM();
     }
 
-    pass Bloom_Final   // 10
+    pass Bloom_Final // 10
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);

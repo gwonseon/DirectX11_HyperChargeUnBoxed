@@ -13,70 +13,80 @@
 BEGIN(Engine)
 class CCollider;
 class CLayer;
-END 
+END
 
 BEGIN(Client)
 
-class CMissile_Truck final : public CContainerObject
+class CMissile_Truck final: public CContainerObject
 {
 public:
-	typedef struct : public CGameObject::GAMEOBJ_DESC
+	typedef struct: public CGameObject::GAMEOBJ_DESC
 	{
 		LEVELID m_eLevelID{};
 		_uint*		iRound		= {nullptr};
-		CPlayer*	pPlayer		= { nullptr };
+		CPlayer*	pPlayer		= {nullptr};
 	}MISSILETRUCK_DESC;
 
-	enum MISSILETRUCK_PARTOBJID { MISSILETRUCK_BODY, MISSILETRUCK_SHOOTER, MISSILETRUCK_END};
+	enum MISSILETRUCK_PARTOBJID {
+		MISSILETRUCK_BODY,MISSILETRUCK_SHOOTER,MISSILETRUCK_END
+	};
 
 private:
-	CMissile_Truck(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMissile_Truck(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	CMissile_Truck(const CMissile_Truck& Prototype);
 	virtual ~CMissile_Truck() = default;
 
 public:
-	/* ¿øÇü»ý¼º½Ã È£Ãâ : »ý¼º½Ã ÇÊ¿äÇÑ »ó´çÈ÷ ¹«°Å¿î ÀÛ¾÷µéÀ» ¼öÇàÇÑ´Ù.(ÆÐÅ¶, ÆÄÀÏ ÀÔÃâ·Â) */
+	/* ì›í˜•ìƒì„±ì‹œ í˜¸ì¶œ : ìƒì„±ì‹œ í•„ìš”í•œ ìƒë‹¹ížˆ ë¬´ê±°ìš´ ìž‘ì—…ë“¤ì„ ìˆ˜í–‰í•œë‹¤.(íŒ¨í‚·, íŒŒì¼ ìž…ì¶œë ¥) */
 	virtual HRESULT Initialize_Prototype() override;
 
-	/* ÆÐÅ¶ÀÌ³ª ÆÄÀÏ ÀÔÃâ·ÂÀ» ÅëÇØ¼­ ¹Þ¾Æ¿ÀÁö ¸øÇÏ´Â Á¤º¸µéµµ ºÐ¸íÈ÷ Á¸ÀçÇÑ´Ù. */
-	/* ¿øÇü¿¡°Ô Á¸ÀçÇÏ´Â ¾Ê´Â Ãß°¡ÀûÀÎ ÃÊ±âÈ­°¡ ÇÊ¿äÇÑ °æ¿ì È£ÃâÇÑ¤¤´Ù. */
+	/* íŒ¨í‚·ì´ë‚˜ íŒŒì¼ ìž…ì¶œë ¥ì„ í†µí•´ì„œ ë°›ì•„ì˜¤ì§€ ëª»í•˜ëŠ” ì •ë³´ë“¤ë„ ë¶„ëª…ížˆ ì¡´ìž¬í•œë‹¤. */
+	/* ì›í˜•ì—ê²Œ ì¡´ìž¬í•˜ëŠ” ì•ŠëŠ” ì¶”ê°€ì ì¸ ì´ˆê¸°í™”ê°€ í•„ìš”í•œ ê²½ìš° í˜¸ì¶œí•œã„´ë‹¤. */
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-	
+
 
 public:
-	CCollider* Get_Collider() { return m_pColliderCom; }
-	_float* Get_HP_Ptr() { return &m_fHp; }
+	CCollider* Get_Collider() {
+		return m_pColliderCom;
+	}
+	_float* Get_HP_Ptr() {
+		return &m_fHp;
+	}
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Bind_ShaderResources();
 
 public:
-	_float* Get_Timer() { return (m_pTracker->Get_Timer()); }
-	CTracker* Get_Tracker() { return m_pTracker; }
+	_float* Get_Timer() {
+		return (m_pTracker->Get_Timer());
+	}
+	CTracker* Get_Tracker() {
+		return m_pTracker;
+	}
 
 private:
-	CTruckShooter*	m_pShooter		=	{ nullptr };
-	CTracker*		m_pTracker		=	{ nullptr };
-	CTruckBody*		m_pTruckBody	=	{ nullptr };
-	CTruck_Missile* m_pMissile		=	{ nullptr };
-	CPlayer*		m_pPlayer		=	{ nullptr };
-	CCollider*		m_pColliderCom	=	{ nullptr };
-	CLayer*			pTruck = { nullptr };
-	_uint*			m_iRound		=	{ nullptr };
+	CTruckShooter*	m_pShooter		=	{nullptr};
+	CTracker*		m_pTracker		=	{nullptr};
+	CTruckBody*		m_pTruckBody	=	{nullptr};
+	CTruck_Missile* m_pMissile		=	{nullptr};
+	CPlayer*		m_pPlayer		=	{nullptr};
+	CCollider*		m_pColliderCom	=	{nullptr};
+	CLayer*			pTruck = {nullptr};
+	_uint*			m_iRound		=	{nullptr};
 
 private:
 	LEVELID m_eLevelID{};
-	_float3 m_fPos{}, m_fScale{};
-	
+	_float3 m_fPos{},m_fScale{};
+
 	_bool m_bSoundOnce = false;
 
 public:
-	static CMissile_Truck* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMissile_Truck* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 
