@@ -169,9 +169,6 @@
     <Filter Include="02. GameObjects\Monster\Blimp">
       <UniqueIdentifier>{0cd2b8c8-f6a4-473c-ab3b-a14aa3bbc3c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\Level_Select">
-      <UniqueIdentifier>{77ce3ac7-86a9-4da9-853a-fb5fdf6b9b82}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels\02. Game_Yard">
       <UniqueIdentifier>{ef8d556f-7b84-4f02-91db-eec1a6ee363e}</UniqueIdentifier>
     </Filter>
@@ -325,6 +322,18 @@
     <Filter Include="02. GameObjects\UI\GamePlay_UI\InGameUI\ConstUI">
       <UniqueIdentifier>{7d39388f-8cdf-4093-b3eb-826b6c3c495d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Player2">
+      <UniqueIdentifier>{76d15014-a6a3-4fd5-8ac0-b2e87159dd77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Camera\Camera_Tool">
+      <UniqueIdentifier>{31c38a0b-0f48-478a-a337-aed98ac88466}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Pivot\FPS_Pivot">
+      <UniqueIdentifier>{b7232cb5-ae0e-4287-9d17-db5f3020d92f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player\Pivot\TPS_Pivot">
+      <UniqueIdentifier>{f7c37fe2-7deb-4efb-895a-9e2f098456d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -402,9 +411,6 @@
     <ClInclude Include="..\Public\Head_Player.h">
       <Filter>02. GameObjects\Player\Head</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Pivot.h">
-      <Filter>02. GameObjects\Player\Pivot</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\CollisionBox.h">
       <Filter>02. GameObjects\CollisionBox</Filter>
     </ClInclude>
@@ -419,9 +425,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Player_FPS.h">
       <Filter>02. GameObjects\Player\FPS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\FPS_Pivot.h">
-      <Filter>02. GameObjects\Player\Pivot</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tank.h">
       <Filter>02. GameObjects\Monster\Tank</Filter>
@@ -521,9 +524,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Level_Yard.h">
       <Filter>01. Levels\02. Game_Yard</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Level_Select.h">
-      <Filter>01. Levels\Level_Select</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Coin_Item.h">
       <Filter>02. GameObjects\Environment\Coin_Item</Filter>
@@ -639,6 +639,18 @@
     <ClInclude Include="..\Public\ConstUI.h">
       <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\ConstUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player2.h">
+      <Filter>02. GameObjects\Player2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Tool.h">
+      <Filter>02. GameObjects\Camera\Camera_Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FPS_Pivot.h">
+      <Filter>02. GameObjects\Player\Pivot\FPS_Pivot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Pivot.h">
+      <Filter>02. GameObjects\Player\Pivot\TPS_Pivot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -707,9 +719,6 @@
     <ClCompile Include="..\Private\Head_Player.cpp">
       <Filter>02. GameObjects\Player\Head</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Pivot.cpp">
-      <Filter>02. GameObjects\Player\Pivot</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\CollisionBox.cpp">
       <Filter>02. GameObjects\CollisionBox</Filter>
     </ClCompile>
@@ -724,9 +733,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_FPS.cpp">
       <Filter>02. GameObjects\Player\FPS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\FPS_Pivot.cpp">
-      <Filter>02. GameObjects\Player\Pivot</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tank.cpp">
       <Filter>02. GameObjects\Monster\Tank</Filter>
@@ -811,9 +817,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Yard.cpp">
       <Filter>01. Levels\02. Game_Yard</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Level_Select.cpp">
-      <Filter>01. Levels\Level_Select</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Coin_Item.cpp">
       <Filter>02. GameObjects\Environment\Coin_Item</Filter>
@@ -931,6 +934,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\ConstUI.cpp">
       <Filter>02. GameObjects\UI\GamePlay_UI\InGameUI\ConstUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player2.cpp">
+      <Filter>02. GameObjects\Player2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Tool.cpp">
+      <Filter>02. GameObjects\Camera\Camera_Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FPS_Pivot.cpp">
+      <Filter>02. GameObjects\Player\Pivot\FPS_Pivot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pivot.cpp">
+      <Filter>02. GameObjects\Player\Pivot\TPS_Pivot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

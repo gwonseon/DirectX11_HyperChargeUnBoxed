@@ -176,6 +176,7 @@
     <ClInclude Include="..\Public\BulletUI.h" />
     <ClInclude Include="..\Public\ButtonUI.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\Public\Camera_Tool.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Coin.h" />
     <ClInclude Include="..\Public\Coin_Item.h" />
@@ -215,10 +216,6 @@
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
-    <ClInclude Include="..\Public\Level_Select.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Loading_UI.h" />
     <ClInclude Include="..\Public\MachineHp.h" />
@@ -238,6 +235,7 @@
     <ClInclude Include="..\Public\Particle_Snow.h" />
     <ClInclude Include="..\Public\Pivot.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\Player2.h" />
     <ClInclude Include="..\Public\PlayerHp.h" />
     <ClInclude Include="..\Public\Player_Build.h" />
     <ClInclude Include="..\Public\Player_FPS.h" />
@@ -293,6 +291,7 @@
     <ClCompile Include="..\Private\BulletUI.cpp" />
     <ClCompile Include="..\Private\ButtonUI.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Camera_Tool.cpp" />
     <ClCompile Include="..\Private\Coin.cpp" />
     <ClCompile Include="..\Private\Coin_Item.cpp" />
     <ClCompile Include="..\Private\Collector.cpp" />
@@ -331,10 +330,6 @@
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
-    <ClCompile Include="..\Private\Level_Select.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Loading_UI.cpp" />
     <ClCompile Include="..\Private\MachineHp.cpp" />
@@ -354,6 +349,7 @@
     <ClCompile Include="..\Private\Particle_Snow.cpp" />
     <ClCompile Include="..\Private\Pivot.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\Player2.cpp" />
     <ClCompile Include="..\Private\PlayerHp.cpp" />
     <ClCompile Include="..\Private\Player_Build.cpp" />
     <ClCompile Include="..\Private\Player_FPS.cpp" />

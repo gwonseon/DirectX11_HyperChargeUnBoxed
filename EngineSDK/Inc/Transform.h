@@ -73,7 +73,11 @@ public:
 public:
 	void Set_Scaling(_float fScaleX,_float fScaleY,_float fScaleZ);
 	void LookAt(_fvector vAt);
+	
+	void CameraAt(_fvector vAt);
+	_vector Get_CameraAt() const {	return  m_vecAt;	}
 
+	// 그냥 이동
 	void Go_Straight(_float fTimeDelta);
 	void Go_Straight(_float fTimeDelta,_float AddfSpeed);
 	void Go_Left(_float fTimeDelta);
@@ -86,28 +90,33 @@ public:
 	void Set_Min_Height();
 	_bool KnockBack(_float fTimeDelta,_vector vKnockBackDir,_float& fPower,_float StartHeight);
 
+	// 네비 이동
 	void Go_Left_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
 	void Go_Right_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
 	void Go_Straight_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
 	void Go_Backward_Nav(_float fTimeDelta,class CNavigation* pNavigation = nullptr);
 	void Go_Straight_Nav_Type2(_float fTimeDelta,_vector vPos,class CNavigation* pNavigation = nullptr);
 
+	// 플레이어용 이동 함수
 	void Go_Straight_Player(_float fTimeDelta);
 	void Go_Straight_Player(_float fTimeDelta,_float AddfSpeed);
 	void Go_Left_Player(_float fTimeDelta);
 	void Go_Right_Player(_float fTimeDelta);
 	void Go_Backward_Player(_float fTimeDelta);
 
+	// 수학계산
 	_float Cal_Distance(_float3 fObj,_float3 fTarget);
 	_float Cal_Distance_vec(_vector vObj,_vector vTarget);
 	_float Cal_Distance_No_Height(_float3 fObj,_float3 fTarget);
 	_float Cal_Distance_vec_No_Height(_vector vObj,_vector vTarget);
 
-
+	// 중력
 	void Gravity(_vector vPos,_float fTimeDelta,_float fMinHeight);
+	// 타겟을 지나쳤는지 검사
 	_bool  IsPass_TargetPosition(_vector prevPos,_vector currentPos,_vector targetPos);
-	// A스타 이동
+
 public:
+	// 길찾기
 	vector<_float3> PathFind(_float fTimeDelta,CNavigation* pNavigation,_int CurrentCell_Idx,_int TargetCell_Idx);
 
 
@@ -120,7 +129,7 @@ private:
 	_float						m_fRotationPerSec = {};
 	_float3						m_fPosition = {};
 	_float3						m_fScale = {};
-
+	_vector						m_vecAt{};
 	_uint						m_iCurrent_JumpState{};
 	_float						m_fStart_Height{};
 	_float						m_fJumpSpeed{};

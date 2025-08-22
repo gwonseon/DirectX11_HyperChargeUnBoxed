@@ -2,7 +2,7 @@
 #include "..\Public\Level_ImGui.h"
 
 
-#include "Camera_Free.h"
+#include "Camera_Tool.h"
 #include "Monster.h"
 #include "Level_Loading.h"
 #include <Terrain.h>
@@ -2204,7 +2204,7 @@ void CLevel_ImGui::Create_ImageButton()
 
 HRESULT CLevel_ImGui::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
-	CCamera_Free::CAMERA_FREE_DESC			Desc{};
+	CCamera_Tool::CAMERA_TOOL_DESC			Desc{};
 
 	Desc.vEye = _float4(0.f,10.f,-5.f,1.f);
 	Desc.vAt = _float4(0.f,0.f,0.f,1.f);
@@ -2217,7 +2217,7 @@ HRESULT CLevel_ImGui::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.fMouseSensor = 0.05f;
 	Desc.eLevel = LEVEL_IMGUI;
 	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_IMGUI,pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free_ImGui"),&Desc)))
+		TEXT("Prototype_GameObject_Camera_Tool"),&Desc)))
 		return E_FAIL;
 
 	return S_OK;

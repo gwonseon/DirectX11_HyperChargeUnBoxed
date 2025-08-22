@@ -810,7 +810,6 @@ HRESULT CLevel_Yard::Ready_Layer_Terrain(const _tchar* pLayerTag)
 HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
 	CCamera_Free::CAMERA_FREE_DESC			Desc{};
-
 	Desc.vEye = _float4(418.755f,1.5f,245.710f,1.f);
 	Desc.fPosition = _float3(418.755f,1.5f,245.710f);
 	Desc.vAt = _float4(0.f,0.f,1.f,1.f);
@@ -820,18 +819,13 @@ HRESULT CLevel_Yard::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	Desc.fSpeedPerSec = 20.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
-	Desc.fMouseSensor = 0.1f;
-	Desc.eLevel = LEVEL_YARD;
 	Desc.matPlayerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
 	Desc.m_vecTPS_CamPos = m_pPlayer->Get_TPSPosptr();
 	Desc.m_vecFPS_CamPos = m_pPlayer->Get_FPSPosptr();
 	Desc.iViewState = m_pPlayer->Get_ViewState();
 	Desc.m_vecWeaponPos = m_pPlayer->Get_WeaponPos();
 	Desc.m_vecWeaponDir = m_pPlayer->Get_WeaponDir();
-	Desc.bShotNow = m_pPlayer->Get_ShotNow();
 	Desc.bShotStart = m_pPlayer->Get_ShotStart();
-	Desc.iWeaponState = m_pPlayer->Get_WeaponState();
-	Desc.iUpperMotion = m_pPlayer->Get_UpperMotion();
 	m_pCamera = static_cast<CCamera_Free*>(m_pGameInstance->Add_GameObject_ToLayer_ReturnObject(LEVEL_YARD,pLayerTag,TEXT("Prototype_GameObject_Camera_Free"),&Desc));
 	m_pPlayer->Set_CameraAt(m_pCamera->Get_Camera_At());
 	m_pPlayer->Set_CameraPos(m_pCamera->Get_Camera_Pos());

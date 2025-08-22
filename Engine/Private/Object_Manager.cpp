@@ -73,7 +73,6 @@ CGameObject* CObject_Manager::Add_GameObject_ToLayer_ReturnObject(_uint iLevelIn
 	if (nullptr == pPrototype)
 		return nullptr;
 
-
 	CGameObject* pGameObject = pPrototype->Clone(pArg);
 	if (nullptr == pGameObject)
 		return nullptr;

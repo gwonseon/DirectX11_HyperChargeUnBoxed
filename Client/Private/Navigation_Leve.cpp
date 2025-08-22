@@ -581,7 +581,7 @@ HRESULT CNavigation_Leve::Ready_Layer_Terrain(const _tchar* pLayerTag)
 }
 HRESULT CNavigation_Leve::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
-	CCamera_Free::CAMERA_FREE_DESC			Desc{};
+	CCamera_Tool::CAMERA_TOOL_DESC			Desc{};
 	Desc.vEye = _float4(386.295f,10.f,450.425f,1.f);
 	Desc.vAt = _float4(0.f,0.f,0.f,1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
@@ -594,7 +594,7 @@ HRESULT CNavigation_Leve::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.eLevel = LEVEL_NAVIGATION;
 
 	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_NAVIGATION,pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free"),&Desc)))
+		TEXT("Prototype_GameObject_Camera_Tool"),&Desc)))
 		return E_FAIL;
 
 	return S_OK;
