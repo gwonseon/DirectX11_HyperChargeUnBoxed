@@ -35,16 +35,12 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_vecCameraPos = pPlayer->vCameraPos;
 	m_iRound = pPlayer->iRound;
 
-	/* 추가적으로 초기화가 필요하다면 수행해준다. */
 	if(FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
-
 	if(FAILED(Add_Components()))
 		return E_FAIL;
 	if(FAILED(Add_PartObjects()))
 		return E_FAIL;
-
-
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,XMVectorSet(pPlayer->fPosition.x,pPlayer->fPosition.y,pPlayer->fPosition.z,1.f));
 	m_pTransformCom->Set_Scaling(1.5f,1.5f,1.5f);
@@ -53,15 +49,12 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
 	m_pKatana = static_cast<CWeapon_Katana*>(m_PartObjects[TPS_PART_KATANA]);
 	m_pHead = static_cast<CHead_Player*>(m_PartObjects[TPS_PART_HEAD]);
-
 	CPivot* m_pTPSPivot = static_cast<CPivot*>(m_PartObjects[TPS_PART_PIVOT]);
 	CFPS_Pivot* m_pFPSPivot = static_cast<CFPS_Pivot*>(m_PartObjects[FPS_PART_PIVOT]);
-
 	m_vecTPS_CamPos = m_pTPSPivot->Get_TPS_CameraPos();
 	m_vecFPS_CamPos = m_pFPSPivot->Get_FPS_CameraPos();
 	m_vecWeaponPos = m_pWaepon->Get_WeaponPos();
 	m_vecWeaponDir = m_pWaepon->Get_WeaponDir();
-
 
 	m_fHp = 100.f;
 	m_fEnergy = 100.f;
@@ -116,8 +109,6 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	if(MouseMove = m_pGameInstance->Get_DIMouseMove(DIMS_X))
 		m_pTransformCom->Turn(XMVectorSet(0.f,1.f,0.f,0.f),fTimeDelta * MouseMove * m_fMouseSensor);
 
-
-
 	m_vecPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	_float3 pos{};
 	XMStoreFloat3(&pos,m_vecPos);
@@ -125,15 +116,6 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	Player_Movement(fTimeDelta);					// 플레이어 동작
 
 	#pragma endregion 카메라회전
-
-	#pragma region 지워
-	if(m_pGameInstance->Get_DIKeyState_Down(DIK_P))
-	{
-		cout << "Cell : " << m_pNavigationCom->Get_CurrentCell_Index() << endl;
-		cout << pos.x << "     " << pos.y << "     " << pos.z << endl;
-	}
-
-	#pragma endregion 지워	
 
 	if(m_iViewState == PLAYER_FPS_VIEW)
 	{
@@ -202,14 +184,11 @@ void CPlayer::Update(_float fTimeDelta)
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
-
 	__super::Late_Update(fTimeDelta);
 
 	if(m_bDead == false)
-	{
 		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 			return;
-	}
 
 }
 HRESULT CPlayer::Render()
@@ -336,7 +315,6 @@ HRESULT CPlayer::Add_PartObjects()
 	PivotDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	PivotDesc.fSpeedPerSec = 0.f;
 	PivotDesc.fRotationPerSec = 0.f;
-	PivotDesc.pParentState = &m_iState_Upper;
 	PivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	PivotDesc.m_iViewState = &m_iViewState;
 
@@ -346,7 +324,6 @@ HRESULT CPlayer::Add_PartObjects()
 	CFPS_Pivot::FPSPIVOT_DESC	FPSPivotDesc{};
 	FPSPivotDesc.fSpeedPerSec = 0.f;
 	FPSPivotDesc.fRotationPerSec = 0.f;
-	FPSPivotDesc.pParentState = &m_iState_Upper;
 	FPSPivotDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	FPSPivotDesc.pSocketMatrix = static_cast<CBody_Player*>(m_PartObjects[TPS_PART_BODY])->Get_SocketMatrix("Camera");
 	FPSPivotDesc.m_iViewState = &m_iViewState;

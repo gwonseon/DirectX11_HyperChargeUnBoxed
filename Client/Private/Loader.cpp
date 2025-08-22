@@ -14,6 +14,7 @@
 
 #include "Terrain.h"
 #include "Camera_Free.h"
+#include "Camera_Tool.h"
 
 #include "Tank.h"
 #include "Helicopter.h"
@@ -1522,11 +1523,11 @@ HRESULT CLoader::Loading_For_ImGuiLevel()
 			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	/* Prototype_GameObject_Camera_Free */
-	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free_ImGui")) == nullptr)
+	/* Prototype_GameObject_Camera_Tool */
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Tool")) == nullptr)
 	{
-		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free_ImGui"),
-			CCamera_Free::Create(m_pDevice,m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Tool"),
+			CCamera_Tool::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Coin")) == nullptr)
@@ -1726,11 +1727,11 @@ HRESULT CLoader::Loading_For_NavigationLevel()
 			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	/* Prototype_GameObject_Camera_Free */
-	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	/* Prototype_GameObject_Camera_Tool */
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Tool")) == nullptr)
 	{
-		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-			CCamera_Free::Create(m_pDevice,m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Tool"),
+			CCamera_Tool::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 	// Environment
@@ -1940,11 +1941,11 @@ HRESULT CLoader::Loading_For_MonsterSpawnLevel()
 			CTerrain::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
-	/* Prototype_GameObject_Camera_Free */
-	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Free")) == nullptr)
+	/* Prototype_GameObject_Camera_Tool */
+	if(m_pGameInstance->Find_Prototype(TEXT("Prototype_GameObject_Camera_Tool")) == nullptr)
 	{
-		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-			CCamera_Free::Create(m_pDevice,m_pContext))))
+		if(FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Tool"),
+			CCamera_Tool::Create(m_pDevice,m_pContext))))
 			return E_FAIL;
 	}
 

@@ -12,7 +12,6 @@
 
 
 BEGIN(Engine)
-
 class CNavigation;
 END
 
@@ -183,10 +182,7 @@ private:
 	_bool					m_bJumpStart = false;
 	_uint					m_iJumpCount = 0;
 private:
-	_bool					m_bKey_A = false;
-	_bool					m_bKey_W = false;
-	_bool					m_bKey_D = false;
-	_bool					m_bKey_S = false;
+
 	_bool					m_bKey_Shift = false;
 	_bool					m_bKey_R = false;
 	_bool					m_bReloading = false;

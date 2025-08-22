@@ -53,6 +53,22 @@ void CTransform::LookAt(_fvector vAt)
 
 }
 
+void CTransform::CameraAt(_fvector vAt)
+{
+	m_vecAt = vAt;
+
+	_float3	vScaled = Get_Scaled();
+	_vector vLook = vAt - Get_State(STATE_POSITION);
+	_vector	vRight = XMVector3Cross(XMVectorSet(0.f,1.f,0.f,0.f),vLook);
+	_vector	vUp = XMVector3Cross(vLook,vRight);
+
+	Set_State(STATE_RIGHT,XMVector3Normalize(vRight) * vScaled.x);
+	Set_State(STATE_UP,XMVector3Normalize(vUp) * vScaled.y);
+	Set_State(STATE_LOOK,XMVector3Normalize(vLook) * vScaled.z);
+
+	
+}
+
 void CTransform::Go_Straight_Nav(_float fTimeDelta,CNavigation* pNavigation)
 {
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);

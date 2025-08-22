@@ -2,7 +2,7 @@
 #include "..\Public\Monster_Path.h"
 
 
-#include "Camera_Free.h"
+#include "Camera_Tool.h"
 #include "Monster.h"
 #include "Level_Loading.h"
 
@@ -120,7 +120,7 @@ HRESULT CMonster_Path::Ready_Layer_Terrain(const _tchar* pLayerTag)
 
 HRESULT CMonster_Path::Ready_Layer_Camera(const _tchar* pLayerTag)
 {
-	CCamera_Free::CAMERA_FREE_DESC			Desc{};
+	CCamera_Tool::CAMERA_TOOL_DESC			Desc{};
 	Desc.vEye = _float4(0.f,10.f,-5.f,1.f);
 	Desc.vAt = _float4(0.f,0.f,0.f,1.f);
 	Desc.fFovy = XMConvertToRadians(60.0f);
@@ -132,7 +132,7 @@ HRESULT CMonster_Path::Ready_Layer_Camera(const _tchar* pLayerTag)
 	Desc.fMouseSensor = 0.05f;
 	Desc.eLevel = LEVEL_MONSTERSPAWN;
 	if(FAILED(m_pGameInstance->Add_GameObject_ToLayer(LEVEL_MONSTERSPAWN,pLayerTag,
-		TEXT("Prototype_GameObject_Camera_Free"),&Desc)))
+		TEXT("Prototype_GameObject_Camera_Tool"),&Desc)))
 		return E_FAIL;
 
 	return S_OK;

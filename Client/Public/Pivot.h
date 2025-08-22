@@ -15,7 +15,6 @@ class CPivot final: public CPartObject
 public:
 	typedef struct: CPartObject::PARTOBJECT_DESC
 	{
-		const _uint* pParentState = {nullptr};
 		const _float4x4* pSocketMatrix = {nullptr};
 
 	}PIVOT_DESC;
@@ -34,7 +33,6 @@ public:
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
 
 
 public:
@@ -42,28 +40,18 @@ public:
 		return &m_vecTPS_CamPos;
 	}
 
-public:
-	_vector Get_PivotPos() {
-		return m_vPostion;
-	}
 
 private:
-	CShader* m_pShaderCom = {nullptr};
-	CModel* m_pModelCom = {nullptr};
+
 	const _float4x4* m_pSocketMatrix = {nullptr};
-	const _uint* m_pParentState = {nullptr};
 
 
+private:
 	_vector m_vecTPS_CamPos{};
-private:
-	_vector m_vPostion{};
+
+	_float3 Position= {-0.439998f,-0.109998f,1.84475};
 
 
-private:
-	HRESULT Add_Components();
-	HRESULT Bind_ShaderResources();
-
-	_float3 Position{},Rotation{};
 public:
 	static CPivot* Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

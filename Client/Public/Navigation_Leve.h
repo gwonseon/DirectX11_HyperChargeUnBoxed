@@ -6,7 +6,7 @@
 #include "Mesh.h"
 #include "GameInstance.h"
 #include "Environment.h"
-#include "Camera_Free.h"
+#include "Camera_Tool.h"
 #include "CollisionBox.h"
 #include "Terrain.h"
 
