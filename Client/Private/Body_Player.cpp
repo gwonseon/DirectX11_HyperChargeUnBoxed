@@ -19,15 +19,12 @@ const _float4x4* CBody_Player::Get_SocketMatrix(const _char* pBoneName)
 
 HRESULT CBody_Player::Initialize_Prototype()
 {
-	/* 패킷, 파일입ㅇ출력을 통한 초기화. */
-
 	return S_OK;
 }
 
 HRESULT CBody_Player::Initialize(void* pArg)
 {
 	BODY_PLAYER_DESC* pDesc = static_cast<BODY_PLAYER_DESC*>(pArg);
-
 	m_pParentState_Upper = pDesc->pParentState_Upper;
 	m_pParentState_Lower = pDesc->pParentState_Lower;
 	m_bAttackState = pDesc->m_bAttackState;
@@ -39,10 +36,10 @@ HRESULT CBody_Player::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_iViewState = pDesc->m_iViewState;
+	m_iUpperMotion = IDLE_MOTION;
 
 	m_pModelCom->Set_Animation_LowerBody(PLAYER_ANIM_Idle_Unarmed,true);
 	m_pModelCom->Set_Animation_UpperBody(PLAYER_ANIM_FiringAnimation8_Base,true);
-	m_iUpperMotion = IDLE_MOTION;
 
 
 	return S_OK;
@@ -158,8 +155,6 @@ void CBody_Player::Late_Update(_float fTimeDelta)
 
 HRESULT CBody_Player::Render()
 {
-
-
 	if(FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -190,7 +185,6 @@ HRESULT CBody_Player::Render()
 HRESULT CBody_Player::Render_Shadow()
 {
 	_float4x4			ViewMatrix,ProjMatrix;
-
 	_float fFar = m_pGameInstance->Get_CameraFar();
 	_float4 fPlayerPos = m_pGameInstance->Get_PlayerPos();
 	XMStoreFloat4x4(&ViewMatrix,XMMatrixLookAtLH(XMVectorSet(fPlayerPos.x - 5.f,fPlayerPos.y + 10.f,fPlayerPos.y - 5.f,1.f),XMVectorSet(fPlayerPos.x,fPlayerPos.y,fPlayerPos.y,1.f),XMVectorSet(0.f,1.f,0.f,0.f)));
@@ -287,7 +281,6 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 				m_iUpperMotion = LOCKETLAUNCHER_FIRE_MOTION;
 				break;
 			}
-
 			default:
 			break;
 			}
@@ -329,7 +322,6 @@ void CBody_Player::UpperBody_Anim(_float fTimeDelta)
 
 	}
 }
-
 void CBody_Player::LowerBody_Anim(_float fTimeDelta)
 {
 	if(m_iJumpState == 0)
@@ -853,13 +845,11 @@ HRESULT CBody_Player::Bind_ShaderResources()
 CBody_Player* CBody_Player::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
 	CBody_Player* pInstance = new CBody_Player(pDevice,pContext);
-
 	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CBody_Player");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

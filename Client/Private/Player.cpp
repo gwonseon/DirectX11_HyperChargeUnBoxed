@@ -46,6 +46,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaling(1.5f,1.5f,1.5f);
 	m_iWeaponState = WEAPON_RIFLE;
 	m_iPrevWeaponState = WEAPON_END;
+
 	m_pWaepon = static_cast<CWeapon*>(m_PartObjects[TPS_PART_WEAPON]);
 	m_pKatana = static_cast<CWeapon_Katana*>(m_PartObjects[TPS_PART_KATANA]);
 	m_pHead = static_cast<CHead_Player*>(m_PartObjects[TPS_PART_HEAD]);
@@ -63,10 +64,11 @@ HRESULT CPlayer::Initialize(void* pArg)
 	m_bDontDestroy = true;
 	m_bKnockdown = false;
 
-	m_fRun_FourDirection = 1.5f;
-	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f;
+	m_fRun_FourDirection = 1.5f;  // 상하좌우 달리기 속도
+	m_fRun_EightDirection = m_fRun_FourDirection * 0.5f; // 대각선 방향 달리기 속도 
 	m_bAffected = true;
 	m_bBuildMode = true;
+	// 빌드 모드 빌드가능 체크에 대해서 비트 플래그 사용할까? 고민좀
 	return S_OK;
 }
 
@@ -77,14 +79,13 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 	if(m_bBuildMode == true && m_bBuild_Able == true)
 	{
 		if(m_pGameInstance->Get_DIKeyState_Pressing(DIK_E))
-		{
 			m_bBuild_Gauging = true;
-		} else
+		else
 			m_bBuild_Gauging = false;
-	} else
-	{
+	} 
+	else
 		m_bBuild_Gauging = false;
-	}
+
 	// 빌드모드 건너뛰기
 	if(m_pGameInstance->Get_DIKeyState_Down(DIK_F) && *m_bRoundStart == false)
 	{
@@ -141,6 +142,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		m_bReloading = false;			// 장전 false
 		m_pWaepon->Set_BulletIn(true);	// 총한테 장전되었다고 알려주기
 	}
+
 	m_pWaepon->Set_CameraPos(m_vecCameraPos);			// 카메라 At 보내주기
 	m_pWaepon->Set_CameraAt(m_vecCameraAt);			// 카메라 At 보내주기
 	m_pGameInstance->Set_PlayerPos(_float4(pos.x,pos.y,pos.z,1.f)); // 플레이어 위치 저장
@@ -150,8 +152,7 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 		m_pWaepon->Set_WeaponState(m_iWeaponState);		// 무기에게 무기 상태 보내주기
 	}
 	m_iPrevWeaponState = m_iWeaponState;
-	if(m_iWeaponState == BATTERY)		m_iViewState = PLAYER_FPS_VIEW; // 배터리는 무조건 1인칭
-	if(m_iWeaponState == TRACKER)		m_iViewState = PLAYER_FPS_VIEW; // 추적기는 무조건 1인칭
+	if(m_iWeaponState == BATTERY || m_iWeaponState == TRACKER)		m_iViewState = PLAYER_FPS_VIEW; // 배터리 & 추적기는 무조건 1인칭
 
 	if(m_iWeaponState == WEAPON_KATANA)			// 칼에게 무기 상태 보내주기	
 	{
@@ -170,7 +171,6 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 void CPlayer::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
-
 	// 공격 당했을 때 무적상태 1초간 
 	if(m_bCanAttacked == false)
 		m_fInvincibleTime += fTimeDelta;
@@ -179,7 +179,6 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bCanAttacked = true;
 		m_fInvincibleTime = 0.f;
 	}
-
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -189,12 +188,10 @@ void CPlayer::Late_Update(_float fTimeDelta)
 	if(m_bDead == false)
 		if(FAILED(m_pGameInstance->Add_RenderGameObject(CRenderer::RG_NONBLEND,this)))
 			return;
-
 }
 HRESULT CPlayer::Render()
 {
 	#ifdef _DEBUG
-
 	m_pNavigationCom->Render();
 	#endif
 	return S_OK;
@@ -211,7 +208,8 @@ void CPlayer::Heal(_float fTimeDelta)
 			{
 				m_fEnergy += 1.f;
 			}
-		} else
+		} 
+		else
 		{
 			// 피가 부족하면 피 충전
 			m_fHp += 1.f;
@@ -220,19 +218,12 @@ void CPlayer::Heal(_float fTimeDelta)
 	m_fHpTiem += fTimeDelta;
 }
 
-
-
-
 HRESULT CPlayer::Add_Components()
 {
-	// For.Comigation
 	CNavigation::NAVIGATION_DESC		Desc{};
-
 	Desc.iCurrentCellIndex = m_iCellidx;
-
 	switch(m_eLevelID)
 	{
-
 	case Client::LEVEL_GAMEPLAY:
 	{
 		if(FAILED(__super::Add_Component(LEVEL_STATIC,TEXT("Prototype_Component_Navigation"),
@@ -247,7 +238,6 @@ HRESULT CPlayer::Add_Components()
 			return E_FAIL;
 		break;
 	}
-
 	default:
 	break;
 	}
@@ -398,9 +388,7 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 
 		}
 
-
 		m_pGameInstance->isPicked(&m_vecTargetPos);
-
 
 		if(!(m_iState_Upper & FIRE))
 		{
@@ -762,37 +750,28 @@ void CPlayer::Player_Movement(_float fTimeDelta)
 CPlayer* CPlayer::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
 	CPlayer* pInstance = new CPlayer(pDevice,pContext);
-
 	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CPlayer");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
-
 CGameObject* CPlayer::Clone(void* pArg)
 {
 	CPlayer* pInstance = new CPlayer(*this);
-
 	if(FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Created : CPlayer");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
-
 void CPlayer::Free()
 {
 	__super::Free();
-
 	Safe_Release(m_pNavigationCom);
 }
-
-
 
 void CPlayer::Walk_Sound(_float fTimDelta)
 {

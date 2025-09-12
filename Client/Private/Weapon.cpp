@@ -36,10 +36,8 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_vecTargetPos = pDesc->vTargetPos;
 	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
 	if(FAILED(Add_Components()))
 		return E_FAIL;
-
 	Position = {-0.86f,0.12f,-0.39f};
 	Scale = {2.3f};
 	Rotation = {8.87969f,-115.2f,6.4f};
@@ -91,7 +89,6 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 					m_fAngle_Y = -60.f;
 			}
 			m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y),XMConvertToRadians(Rotation.y),XMConvertToRadians(Rotation.z));
-			//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
 		} else
 		{
 			_long MouseMoveY = {0};
@@ -105,8 +102,6 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 					m_fAngle_Y = -50.f;
 			}
 			m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y),XMConvertToRadians(Rotation.y),XMConvertToRadians(Rotation.z));
-
-			//	m_pTransformCom->Turn(false, false, true, fTimeDelta * MouseMoveY * 0.1f);
 		}
 	}
 
@@ -188,12 +183,7 @@ void CWeapon::Priority_Update(_float fTimeDelta)
 
 void CWeapon::Update(_float fTimeDelta)
 {
-
-
-
-
 	m_pTransformCom->Set_Scaling(Scale,Scale,Scale);
-
 	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
 	for(size_t i = 0; i < 3; i++)

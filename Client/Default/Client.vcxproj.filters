@@ -334,6 +334,21 @@
     <Filter Include="02. GameObjects\Player\Pivot\TPS_Pivot">
       <UniqueIdentifier>{f7c37fe2-7deb-4efb-895a-9e2f098456d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObjects\Player2\Player_State">
+      <UniqueIdentifier>{2d794b18-0537-4ec3-8766-77f8f5930536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player2\Player_State\PlayerState_Idle">
+      <UniqueIdentifier>{a316ab46-330b-4c65-b5f6-61c40601a550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player2\Player2_Parts">
+      <UniqueIdentifier>{f1e66dee-1546-4f41-8316-a8200f4a280d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player2\Player2_Parts\Player2_Body">
+      <UniqueIdentifier>{c96bca3f-ac9d-4f17-8ffe-b6bed4f59288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObjects\Player2\Player2_Parts\Player2_Head">
+      <UniqueIdentifier>{b1de5574-021d-4c78-8586-0fc665af007e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -651,6 +666,24 @@
     <ClInclude Include="..\Public\Pivot.h">
       <Filter>02. GameObjects\Player\Pivot\TPS_Pivot</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\PlayerState_Idle.h">
+      <Filter>02. GameObjects\Player2\Player_State\PlayerState_Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_State.h">
+      <Filter>02. GameObjects\Player2\Player_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_Define.h">
+      <Filter>02. GameObjects\Player2\Player_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player2_Body.h">
+      <Filter>02. GameObjects\Player2\Player2_Parts\Player2_Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player2_Parts.h">
+      <Filter>02. GameObjects\Player2\Player2_Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player2_Head.h">
+      <Filter>02. GameObjects\Player2\Player2_Parts\Player2_Head</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -946,6 +979,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Pivot.cpp">
       <Filter>02. GameObjects\Player\Pivot\TPS_Pivot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerState_Idle.cpp">
+      <Filter>02. GameObjects\Player2\Player_State\PlayerState_Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_State.cpp">
+      <Filter>02. GameObjects\Player2\Player_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player2_Body.cpp">
+      <Filter>02. GameObjects\Player2\Player2_Parts\Player2_Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player2_Parts.cpp">
+      <Filter>02. GameObjects\Player2\Player2_Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player2_Head.cpp">
+      <Filter>02. GameObjects\Player2\Player2_Parts\Player2_Head</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

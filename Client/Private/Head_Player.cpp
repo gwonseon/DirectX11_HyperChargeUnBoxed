@@ -27,7 +27,7 @@ HRESULT CHead_Player::Initialize(void* pArg)
 	m_iViewState = pDesc->m_iViewState;
 	m_iWeaponState =  pDesc->m_iWeaponState;
 	m_eLevelID = pDesc->m_eLevelID;
-	/* 추가적으로 초기화가 필요하다면 수행해준다. */
+	/* 추가적으로 초기화가 필요하다면 수행해준다.m_iWeaponState */
 	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 	if(FAILED(Add_Components()))
@@ -50,34 +50,7 @@ void CHead_Player::Priority_Update(_float fTimeDelta)
 
 void CHead_Player::Update(_float fTimeDelta)
 {
-	if(m_bTPSState == true)
-	{
-		_long MouseMoveY = {0};
-		if(MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
-		{
-			if(m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
-				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
-			if(m_fAngle_Y > 60.f)
-				m_fAngle_Y = 60.f;
-			if(m_fAngle_Y < -60.f)
-				m_fAngle_Y = -60.f;
-		}
-		//	m_pTransformCom->Rotation(XMConvertToRadians(m_fAngle_Y), XMConvertToRadians(Rotation.y), XMConvertToRadians(Rotation.z));
-		m_pTransformCom->Turn(false,false,true,fTimeDelta * MouseMoveY * -0.1f);
-	} else
-	{
-		_long MouseMoveY = {0};
-		if(MouseMoveY = m_pGameInstance->Get_DIMouseMove(DIMS_Y))
-		{
-			if(m_fAngle_Y <= 80.f && m_fAngle_Y >= -80.f)
-				m_fAngle_Y += fTimeDelta * MouseMoveY * 4.f;
-			if(m_fAngle_Y > 60.f)
-				m_fAngle_Y = 60.f;
-			if(m_fAngle_Y < -60.f)
-				m_fAngle_Y = -60.f;
-		}
-		m_pTransformCom->Turn(false,false,true,fTimeDelta * MouseMoveY * 0.1f);
-	}
+
 }
 
 void CHead_Player::Late_Update(_float fTimeDelta)
@@ -194,13 +167,11 @@ HRESULT CHead_Player::Bind_ShaderResources()
 CHead_Player* CHead_Player::Create(ID3D11Device* pDevice,ID3D11DeviceContext* pContext)
 {
 	CHead_Player* pInstance = new CHead_Player(pDevice,pContext);
-
 	if(FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CHead_Player");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 
@@ -213,7 +184,6 @@ CGameObject* CHead_Player::Clone(void* pArg)
 		MSG_BOX("Failed to Created : CHead_Player");
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

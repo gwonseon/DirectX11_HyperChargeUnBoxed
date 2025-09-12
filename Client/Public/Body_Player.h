@@ -20,9 +20,7 @@ public:
 		const _uint* pParentState_Upper = {nullptr};
 		const _uint* pParentState_Lower = {nullptr};
 		_bool* m_bAttackState = {nullptr};
-
 	}BODY_PLAYER_DESC;
-
 
 	enum PLAYER_ANIM {
 		PLAYER_ANIM_Aim_Pistol_CC,
@@ -170,7 +168,6 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
-
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;

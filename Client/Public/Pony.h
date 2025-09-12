@@ -50,7 +50,7 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 
-public: // »óÅÂÆÐÅÏ
+public:
 	void ChangeState(CPony_State* pNewState)
 	{
 		if(m_pCurrentState)
