@@ -1,11 +1,5 @@
 # [DirectX 11] Hypercharge Unboxed 모작
 
-<div align="center">
-<a href="https://youtu.be/l3Br0U6yNuE">
-  <img src="https://img.youtube.com/vi/l3Br0U6yNuE/maxresdefault.jpg" width="900" alt="Hypercharge Unboxed 전체 플레이 영상" />
-</a>
-</div>
-
 DirectX 11로 Hypercharge Unboxed를 모작한 개인 프로젝트입니다. FPS/TPS 슈팅에 디펜스 요소를 더해 적 웨이브를 막고, 건축 시간에는 트랩을 설치할 수 있도록 구현했습니다.
 
 ### 개인 프로젝트
@@ -14,6 +8,7 @@ DirectX 11로 Hypercharge Unboxed를 모작한 개인 프로젝트입니다. FPS
 - 리팩터링 기간 : 2025.07.15 ~ 2025.08.18
 - 장르 : FPS / TPS, 슈팅, 디펜스
 - 개발 환경 : C++, DirectX 11, HLSL, ImGui
+- 플레이 영상 : [YouTube](https://youtu.be/l3Br0U6yNuE)
 
 # 구현 내용
 
@@ -47,9 +42,7 @@ Navigation Cell이 1,000개 이상인 복잡한 맵에서 몬스터 20마리 이
 ## 2. Bloom 구현 및 깜빡임 해결
 
 <div align="center">
-  <a href="https://youtu.be/E-cgszaGbQ0">
-    <img src="https://img.youtube.com/vi/E-cgszaGbQ0/hqdefault.jpg" width="720" alt="Bloom 깜빡임 문제 해결 영상" />
-  </a>
+  <img src="docs/images/hypercharge-bloom.gif" width="560" alt="Bloom 구현과 깜빡임 개선 과정" />
 </div>
 
 총구 화염과 폭발처럼 강한 빛을 표현하기 위해 Bloom 후처리를 구현했습니다.
@@ -102,9 +95,7 @@ Navigation Cell이 1,000개 이상인 복잡한 맵에서 몬스터 20마리 이
 ## 6. 트랩 건축 시스템
 
 <div align="center">
-  <a href="https://youtu.be/Rrm0McuzFgY">
-    <img src="https://img.youtube.com/vi/Rrm0McuzFgY/hqdefault.jpg" width="720" alt="트랩 건축 시스템 동작 영상" />
-  </a>
+  <img src="docs/images/hypercharge-building-system.gif" width="640" alt="트랩 건축 가능 여부를 색상으로 표시하는 과정" />
 </div>
 
 건축·정비 시간에 아이템과 코인을 사용해 정해진 위치에 트랩을 설치합니다. 설치 가능 여부는 Shader 색상으로 구분했습니다.
